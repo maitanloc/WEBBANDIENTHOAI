@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+    // Expect ViewBag.TotalUsers, ViewBag.TotalCustomers, ViewBag.TotalProducts etc set by controller
+}
+<h1>Dashboard</h1>
+
+<div class="dashboard">
+    <div class="card">
+        <h3>Nhân viên / Users</h3>
+        <div class="value">@ViewBag.TotalUsers ?? "—"</div>
+        <div class="small">Tổng số tài khoản nhân viên</div>
+    </div>
+
+    <div class="card">
+        <h3>Khách hàng</h3>
+        <div class="value">@ViewBag.TotalCustomers ?? "—"</div>
+        <div class="small">Tổng số khách hàng đã đăng ký</div>
+    </div>
+
+    <div class="card">
+        <h3>Sản phẩm</h3>
+        <div class="value">@ViewBag.TotalProducts ?? "—"</div>
+        <div class="small">Tổng số sản phẩm trong catalog</div>
+    </div>
+</div>
+
+<div class="card table-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="margin:0">Danh sách nhân viên</h3>
+        <a class="btn" href="@Url.Action("AddStaff","Admin")">Thêm nhân viên</a>
+    </div>
+
+    @Html.Partial("StaffListPartial")
+</div>

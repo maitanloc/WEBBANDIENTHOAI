@@ -1,0 +1,102 @@
+﻿/* admin.css - dashboard + tables */
+:root {
+    --bg-dark: #071029;
+    --card: rgba(255,255,255,0.03);
+    --accent-or: #f7931e;
+    --accent-purple: #6d44b8;
+    --muted: #9fb0c9;
+    --radius: 12px;
+    font-family: 'Jost', sans-serif;
+}
+
+/* container provided by layout */
+.container {
+    max-width: 1200px;
+    margin: 28px auto;
+    padding: 0 18px;
+    color: #eaf3ff;
+}
+
+/* Dashboard grid */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    padding: 18px;
+    border-radius: var(--radius);
+    box-shadow: 0 8px 26px rgba(2,6,23,0.6);
+}
+
+    .card h3 {
+        margin: 0 0 8px;
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 700;
+    }
+
+    .card .value {
+        font-size: 28px;
+        font-weight: 900;
+        margin-top: 6px;
+        color: var(--accent-or);
+    }
+
+/* staff table */
+.table-wrap {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #dff3ff;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px dashed rgba(255,255,255,0.03);
+}
+
+th {
+    background: linear-gradient(90deg,#111827, #071029);
+    font-weight: 700;
+    color: #fff;
+}
+
+tr:hover {
+    background: linear-gradient(90deg, rgba(247,147,30,0.04), rgba(109,68,184,0.02));
+}
+
+/* actions */
+.btn {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 0;
+    color: #072226;
+    background: var(--accent-or);
+    text-decoration: none;
+}
+
+    .btn.ghost {
+        background: transparent;
+        color: var(--muted);
+        border: 1px solid rgba(255,255,255,0.04);
+    }
+
+/* small screens */
+@media (max-width:980px) {
+    .dashboard {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}

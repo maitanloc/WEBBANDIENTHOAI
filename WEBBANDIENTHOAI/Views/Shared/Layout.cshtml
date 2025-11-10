@@ -1,0 +1,70 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    var role = Context.Session.GetString("RoleName") ?? "";
+    var username = Context.Session.GetString("Username") ?? "";
+    Layout = null; // top-level layout
+}
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>@ViewData["Title"] - PhoneShop</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/auth.css" />
+    <link rel="stylesheet" href="~/css/admin.css" />
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="@Url.Action("Index","Home")">
+                <span class="logo-mark">PH</span>
+                <span class="brand-title">PhoneShop</span>
+            </a>
+
+            <nav class="main-nav">
+                <a href="@Url.Action("Index","Home")">Home</a>
+                <a href="@Url.Action("Index","Product")">Products</a>
+
+                @if (role == "Admin")
+                {
+                    <a class="nav-admin" href="@Url.Action("Index","Admin")">Admin Dashboard</a>
+                }
+                else if (role == "Staff")
+                {
+                    <a class="nav-staff" href="@Url.Action("Index","Staff")">Staff Panel</a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Index","Cart")">Cart</a>
+                }
+            </nav>
+
+            <div class="header-actions">
+                @if (!string.IsNullOrEmpty(username))
+                {
+                    <span class="hello">Xin chào, <strong>@username</strong></span>
+                    <a class="btn-ghost" href="@Url.Action("Logout","Account")">Đăng xuất</a>
+                }
+                else
+                {
+                    <a class="btn" href="@Url.Action("Login","Account")">Đăng nhập</a>
+                    <a class="btn-ghost" href="@Url.Action("Register","Account")">Đăng ký</a>
+                }
+            </div>
+        </div>
+    </header>
+
+    <main role="main" class="container">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            © @DateTime.Now.Year - PhoneShop • FPT Polytechnic style
+        </div>
+    </footer>
+</body>
+</html>

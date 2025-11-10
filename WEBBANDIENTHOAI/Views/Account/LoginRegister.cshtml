@@ -1,0 +1,186 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Đăng nhập / Đăng ký";
+    var error = ViewBag.Error as string;
+    var message = ViewBag.Message as string;
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+}
+
+<main class="auth-v2" role="main" aria-labelledby="auth-title">
+  <div class="auth-card-v2" role="region" aria-label="Authentication card">
+    <aside class="visual-side" aria-hidden="true">
+      <div class="brand">
+        <div class="logo">PH</div>
+        <h1 id="auth-title">WEBBANDIENTHOAI</h1>
+        <p class="tag">Điện thoại • Laptop • TV • Phụ kiện — Giao diện chuyên nghiệp</p>
+      </div>
+
+      <div class="device-mock" aria-hidden="true">
+        <div class="device-screen">
+          <div class="chip" aria-hidden="true"></div>
+          <div class="wave wave-1" aria-hidden="true"></div>
+          <div class="wave wave-2" aria-hidden="true"></div>
+          <div class="badge">FAST • SECURE</div>
+        </div>
+      </div>
+
+      <ul class="features" aria-hidden="true">
+        <li><i class="fa-solid fa-shield-halved"></i><span>Thanh toán an toàn</span></li>
+        <li><i class="fa-solid fa-truck-fast"></i><span>Giao nhanh trong ngày</span></li>
+        <li><i class="fa-solid fa-headset"></i><span>Hỗ trợ 24/7</span></li>
+      </ul>
+
+      <div class="visual-footer">Đăng ký nhận ưu đãi • Hoàn tiền • Miễn phí vận chuyển</div>
+    </aside>
+
+    <section class="form-side" aria-label="Authentication forms">
+      <div class="top">
+        <div class="switch" role="tablist" aria-label="Auth tabs">
+          <button id="tabLogin" class="tab active" aria-pressed="true" aria-controls="loginForm">Đăng nhập</button>
+          <button id="tabRegister" class="tab" aria-pressed="false" aria-controls="registerForm">Đăng ký</button>
+        </div>
+        <div class="tiny">Nhanh — An toàn — Uy tín</div>
+      </div>
+
+      @if (!string.IsNullOrEmpty(error))
+      {
+          <div class="alert error" role="alert">@error</div>
+      }
+      @if (!string.IsNullOrEmpty(message))
+      {
+          <div class="alert success" role="status">@message</div>
+      }
+
+      <!-- LOGIN -->
+      <form id="loginForm" class="auth-form" asp-controller="Account" asp-action="Login" method="post" novalidate>
+        @Html.AntiForgeryToken()
+        <div class="input-wrap">
+          <label class="floating">
+            <input name="usernameOrEmail" type="text" required autocomplete="username" />
+            <span> Email hoặc tên đăng nhập </span>
+            <i class="fa-solid fa-user"></i>
+          </label>
+        </div>
+
+        <div class="input-wrap">
+          <label class="floating">
+            <input name="password" type="password" required autocomplete="current-password" />
+            <span> Mật khẩu </span>
+            <i class="fa-solid fa-lock"></i>
+            <button type="button" class="show-pass" aria-label="Hiện mật khẩu"><i class="fa-solid fa-eye"></i></button>
+          </label>
+        </div>
+
+        <div class="row-between">
+          <label class="check"><input type="checkbox" name="remember" /> Ghi nhớ</label>
+          <a class="link-muted" href="@Url.Action("Forgot","Account")">Quên mật khẩu?</a>
+        </div>
+
+        <button class="btn primary" type="submit">Đăng nhập</button>
+
+        <div class="or"><span>hoặc</span></div>
+
+        <div class="socials">
+          <button type="button" class="btn ghost"><i class="fa-brands fa-google"></i> Đăng nhập bằng Google</button>
+          <button type="button" class="btn ghost"><i class="fa-brands fa-facebook"></i> Facebook</button>
+        </div>
+      </form>
+
+      <!-- REGISTER -->
+      <form id="registerForm" class="auth-form" asp-controller="Account" asp-action="Register" method="post" style="display:none" novalidate>
+        @Html.AntiForgeryToken()
+        <div class="input-wrap two-cols">
+          <label class="floating">
+            <input name="fullname" type="text" required />
+            <span>Họ và tên</span>
+          </label>
+          <label class="floating">
+            <input name="phone" type="tel" />
+            <span>Số điện thoại</span>
+          </label>
+        </div>
+
+        <div class="input-wrap">
+          <label class="floating">
+            <input name="email" type="email" required />
+            <span>Email</span>
+          </label>
+        </div>
+
+        <div class="input-wrap two-cols">
+          <label class="floating">
+            <input name="password" type="password" required />
+            <span>Mật khẩu</span>
+          </label>
+          <label class="floating">
+            <input name="address" type="text" />
+            <span>Địa chỉ (tùy chọn)</span>
+          </label>
+        </div>
+
+        <div class="row-between small">
+          <label class="check"><input type="checkbox" name="terms" required/> Tôi đồng ý Điều khoản</label>
+        </div>
+
+        <button class="btn primary" type="submit">Tạo tài khoản</button>
+
+        <div class="or" style="margin-top:12px"><span>hoặc</span></div>
+        <div class="socials">
+          <button type="button" class="btn ghost"><i class="fa-brands fa-google"></i> Tiếp tục với Google</button>
+        </div>
+      </form>
+
+      <footer class="auth-footer" aria-hidden="true">
+        © FPT Polytechnic - WEBBANDIENTHOAI
+      </footer>
+    </section>
+  </div>
+</main>
+
+@section Scripts {
+<script>
+  (function () {
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+
+    function showLogin() {
+      tabLogin.classList.add('active'); tabLogin.setAttribute('aria-pressed', 'true');
+      tabRegister.classList.remove('active'); tabRegister.setAttribute('aria-pressed', 'false');
+      registerForm.style.display = 'none';
+      loginForm.style.display = 'block';
+    }
+    function showRegister() {
+      tabRegister.classList.add('active'); tabRegister.setAttribute('aria-pressed', 'true');
+      tabLogin.classList.remove('active'); tabLogin.setAttribute('aria-pressed', 'false');
+      loginForm.style.display = 'none';
+      registerForm.style.display = 'block';
+    }
+
+    tabLogin.addEventListener('click', showLogin);
+    tabRegister.addEventListener('click', showRegister);
+
+    // show/hide password
+    document.querySelectorAll('.show-pass').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const inp = e.currentTarget.parentElement.querySelector('input');
+        if (inp.type === 'password') { inp.type = 'text'; e.currentTarget.innerHTML = '<i class="fa-solid fa-eye-slash"></i>'; }
+        else { inp.type = 'password'; e.currentTarget.innerHTML = '<i class="fa-solid fa-eye"></i>'; }
+      });
+    });
+
+    // floating label behavior & prefill check
+    document.querySelectorAll('.floating input').forEach(i => {
+      i.addEventListener('blur', e => {
+        if (e.target.value.trim() !== '') e.target.classList.add('has-val'); else e.target.classList.remove('has-val');
+      });
+      if (i.value.trim() !== '') i.classList.add('has-val');
+    });
+  })();
+</script>
+}
