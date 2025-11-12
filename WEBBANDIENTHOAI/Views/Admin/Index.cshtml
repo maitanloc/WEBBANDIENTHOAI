@@ -1,34 +1,216 @@
 ﻿@{
-    ViewData["Title"] = "Admin Dashboard";
-    // Expect ViewBag.TotalUsers, ViewBag.TotalCustomers, ViewBag.TotalProducts etc set by controller
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Trang Chủ — Admin";
 }
-<h1>Dashboard</h1>
 
-<div class="dashboard">
-    <div class="card">
-        <h3>Nhân viên / Users</h3>
-        <div class="value">@ViewBag.TotalUsers ?? "—"</div>
-        <div class="small">Tổng số tài khoản nhân viên</div>
+<!-- Main markup copied from your HTML body -->
+<div class="aurora" aria-hidden="true"></div>
+
+<div class="flex h-screen w-full">
+  <!-- SIDEBAR -->
+  <aside class="flex w-64 flex-col bg-white p-4 border-r border-gray-200 z-20" aria-label="Sidebar">
+    <div class="flex items-center gap-3 p-3 text-gray-800">
+      <span class="material-symbols-outlined text-primary text-3xl">store</span>
+      <h2 class="text-xl font-bold">WebBánĐiệnThoại</h2>
     </div>
 
-    <div class="card">
-        <h3>Khách hàng</h3>
-        <div class="value">@ViewBag.TotalCustomers ?? "—"</div>
-        <div class="small">Tổng số khách hàng đã đăng ký</div>
-    </div>
+    <div class="flex h-full flex-col justify-between mt-6">
+      <nav aria-label="Chức năng chính" class="flex-1">
+        <ul class="flex flex-col gap-2" id="main-nav">
+          <li><a href="#dashboard" class="nav-link nav-link--active rounded-lg py-2" aria-current="page" title="Trang chính"><span class="material-symbols-outlined nav-icon">dashboard</span><span class="text-primary text-sm font-medium">Trang Chủ</span></a></li>
+          <li><a href="#products" class="nav-link rounded-lg py-2" title="Quản lý sản phẩm"><span class="material-symbols-outlined nav-icon">smartphone</span><span class="text-sm font-medium">Sản Phẩm</span></a></li>
+          <li><a href="#categories" class="nav-link rounded-lg py-2" title="Danh mục &amp; Hãng"><span class="material-symbols-outlined nav-icon">category</span><span class="text-sm font-medium">Loại &amp; Hãng</span></a></li>
+          <li><a href="#orders" class="nav-link rounded-lg py-2" title="Quản lý đơn hàng"><span class="material-symbols-outlined nav-icon">receipt_long</span><span class="text-sm font-medium">Đặt Hàng</span></a></li>
+          <li><a href="#customers" class="nav-link rounded-lg py-2" title="Quản lý khách hàng"><span class="material-symbols-outlined nav-icon">people</span><span class="text-sm font-medium">Khách Hàng</span></a></li>
+          <li><a href="#staff" class="nav-link rounded-lg py-2" title="Quản lý nhân viên"><span class="material-symbols-outlined nav-icon">group</span><span class="text-sm font-medium">Nhân Viên</span></a></li>
+          <li><a href="#warehouse" class="nav-link rounded-lg py-2" title="Quản lý kho"><span class="material-symbols-outlined nav-icon">inventory_2</span><span class="text-sm font-medium">Kho Hàng</span></a></li>
+          <li><a href="#promos" class="nav-link rounded-lg py-2" title="Khuyến mãi &amp; coupon"><span class="material-symbols-outlined nav-icon">local_offer</span><span class="text-sm font-medium">Khuyến Mãi</span></a></li>
+          <li><a href="#shipping" class="nav-link rounded-lg py-2" title="Quản lý Vận Chuyển"><span class="material-symbols-outlined nav-icon">local_shipping</span><span class="text-sm font-medium">Vận Chuyển</span></a></li>
+          <li><a href="#reports" class="nav-link rounded-lg py-2" title="Báo cáo &amp; Thống kê"><span class="material-symbols-outlined nav-icon">assessment</span><span class="text-sm font-medium">Báo Cáo</span></a></li>
+          <li><a href="#audit" class="nav-link rounded-lg py-2" title="Nhật ký hệ thống"><span class="material-symbols-outlined nav-icon">history</span><span class="text-sm font-medium">Nhật Ký</span></a></li>
+          <li><a href="#support" class="nav-link rounded-lg py-2" title="Hỗ trợ khách hàng"><span class="material-symbols-outlined nav-icon">support_agent</span><span class="text-sm font-medium">Hỗ Trợ</span></a></li>
+          <li><a href="#importexport" class="nav-link rounded-lg py-2" title="Import / Export dữ liệu"><span class="material-symbols-outlined nav-icon">import_export</span><span class="text-sm font-medium">Import/Export</span></a></li>
+        </ul>
+      </nav>
 
-    <div class="card">
-        <h3>Sản phẩm</h3>
-        <div class="value">@ViewBag.TotalProducts ?? "—"</div>
-        <div class="small">Tổng số sản phẩm trong catalog</div>
-    </div>
-</div>
+      <div class="flex flex-col gap-4 border-t border-gray-200 pt-4">
+        <div class="flex gap-3 items-center">
+          <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-orange-50 text-primary font-semibold">AD</div>
+          <div class="flex flex-col">
+            <h1 class="text-gray-800 text-sm font-medium">Admin User</h1>
+            <p class="text-gray-500 text-xs">administrator@example.com</p>
+          </div>
+        </div>
 
-<div class="card table-wrap">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <h3 style="margin:0">Danh sách nhân viên</h3>
-        <a class="btn" href="@Url.Action("AddStaff","Admin")">Thêm nhân viên</a>
-    </div>
+        <a id="nav-logout" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer" href="#logout" title="Đăng xuất">
+          <span class="material-symbols-outlined">logout</span>
+          <p class="text-sm font-medium">Đăng Xuất</p>
+        </a>
 
-    @Html.Partial("StaffListPartial")
+        <div class="mt-auto text-xs text-gray-600/70 pt-4">
+          <span>© 2025 WebBánĐiệnThoại</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 flex flex-col overflow-y-auto relative z-10">
+    <!-- HEADER -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-gray-200 px-6 py-3 bg-white sticky top-0 z-30">
+      <div class="flex items-center gap-3">
+        <button class="mobile-sidebar-toggle inline-flex items-center justify-center h-10 w-10 rounded-lg bg-white border border-gray-200 icon-btn focus-ring" aria-label="Mở menu (mobile)">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+
+        <label class="flex flex-col min-w-40 !h-10 max-w-md w-full">
+          <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+            <div class="text-gray-400 flex bg-gray-100 items-center justify-center pl-4 rounded-l-lg">
+              <span class="material-symbols-outlined">search</span>
+            </div>
+            <input id="global-search" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-800 focus:outline-0 focus:ring-2 focus:ring-primary border-none bg-gray-100 h-full placeholder:text-gray-400 px-4 text-base" placeholder="Tìm: sản phẩm, đơn hàng, khách..." />
+          </div>
+        </label>
+      </div>
+
+      <div class="flex flex-1 justify-end gap-3 items-center">
+        <!-- Quick action dropdown -->
+        <div class="relative dropdown" id="quick-root">
+          <button id="quick-actions-btn" class="flex items-center gap-2 rounded-lg h-10 px-3 bg-white text-sm border border-gray-200 icon-btn focus-ring" title="Quick actions" aria-haspopup="true" aria-expanded="false">
+            <span class="material-symbols-outlined text-primary">bolt</span>
+            <span class="action-truncate text-sm">Quick Actions</span>
+            <span class="material-symbols-outlined text-gray-400">expand_more</span>
+          </button>
+
+          <div class="dropdown-menu" id="quick-dropdown" role="menu" aria-label="Quick actions menu" tabindex="-1">
+            <button role="menuitem" id="qa-add-product" class="">➕ Thêm Sản Phẩm</button>
+            <button role="menuitem" id="qa-add-staff">👤 Thêm Nhân Viên</button>
+            <button role="menuitem" id="qa-import">📤 Import Excel</button>
+            <button role="menuitem" id="qa-export">📥 Export báo cáo</button>
+            <button role="menuitem" id="qa-create-coupon">💸 Tạo mã giảm giá</button>
+            <hr class="my-1" />
+            <button role="menuitem" id="qa-nhapkho">📦 Nhập kho</button>
+            <button role="menuitem" id="qa-xuatkho">🚚 Xuất kho</button>
+          </div>
+        </div>
+
+        <!-- Import / Export -->
+        <button id="btn-import" class="flex h-10 items-center gap-2 rounded-lg px-3 bg-white border border-gray-200 text-sm btn-icon focus-ring" title="Import CSV">
+          <span class="material-symbols-outlined text-gray-600">file_upload</span><span class="text-sm text-gray-800">Import</span>
+        </button>
+
+        <button id="btn-export" class="flex h-10 items-center gap-2 rounded-lg px-3 bg-white border border-gray-200 text-sm btn-icon focus-ring" title="Export CSV">
+          <span class="material-symbols-outlined text-gray-600">file_download</span><span class="text-sm text-gray-800">Export</span>
+        </button>
+
+        <!-- Nhập kho / Xuất kho (toolbar) -->
+        <button id="btn-nhapkho" class="flex h-10 items-center gap-2 rounded-lg px-3 bg-white border border-gray-200 text-sm btn-icon focus-ring" title="Nhập kho">
+          <span class="material-symbols-outlined text-gray-600">inventory_2</span><span class="text-sm text-gray-800">Nhập kho</span>
+        </button>
+
+        <button id="btn-xuatkho" class="flex h-10 items-center gap-2 rounded-lg px-3 bg-white border border-gray-200 text-sm btn-icon focus-ring" title="Xuất kho">
+          <span class="material-symbols-outlined text-gray-600">outbound</span><span class="text-sm text-gray-800">Xuất kho</span>
+        </button>
+
+        <!-- Add product -->
+        <button id="btn-add-product" class="flex items-center justify-center min-w-[84px] h-10 px-4 bg-primary text-white text-sm font-bold rounded-lg btn-icon focus-ring" title="Thêm sản phẩm mới">
+          <span class="material-symbols-outlined">add_circle</span><span class="truncate">Thêm Sản Phẩm</span>
+        </button>
+
+        <!-- avatar (initials) -->
+        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center text-primary font-semibold">AD</div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="p-6 sm:p-8 lg:p-10 space-y-8">
+      <div class="flex flex-wrap justify-between items-start gap-4">
+        <div>
+          <p class="text-gray-900 text-3xl font-black leading-tight tracking-[-0.033em]">Trang Chủ</p>
+          <p class="text-gray-500 mt-1">Chào mừng bạn đã quay trở lại</p>
+        </div>
+
+        <div class="flex gap-3 items-center">
+          <button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white px-4 border border-gray-200 text-sm">
+            <p class="text-gray-800 text-sm font-medium">30 ngày trước</p><span class="material-symbols-outlined text-gray-500">expand_more</span>
+          </button>
+
+          <button class="flex h-10 items-center gap-2 rounded-lg px-3 bg-white border border-gray-200 text-sm btn-icon focus-ring" title="Báo cáo">
+            <span class="material-symbols-outlined text-gray-600">insights</span><span class="text-sm">Báo Cáo</span>
+          </button>
+
+          <button class="flex h-10 items-center gap-2 rounded-lg px-3 bg-white border border-gray-200 text-sm btn-icon focus-ring" title="Khuyến mãi">
+            <span class="material-symbols-outlined text-gray-600">local_offer</span><span class="text-sm">Khuyến Mãi</span>
+          </button>
+
+          <button class="flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold btn-icon focus-ring" title="Thêm sản phẩm">
+            <span class="material-symbols-outlined">add_circle</span><span class="truncate">Thêm Sản Phẩm</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="kpi-card flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white border border-gray-200">
+          <p class="text-gray-600 text-base font-medium">Total Doanh Thu</p>
+          <p class="text-gray-900 tracking-light text-3xl font-bold">$1,250,450</p>
+          <p class="text-green-500 text-sm font-medium flex items-center gap-1"><span class="material-symbols-outlined text-base">arrow_upward</span>+2.5%</p>
+        </div>
+        <div class="kpi-card flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white border border-gray-200">
+          <p class="text-gray-600 text-base font-medium">Tổng tiền hôm nay</p>
+          <p class="text-gray-900 tracking-light text-3xl font-bold">$12,830</p>
+          <p class="text-green-500 text-sm font-medium flex items-center gap-1"><span class="material-symbols-outlined text-base">arrow_upward</span>+1.8%</p>
+        </div>
+        <div class="kpi-card flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white border border-gray-200">
+          <p class="text-gray-600 text-base font-medium">Đơn mới</p>
+          <p class="text-gray-900 tracking-light text-3xl font-bold">256</p>
+          <p class="text-red-500 text-sm font-medium flex items-center gap-1"><span class="material-symbols-outlined text-base">arrow_downward</span>-0.5%</p>
+        </div>
+        <div class="kpi-card flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white border border-gray-200">
+          <p class="text-gray-600 text-base font-medium">Sắp hết</p>
+          <p class="text-gray-900 tracking-light text-3xl font-bold">15</p>
+          <p class="text-gray-500 text-sm font-medium flex items-center gap-1">3 items critical</p>
+        </div>
+      </div>
+
+      <!-- Charts + Orders (placeholders) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 p-6 bg-white rounded-xl border border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-800">Doanh thu theo thời gian</h3>
+          <div class="mt-4 h-80 flex items-center justify-center bg-gray-50 rounded-lg">
+            <div class="text-gray-400">[Line chart placeholder]</div>
+          </div>
+
+          <div class="p-6 bg-white rounded-xl border border-gray-200 mt-6">
+            <h3 class="text-lg font-semibold text-gray-800">Tình trạng hàng tồn kho</h3>
+            <div class="mt-4 h-48 flex items-center justify-center">
+              <div class="text-gray-400">[Donut chart placeholder]</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 bg-white rounded-xl border border-gray-200 table-card">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Đơn đặt hàng gần đây</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500">
+              <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr><th class="px-6 py-3">Mã Đơn</th><th class="px-6 py-3">Nhân Viên</th><th class="px-6 py-3">Ngày</th><th class="px-6 py-3">Trạng Thái</th><th class="px-6 py-3 text-right">Tổng tiền</th></tr>
+              </thead>
+              <tbody>
+                <tr class="bg-white border-b hover:bg-gray-50"><th class="px-6 py-4 font-medium text-gray-900">#ORD-00124</th><td class="px-6 py-4">John Doe</td><td class="px-6 py-4">2023-10-26</td><td class="px-6 py-4"><span class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Shipped</span></td><td class="px-6 py-4 text-right">$1,299.00</td></tr>
+                <tr class="bg-white border-b hover:bg-gray-50"><th class="px-6 py-4 font-medium text-gray-900">#ORD-00123</th><td class="px-6 py-4">Jane Smith</td><td class="px-6 py-4">2023-10-25</td><td class="px-6 py-4"><span class="inline-flex items-center bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Processing</span></td><td class="px-6 py-4 text-right">$999.00</td></tr>
+                <tr class="bg-white border-b hover:bg-gray-50"><th class="px-6 py-4 font-medium text-gray-900">#ORD-00122</th><td class="px-6 py-4">Peter Jones</td><td class="px-6 py-4">2023-10-25</td><td class="px-6 py-4"><span class="inline-flex items-center bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Cancelled</span></td><td class="px-6 py-4 text-right">$750.50</td></tr>
+                <tr class="bg-white hover:bg-gray-50"><th class="px-6 py-4 font-medium text-gray-900">#ORD-00121</th><td class="px-6 py-4">Maria Garcia</td><td class="px-6 py-4">2023-10-24</td><td class="px-6 py-4"><span class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Delivered</span></td><td class="px-6 py-4 text-right">$1,450.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-4 flex gap-2">
+            <button class="flex-1 rounded-lg px-3 py-2 border border-gray-200 bg-white text-sm">Xem tất cả đơn</button>
+            <button class="rounded-lg px-3 py-2 bg-primary text-white text-sm">Xuất báo cáo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>
