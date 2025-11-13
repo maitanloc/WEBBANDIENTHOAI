@@ -3,6 +3,71 @@
     ViewData["Title"] = "Trang Chủ — Admin";
 }
 
+<style>
+    .Btn {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 45px;
+        height: 45px;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.15);
+        background-color: rgb(255, 65, 65);
+    }
+
+    .sign {
+        width: 100%;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .sign svg {
+            width: 17px;
+        }
+
+            .sign svg path {
+                fill: white;
+            }
+
+    .text {
+        position: absolute;
+        right: 0;
+        width: 0;
+        opacity: 0;
+        color: white;
+        font-size: 0.95em; /* giảm từ 1.2em xuống để phù hợp hơn */
+        font-weight: 500; /* nhẹ hơn một chút để đồng bộ với font dashboard */
+        transition: all 0.3s ease;
+    }
+
+    .Btn:hover {
+        width: 150px; /* nhỏ hơn 190px cho vừa với sidebar */
+        border-radius: 30px;
+    }
+
+        .Btn:hover .sign {
+            width: 35%;
+            padding-left: 10px;
+        }
+
+        .Btn:hover .text {
+            opacity: 1;
+            width: 65%;
+            padding-right: 10px;
+        }
+
+    .Btn:active {
+        transform: translate(2px, 2px);
+    }
+</style>
+
 <div class="flex h-screen w-full">
   <!-- SIDEBAR -->
   <aside class="flex w-64 flex-col bg-white p-4 border-r border-gray-200 z-20" aria-label="Sidebar">
@@ -31,10 +96,22 @@
           </div>
         </div>
 
-        <a id="nav-logout" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer" href="@Url.Action("Logout","Account")" title="Đăng xuất">
-          <span class="material-symbols-outlined">logout</span>
-          <p class="text-sm font-medium">Đăng Xuất</p>
-        </a>
+                <button id="nav-logout" class="Btn" title="Đăng Xuất">
+                    <div class="sign">
+                        <svg viewBox="0 0 512 512" height="1em" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M497 273l-80 80c-15 15-41 4-41-17v-48H192c-8 0-15-7-15-15v-34c0-8 7-15 15-15h184v-48c0-21 26-32 41-17l80 80c9 9 9 25 0 34zM272 80v48c0 8-7 15-15 15h-97v226h97c8 0 15 7 15 15v48c0 8-7 15-15 15H120c-22 0-40-18-40-40V105c0-22 18-40 40-40h137c8 0 15 7 15 15z" />
+                        </svg>
+                    </div>
+                    <div class="text">Đăng Xuất</div>
+                </button>
+
+                <script>
+                    document.getElementById("nav-logout").addEventListener("click", function() {
+                      if (confirm("Bạn có chắc muốn đăng xuất không?")) {
+                        window.location.href = "/Account/Logout"; // đổi URL cho đúng với route logout của bạn
+                      }
+                    });
+                </script>
 
         <div class="mt-auto text-xs text-gray-600/70 pt-4">
           <span>© 2025 WebBánĐiệnThoại</span>
