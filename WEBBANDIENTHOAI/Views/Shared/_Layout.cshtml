@@ -1,33 +1,39 @@
-﻿@{
-    Layout = null;
-    ViewData["Title"] = ViewData["Title"] ?? "Admin Dashboard — WebBánĐiệnThoại";
-}
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - WebBánĐiệnThoại</title>
 
-    <!-- Tailwind CDN (plugins forms, container queries) -->
+    <!-- Tailwind CDN (forms, container-queries) -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
-    <!-- Material Symbols + Inter font -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+    <!-- Fonts & icons -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
-    <!-- Admin CSS (tách ra) -->
-    <link rel="stylesheet" href="@(Url.Content("~/css/admin.css"))" />
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="~/css/admin.css" />
 
     @RenderSection("Styles", required: false)
 </head>
-<body class="font-display bg-background-light relative text-gray-800">
-    @RenderBody()
+<body class="font-display bg-background-light text-gray-800">
+    @* Aurora overlay sits behind layout content *@
+    <div class="aurora" aria-hidden="true"></div>
 
-    <!-- Admin JS (tách ra) -->
-    <script src="@(Url.Content("~/js/admin.js"))"></script>
+    <div id="app" class="min-h-screen">
+        @RenderBody()
+    </div>
+
+    <!-- Scripts injected at bottom for better perf -->
+    <script>
+      // Small helper to add/remove body class for theme if needed later
+      (function(){
+        // ready
+      })();
+    </script>
 
     @RenderSection("Scripts", required: false)
 </body>
