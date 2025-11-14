@@ -74,8 +74,40 @@ CREATE TABLE dbo.Categories
 );
 GO
 
--- Products - Updated: Removed Stock column, added StockCode, KEPT ALL OTHER COLUMNS
+IF OBJECT_ID('dbo.ProductStatuses', 'U') IS NOT NULL DROP TABLE dbo.ProductStatuses;
+
+CREATE TABLE dbo.ProductStatuses
+(
+    StatusId   TINYINT IDENTITY(1,1) PRIMARY KEY,
+    StatusName NVARCHAR(30)  NOT NULL UNIQUE,
+    Description NVARCHAR(150) NULL
+);
+GO
+
+    -- Dữ liệu trạng thái
+INSERT INTO dbo.ProductStatuses (StatusName, Description) VALUES
+('InStock',      N'Còn hàng'),
+('OutOfStock',   N'Hết hàng'),
+('PreOrder',     N'Đặt trước'),
+('Discontinued', N'Ngừng kinh doanh');
+GO
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+    
 IF OBJECT_ID('dbo.Products','U') IS NOT NULL DROP TABLE dbo.Products;
+
 CREATE TABLE dbo.Products
 (
     ProductId INT IDENTITY(1,1) PRIMARY KEY,
@@ -85,14 +117,18 @@ CREATE TABLE dbo.Products
     Brand NVARCHAR(100) NULL,
     Price DECIMAL(18,2) NOT NULL DEFAULT 0,
     OldPrice DECIMAL(18,2) NULL,
-    StockCode NVARCHAR(50) NOT NULL, -- Mã tồn kho thay vì số lượng
+    StockCode NVARCHAR(50) NOT NULL,
     Color NVARCHAR(100) NULL,
     Size NVARCHAR(100) NULL,
     DefaultImage NVARCHAR(300) NULL,
     ShortDescription NVARCHAR(1000) NULL,
     CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
-    IsActive BIT NOT NULL DEFAULT 1,
-    CONSTRAINT FK_Products_Categories FOREIGN KEY(CategoryId) REFERENCES dbo.Categories(CategoryId)
+    
+    -- THAY IsActive BIT → StatusId TINYINT
+    StatusId TINYINT NOT NULL DEFAULT 1, -- 1 = InStock
+
+    CONSTRAINT FK_Products_Categories FOREIGN KEY(CategoryId) REFERENCES dbo.Categories(CategoryId),
+    CONSTRAINT FK_Products_Status FOREIGN KEY(StatusId) REFERENCES dbo.ProductStatuses(StatusId)
 );
 GO
 
@@ -355,52 +391,54 @@ GO
  * Products (FULL VERSION - với đầy đủ các cột)
  ****************************************/
 
-INSERT INTO dbo.Products (CategoryId, SKU, Name, Brand, Price, OldPrice, StockCode, Color, Size, DefaultImage, ShortDescription)
+INSERT INTO dbo.Products 
+(
+    CategoryId, SKU, Name, Brand, Price, OldPrice, StockCode, 
+    Color, Size, DefaultImage, ShortDescription, StatusId
+)
 VALUES
 -- Smartphones (CategoryId = 1)
-(1,'IP16PM-001','iPhone 16 Pro Max','Apple',34990000,37990000,'STK-IP16PM-001','Titanium','6.7 inch','/images/iphone16promax.jpg','Chip A18 Pro, Camera 48MP, OLED'),
-(1,'IP16-001','iPhone 16','Apple',25990000,28990000,'STK-IP16-001','Black','6.1 inch','/images/iphone16.jpg','Chip A17, camera kép, MagSafe'),
-(1,'S24U-001','Samsung Galaxy S24 Ultra','Samsung',32990000,35990000,'STK-S24U-001','Phantom Black','6.8 inch','/images/s24ultra.jpg','Camera zoom up to 100x'),
-(1,'PX9P-001','Google Pixel 9 Pro','Google',25990000,27990000,'STK-PX9P-001','Seafoam','6.7 inch','/images/pixel9pro.jpg','AI camera'),
+(1,'IP16PM-001','iPhone 16 Pro Max','Apple',34990000,37990000,'STK-IP16PM-001','Titanium','6.7 inch','/images/iphone16promax.jpg','Chip A18 Pro, Camera 48MP, OLED', 1),
+(1,'IP16-001','iPhone 16','Apple',25990000,28990000,'STK-IP16-001','Black','6.1 inch','/images/iphone16.jpg','Chip A17, camera kép, MagSafe', 1),
+(1,'S24U-001','Samsung Galaxy S24 Ultra','Samsung',32990000,35990000,'STK-S24U-001','Phantom Black','6.8 inch','/images/s24ultra.jpg','Camera zoom up to 100x', 1),
+(1,'PX9P-001','Google Pixel 9 Pro','Google',25990000,27990000,'STK-PX9P-001','Seafoam','6.7 inch','/images/pixel9pro.jpg','AI camera', 1),
 
 -- Laptops (CategoryId = 2)
-(2,'MBP-16-2025','MacBook Pro 16 (M4)','Apple',64990000,69990000,'STK-MBP16-001','Space Gray','16 inch','/images/macbookpro16_m4.jpg','M4 chip, 16GB/1TB'),
-(2,'XPS-15-2025','Dell XPS 15','Dell',42990000,46990000,'STK-XPS15-001','Silver','15.6 inch','/images/dell_xps15.jpg','Intel i9, 32GB RAM'),
-(2,'RZ-17G-2025','Razer Blade 17','Razer',54990000,57990000,'STK-RZ17-001','Black','17 inch','/images/razerblade17.jpg','Gaming high-end, RTX'),
-(2,'AS-GF-15','Asus ROG Flow','ASUS',38990000,41990000,'STK-ASGF15-001','Black','15.6 inch','/images/asus_rog.jpg','Gaming lightweight'),
+(2,'MBP-16-2025','MacBook Pro 16 (M4)','Apple',64990000,69990000,'STK-MBP16-001','Space Gray','16 inch','/images/macbookpro16_m4.jpg','M4 chip, 16GB/1TB', 1),
+(2,'XPS-15-2025','Dell XPS 15','Dell',42990000,46990000,'STK-XPS15-001','Silver','15.6 inch','/images/dell_xps15.jpg','Intel i9, 32GB RAM', 1),
+(2,'RZ-17G-2025','Razer Blade 17','Razer',54990000,57990000,'STK-RZ17-001','Black','17 inch','/images/razerblade17.jpg','Gaming high-end, RTX', 1),
+(2,'AS-GF-15','Asus ROG Flow','ASUS',38990000,41990000,'STK-ASGF15-001','Black','15.6 inch','/images/asus_rog.jpg','Gaming lightweight', 1),
 
 -- Televisions (CategoryId = 3)
-(3,'OLED55-2025','LG OLED 55" C-Series','LG',24990000,27990000,'STK-OLED55-001','Black','55 inch','/images/lg_oled55.jpg','OLED 4K, Smart TV'),
-(3,'QLED65-2025','Samsung QLED 65"','Samsung',31990000,34990000,'STK-QLED65-001','Black','65 inch','/images/samsung_qled65.jpg','QLED 4K'),
+(3,'OLED55-2025','LG OLED 55" C-Series','LG',24990000,27990000,'STK-OLED55-001','Black','55 inch','/images/lg_oled55.jpg','OLED 4K, Smart TV', 1),
+(3,'QLED65-2025','Samsung QLED 65"','Samsung',31990000,34990000,'STK-QLED65-001','Black','65 inch','/images/samsung_qled65.jpg','QLED 4K', 1),
 
 -- Phone Accessories (CategoryId = 4)
-(4,'CASE-001','Ốp lưng chống sốc (Universal)','AccessoryBrand',299000,399000,'STK-CASE-001','Black','Universal','/images/case001.jpg','Ốp lưng bảo vệ cho nhiều dòng'),
-(4,'CHG-65W','Adapter sạc nhanh 65W','AccessoryBrand',399000,499000,'STK-CHG65W-001','White','Standard','/images/charger65w.jpg','Sạc PD 65W'),
-(4,'CABLE-USBC-1M','Cáp USB-C 1m','AccessoryBrand',99000,129000,'STK-CABLE-001','White','1m','/images/usb_cable.jpg','Cáp sạc & dữ liệu'),
-(4,'EAR-TRUE-WIRE','Tai nghe true wireless','AudioBrand',1990000,2490000,'STK-EARTW-001','White','In-ear','/images/earbuds1.jpg','ANC, Bluetooth 5.3'),
+(4,'CASE-001','Ốp lưng chống sốc (Universal)','AccessoryBrand',299000,399000,'STK-CASE-001','Black','Universal','/images/case001.jpg','Ốp lưng bảo vệ cho nhiều dòng', 1),
+(4,'CHG-65W','Adapter sạc nhanh 65W','AccessoryBrand',399000,499000,'STK-CHG65W-001','White','Standard','/images/charger65w.jpg','Sạc PD 65W', 1),
+(4,'CABLE-USBC-1M','Cáp USB-C 1m','AccessoryBrand',99000,129000,'STK-CABLE-001','White','1m','/images/usb_cable.jpg','Cáp sạc & dữ liệu', 1),
+(4,'EAR-TRUE-WIRE','Tai nghe true wireless','AudioBrand',1990000,2490000,'STK-EARTW-001','White','In-ear','/images/earbuds1.jpg','ANC, Bluetooth 5.3', 1),
 
 -- Computer Accessories (CategoryId = 5)
-(5,'MOUSE-G502','Logitech G502 HERO','Logitech',1290000,1490000,'STK-MOUSE-001','Black','Standard','/images/logitech_g502.jpg','Gaming mouse, high DPI'),
-(5,'KB-MECH-01','Bàn phím cơ RGB','KeyBrand',990000,1190000,'STK-KB01-001','Black','Full','/images/keyboard_mech.jpg','Hot-swap, RGB'),
-(5,'SSD-1TB','SSD NVMe 1TB','StorageBrand',2399000,2799000,'STK-SSD1TB-001','','M.2 2280','/images/ssd_1tb.jpg','Fast NVMe storage'),
+(5,'MOUSE-G502','Logitech G502 HERO','Logitech',1290000,1490000,'STK-MOUSE-001','Black','Standard','/images/logitech_g502.jpg','Gaming mouse, high DPI', 1),
+(5,'KB-MECH-01','Bàn phím cơ RGB','KeyBrand',990000,1190000,'STK-KB01-001','Black','Full','/images/keyboard_mech.jpg','Hot-swap, RGB', 1),
+(5,'SSD-1TB','SSD NVMe 1TB','StorageBrand',2399000,2799000,'STK-SSD1TB-001','','M.2 2280','/images/ssd_1tb.jpg','Fast NVMe storage', 1),
 
 -- Audio & Wearables (CategoryId = 6)
-(6,'BH-ANC1','Sony WH-1000XM5','Sony',6790000,7290000,'STK-BHANC1-001','Black','Over-ear','/images/sony_wh1000xm5.jpg','ANC, long battery'),
-(6,'WATCH-5','Apple Watch Series 9','Apple',11990000,12990000,'STK-WATCH5-001','Silver','45mm','/images/apple_watch9.jpg','Health & fitness'),
-(6,'SPEAKER-1','JBL Flip 6','JBL',1999000,2299000,'STK-SPK1-001','Blue','Portable','/images/jbl_flip6.jpg','Waterproof Bluetooth speaker'),
+(6,'BH-ANC1','Sony WH-1000XM5','Sony',6790000,7290000,'STK-BHANC1-001','Black','Over-ear','/images/sony_wh1000xm5.jpg','ANC, long battery', 1),
+(6,'WATCH-5','Apple Watch Series 9','Apple',11990000,12990000,'STK-WATCH5-001','Silver','45mm','/images/apple_watch9.jpg','Health & fitness', 1),
+(6,'SPEAKER-1','JBL Flip 6','JBL',1999000,2299000,'STK-SPK1-001','Blue','Portable','/images/jbl_flip6.jpg','Waterproof Bluetooth speaker', 1),
 
--- More Smartphones & Laptops to reach variety
-(1,'XIAO-14-U','Xiaomi 14 Ultra','Xiaomi',22990000,24990000,'STK-XIAO14U-001','White','6.73 inch','/images/xiaomi14ultra.jpg','Leica camera'),
-(1,'OP12-001','OnePlus 12','OnePlus',21990000,23990000,'STK-OP12-001','Black','6.82 inch','/images/oneplus12.jpg','Smooth OS'),
-(2,'MB-13-2025','MacBook Air 13 (M4)','Apple',32990000,34990000,'STK-MBA13-001','Silver','13.6 inch','/images/macbookair13_m4.jpg','Lightweight M4'),
-(2,'LENO-IDEA7','Lenovo IdeaPad 7','Lenovo',17990000,19990000,'STK-LENO7-001','Grey','15.6 inch','/images/lenovo_ideapad7.jpg','Efficient performance'),
+-- More Smartphones & Laptops
+(1,'XIAO-14-U','Xiaomi 14 Ultra','Xiaomi',22990000,24990000,'STK-XIAO14U-001','White','6.73 inch','/images/xiaomi14ultra.jpg','Leica camera', 1),
+(1,'OP12-001','OnePlus 12','OnePlus',21990000,23990000,'STK-OP12-001','Black','6.82 inch','/images/oneplus12.jpg','Smooth OS', 1),
+(2,'MB-13-2025','MacBook Air 13 (M4)','Apple',32990000,34990000,'STK-MBA13-001','Silver','13.6 inch','/images/macbookair13_m4.jpg','Lightweight M4', 1),
+(2,'LENO-IDEA7','Lenovo IdeaPad 7','Lenovo',17990000,19990000,'STK-LENO7-001','Grey','15.6 inch','/images/lenovo_ideapad7.jpg','Efficient performance', 1),
 
 -- Extra accessories
-(4,'PROT-GLASS','Kính cường lực','AccessoryBrand',99000,129000,'STK-PROT-001','Transparent','Universal','/images/screen_protector.jpg','Tempered glass'),
-(5,'EXT-HDD-2TB','HDD External 2TB','StorageBrand',1999000,2299000,'STK-HDD2TB-001','Black','2TB','/images/hdd_2tb.jpg','Portable HDD'),
-(6,'EAR-SPORTS','Earbuds Sport','AudioBrand',499000,699000,'STK-EARSP-001','Black','In-ear','/images/earbuds_sport.jpg','Sweat resistant');
-GO
-
+(4,'PROT-GLASS','Kính cường lực','AccessoryBrand',99000,129000,'STK-PROT-001','Transparent','Universal','/images/screen_protector.jpg','Tempered glass', 1),
+(5,'EXT-HDD-2TB','HDD External 2TB','StorageBrand',1999000,2299000,'STK-HDD2TB-001','Black','2TB','/images/hdd_2tb.jpg','Portable HDD', 1),
+(6,'EAR-SPORTS','Earbuds Sport','AudioBrand',499000,699000,'STK-EARSP-001','Black','In-ear','/images/earbuds_sport.jpg','Sweat resistant', 1);
 /****************************************
  * Inventory data (sample stock quantities)
  ****************************************/
