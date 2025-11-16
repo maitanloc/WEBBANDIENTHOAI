@@ -1,57 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebBanDienThoai.Models;
+using WEBBANDIENTHOAI.Models;
 
-
-
-namespace WEBBANDIENTHOAI.Models
+public class Product
 {
-    public class Product
-    {
-        [Key]
-        public int ProductId { get; set; }
+    [Key]
+    public int ProductId { get; set; } // (ProductId)
 
-        [ForeignKey(nameof(Category))]
-        public int CategoryId { get; set; }
-        public virtual Category? Category { get; set; }
+    public int CategoryId { get; set; } // (CategoryId)
 
-        [Required, StringLength(60)]
-        public string SKU { get; set; } = string.Empty;
+    [Required, MaxLength(60)]
+    public string SKU { get; set; } // (SKU: mã SKU, KHÔNG NÊN THAY)
 
-        [Required, StringLength(250)]
-        public string Name { get; set; } = string.Empty;
+    [Required, MaxLength(250)]
+    public string Name { get; set; } // (Name)
 
-        [StringLength(100)]
-        public string? Brand { get; set; }
+    [MaxLength(100)]
+    public string Brand { get; set; } // (Brand)
 
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal Price { get; set; }
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal Price { get; set; } = 0m; // (Price)
 
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal? OldPrice { get; set; }
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal? OldPrice { get; set; } // (OldPrice)
 
-        public int Stock { get; set; }
+    [Required, MaxLength(50)]
+    public string StockCode { get; set; } // (StockCode: mã tồn kho, KHÔNG NÊN THAY nếu có tồn)
 
-        [StringLength(100)]
-        public string? Color { get; set; }
+    [MaxLength(100)]
+    public string Color { get; set; } // (Color)
 
-        [StringLength(100)]
-        public string? Size { get; set; }
+    [MaxLength(100)]
+    public string Size { get; set; } // (Size)
 
-        [StringLength(300)]
-        public string? DefaultImage { get; set; }
+    [MaxLength(300)]
+    public string DefaultImage { get; set; } // (DefaultImage: đường dẫn ảnh chính)
 
-        [StringLength(1000)]
-        public string? ShortDescription { get; set; }
+    [MaxLength(1000)]
+    public string ShortDescription { get; set; } // (ShortDescription)
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public byte StatusId { get; set; } = 1; // (StatusId: FK trạng thái)
 
-        public bool IsActive { get; set; } = true;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // (CreatedAt)
 
-        // Navigation
-        public virtual ICollection<ProductImage>? ProductImages { get; set; }
-        public virtual ICollection<CartDetail>? CartDetails { get; set; }
-        public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
-    }
+    // Navigation
+    [ForeignKey("CategoryId")]
+    public Category Category { get; set; }
+
+    [ForeignKey("StatusId")]
+    public ProductStatus ProductStatus { get; set; }
+
+    public ICollection<ProductImage> Images { get; set; }
+    public LaptopConfiguration LaptopConfiguration { get; set; }
+    public PhoneConfiguration PhoneConfiguration { get; set; }
+    public ICollection<ImportReceiptDetail> ImportDetails { get; set; }
+    public ICollection<ExportReceiptDetail> ExportDetails { get; set; }
+    public ICollection<OrderDetail> OrderDetails { get; set; }
+    public ICollection<CartDetail> CartDetails { get; set; }
 }

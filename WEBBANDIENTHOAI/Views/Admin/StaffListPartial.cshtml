@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<WEBBANDIENTHOAI.Models.User>
-<table>
+
+<table class="table">
     <thead>
         <tr>
             <th>Id</th>
@@ -19,16 +20,16 @@
             <td>@u.Username</td>
             <td>@u.FullName</td>
             <td>@u.Email</td>
-            <td>@(u.Role?.RoleName ?? "Staff")</td>
+            <td>@(u.Role?.RoleName ?? "—")</td> <!-- dùng navigation property Role -->
             <td>@(u.IsActive ? "Active" : "Locked")</td>
             <td>
                 <form asp-controller="Admin" asp-action="ToggleActive" method="post" style="display:inline">
                     <input type="hidden" name="userId" value="@u.UserId" />
-                    <button class="btn.ghost" type="submit">Toggle</button>
+                    <button class="btn" type="submit">Toggle</button>
                 </form>
                 <form asp-controller="Admin" asp-action="DeleteUser" method="post" style="display:inline" onsubmit="return confirm('Xác nhận xóa?')">
                     <input type="hidden" name="userId" value="@u.UserId" />
-                    <button class="btn ghost" type="submit">Delete</button>
+                    <button class="btn" type="submit">Delete</button>
                 </form>
             </td>
         </tr>

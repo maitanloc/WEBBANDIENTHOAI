@@ -5,16 +5,16 @@ namespace WEBBANDIENTHOAI.Models
     public class AuditLog
     {
         [Key]
-        public int LogId { get; set; }
+        public int LogId { get; set; } // (LogId)
 
-        public DateTime LogTime { get; set; } = DateTime.UtcNow;
+        public DateTime LogTime { get; set; } = DateTime.UtcNow; // (LogTime)
 
-        [StringLength(150)]
-        public string? Username { get; set; }
+        [MaxLength(150)]
+        public string Username { get; set; } // (Username)
 
-        [StringLength(250)]
-        public string? Action { get; set; }
+        [MaxLength(250)]
+        public string Action { get; set; } // (Action)
 
-        public string? Details { get; set; }
+        public string Details { get; set; } // (Details)
     }
 }

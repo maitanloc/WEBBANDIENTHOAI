@@ -1,16 +1,16 @@
 ﻿using System.Linq;
-using System.Text;
-using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WEBBANDIENTHOAI.Data;
+using WEBBANDIENTHOAI.Services;
 using WEBBANDIENTHOAI.Models;
 
-namespace WebBanDienThoai.Controllers
+namespace WEBBANDIENTHOAI.Controllers
 {
     public class AccountController : Controller
     {
         private readonly AppDbContext _context;
-
         public AccountController(AppDbContext context)
         {
             _context = context;
@@ -19,66 +19,56 @@ namespace WebBanDienThoai.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            return View("LoginRegister");
-        }
+            // nếu đã login -> redirect
+            if (HttpContext.Session.GetString("UserId") != null)
+            {
+                var role = HttpContext.Session.GetString("RoleName") ?? "";
+                if (role == "Admin") return RedirectToAction("Index", "Admin");
+                if (role == "Staff") return RedirectToAction("Index", "Staff");
+                return RedirectToAction("Index", "Home");
+            }
 
-        // Utility: hash plain password to SHA-256 bytes (match SQL HASHBYTES('SHA2_256', ...))
-        private static byte[] HashPassword(string plain)
-        {
-            if (plain == null) plain = string.Empty;
-            using var sha = SHA256.Create();
-            return sha.ComputeHash(Encoding.UTF8.GetBytes(plain));
+            // View: Views/Account/LoginRegister.cshtml
+            return View("LoginRegister");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Login(string usernameOrEmail, string password)
+        public IActionResult Login(string identifier, string password)
         {
-            if (string.IsNullOrWhiteSpace(usernameOrEmail) || string.IsNullOrWhiteSpace(password))
+            // identifier = email hoặc username
+            if (string.IsNullOrWhiteSpace(identifier) || string.IsNullOrWhiteSpace(password))
             {
                 ViewBag.Error = "Vui lòng nhập đầy đủ thông tin.";
                 return View("LoginRegister");
             }
 
-            var hashed = HashPassword(password);
+            // Hash mật khẩu
+            var hashed = PasswordHasher.Hash(password);
 
-            // Tìm user (admin/staff) theo username hoặc email và so sánh PasswordHash
-            var user = _context.Users
-                .FirstOrDefault(u => (u.Username == usernameOrEmail || u.Email == usernameOrEmail));
-
-            if (user != null)
+            // Tìm user (Users table)
+            var user = _context.Users.FirstOrDefault(u => u.Username == identifier || u.Email == identifier);
+            if (user != null && PasswordHasher.Verify(password, user.PasswordHash))
             {
-                var dbHash = user.PasswordHash ?? new byte[0];
-                if (dbHash.SequenceEqual(hashed))
-                {
-                    HttpContext.Session.SetString("UserId", user.UserId.ToString());
-                    var roleName = _context.Roles.FirstOrDefault(r => r.RoleId == user.RoleId)?.RoleName ?? "";
-                    HttpContext.Session.SetString("RoleName", roleName);
-                    HttpContext.Session.SetString("Username", user.FullName ?? user.Username);
+                // set session
+                HttpContext.Session.SetString("UserId", user.UserId.ToString());
+                var role = _context.Roles.FirstOrDefault(r => r.RoleId == user.RoleId)?.RoleName ?? "";
+                HttpContext.Session.SetString("RoleName", role);
+                HttpContext.Session.SetString("Username", user.FullName ?? user.Username);
 
-                    if (roleName == "Admin")
-                        return RedirectToAction("Index", "Admin");
-                    else if (roleName == "Staff")
-                        return RedirectToAction("Index", "Staff");
-                    else
-                        return RedirectToAction("Index", "Home");
-                }
+                if (role == "Admin") return RedirectToAction("Index", "Admin");
+                if (role == "Staff") return RedirectToAction("Index", "Staff");
+                return RedirectToAction("Index", "Home");
             }
 
-            // Nếu không phải Users, kiểm tra Customers (theo Email)
-            var customer = _context.Customers
-                .FirstOrDefault(c => c.Email == usernameOrEmail);
-
-            if (customer != null)
+            // Nếu không phải Users thì check Customers (email)
+            var cust = _context.Customers.FirstOrDefault(c => c.Email == identifier);
+            if (cust != null && PasswordHasher.Verify(password, cust.PasswordHash))
             {
-                var custHash = customer.PasswordHash ?? new byte[0];
-                if (custHash.SequenceEqual(hashed))
-                {
-                    HttpContext.Session.SetString("UserId", customer.CustomerId.ToString());
-                    HttpContext.Session.SetString("RoleName", "Customer");
-                    HttpContext.Session.SetString("Username", customer.FullName ?? customer.Email);
-                    return RedirectToAction("Index", "Home");
-                }
+                HttpContext.Session.SetString("UserId", cust.CustomerId.ToString());
+                HttpContext.Session.SetString("RoleName", "Customer");
+                HttpContext.Session.SetString("Username", cust.FullName ?? cust.Email);
+                return RedirectToAction("Index", "Home");
             }
 
             ViewBag.Error = "Sai tài khoản hoặc mật khẩu!";
@@ -89,20 +79,20 @@ namespace WebBanDienThoai.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Register(string fullname, string email, string phone, string password, string address)
         {
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(fullname))
+            if (string.IsNullOrWhiteSpace(fullname) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
                 ViewBag.Error = "Họ tên, email và mật khẩu là bắt buộc.";
                 return View("LoginRegister");
             }
 
+            // tránh duplicate email
             if (_context.Customers.Any(c => c.Email == email))
             {
                 ViewBag.Error = "Email đã tồn tại!";
                 return View("LoginRegister");
             }
 
-            var hash = HashPassword(password);
-
+            var hash = PasswordHasher.Hash(password);
             var customer = new Customer
             {
                 FullName = fullname,

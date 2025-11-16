@@ -1,30 +1,29 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace WEBBANDIENTHOAI.Models
 {
     public class Customer
     {
         [Key]
-        public int CustomerId { get; set; }
+        public int CustomerId { get; set; } // CustomerId: Mã khách hàng
 
-        [Required, StringLength(150)]
-        public string FullName { get; set; } = string.Empty;
+        [Required, MaxLength(150)]
+        public string FullName { get; set; }
 
-        [Required, StringLength(150)]
-        public string Email { get; set; } = string.Empty;
+        [Required, MaxLength(150)]
+        public string Email { get; set; }
 
-        // hashed password bytes
         [Required]
-        public byte[] PasswordHash { get; set; } = Array.Empty<byte>();
+        public byte[] PasswordHash { get; set; }
 
-        [StringLength(30)]
-        public string? Phone { get; set; }
+        [MaxLength(30)]
+        public string Phone { get; set; }
 
-        [StringLength(300)]
-        public string? Address { get; set; }
+        [MaxLength(300)]
+        public string Address { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
         public bool IsActive { get; set; } = true;
     }
 }

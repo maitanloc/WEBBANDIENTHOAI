@@ -1,50 +1,63 @@
-using System;
 using Microsoft.EntityFrameworkCore;
-using WEBBANDIENTHOAI.Models;
+using WEBBANDIENTHOAI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Services
+// ========================
+// 1) Load connection string
+// ========================
+var conn = builder.Configuration.GetConnectionString("DefaultConnection")
+           ?? "Data Source=DELL\\SQLEXPRESS02;Initial Catalog=PhoneShopFull;Integrated Security=True;TrustServerCertificate=True";
+
+// ========================
+// 2) Add MVC services
+// ========================
 builder.Services.AddControllersWithViews();
+
+// ========================
+// 3) Add DbContext
+// ========================
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(conn));
+
+// ========================
+// 4) Enable Session
+// ========================
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(60);
+    options.IdleTimeout = TimeSpan.FromHours(4);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
-// DbContext (giữ như bạn đã cấu hình)
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+// ========================
+// Build app
+// ========================
 var app = builder.Build();
 
-// Middleware pipeline (CHÚ Ý THỨ TỰ)
+// ========================
+// 5) Middleware pipeline
+// ========================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-
-// Serve static files (css/js/images) from wwwroot
-// -> Không gọi UseDefaultFiles() ở đây
 app.UseStaticFiles();
-
 app.UseRouting();
 
-// session must be between routing and endpoints
-app.UseSession();
-
+app.UseSession();       // must be before UseAuthorization
 app.UseAuthorization();
 
-// Default MVC route -> truy cập "/" sẽ tới HomeController.Index
+// ========================
+// 6) Default Route
+// ========================
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}");
 
-
-
+// ========================
+// Run
+// ========================
 app.Run();

@@ -6,15 +6,18 @@ namespace WEBBANDIENTHOAI.Models
     public class Cart
     {
         [Key]
-        public int CartId { get; set; }
+        public int CartId { get; set; } // (CartId)
 
-        [ForeignKey(nameof(Customer))]
-        public int CustomerId { get; set; }
-        public virtual Customer? Customer { get; set; }
+        public int CustomerId { get; set; } // (CustomerId)
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // (CreatedAt)
 
-        public virtual ICollection<CartDetail>? CartDetails { get; set; }
+        public DateTime? UpdatedAt { get; set; } // (UpdatedAt)
+
+        [ForeignKey("CustomerId")]
+        public Customer Customer { get; set; }
+
+        public ICollection<CartDetail> Details { get; set; }
     }
+
 }

@@ -5,16 +5,16 @@ namespace WEBBANDIENTHOAI.Models
     public class Category
     {
         [Key]
-        public int CategoryId { get; set; }
+        public int CategoryId { get; set; } // (CategoryId)
 
-        [Required, StringLength(120)]
-        public string CategoryName { get; set; } = string.Empty;
+        [Required, MaxLength(120)]
+        public string CategoryName { get; set; } // (CategoryName)
 
-        [StringLength(500)]
-        public string? Description { get; set; }
+        [MaxLength(500)]
+        public string Description { get; set; } // (Description)
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // (CreatedAt)
 
-        public virtual ICollection<Product>? Products { get; set; }
+        public ICollection<Product> Products { get; set; }
     }
 }

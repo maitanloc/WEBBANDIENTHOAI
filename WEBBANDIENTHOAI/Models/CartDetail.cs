@@ -6,19 +6,21 @@ namespace WEBBANDIENTHOAI.Models
     public class CartDetail
     {
         [Key]
-        public int CartDetailId { get; set; }
+        public int CartDetailId { get; set; } // (CartDetailId)
 
-        [ForeignKey(nameof(Cart))]
-        public int CartId { get; set; }
-        public virtual Cart? Cart { get; set; }
+        public int CartId { get; set; } // (CartId)
 
-        [ForeignKey(nameof(Product))]
-        public int ProductId { get; set; }
-        public virtual Product? Product { get; set; }
+        public int ProductId { get; set; } // (ProductId)
 
-        public int Quantity { get; set; } = 1;
+        public int Quantity { get; set; } = 1; // (Quantity)
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal UnitPrice { get; set; }
+        public decimal UnitPrice { get; set; } // (UnitPrice)
+
+        [ForeignKey("CartId")]
+        public Cart Cart { get; set; }
+
+        [ForeignKey("ProductId")]
+        public Product Product { get; set; }
     }
 }

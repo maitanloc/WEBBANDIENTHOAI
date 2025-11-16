@@ -4,27 +4,26 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WEBBANDIENTHOAI.Models
 {
+    // Users (Admin / Staff)
     public class User
     {
         [Key]
-        public int UserId { get; set; }
+        public int UserId { get; set; } // UserId: Mã user
 
-        [Required, StringLength(100)]
-        public string Username { get; set; } = string.Empty;
+        [Required, MaxLength(100)]
+        public string Username { get; set; } // Username: tên đăng nhập
 
-        // store hashed password bytes
         [Required]
-        public byte[] PasswordHash { get; set; } = Array.Empty<byte>();
+        public byte[] PasswordHash { get; set; } // PasswordHash: SHA256 hash
 
-        [StringLength(150)]
-        public string? FullName { get; set; }
+        [MaxLength(150)]
+        public string FullName { get; set; } // FullName: tên đầy đủ
 
-        [StringLength(150)]
-        public string? Email { get; set; }
+        [MaxLength(150)]
+        public string Email { get; set; } // Email
 
-        [ForeignKey(nameof(Role))]
         public int RoleId { get; set; }
-        public virtual Role? Role { get; set; }
+        public Role Role { get; set; } // <-- navigation property
 
         public bool IsActive { get; set; } = true;
 

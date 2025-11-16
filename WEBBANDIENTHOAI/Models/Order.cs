@@ -1,33 +1,30 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WEBBANDIENTHOAI.Models;
 
-namespace WEBBANDIENTHOAI.Models
+public class Order
 {
-    public class Order
-    {
-        [Key]
-        public int OrderId { get; set; }
+    [Key]
+    public int OrderId { get; set; } // (OrderId)
 
-        [ForeignKey(nameof(Customer))]
-        public int CustomerId { get; set; }
-        public virtual Customer? Customer { get; set; }
+    public int CustomerId { get; set; } // (CustomerId)
 
-        public DateTime OrderDate { get; set; } = DateTime.UtcNow;
+    public DateTime OrderDate { get; set; } = DateTime.UtcNow; // (OrderDate)
 
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal Total { get; set; }
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal Total { get; set; } = 0m; // (Total)
 
-        [StringLength(50)]
-        public string Status { get; set; } = "Pending";
+    [MaxLength(50)]
+    public string Status { get; set; } = "Pending"; // (Status)
 
-        [StringLength(300)]
-        public string? ShippingAddress { get; set; }
+    [MaxLength(300)]
+    public string ShippingAddress { get; set; } // (ShippingAddress)
 
-        // optional: staff who created/processed order
-        [ForeignKey(nameof(CreatedByUser))]
-        public int? CreatedByUserId { get; set; }
-        public virtual User? CreatedByUser { get; set; }
+    public int? CreatedByUserId { get; set; } // (CreatedByUserId)
 
-        public virtual ICollection<OrderDetail>? OrderDetails { get; set; }
-    }
+    [ForeignKey("CustomerId")]
+    public Customer Customer { get; set; }
+
+    public ICollection<OrderDetail> Details { get; set; }
 }
