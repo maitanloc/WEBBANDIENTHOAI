@@ -2,7 +2,7 @@
 
 /* ========== Aurora Background & general styles ========== */
 :root {
-    --primary: #ec7f13;
+    --primary: #FFA500;
 }
 
 body {
@@ -161,8 +161,8 @@ body {
 /* image */
 .cao {
     width: 80%;
-    height: 100px;
-    object-fit: cover;
+    /* height: 100px; */ /* Removed fixed height */
+    object-fit: contain; /* Changed to contain */
     opacity: 0.95;
 }
 
