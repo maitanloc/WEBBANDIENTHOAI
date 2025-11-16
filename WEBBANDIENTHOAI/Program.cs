@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1) Load connection string
 // ========================
 var conn = builder.Configuration.GetConnectionString("DefaultConnection")
-           ?? "Data Source=DELL\\SQLEXPRESS02;Initial Catalog=PhoneShopFull;Integrated Security=True;TrustServerCertificate=True";
+           ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=PhoneShopFull;Integrated Security=True;TrustServerCertificate=True";
 
 // ========================
 // 2) Add MVC services

@@ -44,7 +44,7 @@
             </div>
           </div>
 
-          <a id="nav-logout" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer" href="#logout" title="Đăng xuất">
+          <a id="nav-logout" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer" href="@Url.Action("Logout", "Account")" title="Đăng xuất">
             <span class="material-symbols-outlined">logout</span>
             <p class="text-sm font-medium">Đăng Xuất</p>
           </a>
@@ -228,6 +228,19 @@
         </section>
       </div>
     </main>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logout-confirm-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-8 shadow-xl text-center">
+        <img src="@Url.Content("~/Images/hỏi đăng xuất.png")" alt="Confirm Logout" class="mx-auto mb-4" style="max-width: 100px;"/>
+        <h2 class="text-xl font-bold mb-4">Xác nhận đăng xuất</h2>
+        <p class="mb-6">Bạn có chắc chắn muốn đăng xuất không?</p>
+        <div class="flex justify-center gap-4">
+            <button id="logout-confirm-yes" class="px-6 py-2 bg-red-600 text-white rounded">Đăng xuất</button>
+            <button id="logout-confirm-no" class="px-6 py-2 bg-gray-300 rounded">Hủy</button>
+        </div>
+    </div>
   </div>
 </div>
 

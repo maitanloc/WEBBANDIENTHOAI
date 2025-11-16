@@ -171,4 +171,35 @@
     window.addEventListener('focus', () => {
         // If needed, you can refresh only if underlying data changed (not implemented here).
     });
+
+    // Logout confirmation
+    document.addEventListener('DOMContentLoaded', function () {
+        const logoutBtn = document.getElementById('nav-logout');
+        const modal = document.getElementById('logout-confirm-modal');
+        const confirmYesBtn = document.getElementById('logout-confirm-yes');
+        const confirmNoBtn = document.getElementById('logout-confirm-no');
+
+        if (logoutBtn && modal && confirmYesBtn && confirmNoBtn) {
+            logoutBtn.addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent navigating to the logout URL immediately
+                modal.classList.remove('hidden');
+            });
+
+            confirmNoBtn.addEventListener('click', function () {
+                modal.classList.add('hidden');
+            });
+
+            confirmYesBtn.addEventListener('click', function () {
+                // Redirect to the original logout URL
+                window.location.href = logoutBtn.href;
+            });
+
+            // Also hide the modal if the user clicks outside of it
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        }
+    });
 })();
