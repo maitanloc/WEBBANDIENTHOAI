@@ -59,63 +59,57 @@
     <!-- MAIN -->
     <main class="flex-1 flex flex-col overflow-y-auto relative z-10">
       <!-- HEADER -->
-      <header class="flex items-center justify-between whitespace-nowrap border-b border-gray-200 px-6 py-3 bg-white sticky top-0 z-30">
-        <div class="flex items-center gap-3">
-          <button class="mobile-sidebar-toggle inline-flex items-center justify-center h-10 w-10 rounded-lg bg-white border border-gray-200 icon-btn focus-ring" aria-label="Mở menu (mobile)">
-            <span class="material-symbols-outlined">menu</span>
-          </button>
+            <header class="flex items-center justify-between whitespace-nowrap border-b border-gray-200 px-6 py-3 bg-white sticky top-0 z-30">
 
-          <div class="min-w-0 max-w-md w-full">
-            <div class="flex items-center rounded-lg bg-gray-100 h-10 overflow-hidden">
-              <div class="text-gray-400 flex items-center justify-center pl-4 pr-3">
-                <span class="material-symbols-outlined">search</span>
-              </div>
-              <input id="global-search" class="form-input flex-1 min-w-0 text-sm bg-transparent px-3 focus:outline-0" placeholder="Tìm: sản phẩm, đơn hàng, khách..." />
-            </div>
-          </div>
-        </div>
+                <div class="flex items-center gap-3 flex-1 mr-4">
+                    <button class="mobile-sidebar-toggle inline-flex items-center justify-center h-10 w-10 rounded-lg bg-white border border-gray-200 icon-btn lg:hidden">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
 
-        <div class="flex items-center gap-3">
-          <div class="relative dropdown" id="quick-root">
-            <button id="quick-actions-btn" class="flex items-center gap-2 rounded-lg h-10 px-3 bg-white text-sm border border-gray-200 icon-btn focus-ring" aria-haspopup="true" aria-expanded="false">
-              <span class="material-symbols-outlined text-primary">bolt</span>
-              <span class="action-truncate text-sm">Quick Actions</span>
-              <span class="material-symbols-outlined text-gray-400">expand_more</span>
-            </button>
+                    <div class="w-full max-w-md">
+                        <div class="flex items-center rounded-lg bg-gray-100 h-10 overflow-hidden hover:ring-1 ring-gray-300 transition-all">
+                            <div class="text-gray-400 flex items-center justify-center pl-4 pr-3">
+                                <span class="material-symbols-outlined text-[20px]">search</span>
+                            </div>
+                            <input id="global-search" class="form-input flex-1 min-w-0 text-sm bg-transparent px-3 focus:outline-0" placeholder="Tìm kiếm..." />
+                        </div>
+                    </div>
+                </div>
 
-            <div class="dropdown-menu" id="quick-dropdown" role="menu" aria-label="Quick actions menu" tabindex="-1">
-              <button role="menuitem" id="qa-add-product">➕ Thêm Sản Phẩm</button>
-              <button role="menuitem" id="qa-import">📤 Import Excel</button>
-              <button role="menuitem" id="qa-export">📥 Export báo cáo</button>
-              <hr class="my-1" />
-              <button role="menuitem" id="qa-nhapkho">📦 Nhập kho</button>
-              <button role="menuitem" id="qa-xuatkho">🚚 Xuất kho</button>
-            </div>
-          </div>
+                <div class="flex items-center gap-3">
 
-          <button id="btn-import" class="flex h-10 items-center gap-2 rounded-lg px-3 bg-white border border-gray-200 text-sm btn-icon focus-ring" title="Import CSV">
-            <span class="material-symbols-outlined text-gray-600">file_upload</span><span class="text-sm text-gray-800">Import</span>
-          </button>
+                    <div class="hidden sm:flex items-center rounded-lg border border-gray-200 bg-white overflow-hidden divide-x divide-gray-200">
+                        <button id="btn-import" class="flex h-10 items-center gap-2 px-3 hover:bg-gray-50 transition-colors" title="Import Excel">
+                            <span class="material-symbols-outlined text-gray-600 text-[18px]">file_upload</span>
+                            <span class="text-sm text-gray-700 font-medium">Import</span>
+                        </button>
+                        <button id="btn-export" class="flex h-10 items-center gap-2 px-3 hover:bg-gray-50 transition-colors" title="Export Báo cáo">
+                            <span class="material-symbols-outlined text-gray-600 text-[18px]">file_download</span>
+                            <span class="text-sm text-gray-700 font-medium">Export</span>
+                        </button>
+                    </div>
 
-          <button id="btn-export" class="flex h-10 items-center gap-2 rounded-lg px-3 bg-white border border-gray-200 text-sm btn-icon focus-ring" title="Export CSV">
-            <span class="material-symbols-outlined text-gray-600">file_download</span><span class="text-sm text-gray-800">Export</span>
-          </button>
+                    <div class="hidden md:flex items-center rounded-lg border border-gray-200 bg-white overflow-hidden divide-x divide-gray-200">
+                        <button id="btn-nhapkho" class="flex h-10 items-center gap-2 px-3 hover:bg-gray-50 transition-colors" title="Nhập kho">
+                            <span class="material-symbols-outlined text-gray-600 text-[18px]">inventory_2</span>
+                            <span class="text-sm text-gray-700 font-medium">Nhập</span>
+                        </button>
+                        <button id="btn-xuatkho" class="flex h-10 items-center gap-2 px-3 hover:bg-gray-50 transition-colors" title="Xuất kho">
+                            <span class="material-symbols-outlined text-gray-600 text-[18px]">outbound</span>
+                            <span class="text-sm text-gray-700 font-medium">Xuất</span>
+                        </button>
+                    </div>
 
-          <button id="btn-nhapkho" class="flex h-10 items-center gap-2 rounded-lg px-3 bg-white border border-gray-200 text-sm btn-icon focus-ring" title="Nhập kho">
-            <span class="material-symbols-outlined text-gray-600">inventory_2</span><span class="text-sm text-gray-800">Nhập kho</span>
-          </button>
+                    <button id="btn-add-product" class="flex items-center gap-2 h-10 px-4 bg-primary hover:bg-orange-600 text-white text-sm font-bold rounded-lg shadow-sm transition-all ml-1">
+                        <span class="material-symbols-outlined text-[20px]">add_circle</span>
+                        <span class="hidden sm:inline">Thêm Sản Phẩm</span>
+                    </button>
 
-          <button id="btn-xuatkho" class="flex h-10 items-center gap-2 rounded-lg px-3 bg-white border border-gray-200 text-sm btn-icon focus-ring" title="Xuất kho">
-            <span class="material-symbols-outlined text-gray-600">outbound</span><span class="text-sm text-gray-800">Xuất kho</span>
-          </button>
-
-          <button id="btn-add-product" class="flex items-center justify-center min-w-[84px] h-10 px-4 bg-primary text-white text-sm font-bold rounded-lg btn-icon focus-ring" title="Thêm sản phẩm mới">
-            <span class="material-symbols-outlined">add_circle</span><span class="truncate">Thêm Sản Phẩm</span>
-          </button>
-
-          <div class="h-10 w-10 rounded-full bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center text-primary font-semibold">AD</div>
-        </div>
-      </header>
+                    <div class="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-primary font-bold text-xs ml-2 border-2 border-white shadow-sm">
+                        AD
+                    </div>
+                </div>
+            </header>
 
       <!-- CONTENT -->
       <div class="p-6 sm:p-8 lg:p-10 space-y-8">
