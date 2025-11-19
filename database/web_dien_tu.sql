@@ -106,23 +106,23 @@ CREATE TABLE dbo.ProductStatuses
 );
 GO
 
--- Products
+-- Tạo bảng Products với ImageId thay vì DefaultImage
 CREATE TABLE dbo.Products
 (
-    ProductId     INT IDENTITY(1,1) PRIMARY KEY,
-    CategoryId    INT NOT NULL,
-    SKU           NVARCHAR(60) NOT NULL UNIQUE,
-    Name          NVARCHAR(250) NOT NULL,
-    Brand         NVARCHAR(100) NULL,
-    Price         DECIMAL(18,2) NOT NULL DEFAULT 0,
-    OldPrice      DECIMAL(18,2) NULL,
-    StockCode     NVARCHAR(50) NOT NULL,
-    Color         NVARCHAR(100) NULL,
-    Size          NVARCHAR(100) NULL,
-    DefaultImage  NVARCHAR(300) NULL,
+    ProductId        INT IDENTITY(1,1) PRIMARY KEY,
+    CategoryId       INT NOT NULL,
+    SKU              NVARCHAR(60) NOT NULL UNIQUE,
+    Name             NVARCHAR(250) NOT NULL,
+    Brand            NVARCHAR(100) NULL,
+    Price            DECIMAL(18,2) NOT NULL DEFAULT 0,
+    OldPrice         DECIMAL(18,2) NULL,
+    StockCode        NVARCHAR(50) NOT NULL,
+    Color            NVARCHAR(100) NULL,
+    Size             NVARCHAR(100) NULL,
+    ImageId          INT NULL,
     ShortDescription NVARCHAR(1000) NULL,
-    StatusId      TINYINT NOT NULL DEFAULT 1,
-    CreatedAt     DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    StatusId         TINYINT NOT NULL DEFAULT 1,
+    CreatedAt        DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
     CONSTRAINT FK_Products_Categories FOREIGN KEY(CategoryId) REFERENCES dbo.Categories(CategoryId),
     CONSTRAINT FK_Products_Status FOREIGN KEY(StatusId) REFERENCES dbo.ProductStatuses(StatusId)
 );
@@ -133,16 +133,22 @@ CREATE INDEX IX_Products_Price ON dbo.Products(Price);
 CREATE INDEX IX_Products_StockCode ON dbo.Products(StockCode);
 GO
 
--- ProductImages
+-- Tạo bảng ProductImages với ImagePath là VARBINARY(MAX)
+-- Tạo bảng ProductImages TẠM THỜI KHÔNG CÓ KHÓA NGOẠI
 CREATE TABLE dbo.ProductImages
 (
     ImageId     INT IDENTITY(1,1) PRIMARY KEY,
     ProductId   INT NOT NULL,
-    ImagePath   NVARCHAR(300) NOT NULL,
+    ImagePath   VARBINARY(MAX) NULL,
     IsPrimary   BIT NOT NULL DEFAULT 0,
-    CreatedAt   DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
-    CONSTRAINT FK_ProductImages_Products FOREIGN KEY(ProductId) REFERENCES dbo.Products(ProductId) ON DELETE CASCADE
+    CreatedAt   DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
+    -- TẠM BỎ: CONSTRAINT FK_ProductImages_Products FOREIGN KEY(ProductId) REFERENCES dbo.Products(ProductId) ON DELETE CASCADE
 );
+GO
+-- Tạo khóa ngoại từ Products.ImageId đến ProductImages.ImageId
+ALTER TABLE dbo.Products 
+ADD CONSTRAINT FK_Products_ProductImages 
+FOREIGN KEY (ImageId) REFERENCES dbo.ProductImages(ImageId);
 GO
 
 -- Inventory
@@ -400,6 +406,7 @@ PRINT '=== TẠO DATABASE PhoneShopFull THÀNH CÔNG 100% ===';
 IF OBJECT_ID('dbo.trg_Products_PreventKeyChange','TR') IS NOT NULL
     DROP TRIGGER dbo.trg_Products_PreventKeyChange;
 GO
+
 
 CREATE TRIGGER dbo.trg_Products_PreventKeyChange
 ON dbo.Products
@@ -744,15 +751,22 @@ INSERT INTO dbo.Categories (CategoryName, Description)
 VALUES ('Smartphones','Điện thoại thông minh'), ('Laptops','Laptop'), ('Phone Accessories','Phụ kiện điện thoại');
 GO
 
--- Sample products
-INSERT INTO dbo.Products (CategoryId, SKU, Name, Brand, Price, OldPrice, StockCode, Color, Size, DefaultImage, ShortDescription, StatusId)
+-- ============================
+-- Seed initial data (sửa phần gây lỗi)
+-- ============================
+
+-- Roles, ProductStatuses, Users, Customers, Categories (giữ nguyên như cũ)
+-- ... (không thay đổi)
+
+-- Thêm dữ liệu vào Products NHƯNG ImageId = NULL trước
+INSERT INTO dbo.Products (CategoryId, SKU, Name, Brand, Price, OldPrice, StockCode, Color, Size, ImageId, ShortDescription, StatusId)
 VALUES
-(1,'IP16-001','iPhone 16','Apple',25990000,28990000,'STK-IP16-001','Black','6.1 inch','/images/iphone16.jpg','Chip A17, camera kép',1),
-(2,'MBP-16-2025','MacBook Pro 16 (M4)','Apple',64990000,69990000,'STK-MBP16-001','Space Gray','16 inch','/images/macbookpro16_m4.jpg','M4 chip, 16GB/1TB',1),
-(1,'S24U-001','Samsung Galaxy S24 Ultra','Samsung',32990000,35990000,'STK-S24U-001','Phantom Black','6.8 inch','/images/s24ultra.jpg','Camera zoom',1);
+(1,'IP16-001','iPhone 16','Apple',25990000,28990000,'STK-IP16-001','Black','6.1 inch', NULL ,'Chip A17, camera kép',1),
+(2,'MBP-16-2025','MacBook Pro 16 (M4)','Apple',64990000,69990000,'STK-MBP16-001','Space Gray','16 inch', NULL ,'M4 chip, 16GB/1TB',1),
+(1,'S24U-001','Samsung Galaxy S24 Ultra','Samsung',32990000,35990000,'STK-S24U-001','Phantom Black','6.8 inch', NULL ,'Camera zoom',1);
 GO
 
--- Create inventory rows corresponding to products
+-- Tạo inventory (giữ nguyên)
 INSERT INTO dbo.Inventory (StockCode, ProductId, CurrentQuantity, MinimumQuantity, MaximumQuantity, Location)
 SELECT p.StockCode, p.ProductId,
     CASE WHEN p.CategoryId = 2 THEN 8 WHEN p.CategoryId = 1 THEN 15 ELSE 10 END,
@@ -760,10 +774,26 @@ SELECT p.StockCode, p.ProductId,
 FROM dbo.Products p;
 GO
 
--- Ensure ProductImages table sample fill
+-- Chèn ảnh (bây giờ ProductId đã tồn tại nên không lỗi)
 INSERT INTO dbo.ProductImages (ProductId, ImagePath, IsPrimary)
-SELECT ProductId, DefaultImage, 1 FROM dbo.Products WHERE DefaultImage IS NOT NULL;
+VALUES
+(1, 0x89504E470D0A1A0A0000000D49484452, 1),  -- ảnh chính của iPhone 16
+(2, 0x89504E470D0A1A0A0000000D49484452, 1),  -- ảnh chính của MacBook
+(3, 0x89504E470D0A1A0A0000000D49484452, 1);  -- ảnh chính của S24 Ultra
 GO
 
-PRINT 'Schema and sample data created successfully.';
+-- Cập nhật lại ImageId cho sản phẩm (lấy ảnh có IsPrimary = 1)
+UPDATE p
+SET ImageId = i.ImageId
+FROM dbo.Products p
+INNER JOIN dbo.ProductImages i ON i.ProductId = p.ProductId AND i.IsPrimary = 1;
+GO
+
+-- Bây giờ mới thêm FK ngược lại (an toàn vì dữ liệu đã hợp lệ)
+ALTER TABLE dbo.ProductImages
+ADD CONSTRAINT FK_ProductImages_Products
+FOREIGN KEY (ProductId) REFERENCES dbo.Products(ProductId) ON DELETE CASCADE;
+GO
+
+PRINT 'Seed data completed successfully - ImageId đã được gán đúng';
 GO
