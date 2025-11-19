@@ -80,6 +80,7 @@ CREATE TABLE dbo.Customers
     Email        NVARCHAR(150) NOT NULL UNIQUE,
     PasswordHash VARBINARY(64) NOT NULL,
     Phone        NVARCHAR(30) NULL,
+    CitizenID    NVARCHAR(12) NOT NULL,
     Address      NVARCHAR(300) NULL,
     CreatedAt    DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
     IsActive     BIT NOT NULL DEFAULT 1
@@ -731,11 +732,12 @@ VALUES
 GO
 
 -- Customers
-INSERT INTO dbo.Customers (FullName, Email, PasswordHash, Phone, Address)
+INSERT INTO dbo.Customers (FullName, Email, PasswordHash, Phone, CitizenID, Address)
 VALUES
-('Nguyen Van A','a.nguyen@example.com', HASHBYTES('SHA2_256','pass123'), '0912345678','HCM, District 1'),
-('Tran Thi B','b.tran@example.com', HASHBYTES('SHA2_256','pass123'), '0987654321','Da Nang');
+('Nguyen Van A','a.nguyen@example.com', HASHBYTES('SHA2_256','pass123'), '0912345678','036167132476','HCM, District 1'),
+('Tran Thi B','b.tran@example.com', HASHBYTES('SHA2_256','pass123'), '0987654321','018476812473','Da Nang');
 GO
+
 
 -- Categories
 INSERT INTO dbo.Categories (CategoryName, Description)
