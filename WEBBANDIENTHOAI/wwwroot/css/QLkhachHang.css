@@ -1,0 +1,72 @@
+﻿.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Buttons */
+.icon-btn {
+    padding: 8px;
+    border-radius: 999px;
+    color: #1F2937;
+}
+
+.avatar-img {
+    background-size: cover;
+    background-position: center;
+    border-radius: 999px;
+    width: 40px;
+    height: 40px;
+}
+
+.search-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f7f5;
+    padding-left: 14px;
+    border-radius: 8px 0 0 8px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 0 16px;
+    border: none;
+    outline: none;
+}
+
+.filter-btn {
+    background: #e5e7eb;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.table-head th {
+    font-weight: 700;
+    background: #f8f7f5;
+    color: #1F2937;
+}
+
+.table-row {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* STATUS BADGES */
+.badge {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.badge-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
