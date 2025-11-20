@@ -10,8 +10,8 @@ namespace WEBBANDIENTHOAI.Models
 
         public int ProductId { get; set; } // (ProductId)
 
-        [Required, MaxLength(300)]
-        public string ImagePath { get; set; } // (ImagePath)
+        // Đúng với cột VARBINARY(MAX) trong DB
+        public byte[]? ImagePath { get; set; }
 
         public bool IsPrimary { get; set; } = false; // (IsPrimary)
 

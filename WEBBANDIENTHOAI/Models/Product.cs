@@ -1,61 +1,72 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using WebBanDienThoai.Models;
-using WEBBANDIENTHOAI.Models;
 
-public class Product
+namespace WEBBANDIENTHOAI.Models
 {
-    [Key]
-    public int ProductId { get; set; } // (ProductId)
+    public class Product
+    {
+        [Key]
+        public int ProductId { get; set; }   // ← đã sửa lỗi typo
 
-    public int CategoryId { get; set; } // (CategoryId)
+        public int CategoryId { get; set; }
 
-    [Required, MaxLength(60)]
-    public string SKU { get; set; } // (SKU: mã SKU, KHÔNG NÊN THAY)
+        [Required, MaxLength(60)]
+        public string SKU { get; set; } = null!;
 
-    [Required, MaxLength(250)]
-    public string Name { get; set; } // (Name)
+        [Required, MaxLength(250)]
+        public string Name { get; set; } = null!;
 
-    [MaxLength(100)]
-    public string Brand { get; set; } // (Brand)
+        [MaxLength(100)]
+        public string? Brand { get; set; }
 
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal Price { get; set; } = 0m; // (Price)
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Price { get; set; } = 0m;
 
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal? OldPrice { get; set; } // (OldPrice)
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? OldPrice { get; set; }
 
-    [Required, MaxLength(50)]
-    public string StockCode { get; set; } // (StockCode: mã tồn kho, KHÔNG NÊN THAY nếu có tồn)
+        [Required, MaxLength(50)]
+        public string StockCode { get; set; } = null!;
 
-    [MaxLength(100)]
-    public string Color { get; set; } // (Color)
+        [MaxLength(100)]
+        public string? Color { get; set; }
 
-    [MaxLength(100)]
-    public string Size { get; set; } // (Size)
+        [MaxLength(100)]
+        public string? Size { get; set; }
 
-    [MaxLength(300)]
-    public string DefaultImage { get; set; } // (DefaultImage: đường dẫn ảnh chính)
+        // FK tới ảnh chính (IsPrimary = 1)
+        public int? ImageId { get; set; }
 
-    [MaxLength(1000)]
-    public string ShortDescription { get; set; } // (ShortDescription)
+        [MaxLength(1000)]
+        public string? ShortDescription { get; set; }
 
-    public byte StatusId { get; set; } = 1; // (StatusId: FK trạng thái)
+        public byte StatusId { get; set; } = 1;
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // (CreatedAt)
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    // Navigation
-    [ForeignKey("CategoryId")]
-    public Category Category { get; set; }
+        // Navigation properties
+        [ForeignKey("CategoryId")]
+        public virtual Category Category { get; set; } = null!;
 
-    [ForeignKey("StatusId")]
-    public ProductStatus ProductStatus { get; set; }
+        [ForeignKey("StatusId")]
+        public virtual ProductStatus ProductStatus { get; set; } = null!;
 
-    public ICollection<ProductImage> Images { get; set; }
-    public LaptopConfiguration LaptopConfiguration { get; set; }
-    public PhoneConfiguration PhoneConfiguration { get; set; }
-    public ICollection<ImportReceiptDetail> ImportDetails { get; set; }
-    public ICollection<ExportReceiptDetail> ExportDetails { get; set; }
-    public ICollection<OrderDetail> OrderDetails { get; set; }
-    public ICollection<CartDetail> CartDetails { get; set; }
+        // Ảnh chính
+        [ForeignKey("ImageId")]
+        public virtual ProductImage? PrimaryImage { get; set; }
+
+        // Tất cả ảnh của sản phẩm
+        public virtual ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
+
+        // One-to-one config (Laptop / Phone)
+        public virtual LaptopConfiguration? LaptopConfiguration { get; set; }
+        public virtual PhoneConfiguration? PhoneConfiguration { get; set; }
+
+        // Các collection khác
+        public virtual ICollection<ImportReceiptDetail> ImportDetails { get; set; } = new List<ImportReceiptDetail>();
+        public virtual ICollection<ExportReceiptDetail> ExportDetails { get; set; } = new List<ExportReceiptDetail>();
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+        public virtual ICollection<CartDetail> CartDetails { get; set; } = new List<CartDetail>();
+    }
 }
