@@ -68,7 +68,7 @@ namespace WEBBANDIENTHOAI.Controllers
                 HttpContext.Session.SetString("UserId", cust.CustomerId.ToString());
                 HttpContext.Session.SetString("RoleName", "Customer");
                 HttpContext.Session.SetString("Username", cust.FullName ?? cust.Email);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "HomeUser");
             }
 
             ViewBag.Error = "Sai tài khoản hoặc mật khẩu!";

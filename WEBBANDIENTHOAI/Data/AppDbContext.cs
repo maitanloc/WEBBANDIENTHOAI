@@ -101,5 +101,7 @@ namespace WEBBANDIENTHOAI.Data
             modelBuilder.Entity<Inventory>().HasIndex(i => i.StockCode);
             modelBuilder.Entity<Order>().HasIndex(o => o.OrderDate);
         }
+
+
     }
 }

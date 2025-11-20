@@ -1,0 +1,207 @@
+﻿@{
+    ViewData["Title"] = "TechShop - Cửa hàng Điện thoại & Laptop";
+}
+
+<!DOCTYPE html>
+<html class="light" lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f48c25",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221910",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+
+@* -------- HEADER -------- *@
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/20 bg-background-light/80 dark:bg-background-dark/80 px-4 sm:px-10 py-3 backdrop-blur-sm">
+
+    <div class="flex items-center gap-8">
+                    <div class="flex items-center gap-3 text-gray-800 dark:text-white">
+                        <div class="size-12">
+                            <img src="/images/fox-mobile-logo.png" alt="FOX Mobile Logo" class="w-full h-full object-contain" />
+                        </div>
+                        <h2 class="text-lg font-bold tracking-tight">FOX Mobile</h2>
+                    </div>
+    </div>
+
+    @* ------- SEARCH -------- *@
+    <div class="hidden md:flex flex-1 justify-center px-8">
+        <label class="flex flex-col w-full !h-10 max-w-lg">
+            <div class="flex w-full items-stretch rounded-lg h-full">
+                <div class="text-gray-500 dark:text-gray-400 flex bg-gray-200/50 dark:bg-white/10 items-center justify-center pl-4 rounded-l-lg">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">search</span>
+                </div>
+                <input class="form-input w-full flex-1 rounded-r-lg text-gray-800 dark:text-white bg-gray-200/50 dark:bg-white/10 border-none h-full px-4 text-sm"
+                       placeholder="Tìm kiếm sản phẩm..." />
+            </div>
+        </label>
+    </div>
+
+    @* ------ NAV + ICONS ------ *@
+    <div class="flex flex-1 justify-end gap-2 sm:gap-4">
+
+        <div class="hidden lg:flex items-center gap-6">
+            <a class="text-sm font-medium hover:text-primary dark:hover:text-primary">Điện thoại</a>
+            <a class="text-sm font-medium hover:text-primary dark:hover:text-primary">Laptop</a>
+            <a class="text-sm font-medium hover:text-primary dark:hover:text-primary">Khuyến mãi</a>
+        </div>
+
+        <div class="flex gap-2">
+            <button class="flex items-center justify-center rounded-lg h-10 w-10 bg-gray-200/50 dark:bg-white/10 hover:bg-gray-200/80">
+                <span class="material-symbols-outlined" style="font-size: 20px;">shopping_cart</span>
+            </button>
+            <button class="flex items-center justify-center rounded-lg h-10 w-10 bg-gray-200/50 dark:bg-white/10 hover:bg-gray-200/80">
+                <span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
+            </button>
+        </div>
+
+        <div class="bg-center bg-cover rounded-full size-10"
+             style='background-image:url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWYrMaT3ySxtBCkjNkMzf---PeGg879mBd0Ss2iDhMCRqdSsVhXvOBvzWu7IBMcgt2iZj4blpWqCV4CaxIwJyK9fRus7cbcxcQrjGcG90a7DeWlRDNTx4656T0Msqb4PV4FKTonssgQ5num_pgwl4E4dw3KXwHVpQP_PaOR_ice0kJnf8n1C9iyIcCM7hLESEJhwICT4arTvzqePflVFoDCwm_oiRK--esXKPvSHRN34wJWBm9r-Ac7D08-_QISSlhSLrnrDFQBvo");'>
+        </div>
+
+    </div>
+
+</header>
+
+
+@* -------- MAIN CONTENT -------- *@
+<main class="flex flex-col flex-1 px-4 sm:px-10 md:px-20 lg:px-40 py-8">
+
+<div class="layout-content-container flex flex-col w-full max-w-7xl mx-auto flex-1 gap-12">
+
+    @* ===== BANNER ===== *@
+    <div class="@@container">
+        <div class="@@\[480px\]:p-0">
+            <div class="relative flex min-h-[480px] flex-col gap-6 bg-cover bg-center 
+                        @@\[480px\]:rounded-xl items-start justify-end px-6 pb-10"
+                 style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuArnnKLLO3CIL7dOLuFqEacdZZnY5rcCUsj8FiLZTMmaq2v3u6gW9NODPYP02BSwHUPlpqnHpdBCpbatbQMMi1tgdKwHWpmGkKvBYmAekOHeQVquXOVP5pCf8Hp-RzbiDZ6evO_u7YakCt4uPZ1Gh0NwiWFQDxarJZ3n8GAPCo6wtHbLWlUrcomL2TCojIXawF_ILQ8NOj1PGDZvPJr4lpLUO0XfHrTFnk_G14P2jvoJY38jv6Hj-qV5jCezuMAH2-Z-etbjMzLm-8");'>
+
+                <div class="flex flex-col gap-4 text-left max-w-2xl">
+                    <h1 class="text-white text-4xl font-black drop-shadow-md">
+                        iPhone 15 Pro Max - Đỉnh Cao Công Nghệ
+                    </h1>
+                    <h2 class="text-white/90 text-sm drop-shadow-sm">
+                        Trải nghiệm sức mạnh và hiệu năng vượt trội ngay hôm nay.
+                    </h2>
+                </div>
+
+                <button class="flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-white font-bold hover:bg-primary/90 transition-all shadow-lg">
+                    Khám Phá Ngay
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    @* ===== CATEGORY ===== *@
+    <section>
+        <h2 class="text-gray-800 dark:text-white text-[22px] font-bold px-4 pb-4">Danh Mục Sản Phẩm</h2>
+
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 p-0 md:p-4">
+
+            <div class="flex flex-col items-center gap-3 rounded-xl border border-primary/20 p-4 hover:shadow-lg">
+                <div class="text-primary">
+                    <span class="material-symbols-outlined" style="font-size:28px;">phone_iphone</span>
+                </div>
+                <h3 class="font-bold">Điện thoại</h3>
+                <p class="text-gray-500 text-sm">Mẫu mới nhất</p>
+            </div>
+
+            <div class="flex flex-col items-center gap-3 rounded-xl border border-primary/20 p-4 hover:shadow-lg">
+                <div class="text-primary">
+                    <span class="material-symbols-outlined" style="font-size:28px;">laptop_mac</span>
+                </div>
+                <h3 class="font-bold">Laptop</h3>
+                <p class="text-gray-500 text-sm">Hiệu năng cao</p>
+            </div>
+
+        </div>
+    </section>
+
+
+    @* ===== FEATURED PRODUCTS ===== *@
+                    <h2 class="text-gray-800 dark:text-white text-[22px] font-bold px-4 pb-4">Sản Phẩm Nổi Bật</h2>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                        @foreach (var sp in Model)
+                        {
+                            <div class="flex flex-col gap-4 rounded-xl overflow-hidden border border-primary/20 bg-background-light dark:bg-background-dark/50 shadow-sm hover:shadow-xl group">
+                                <div class="aspect-square p-4 flex items-center justify-center bg-white dark:bg-gray-800">
+                                    <img src="@($"/images/products/{sp.ImageId}.jpg")"
+                                         class="h-40 object-contain group-hover:scale-105 transition-transform" />
+                                </div>
+
+                                <div class="p-4 flex flex-col gap-2">
+                                    <h3 class="font-bold">@sp.Name</h3>
+                                    <p class="text-sm text-gray-500 flex-1">@sp.ShortDescription</p>
+
+                                    <div class="flex items-center justify-between mt-4">
+                                        <span class="font-bold text-lg text-primary">
+                                            @String.Format("{0:N0}₫", sp.Price)
+                                        </span>
+
+                                        <button class="flex items-center justify-center size-9 bg-primary/20 text-primary rounded-full hover:bg-primary hover:text-white transition">
+                                            <span class="material-symbols-outlined">add_shopping_cart</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+
+        @* === Bạn có thể làm tương tự cho card 2, 3, 4 === *@
+
+    </div>
+
+</div>
+
+</main>
+
+</div>
+</div>
+
+</body>
+</html>
+
