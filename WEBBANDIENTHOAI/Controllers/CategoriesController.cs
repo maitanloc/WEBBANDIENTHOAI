@@ -1,27 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
-using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
+using WEBBANDIENTHOAI.Repository;
+using System.Threading.Tasks;
 
 namespace WEBBANDIENTHOAI.Controllers
 {
     public class CategoriesController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public CategoriesController(AppDbContext context)
+        public CategoriesController(ICategoryRepository categoryRepository)
         {
-            _context = context;
+            _categoryRepository = categoryRepository;
         }
 
         // GET: Categories
         public async Task<IActionResult> Index()
         {
-            var categories = await _context.Categories
-                .Include(c => c.Products)
-                .ToListAsync();
+            var categories = await _categoryRepository.GetAllWithProductsAsync();
             return View(categories);
         }
 
@@ -36,18 +32,25 @@ namespace WEBBANDIENTHOAI.Controllers
                 {
                     CategoryName = dto.CategoryName,
                     Description = dto.Description,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = System.DateTime.UtcNow
                 };
 
-                _context.Categories.Add(category);
-                await _context.SaveChangesAsync();
+                var result = await _categoryRepository.CreateAsync(category);
 
-                TempData["Success"] = "Thêm danh mục thành công!";
+                if (result)
+                {
+                    TempData["Success"] = "Thêm danh mục thành công!";
+                }
+                else
+                {
+                    TempData["Error"] = "Lỗi khi thêm danh mục!";
+                }
+
                 return RedirectToAction(nameof(Index));
             }
 
             // Nếu có lỗi validation, trả về view với thông báo lỗi
-            var categories = await _context.Categories.ToListAsync();
+            var categories = await _categoryRepository.GetAllWithProductsAsync();
             return View("Index", categories);
         }
 
@@ -58,7 +61,7 @@ namespace WEBBANDIENTHOAI.Controllers
         {
             if (ModelState.IsValid)
             {
-                var category = await _context.Categories.FindAsync(dto.CategoryId);
+                var category = await _categoryRepository.GetByIdAsync(dto.CategoryId);
                 if (category == null)
                 {
                     TempData["Error"] = "Không tìm thấy danh mục!";
@@ -68,26 +71,18 @@ namespace WEBBANDIENTHOAI.Controllers
                 category.CategoryName = dto.CategoryName;
                 category.Description = dto.Description;
 
-                try
-                {
-                    _context.Categories.Update(category);
-                    await _context.SaveChangesAsync();
+                var result = await _categoryRepository.UpdateAsync(category);
 
-                    TempData["Success"] = "Cập nhật danh mục thành công!";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateConcurrencyException)
+                if (result)
                 {
-                    if (!CategoryExists(dto.CategoryId))
-                    {
-                        TempData["Error"] = "Danh mục không tồn tại!";
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    TempData["Success"] = "Cập nhật danh mục thành công!";
                 }
+                else
+                {
+                    TempData["Error"] = "Lỗi khi cập nhật danh mục!";
+                }
+
+                return RedirectToAction(nameof(Index));
             }
 
             TempData["Error"] = "Dữ liệu không hợp lệ!";
@@ -99,33 +94,25 @@ namespace WEBBANDIENTHOAI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var category = await _context.Categories
-                .Include(c => c.Products)
-                .FirstOrDefaultAsync(c => c.CategoryId == id);
-
-            if (category == null)
-            {
-                TempData["Error"] = "Không tìm thấy danh mục!";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Kiểm tra xem danh mục có sản phẩm không
-            if (category.Products?.Any() == true)
+            var hasProducts = await _categoryRepository.HasProductsAsync(id);
+            if (hasProducts)
             {
                 TempData["Error"] = "Không thể xóa danh mục này vì đang có sản phẩm thuộc danh mục.";
                 return RedirectToAction(nameof(Index));
             }
 
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            var result = await _categoryRepository.DeleteAsync(id);
 
-            TempData["Success"] = "Xóa danh mục thành công!";
+            if (result)
+            {
+                TempData["Success"] = "Xóa danh mục thành công!";
+            }
+            else
+            {
+                TempData["Error"] = "Lỗi khi xóa danh mục!";
+            }
+
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool CategoryExists(int id)
-        {
-            return _context.Categories.Any(e => e.CategoryId == id);
         }
     }
 }

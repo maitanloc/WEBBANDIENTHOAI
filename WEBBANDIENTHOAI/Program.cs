@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WEBBANDIENTHOAI.Data;
+using WEBBANDIENTHOAI.Repository; // Thêm dòng này
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +22,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(conn));
 
 // ========================
-// 4) Enable Session
+// 4) Register Repositories
+// ========================
+builder.Services.AddScoped<IProductStatusRepository, ProductStatusRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+// ========================
+// 5) Enable Session
 // ========================
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -37,7 +44,7 @@ builder.Services.AddSession(options =>
 var app = builder.Build();
 
 // ========================
-// 5) Middleware pipeline
+// 6) Middleware pipeline
 // ========================
 if (!app.Environment.IsDevelopment())
 {
@@ -51,7 +58,7 @@ app.UseSession();       // must be before UseAuthorization
 app.UseAuthorization();
 
 // ========================
-// 6) Default Route
+// 7) Default Route
 // ========================
 app.MapControllerRoute(
     name: "default",
