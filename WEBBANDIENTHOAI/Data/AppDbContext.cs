@@ -81,6 +81,21 @@ namespace WEBBANDIENTHOAI.Data
 
             modelBuilder.Entity<AuditLog>().ToTable("AuditLogs");
 
+            // 🔥 FIX QUAN HỆ Product ↔ ProductImage
+            modelBuilder.Entity<Product>()
+                .HasMany(p => p.Images)
+                .WithOne(pi => pi.Product)
+                .HasForeignKey(pi => pi.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Quan hệ optional cho PrimaryImage
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.PrimaryImage)
+                .WithOne()
+                .HasForeignKey<Product>(p => p.ImageId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // Indexes / constraints you may want (ví dụ)
             modelBuilder.Entity<Product>().HasIndex(p => p.SKU).IsUnique(false);
             modelBuilder.Entity<Inventory>().HasIndex(i => i.StockCode);
