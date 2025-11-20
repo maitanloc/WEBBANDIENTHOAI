@@ -1,0 +1,273 @@
+﻿@model IEnumerable<WEBBANDIENTHOAI.Models.ProductStatus>
+
+@{
+    ViewData["Title"] = "Quản lý Trạng thái Sản phẩm";
+}
+
+<!DOCTYPE html>
+<html class="light" lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/ProductStatuses.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body class="status-management bg-background-light dark:bg-background-dark font-display text-[#181411] dark:text-gray-200">
+    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div class="layout-container flex h-full grow flex-col">
+            <main class="flex-1 px-4 sm:px-6 md:px-8 lg:px-12 py-8">
+                <div class="mx-auto max-w-7xl">
+                    <!-- Top Nav Bar -->
+                    <header class="status-header flex flex-col sm:flex-row items-start sm:items-center sm:justify-between whitespace-nowrap pb-6">
+                        <div class="flex items-center gap-4 text-[#181411] dark:text-gray-100">
+                            <div class="size-8 text-primary">
+                                <svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd" d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z" fill="currentColor" fill-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <h1 class="text-2xl font-bold tracking-tight">Quản lý Trạng thái Sản phẩm</h1>
+                        </div>
+                        <button type="button"
+                                class="btn-primary-custom mt-4 sm:mt-0"
+                                data-bs-toggle="modal" data-bs-target="#createModal">
+                            <span class="material-symbols-outlined text-base">add_circle</span>
+                            <span class="truncate">Thêm Trạng thái</span>
+                        </button>
+                    </header>
+
+                    <!-- Thông báo -->
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success mb-4">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger mb-4">@TempData["Error"]</div>
+                    }
+
+                    <!-- Main Content - Table -->
+                    <div class="w-full">
+                        @if (Model.Any())
+                        {
+                            <div class="status-table overflow-hidden shadow-sm">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left" scope="col">Tên trạng thái</th>
+                                            <th class="text-left" scope="col">Mô tả</th>
+                                            <th class="text-left" scope="col">Số sản phẩm</th>
+                                            <th class="text-right" scope="col">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40">
+                                                <td class="whitespace-nowrap font-medium text-gray-900 dark:text-gray-100">
+                                                    @item.StatusName
+                                                </td>
+                                                <td class="whitespace-nowrap text-gray-600 dark:text-gray-300">
+                                                    @(item.Description ?? "Không có mô tả")
+                                                </td>
+                                                <td class="whitespace-nowrap text-gray-600 dark:text-gray-300">
+                                                    <span class="status-badge @GetStatusBadgeClass(item.StatusName)">
+                                                        @item.Products?.Count ?? 0 sản phẩm
+                                                    </span>
+                                                </td>
+                                                <td class="whitespace-nowrap text-right font-medium">
+                                                    <div class="flex items-center justify-end gap-2">
+                                                        <button class="action-btn edit-btn"
+                                                                data-bs-toggle="modal" data-bs-target="#editModal"
+                                                                data-id="@item.StatusId"
+                                                                data-name="@item.StatusName"
+                                                                data-desc="@item.Description">
+                                                            <span class="material-symbols-outlined text-xl">edit</span>
+                                                        </button>
+                                                        <button class="action-btn delete-btn"
+                                                                data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                                data-id="@item.StatusId"
+                                                                data-name="@item.StatusName">
+                                                            <span class="material-symbols-outlined text-xl">delete</span>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Empty State -->
+                            <div class="empty-state">
+                                <div class="flex flex-col items-center gap-6">
+                                    <div class="empty-state-icon">
+                                        <span class="material-symbols-outlined text-4xl">inventory</span>
+                                    </div>
+                                    <div class="flex max-w-sm flex-col items-center gap-2">
+                                        <p class="text-lg font-bold text-[#181411] dark:text-gray-100">Chưa có trạng thái nào</p>
+                                        <p class="text-sm font-normal text-gray-600 dark:text-gray-400">Bắt đầu bằng cách thêm trạng thái đầu tiên của bạn.</p>
+                                    </div>
+                                    <button type="button"
+                                            class="btn-primary-custom"
+                                            data-bs-toggle="modal" data-bs-target="#createModal">
+                                        <span class="material-symbols-outlined text-base">add_circle</span>
+                                        <span class="truncate">Thêm Trạng thái Đầu tiên</span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Thêm -->
+    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Thêm Trạng thái Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="CreateStatus" asp-controller="ProductStatuses" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="modal-label" for="createStatusName">Tên trạng thái <span class="text-red-500">*</span></label>
+                            <input type="text" id="createStatusName" name="StatusName" class="modal-input"
+                                   placeholder="Nhập tên trạng thái" required maxlength="30" />
+                        </div>
+                        <div class="form-group">
+                            <label class="modal-label" for="createDescription">Mô tả</label>
+                            <textarea id="createDescription" name="Description" class="modal-input modal-textarea"
+                                      placeholder="Nhập mô tả cho trạng thái" maxlength="150"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="modal-btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="modal-btn-primary">Thêm Trạng thái</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Sửa -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Sửa Trạng thái</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="EditStatus" asp-controller="ProductStatuses" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body">
+                        <input type="hidden" name="StatusId" id="editStatusId" />
+                        <div class="form-group">
+                            <label class="modal-label" for="editStatusName">Tên trạng thái <span class="text-red-500">*</span></label>
+                            <input type="text" id="editStatusName" name="StatusName" class="modal-input"
+                                   placeholder="Nhập tên trạng thái" required maxlength="30" />
+                        </div>
+                        <div class="form-group">
+                            <label class="modal-label" for="editDescription">Mô tả</label>
+                            <textarea id="editDescription" name="Description" class="modal-input modal-textarea"
+                                      placeholder="Nhập mô tả cho trạng thái" maxlength="150"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="modal-btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="modal-btn-primary">Cập nhật Trạng thái</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Xóa -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Xóa Trạng thái</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="DeleteStatus" asp-controller="ProductStatuses" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="deleteStatusId" />
+                        <p class="text-gray-700 dark:text-gray-300 mb-3">Bạn có chắc chắn muốn xóa trạng thái "<span id="deleteStatusName" class="font-semibold"></span>"?</p>
+                        <p class="text-red-500 text-sm">Lưu ý: Không thể xóa nếu trạng thái đang có sản phẩm.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="modal-btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="modal-btn-danger">Xóa Trạng thái</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Xử lý modal sửa - tự động điền thông tin khi nhấn nút sửa
+        $('#editModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            var name = button.data('name');
+            var desc = button.data('desc');
+
+            var modal = $(this);
+            modal.find('#editStatusId').val(id);
+            modal.find('#editStatusName').val(name);
+            modal.find('#editDescription').val(desc || '');
+        });
+
+        // Xử lý modal xóa
+        $('#deleteModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            var name = button.data('name');
+
+            var modal = $(this);
+            modal.find('#deleteStatusId').val(id);
+            modal.find('#deleteStatusName').text(name);
+        });
+
+        // Reset form khi đóng modal thêm
+        $('#createModal').on('hidden.bs.modal', function () {
+            $(this).find('form')[0].reset();
+        });
+
+        // Tự động ẩn thông báo sau 5 giây
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+</body>
+</html>
+
+@functions {
+    public string GetStatusBadgeClass(string statusName)
+    {
+        return statusName?.ToLower() switch
+        {
+            "còn hàng" or "active" or "đang hoạt động" => "active",
+            "hết hàng" or "inactive" or "ngừng kinh doanh" => "inactive",
+            "đặt trước" or "done" or "hoàn thành" => "done",
+            _ => "active"
+        };
+    }
+}
