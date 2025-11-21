@@ -19,7 +19,6 @@ namespace WEBBANDIENTHOAI.Controllers
             // Lấy 8 sản phẩm nổi bật – hoặc tất cả
             var featuredProducts = _context.Products
                 .OrderByDescending(p => p.CreatedAt)
-                .Take(8)
                 .ToList();
 
             // Lấy role từ session
@@ -33,5 +32,6 @@ namespace WEBBANDIENTHOAI.Controllers
 
             return View(featuredProducts); // nhớ trả data ra View
         }
+
     }
 }
