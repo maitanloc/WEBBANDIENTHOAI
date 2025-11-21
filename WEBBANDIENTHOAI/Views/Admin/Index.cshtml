@@ -5,337 +5,69 @@
     ViewData["Title"] = "Trang Chủ — Admin";
 }
 
-<link rel="stylesheet" href="@(Url.Content("~/css/admin-dashboard.css"))" />
+<link rel="stylesheet" href="~/css/admin-dashboard.css" />
 
-<div class="admin-root">
-  <div class="flex h-screen w-full">
-    <!-- SIDEBAR (nhiều app dùng _Layout có sidebar, nhưng giữ ở đây nếu _Layout không) -->
-        <aside class="w-64 flex-shrink-0 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex flex-col p-4">
-            <div class="flex items-center gap-3 px-2 mb-6">
-                <span class="material-symbols-outlined text-primary text-3xl">store</span>
-                <h1 class="text-xl font-bold">WebBánĐiệnThoại</h1>
-            </div>
-
-            <nav class="flex flex-col gap-2 flex-grow">
-                <!-- Quản lý Sản Phẩm -->
-                <details class="group" open>
-                    <summary class="flex items-center justify-between p-3 rounded-DEFAULT cursor-pointer hover:bg-primary/10">
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-text-muted-light">smartphone</span>
-                            <span class="font-medium text-sm">Quản lý Sản Phẩm</span>
-                        </div>
-                        <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
-                    </summary>
-                    <div class="pl-8 pt-2 flex flex-col gap-2">
-                        <a href="@Url.Action("Products", "Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10">
-                            <span class="material-symbols-outlined text-sm">inventory_2</span>
-                            Sản Phẩm
-                        </a>
-                        <a href="@Url.Action("ProductStatuses", "ProductStatuses")" class="flex items-center gap-3 p-2 rounded text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 transition-colors">
-                            <span class="material-symbols-outlined text-base">category</span>
-                            Trạng thái sản phẩm
-                        </a>
-                        <a href="@Url.Action("Index", "Categories")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10">
-                            <span class="material-symbols-outlined text-sm">category</span>
-                            Danh mục
-                        </a>
-                    </div>
-                </details>
-
-                <!-- Quản lý Đơn Hàng -->
-                <details class="group">
-                    <summary class="flex items-center justify-between p-3 rounded-DEFAULT cursor-pointer hover:bg-primary/10">
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-text-muted-light">receipt_long</span>
-                            <span class="font-medium text-sm">Quản lý Đơn Hàng</span>
-                        </div>
-                        <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
-                    </summary>
-                    <div class="pl-8 pt-2 flex flex-col gap-2">
-                        <a href="@Url.Action("Orders", "Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10">
-                            <span class="material-symbols-outlined text-sm">shopping_cart</span>
-                            Đặt Hàng
-                        </a>
-                        <a href="@Url.Action("Shipping", "Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10">
-                            <span class="material-symbols-outlined text-sm">local_shipping</span>
-                            Vận Chuyển
-                        </a>
-                    </div>
-                </details>
-
-                <!-- Quản lý Tài Khoản -->
-                <details class="group">
-                    <summary class="flex items-center justify-between p-3 rounded-DEFAULT cursor-pointer hover:bg-primary/10">
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-text-muted-light">group</span>
-                            <span class="font-medium text-sm">Quản lý Tài Khoản</span>
-                        </div>
-                        <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
-                    </summary>
-                    <div class="pl-8 pt-2 flex flex-col gap-2">
-                        <a href="@Url.Action("Index", "Customer")"
-                           class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10">
-                            <span class="material-symbols-outlined text-sm">people</span>
-                            Khách Hàng  
-                        </a>
-                        <a href="@Url.Action("StaffList", "Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10">
-                            <span class="material-symbols-outlined text-sm">badge</span>
-                            Nhân Viên
-                        </a>
-                    </div>
-                </details>
-
-                <!-- Báo Cáo & Công Cụ -->
-                <details class="group" open>
-                    <summary class="flex items-center justify-between p-3 rounded-DEFAULT cursor-pointer hover:bg-primary/10 bg-primary/10">
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-primary">assessment</span>
-                            <span class="font-medium text-sm text-primary">Báo Cáo & Công Cụ</span>
-                        </div>
-                        <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm text-primary">chevron_right</span>
-                    </summary>
-                    <div class="pl-8 pt-2 flex flex-col gap-2">
-                        <a href="@Url.Action("Reports", "Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-primary bg-primary/20">
-                            <span class="material-symbols-outlined text-sm">assessment</span>
-                            Báo Cáo
-                        </a>
-                        <a href="@Url.Action("Audit", "Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10">
-                            <span class="material-symbols-outlined text-sm">history</span>
-                            Nhật Ký
-                        </a>
-                        <a href="@Url.Action("Promos", "Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10">
-                            <span class="material-symbols-outlined text-sm">local_offer</span>
-                            Khuyến Mãi
-                        </a>
-                        <a href="@Url.Action("Inventory", "Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10">
-                            <span class="material-symbols-outlined text-sm">inventory_2</span>
-                            Kho Hàng
-                        </a>
-                        <a href="@Url.Action("ImportExport", "Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10">
-                            <span class="material-symbols-outlined text-sm">import_export</span>
-                            Import/Export
-                        </a>
-                        <a href="@Url.Action("Support", "Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10">
-                            <span class="material-symbols-outlined text-sm">support_agent</span>
-                            Hỗ Trợ
-                        </a>
-                    </div>
-                </details>
-            </nav>
-
-            <div class="mt-auto">
-                <div class="flex items-center gap-3 p-3 bg-surface-light/60 rounded-lg mb-3">
-                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-orange-50 text-primary font-semibold">AD</div>
-                    <div class="flex flex-col">
-                        <h1 class="text-gray-800 text-sm font-medium">Admin User</h1>
-                        <p class="text-gray-500 text-xs">administrator@example.com</p>
-                    </div>
-                </div>
-
-                <a id="nav-logout" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer" href="@Url.Action("Logout", "Account")">
-                    <span class="material-symbols-outlined">logout</span>
-                    <p class="text-sm font-medium">Đăng Xuất</p>
-                </a>
-
-                <div class="mt-3 text-xs text-gray-600/70 text-center">
-                    <span>© 2025 WebBánĐiệnThoại</span>
-                </div>
-            </div>
-        </aside>
-
-    <!-- MAIN -->
-    <main class="flex-1 flex flex-col overflow-y-auto relative z-10">
-      <!-- HEADER -->
-            <header class="flex items-center justify-between whitespace-nowrap border-b border-gray-200 px-6 py-3 bg-white sticky top-0 z-30">
-
-                <div class="flex items-center gap-3 flex-1 mr-4">
-                    <button class="mobile-sidebar-toggle inline-flex items-center justify-center h-10 w-10 rounded-lg bg-white border border-gray-200 icon-btn lg:hidden">
-                        <span class="material-symbols-outlined">menu</span>
-                    </button>
-
-                    <div class="w-full max-w-md">
-                        <div class="flex items-center rounded-lg bg-gray-100 h-10 overflow-hidden hover:ring-1 ring-gray-300 transition-all">
-                            <div class="text-gray-400 flex items-center justify-center pl-4 pr-3">
-                                <span class="material-symbols-outlined text-[20px]">search</span>
-                            </div>
-                            <input id="global-search" class="form-input flex-1 min-w-0 text-sm bg-transparent px-3 focus:outline-0" placeholder="Tìm kiếm..." />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-3">
-
-                    <div class="hidden sm:flex items-center rounded-lg border border-gray-200 bg-white overflow-hidden divide-x divide-gray-200">
-                        <button id="btn-import" class="flex h-10 items-center gap-2 px-3 hover:bg-gray-50 transition-colors" title="Import Excel">
-                            <span class="material-symbols-outlined text-gray-600 text-[18px]">file_upload</span>
-                            <span class="text-sm text-gray-700 font-medium">Import</span>
-                        </button>
-                        <button id="btn-export" class="flex h-10 items-center gap-2 px-3 hover:bg-gray-50 transition-colors" title="Export Báo cáo">
-                            <span class="material-symbols-outlined text-gray-600 text-[18px]">file_download</span>
-                            <span class="text-sm text-gray-700 font-medium">Export</span>
-                        </button>
-                    </div>
-
-                    <div class="hidden md:flex items-center rounded-lg border border-gray-200 bg-white overflow-hidden divide-x divide-gray-200">
-                        <button id="btn-nhapkho" class="flex h-10 items-center gap-2 px-3 hover:bg-gray-50 transition-colors" title="Nhập kho">
-                            <span class="material-symbols-outlined text-gray-600 text-[18px]">inventory_2</span>
-                            <span class="text-sm text-gray-700 font-medium">Nhập</span>
-                        </button>
-                        <button id="btn-xuatkho" class="flex h-10 items-center gap-2 px-3 hover:bg-gray-50 transition-colors" title="Xuất kho">
-                            <span class="material-symbols-outlined text-gray-600 text-[18px]">outbound</span>
-                            <span class="text-sm text-gray-700 font-medium">Xuất</span>
-                        </button>
-                    </div>  
-
-                    <button id="btn-add-product" class="flex items-center gap-2 h-10 px-4 bg-primary hover:bg-orange-600 text-white text-sm font-bold rounded-lg shadow-sm transition-all ml-1">
-                        <span class="material-symbols-outlined text-[20px]">add_circle</span>
-                        <span class="hidden sm:inline">Thêm Sản Phẩm</span>
-                    </button>
-
-                    <div class="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-primary font-bold text-xs ml-2 border-2 border-white shadow-sm">
-                        AD
-                    </div>
-                </div>
-            </header>
-
-      <!-- CONTENT -->
-      <div class="p-6 sm:p-8 lg:p-10 space-y-8">
-        <div class="flex flex-wrap justify-between items-start gap-4">
-          <div>
-            <p class="text-gray-900 text-3xl font-black leading-tight tracking-[-0.033em]">Trang Chủ</p>
-            <p class="text-gray-500 mt-1">Chào mừng bạn đã quay trở lại</p>
-          </div>
-
-          <div class="flex gap-3 items-center">
-            <button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white px-4 border border-gray-200 text-sm">
-              <p class="text-gray-800 text-sm font-medium">30 ngày trước</p><span class="material-symbols-outlined text-gray-500">expand_more</span>
-            </button>
-
-            <a class="flex h-10 items-center gap-2 rounded-lg px-3 bg-white border border-gray-200 text-sm btn-icon focus-ring" href="@Url.Action("Reports","Admin")" title="Báo cáo">
-              <span class="material-symbols-outlined text-gray-600">insights</span><span class="text-sm">Báo Cáo</span>
-            </a>
-
-            <a class="flex h-10 items-center gap-2 rounded-lg px-3 bg-white border border-gray-200 text-sm btn-icon focus-ring" href="@Url.Action("Promos","Admin")" title="Khuyến mãi">
-              <span class="material-symbols-outlined text-gray-600">local_offer</span><span class="text-sm">Khuyến Mãi</span>
-            </a>
-
-            <a class="flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold btn-icon focus-ring" href="@Url.Action("AddProduct","Admin")" title="Thêm sản phẩm">
-              <span class="material-symbols-outlined">add_circle</span><span class="truncate">Thêm Sản Phẩm</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- KPI -->
-        <section class="kpi-grid" aria-label="KPI">
-          <article class="kpi-card">
-            <div class="kpi-label">Doanh Thu</div>
-            <div id="totalRevenueValue" class="kpi-value">@String.Format(new CultureInfo("vi-VN"), "{0:C0}", Model.TotalRevenue)</div>
-            <div class="kpi-meta">Tổng (từ Orders)</div>
-          </article>
-
-          <article class="kpi-card">
-            <div class="kpi-label">Tổng hôm nay</div>
-            <div id="todayRevenueValue" class="kpi-value">@String.Format(new CultureInfo("vi-VN"), "{0:C0}", Model.TodayRevenue)</div>
-            <div class="kpi-meta">Hôm nay</div>
-          </article>
-
-          <article class="kpi-card">
-            <div class="kpi-label">Đơn mới</div>
-            <div id="newOrdersValue" class="kpi-value">@Model.NewOrdersCount</div>
-            <div class="kpi-meta">Đơn Pending</div>
-          </article>
-
-          <article class="kpi-card">
-            <div class="kpi-label">Sắp hết</div>
-            <div id="lowStockValue" class="kpi-value">@Model.LowStockCount</div>
-            <div class="kpi-meta">Số dòng tồn <= ngưỡng</div>
-          </article>
-        </section>
-
-        <!-- Charts + Recent Orders -->
-        <section class="grid-two">
-          <div class="panel">
-            <h3>Doanh thu (7 ngày)</h3>
-            <div id="revenueChartWrap" class="chart-wrap">
-              <canvas id="revenueChart" height="140" aria-label="Doanh thu 7 ngày"></canvas>
-              <div id="revenuePlaceholder" class="chart-placeholder" style="display:none">Không có dữ liệu doanh thu</div>
-            </div>
-
-            @if (Model.StockLabels != null && Model.StockData != null && Model.StockLabels.Any())
-            {
-                <div class="mt-6">
-                    <h4>Tình trạng hàng tồn kho</h4>
-                    <div class="chart-wrap">
-                      <canvas id="stockDonut" height="140" aria-label="Tồn kho"></canvas>
-                    </div>
-                </div>
-            }
-          </div>
-
-          <div class="panel table-panel">
-            <h3>Đơn đặt hàng gần đây</h3>
-            <div class="table-wrap">
-              <table class="table">
-                <thead>
-                  <tr><th>Mã Đơn</th><th>Nhân Viên / Khách</th><th>Ngày</th><th>Trạng Thái</th><th class="text-right">Tổng tiền</th></tr>
-                </thead>
-                <tbody>
-                  @if (Model.RecentOrders != null && Model.RecentOrders.Any())
-                  {
-                      foreach(var o in Model.RecentOrders)
-                      {
-                          <tr>
-                            <td class="code">@o.OrderCode</td>
-                            <td>@o.StaffOrCustomer</td>
-                            <td>@o.OrderDate.ToString("yyyy-MM-dd")</td>
-                            <td><span class="status">@o.Status</span></td>
-                            <td class="text-right">@String.Format(new CultureInfo("vi-VN"), "{0:C0}", o.Total)</td>
-                          </tr>
-                      }
-                  }
-                  else
-                  {
-                      <tr><td colspan="5" class="muted text-center">Không có đơn hàng gần đây</td></tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-
-            <div class="panel-actions">
-              <a href="@Url.Action("Orders", "Admin")" class="btn">Xem tất cả đơn</a>
-              <a href="@Url.Action("ExportReport", "Admin")" class="btn primary">Xuất báo cáo</a>
-            </div>
-          </div>
-        </section>
-      </div>
-    </main>
+<div class="space-y-8 p-6 sm:p-8 lg:p-10">
+  <div class="flex justify-between items-start">
+    <div>
+      <h1 class="text-3xl font-black">Trang Chủ</h1>
+      <p class="text-gray-500 mt-1">Chào mừng bạn đã quay trở lại</p>
+    </div>
+    <div class="flex gap-3 items-center">
+      <a class="btn panel-link" data-url="@Url.Action("AddProduct","Admin")" href="@Url.Action("AddProduct","Admin")">Thêm sản phẩm</a>
+    </div>
   </div>
 
-  <!-- Logout Confirmation Modal -->
-  <div id="logout-confirm-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-lg p-8 shadow-xl text-center">
-        <img src="@Url.Content("~/Images/hỏi đăng xuất.png")" alt="Confirm Logout" class="mx-auto mb-4" style="max-width: 100px;"/>
-        <h2 class="text-xl font-bold mb-4">Xác nhận đăng xuất</h2>
-        <p class="mb-6">Bạn có chắc chắn muốn đăng xuất không?</p>
-        <div class="flex justify-center gap-4">
-            <button id="logout-confirm-yes" class="px-6 py-2 bg-red-600 text-white rounded">Đăng xuất</button>
-            <button id="logout-confirm-no" class="px-6 py-2 bg-gray-300 rounded">Hủy</button>
-        </div>
+  <!-- KPI -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="p-4 bg-white rounded shadow">
+      <div class="text-sm text-gray-500">Doanh thu</div>
+      <div class="text-xl font-bold">@String.Format(new CultureInfo("vi-VN"), "{0:C0}", Model.TotalRevenue)</div>
+    </div>
+    <div class="p-4 bg-white rounded shadow">
+      <div class="text-sm text-gray-500">Hôm nay</div>
+      <div class="text-xl font-bold">@String.Format(new CultureInfo("vi-VN"), "{0:C0}", Model.TodayRevenue)</div>
+    </div>
+    <div class="p-4 bg-white rounded shadow">
+      <div class="text-sm text-gray-500">Đơn mới</div>
+      <div class="text-xl font-bold">@Model.NewOrdersCount</div>
+    </div>
+    <div class="p-4 bg-white rounded shadow">
+      <div class="text-sm text-gray-500">Sắp hết</div>
+      <div class="text-xl font-bold">@Model.LowStockCount</div>
+    </div>
+  </section>
+
+  <!-- Recent orders + charts -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white p-4 rounded shadow">
+      <h3 class="font-semibold mb-3">Doanh thu (7 ngày)</h3>
+      <canvas id="revenueChart" height="140"></canvas>
+    </div>
+
+    <div class="bg-white p-4 rounded shadow">
+      <h3 class="font-semibold mb-3">Đơn gần đây</h3>
+      <table class="w-full text-sm">
+        <thead><tr><th>Mã</th><th>KH</th><th>Ngày</th><th class="text-right">Tổng</th></tr></thead>
+        <tbody>
+          @if (Model.RecentOrders != null && Model.RecentOrders.Any())
+          {
+              foreach(var o in Model.RecentOrders)
+              {
+                  <tr>
+                    <td>@o.OrderCode</td>
+                    <td>@o.StaffOrCustomer</td>
+                    <td>@o.OrderDate.ToString("yyyy-MM-dd")</td>
+                    <td class="text-right">@String.Format(new CultureInfo("vi-VN"), "{0:C0}", o.Total)</td>
+                  </tr>
+              }
+          }
+          else
+          {
+              <tr><td colspan="4" class="text-center text-gray-500">Không có đơn gần đây</td></tr>
+          }
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
-
-<!-- truyền dữ liệu cho JS -->
-<script>
-  window.DASHBOARD = {
-    revenueLabels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueByDayLabels ?? new List<string>())),
-    revenueData: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueByDay ?? new List<decimal>())),
-    stockLabels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StockLabels ?? new List<string>())),
-    stockData: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StockData ?? new List<int>()))
-  };
-</script>
-
-@section Scripts {
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="@(Url.Content("~/js/admin-dashboard.js"))"></script>
-}

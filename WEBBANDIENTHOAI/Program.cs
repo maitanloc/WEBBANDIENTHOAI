@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1) Load connection string
 // ========================
 var conn = builder.Configuration.GetConnectionString("DefaultConnection")
-           ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=PhoneShopFull;Integrated Security=True;TrustServerCertificate=True";
+           ?? "Data Source=DELL\\SQLEXPRESS02;Initial Catalog=PhoneShopFull;Integrated Security=True;TrustServerCertificate=True";
 
 // ========================
 // 2) Add MVC services
@@ -26,6 +26,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // ========================
 builder.Services.AddScoped<IProductStatusRepository, ProductStatusRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+
 
 // ========================
 // 5) Enable Session
