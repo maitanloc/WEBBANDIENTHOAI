@@ -9,44 +9,418 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>@ViewData["Title"] - WebBánĐiệnThoại</title>
 
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries" defer></script>
+    <!-- CHỈ SỬ DỤNG TAILWIND - LOẠI BỎ BOOTSTRAP CONFLICT -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
-    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Products.css" asp-append-version="true" />
+    <!-- LOẠI BỎ CSS CONFLICT -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <!-- CSS TÙY CHỈNH RIÊNG CHO ADMIN -->
+    <style>
+        /* RESET LẠI MỘT SỐ STYLE BỊ CONFLICT */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ẨN NỘI DUNG CHO ĐẾN KHI LOAD XONG */
+        .main-content {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .content-loaded .main-content {
+            opacity: 1;
+        }
+
+        /* SIDEBAR FIXED */
+        .sidebar-fixed {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 16rem;
+            z-index: 40;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        /* MAIN CONTENT OFFSET */
+        .main-content {
+            margin-left: 16rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ACTIVE LINK STYLES */
+        .panel-link.active-panel-link {
+            background: rgba(11,107,255,0.08);
+            color: #0b6bff;
+            border-radius: 0.5rem;
+        }
+
+        /* MATERIAL ICONS FIX */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* SEARCH FORM STYLES */
+        .search-form {
+            max-width: 32rem;
+        }
+
+        /* === FIX QUAN TRỌNG: RESET TRIỆT ĐỂ CHO LOADER === */
+        #initial-loader,
+        #navigation-loader {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 9999 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            background: white !important; /* NỀN TRẮNG NGAY LẬP TỨC */
+            transform: none !important;
+            opacity: 1 !important;
+            transition: none !important; /* KHÔNG CÓ TRANSITION GÂY DELAY */
+        }
+
+            #initial-loader.fade-out {
+                opacity: 0 !important;
+                pointer-events: none !important;
+                transition: opacity 0.5s ease-in-out !important;
+            }
+
+            #navigation-loader.hidden {
+                display: none !important;
+            }
+
+        /* RESET CONTAINER LOADER */
+        .loader {
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: fit-content !important;
+            height: fit-content !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            background: transparent !important;
+        }
+
+        /* ĐẢM BẢO LOADER KHÔNG BỊ ẢNH HƯỞNG BỞI CSS KHÁC */
+        .truckWrapper {
+            position: relative !important;
+            width: 200px !important;
+            height: 100px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            overflow-x: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            transform: none !important;
+        }
+
+        /* LOADER XE TẢI - GIỮ NGUYÊN ANIMATION */
+        .truckBody {
+            width: 130px;
+            height: fit-content;
+            margin-bottom: 6px;
+            animation: motion 1s linear infinite;
+        }
+
+        /* truck suspension animation*/
+        @@keyframes motion {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(3px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* truck's tires */
+        .truckTires {
+            width: 130px;
+            height: fit-content;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px 10px 0px 15px;
+            position: absolute;
+            bottom: 0;
+        }
+
+            .truckTires svg {
+                width: 24px;
+            }
+
+        .road {
+            width: 100%;
+            height: 1.5px;
+            background-color: #282828;
+            position: relative;
+            bottom: 0;
+            align-self: flex-end;
+            border-radius: 3px;
+        }
+
+            .road::before {
+                content: "";
+                position: absolute;
+                width: 20px;
+                height: 100%;
+                background-color: #282828;
+                right: -50%;
+                border-radius: 3px;
+                animation: roadAnimation 1.4s linear infinite;
+                border-left: 10px solid white;
+            }
+
+            .road::after {
+                content: "";
+                position: absolute;
+                width: 10px;
+                height: 100%;
+                background-color: #282828;
+                right: -65%;
+                border-radius: 3px;
+                animation: roadAnimation 1.4s linear infinite;
+                border-left: 4px solid white;
+            }
+
+        .lampPost {
+            position: absolute;
+            bottom: 0;
+            right: -90%;
+            height: 90px;
+            animation: roadAnimation 1.4s linear infinite;
+        }
+
+        @@keyframes roadAnimation {
+            0% {
+                transform: translateX(0px);
+            }
+
+            100% {
+                transform: translateX(-350px);
+            }
+        }
+
+        /* RESPONSIVE FIXES */
+        @@media (max-width: 768px) {
+            .sidebar-fixed {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar-fixed.mobile-open {
+                transform: translateX(0);
+            }
+        }
+
+        /* === EMERGENCY FIX: ĐẢM BẢO KHÔNG CÓ BACKGROUND TRONG SUỐT === */
+        #navigation-loader {
+            background: white !important;
+            background-color: white !important;
+            background-image: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+
+        /* === POPUP XÁC NHẬN ĐĂNG XUẤT === */
+        .logout-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .logout-popup {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .logout-image {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .logout-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .logout-message {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .logout-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .logout-btn-cancel {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+            .logout-btn-cancel:hover {
+                background: #4b5563;
+            }
+
+        .logout-btn-confirm {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+            .logout-btn-confirm:hover {
+                background: #dc2626;
+            }
+    </style>
 
     @RenderSection("Styles", required: false)
 </head>
-<body class="font-display bg-background-light text-gray-800 antialiased">
-    <div class="min-h-screen flex">
-        <!-- === SIDEBAR (moved here, exact code from your Admin Index) === -->
-        <aside class="w-64 flex-shrink-0 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex flex-col p-4">
+<body class="bg-gray-50 text-gray-800">
+    <!-- INITIAL LOADER - HIỆN KHI BẮT ĐẦU LOAD TRANG -->
+    <div id="initial-loader">
+        <div class="loader">
+            <div class="truckWrapper">
+                <div class="truckBody">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 198 93" class="trucksvg">
+                        <path stroke-width="3" stroke="#282828" fill="#f97316" d="M135 22.5H177.264C178.295 22.5 179.22 23.133 179.594 24.0939L192.33 56.8443C192.442 57.1332 192.5 57.4404 192.5 57.7504V89C192.5 90.3807 191.381 91.5 190 91.5H135C133.619 91.5 132.5 90.3807 132.5 89V25C132.5 23.6193 133.619 22.5 135 22.5Z"></path>
+                        <path stroke-width="3" stroke="#282828" fill="#7D7C7C" d="M146 33.5H181.741C182.779 33.5 183.709 34.1415 184.078 35.112L190.538 52.112C191.16 53.748 189.951 55.5 188.201 55.5H146C144.619 55.5 143.5 54.3807 143.5 53V36C143.5 34.6193 144.619 33.5 146 33.5Z"></path>
+                        <path stroke-width="2" stroke="#282828" fill="#282828" d="M150 65C150 65.39 149.763 65.8656 149.127 66.2893C148.499 66.7083 147.573 67 146.5 67C145.427 67 144.501 66.7083 143.873 66.2893C143.237 65.8656 143 65.39 143 65C143 64.61 143.237 64.1344 143.873 63.7107C144.501 63.2917 145.427 63 146.5 63C147.573 63 148.499 63.2917 149.127 63.7107C149.763 64.1344 150 64.61 150 65Z"></path>
+                        <rect stroke-width="2" stroke="#282828" fill="#FFFCAB" rx="1" height="7" width="5" y="63" x="187"></rect>
+                        <rect stroke-width="2" stroke="#282828" fill="#282828" rx="1" height="11" width="4" y="81" x="193"></rect>
+                        <rect stroke-width="3" stroke="#282828" fill="#DFDFDF" rx="2.5" height="90" width="121" y="1.5" x="6.5"></rect>
+                        <rect stroke-width="2" stroke="#282828" fill="#DFDFDF" rx="2" height="4" width="6" y="84" x="1"></rect>
+                    </svg>
+                </div>
+                <div class="truckTires">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 30 30" class="tiresvg">
+                        <circle stroke-width="3" stroke="#282828" fill="#282828" r="13.5" cy="15" cx="15"></circle>
+                        <circle fill="#DFDFDF" r="7" cy="15" cx="15"></circle>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 30 30" class="tiresvg">
+                        <circle stroke-width="3" stroke="#282828" fill="#282828" r="13.5" cy="15" cx="15"></circle>
+                        <circle fill="#DFDFDF" r="7" cy="15" cx="15"></circle>
+                    </svg>
+                </div>
+                <div class="road"></div>
+                <svg xml:space="preserve" viewBox="0 0 453.459 453.459" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="Capa_1" version="1.1" fill="#000000" class="lampPost">
+                <path d="M252.882,0c-37.781,0-68.686,29.953-70.245,67.358h-6.917v8.954c-26.109,2.163-45.463,10.011-45.463,19.366h9.993
+c-1.65,5.146-2.507,10.54-2.507,16.017c0,28.956,23.558,52.514,52.514,52.514c28.956,0,52.514-23.558,52.514-52.514
+c0-5.478-0.856-10.872-2.506-16.017h9.992c0-9.354-19.352-17.204-45.463-19.366v-8.954h-6.149C200.189,38.779,223.924,16,252.882,16
+c29.952,0,54.32,24.368,54.32,54.32c0,28.774-11.078,37.009-25.105,47.437c-17.444,12.968-37.216,27.667-37.216,78.884v113.914
+h-0.797c-5.068,0-9.174,4.108-9.174,9.177c0,2.844,1.293,5.383,3.321,7.066c-3.432,27.933-26.851,95.744-8.226,115.459v11.202h45.75
+v-11.202c18.625-19.715-4.794-87.527-8.227-115.459c2.029-1.683,3.322-4.223,3.322-7.066c0-5.068-4.107-9.177-9.176-9.177h-0.795
+V196.641c0-43.174,14.942-54.283,30.762-66.043c14.793-10.997,31.559-23.461,31.559-60.277C323.202,31.545,291.656,0,252.882,0z
+M232.77,111.694c0,23.442-19.071,42.514-42.514,42.514c-23.442,0-42.514-19.072-42.514-42.514c0-5.531,1.078-10.957,3.141-16.017
+h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP XÁC NHẬN ĐĂNG XUẤT -->
+    <div id="logout-popup" class="logout-overlay">
+        <div class="logout-popup">
+            <img src="~/images/hỏi đăng xuất.png" alt="Xác nhận đăng xuất" class="logout-image" />
+            <h3 class="logout-title">Xác nhận đăng xuất</h3>
+            <p class="logout-message">Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?</p>
+            <div class="logout-buttons">
+                <button id="logout-cancel" class="logout-btn-cancel">Hủy</button>
+                <button id="logout-confirm" class="logout-btn-confirm">Đăng xuất</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex">
+        <!-- SIDEBAR FIXED -->
+        <aside class="sidebar-fixed flex flex-col p-4">
             <div class="flex items-center gap-3 px-2 mb-6">
-                <span class="material-symbols-outlined text-primary text-3xl">store</span>
-                <h1 class="text-xl font-bold">WebBánĐiệnThoại</h1>
+                <span class="material-symbols-outlined text-orange-500 text-3xl">store</span>
+                <h1 class="text-xl font-bold text-gray-800">WebBánĐiệnThoại</h1>
             </div>
 
             <nav class="flex flex-col gap-2 flex-grow">
                 <!-- Quản lý Sản Phẩm -->
                 <details class="group" open>
-                    <summary class="flex items-center justify-between p-3 rounded-DEFAULT cursor-pointer hover:bg-primary/10">
+                    <summary class="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-orange-50">
                         <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-text-muted-light">smartphone</span>
+                            <span class="material-symbols-outlined text-gray-600">smartphone</span>
                             <span class="font-medium text-sm">Quản lý Sản Phẩm</span>
                         </div>
                         <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
                     </summary>
                     <div class="pl-8 pt-2 flex flex-col gap-2">
-                        <a href="@Url.Action("Index","Products")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 panel-link" data-url="@Url.Action("Index","Products")">
+                        <a href="@Url.Action("Index", "Products")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">inventory_2</span>
                             Sản Phẩm
                         </a>
-                        <a href="@Url.Action("ProductStatuses","ProductStatuses")" class="flex items-center gap-3 p-2 rounded text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 transition-colors panel-link" data-url="@Url.Action("ProductStatuses","ProductStatuses")">
+                        <a href="@Url.Action("ProductStatuses", "ProductStatuses")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-base">category</span>
                             Trạng thái sản phẩm
                         </a>
-                        <a href="@Url.Action("Index","Categories")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 panel-link" data-url="@Url.Action("Index","Categories")">
+                        <a href="@Url.Action("Index", "Categories")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">category</span>
                             Danh mục
                         </a>
@@ -55,19 +429,19 @@
 
                 <!-- Quản lý Đơn Hàng -->
                 <details class="group">
-                    <summary class="flex items-center justify-between p-3 rounded-DEFAULT cursor-pointer hover:bg-primary/10">
+                    <summary class="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-orange-50">
                         <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-text-muted-light">receipt_long</span>
+                            <span class="material-symbols-outlined text-gray-600">receipt_long</span>
                             <span class="font-medium text-sm">Quản lý Đơn Hàng</span>
                         </div>
                         <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
                     </summary>
                     <div class="pl-8 pt-2 flex flex-col gap-2">
-                        <a href="@Url.Action("Orders","Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 panel-link" data-url="@Url.Action("Orders","Admin")">
+                        <a href="@Url.Action("Orders", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">shopping_cart</span>
                             Đặt Hàng
                         </a>
-                        <a href="@Url.Action("Shipping","Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 panel-link" data-url="@Url.Action("Shipping","Admin")">
+                        <a href="@Url.Action("Shipping", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">local_shipping</span>
                             Vận Chuyển
                         </a>
@@ -76,19 +450,19 @@
 
                 <!-- Quản lý Tài Khoản -->
                 <details class="group">
-                    <summary class="flex items-center justify-between p-3 rounded-DEFAULT cursor-pointer hover:bg-primary/10">
+                    <summary class="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-orange-50">
                         <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-text-muted-light">group</span>
+                            <span class="material-symbols-outlined text-gray-600">group</span>
                             <span class="font-medium text-sm">Quản lý Tài Khoản</span>
                         </div>
                         <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
                     </summary>
                     <div class="pl-8 pt-2 flex flex-col gap-2">
-                        <a href="@Url.Action("Index","Customer")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 panel-link" data-url="@Url.Action("Index","Customer")">
+                        <a href="@Url.Action("Index", "Customer")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">people</span>
-                            Khách Hàng  
+                            Khách Hàng
                         </a>
-                        <a href="@Url.Action("StaffList","Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 panel-link" data-url="@Url.Action("StaffList","Admin")">
+                        <a href="@Url.Action("StaffList", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">badge</span>
                             Nhân Viên
                         </a>
@@ -97,35 +471,35 @@
 
                 <!-- Báo Cáo & Công Cụ -->
                 <details class="group" open>
-                    <summary class="flex items-center justify-between p-3 rounded-DEFAULT cursor-pointer hover:bg-primary/10 bg-primary/10">
+                    <summary class="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-orange-50 bg-orange-50">
                         <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-primary">assessment</span>
-                            <span class="font-medium text-sm text-primary">Báo Cáo & Công Cụ</span>
+                            <span class="material-symbols-outlined text-orange-500">assessment</span>
+                            <span class="font-medium text-sm text-orange-500">Báo Cáo & Công Cụ</span>
                         </div>
-                        <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm text-primary">chevron_right</span>
+                        <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm text-orange-500">chevron_right</span>
                     </summary>
                     <div class="pl-8 pt-2 flex flex-col gap-2">
-                        <a href="@Url.Action("Reports","Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-primary bg-primary/20 panel-link" data-url="@Url.Action("Reports","Admin")">
+                        <a href="@Url.Action("Reports", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-orange-500 bg-orange-100 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">assessment</span>
                             Báo Cáo
                         </a>
-                        <a href="@Url.Action("Audit","Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 panel-link" data-url="@Url.Action("Audit","Admin")">
+                        <a href="@Url.Action("Audit", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">history</span>
                             Nhật Ký
                         </a>
-                        <a href="@Url.Action("Promos","Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 panel-link" data-url="@Url.Action("Promos","Admin")">
+                        <a href="@Url.Action("Promos", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">local_offer</span>
                             Khuyến Mãi
                         </a>
-                        <a href="@Url.Action("Inventory","Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 panel-link" data-url="@Url.Action("Inventory","Admin")">
+                        <a href="@Url.Action("Inventory", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">inventory_2</span>
                             Kho Hàng
                         </a>
-                        <a href="@Url.Action("ImportExport","Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 panel-link" data-url="@Url.Action("ImportExport","Admin")">
+                        <a href="@Url.Action("ImportExport", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">import_export</span>
                             Import/Export
                         </a>
-                        <a href="@Url.Action("Support","Admin")" class="flex items-center gap-3 p-2 rounded-DEFAULT text-sm text-text-muted-light hover:text-text-light hover:bg-primary/10 panel-link" data-url="@Url.Action("Support","Admin")">
+                        <a href="@Url.Action("Support", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">support_agent</span>
                             Hỗ Trợ
                         </a>
@@ -134,15 +508,16 @@
             </nav>
 
             <div class="mt-auto">
-                <div class="flex items-center gap-3 p-3 bg-surface-light/60 rounded-lg mb-3">
-                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-orange-50 text-primary font-semibold">AD</div>
+                <div class="flex items-center gap-3 p-3 bg-gray-100 rounded-lg mb-3">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-orange-50 text-orange-500 font-semibold">AD</div>
                     <div class="flex flex-col">
                         <h1 class="text-gray-800 text-sm font-medium">Admin User</h1>
                         <p class="text-gray-500 text-xs">administrator@example.com</p>
                     </div>
                 </div>
 
-                <a id="nav-logout" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer" href="@Url.Action("Logout","Account")">
+                <!-- Sửa link đăng xuất trong sidebar -->
+                <a id="nav-logout" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer logout-trigger">
                     <span class="material-symbols-outlined">logout</span>
                     <p class="text-sm font-medium">Đăng Xuất</p>
                 </a>
@@ -152,27 +527,27 @@
                 </div>
             </div>
         </aside>
-        <!-- === end sidebar === -->
 
-        <!-- MAIN -->
-        <div class="flex-1 min-h-screen flex flex-col">
+        <!-- MAIN CONTENT -->
+        <div class="main-content flex-1">
             <header class="bg-white border-b">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="h-16 flex items-center justify-between">
-                        <form method="get" action="@Url.Action("Index","Products")" class="max-w-2xl w-full">
+                        <form method="get" action="@Url.Action("Index","Products")" class="search-form w-full" id="search-form">
                             <div class="relative">
-                                <input name="search" value="@(currentSearch)" class="w-full rounded-lg border px-4 py-2 pr-12 text-sm placeholder-gray-400" placeholder="Tìm theo tên, SKU, mã kho..." />
-                                <button type="submit" class="absolute right-1 top-1/2 -translate-y-1/2 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm">
-                                    <span class="material-symbols-outlined">search</span>
+                                <input name="search" value="@(currentSearch)" class="w-full rounded-lg border border-gray-300 px-4 py-2 pr-12 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent" placeholder="Tìm theo tên, SKU, mã kho..." />
+                                <button type="submit" class="absolute right-1 top-1/2 -translate-y-1/2 bg-orange-500 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-orange-600 transition-colors">
+                                    <span class="material-symbols-outlined text-lg">search</span>
                                 </button>
                             </div>
                         </form>
 
                         <div class="ml-4 flex items-center gap-3">
-                            <button id="open-products-btn" data-url="@Url.Action("Index","Products")" class="hidden sm:inline-flex items-center gap-2 px-3 py-2 bg-primary text-white rounded panel-link" data-url="@Url.Action("Index","Products")">
+                            <button id="open-products-btn" class="hidden sm:inline-flex items-center gap-2 px-3 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors" data-loader="true">
                                 <span class="material-symbols-outlined">inventory_2</span> Sản phẩm
                             </button>
-                            <a href="@Url.Action("Logout","Account")" class="text-sm text-gray-600">Đăng xuất</a>
+                            <!-- Sửa link đăng xuất trong header -->
+                            <a href="#" class="text-sm text-gray-600 hover:text-gray-800 logout-trigger">Đăng xuất</a>
                         </div>
                     </div>
                 </div>
@@ -191,23 +566,256 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-sm text-gray-500">
                     <div class="flex justify-between">
                         <div>© @(DateTime.UtcNow.Year) WebBánĐiệnThoại</div>
-                        <div><a class="text-blue-600" href="#">Chính sách</a></div>
+                        <div><a class="text-orange-500 hover:text-orange-600" href="#">Chính sách</a></div>
                     </div>
                 </div>
             </footer>
         </div>
     </div>
 
-    <div id="panel-spinner" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/20">
-        <div class="bg-white p-4 rounded-md flex items-center gap-3 shadow-lg">
-            <div class="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
-            <div class="text-sm">Đang tải...</div>
+    <!-- NAVIGATION LOADER - HIỆN KHI CHUYỂN TRANG -->
+    <div id="navigation-loader" class="hidden">
+        <div class="loader">
+            <div class="truckWrapper">
+                <div class="truckBody">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 198 93" class="trucksvg">
+                        <path stroke-width="3" stroke="#282828" fill="#f97316" d="M135 22.5H177.264C178.295 22.5 179.22 23.133 179.594 24.0939L192.33 56.8443C192.442 57.1332 192.5 57.4404 192.5 57.7504V89C192.5 90.3807 191.381 91.5 190 91.5H135C133.619 91.5 132.5 90.3807 132.5 89V25C132.5 23.6193 133.619 22.5 135 22.5Z"></path>
+                        <path stroke-width="3" stroke="#282828" fill="#7D7C7C" d="M146 33.5H181.741C182.779 33.5 183.709 34.1415 184.078 35.112L190.538 52.112C191.16 53.748 189.951 55.5 188.201 55.5H146C144.619 55.5 143.5 54.3807 143.5 53V36C143.5 34.6193 144.619 33.5 146 33.5Z"></path>
+                        <path stroke-width="2" stroke="#282828" fill="#282828" d="M150 65C150 65.39 149.763 65.8656 149.127 66.2893C148.499 66.7083 147.573 67 146.5 67C145.427 67 144.501 66.7083 143.873 66.2893C143.237 65.8656 143 65.39 143 65C143 64.61 143.237 64.1344 143.873 63.7107C144.501 63.2917 145.427 63 146.5 63C147.573 63 148.499 63.2917 149.127 63.7107C149.763 64.1344 150 64.61 150 65Z"></path>
+                        <rect stroke-width="2" stroke="#282828" fill="#FFFCAB" rx="1" height="7" width="5" y="63" x="187"></rect>
+                        <rect stroke-width="2" stroke="#282828" fill="#282828" rx="1" height="11" width="4" y="81" x="193"></rect>
+                        <rect stroke-width="3" stroke="#282828" fill="#DFDFDF" rx="2.5" height="90" width="121" y="1.5" x="6.5"></rect>
+                        <rect stroke-width="2" stroke="#282828" fill="#DFDFDF" rx="2" height="4" width="6" y="84" x="1"></rect>
+                    </svg>
+                </div>
+                <div class="truckTires">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 30 30" class="tiresvg">
+                        <circle stroke-width="3" stroke="#282828" fill="#282828" r="13.5" cy="15" cx="15"></circle>
+                        <circle fill="#DFDFDF" r="7" cy="15" cx="15"></circle>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 30 30" class="tiresvg">
+                        <circle stroke-width="3" stroke="#282828" fill="#282828" r="13.5" cy="15" cx="15"></circle>
+                        <circle fill="#DFDFDF" r="7" cy="15" cx="15"></circle>
+                    </svg>
+                </div>
+                <div class="road"></div>
+                <svg xml:space="preserve" viewBox="0 0 453.459 453.459" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="Capa_1" version="1.1" fill="#000000" class="lampPost">
+                <path d="M252.882,0c-37.781,0-68.686,29.953-70.245,67.358h-6.917v8.954c-26.109,2.163-45.463,10.011-45.463,19.366h9.993
+c-1.65,5.146-2.507,10.54-2.507,16.017c0,28.956,23.558,52.514,52.514,52.514c28.956,0,52.514-23.558,52.514-52.514
+c0-5.478-0.856-10.872-2.506-16.017h9.992c0-9.354-19.352-17.204-45.463-19.366v-8.954h-6.149C200.189,38.779,223.924,16,252.882,16
+c29.952,0,54.32,24.368,54.32,54.32c0,28.774-11.078,37.009-25.105,47.437c-17.444,12.968-37.216,27.667-37.216,78.884v113.914
+h-0.797c-5.068,0-9.174,4.108-9.174,9.177c0,2.844,1.293,5.383,3.321,7.066c-3.432,27.933-26.851,95.744-8.226,115.459v11.202h45.75
+v-11.202c18.625-19.715-4.794-87.527-8.227-115.459c2.029-1.683,3.322-4.223,3.322-7.066c0-5.068-4.107-9.177-9.176-9.177h-0.795
+V196.641c0-43.174,14.942-54.283,30.762-66.043c14.793-10.997,31.559-23.461,31.559-60.277C323.202,31.545,291.656,0,252.882,0z
+M232.77,111.694c0,23.442-19.071,42.514-42.514,42.514c-23.442,0-42.514-19.072-42.514-42.514c0-5.531,1.078-10.957,3.141-16.017
+h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
+                </svg>
+            </div>
         </div>
     </div>
 
-    <style>.panel-link.active-panel-link { background: rgba(11,107,255,0.08); color:#0b6bff; border-radius:.5rem; }</style>
+    <script>
+        // QUẢN LÝ LOADER TOÀN TRANG - ĐÃ SỬA LỖI
+        document.addEventListener('DOMContentLoaded', function() {
+            const initialLoader = document.getElementById('initial-loader');
+            const navigationLoader = document.getElementById('navigation-loader');
+            const logoutPopup = document.getElementById('logout-popup');
+            const logoutCancel = document.getElementById('logout-cancel');
+            const logoutConfirm = document.getElementById('logout-confirm');
+            const logoutTriggers = document.querySelectorAll('.logout-trigger');
+            const minLoadTime = 1500; // 1.5 giây
 
-    <script src="~/js/admin-panel-loader.js" asp-append-version="true" defer></script>
+            // XỬ LÝ POPUP ĐĂNG XUẤT
+            function showLogoutPopup() {
+                logoutPopup.style.display = 'flex';
+            }
+
+            function hideLogoutPopup() {
+                logoutPopup.style.display = 'none';
+            }
+
+            // Gán sự kiện cho các nút đăng xuất
+            logoutTriggers.forEach(trigger => {
+                trigger.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showLogoutPopup();
+                });
+            });
+
+            // Xử lý nút hủy
+            logoutCancel.addEventListener('click', function() {
+                hideLogoutPopup();
+            });
+
+            // Xử lý nút xác nhận đăng xuất
+            logoutConfirm.addEventListener('click', function() {
+                hideLogoutPopup();
+                // Hiển thị loader và chuyển đến trang đăng xuất
+                resetLoaderPosition();
+                navigationLoader.style.background = 'white';
+                navigationLoader.style.display = 'flex';
+                navigationLoader.classList.remove('hidden');
+
+                setTimeout(function() {
+                    window.location.href = '@Url.Action("Logout", "Account")';
+                }, minLoadTime);
+            });
+
+            // Đóng popup khi click bên ngoài
+            logoutPopup.addEventListener('click', function(e) {
+                if (e.target === logoutPopup) {
+                    hideLogoutPopup();
+                }
+            });
+
+            // FORCE RESET POSITION CHO LOADER
+            function resetLoaderPosition() {
+                if (initialLoader) {
+                    initialLoader.style.position = 'fixed';
+                    initialLoader.style.top = '0';
+                    initialLoader.style.left = '0';
+                    initialLoader.style.background = 'white';
+                }
+                if (navigationLoader) {
+                    navigationLoader.style.position = 'fixed';
+                    navigationLoader.style.top = '0';
+                    navigationLoader.style.left = '0';
+                    navigationLoader.style.background = 'white';
+                    navigationLoader.style.display = 'flex';
+                }
+            }
+
+            // GỌI NGAY KHI DOM LOAD
+            resetLoaderPosition();
+
+            // Thời điểm bắt đầu load
+            const startTime = Date.now();
+
+            // Hiển thị nội dung sau khi load
+            function showContent() {
+                const currentTime = Date.now();
+                const elapsed = currentTime - startTime;
+                const remainingTime = Math.max(0, minLoadTime - elapsed);
+
+                setTimeout(function() {
+                    document.body.classList.add('content-loaded');
+
+                    setTimeout(function() {
+                        initialLoader.classList.add('fade-out');
+                        setTimeout(function() {
+                            initialLoader.style.display = 'none';
+                        }, 500);
+                    }, 300);
+                }, remainingTime);
+            }
+
+            // Xử lý khi trang load xong
+            if (document.readyState === 'complete') {
+                showContent();
+            } else {
+                window.addEventListener('load', function() {
+                    resetLoaderPosition();
+                    showContent();
+                });
+            }
+
+            // Fallback
+            setTimeout(function() {
+                resetLoaderPosition();
+                showContent();
+            }, 3000);
+
+            // QUẢN LÝ NAVIGATION LOADER - ĐÃ SỬA LỖI NỀN TRONG SUỐT
+            const currentUrl = window.location.pathname + window.location.search;
+            const links = document.querySelectorAll('[data-loader="true"]');
+
+            links.forEach(link => {
+                if (link.getAttribute('href') === currentUrl) {
+                    link.classList.add('active-panel-link');
+                }
+
+                link.addEventListener('click', function(e) {
+                    if (!this.target || this.target !== '_blank') {
+                        e.preventDefault();
+                        const href = this.getAttribute('href');
+
+                        // ĐẢM BẢO LOADER CÓ NỀN TRẮNG NGAY LẬP TỨC
+                        resetLoaderPosition();
+                        navigationLoader.style.background = 'white';
+                        navigationLoader.style.display = 'flex';
+                        navigationLoader.classList.remove('hidden');
+
+                        setTimeout(function() {
+                            window.location.href = href;
+                        }, minLoadTime);
+                    }
+                });
+            });
+
+            // Xử lý form submit
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    resetLoaderPosition();
+                    navigationLoader.style.background = 'white';
+                    navigationLoader.style.display = 'flex';
+                    navigationLoader.classList.remove('hidden');
+
+                    setTimeout(function() {
+                        navigationLoader.classList.add('hidden');
+                    }, 5000);
+                });
+            });
+
+            // Xử lý nút sản phẩm
+            const openProductsBtn = document.getElementById('open-products-btn');
+            if (openProductsBtn) {
+                openProductsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    resetLoaderPosition();
+                    navigationLoader.style.background = 'white';
+                    navigationLoader.style.display = 'flex';
+                    navigationLoader.classList.remove('hidden');
+
+                    setTimeout(function() {
+                        window.location.href = '@Url.Action("Index", "Products")';
+                    }, minLoadTime);
+                });
+            }
+
+            // Xử lý search form
+            const searchForm = document.getElementById('search-form');
+            if (searchForm) {
+                searchForm.addEventListener('submit', function(e) {
+                    resetLoaderPosition();
+                    navigationLoader.style.background = 'white';
+                    navigationLoader.style.display = 'flex';
+                    navigationLoader.classList.remove('hidden');
+                });
+            }
+        });
+
+        // Hàm để hiện/ẩn loader từ bất kỳ đâu
+        window.showLoader = function() {
+            const navigationLoader = document.getElementById('navigation-loader');
+            if (navigationLoader) {
+                navigationLoader.style.position = 'fixed';
+                navigationLoader.style.top = '0';
+                navigationLoader.style.left = '0';
+                navigationLoader.style.background = 'white';
+                navigationLoader.style.display = 'flex';
+                navigationLoader.classList.remove('hidden');
+            }
+        };
+
+        window.hideLoader = function() {
+            const navigationLoader = document.getElementById('navigation-loader');
+            if (navigationLoader) {
+                navigationLoader.classList.add('hidden');
+            }
+        };
+    </script>
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>

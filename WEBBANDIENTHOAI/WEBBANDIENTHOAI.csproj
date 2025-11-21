@@ -7,10 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DTOs\**" />
+    <Compile Remove="Mappings\**" />
     <Compile Remove="Repositories\**" />
+    <Compile Remove="Tests\**" />
+    <Content Remove="DTOs\**" />
+    <Content Remove="Mappings\**" />
     <Content Remove="Repositories\**" />
+    <Content Remove="Tests\**" />
+    <EmbeddedResource Remove="DTOs\**" />
+    <EmbeddedResource Remove="Mappings\**" />
     <EmbeddedResource Remove="Repositories\**" />
+    <EmbeddedResource Remove="Tests\**" />
+    <None Remove="DTOs\**" />
+    <None Remove="Mappings\**" />
     <None Remove="Repositories\**" />
+    <None Remove="Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,12 +33,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MySql.Data" Version="9.5.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DTOs\" />
-    <Folder Include="Mappings\" />
-    <Folder Include="Tests\" />
   </ItemGroup>
 
 </Project>
