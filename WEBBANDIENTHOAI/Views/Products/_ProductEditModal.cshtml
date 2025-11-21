@@ -1,0 +1,166 @@
+﻿@model WEBBANDIENTHOAI.Models.Product
+@{
+    Layout = null;
+    // Expect ViewBag.Statuses = IEnumerable<WEBBANDIENTHOAI.Models.ProductStatus>
+    // Expect ViewBag.Categories = IEnumerable<WEBBANDIENTHOAI.Models.Category>
+}
+
+<link rel="stylesheet" href="~/css/products-edit.css" />
+
+<div class="pb-modal-overlay" role="dialog" aria-modal="true">
+  <div class="pb-modal-card">
+    <div class="pb-modal-header">
+      <h2 class="pb-modal-title">Sửa sản phẩm — @Model.Name</h2>
+      <button type="button" class="pb-modal-close" data-action="close">&times;</button>
+    </div>
+
+    <form id="product-edit-form" class="pb-form" enctype="multipart/form-data" method="post" data-product-id="@Model.ProductId">
+      @Html.AntiForgeryToken()
+
+      <input type="hidden" name="ProductId" value="@Model.ProductId" />
+
+      <div class="pb-modal-body">
+        <div class="pb-grid">
+          <!-- Left column: images / preview -->
+          <div class="pb-col-left">
+            <div class="pb-section">
+              <label class="pb-label">Ảnh chính (lưu vào SQL)</label>
+
+              <div class="pb-image-preview">
+                @if (Model.PrimaryImage != null)
+                {
+                    <img id="primary-preview" src="@Url.Action("Image","Products", new { id = Model.PrimaryImage.ImageId })" alt="Primary" />
+                }
+                else
+                {
+                    <div id="primary-preview" class="pb-no-image">No image</div>
+                }
+              </div>
+
+              <div class="mt-3">
+                <input id="primaryImageInput" name="primaryImage" type="file" accept="image/*" />
+                <p class="pb-note">Kích thước tối đa đề xuất 3MB. Ảnh sẽ được lưu vào database.</p>
+              </div>
+            </div>
+
+            <div class="pb-section">
+              <label class="pb-label">Tình trạng tồn kho (read-only)</label>
+              <div class="pb-readonly">
+                @* If you want inventory values, make sure the Repository populates Model.Inventory via Include *@
+                <div>Hiện có: @(Model.ImportDetails?.Sum(d => d.Quantity) ?? 0)</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right column: editable fields -->
+          <div class="pb-col-right">
+            <div class="pb-field">
+              <label class="pb-field-label">Tên sản phẩm <span class="required">*</span></label>
+              <input name="Name" value="@Model.Name" required maxlength="250" />
+            </div>
+
+            <div class="pb-field">
+              <label class="pb-field-label">SKU <span class="required">*</span></label>
+              <input name="SKU" value="@Model.SKU" required maxlength="60" />
+            </div>
+
+            <div class="pb-field">
+              <label class="pb-field-label">Hãng (Brand)</label>
+              <input name="Brand" value="@Model.Brand" maxlength="100" />
+            </div>
+
+            <div class="pb-grid-2">
+              <div class="pb-field">
+                <label class="pb-field-label">Giá <span class="required">*</span></label>
+                <input name="Price" type="number" step="0.01" value="@Model.Price" min="0" required />
+              </div>
+              <div class="pb-field">
+                <label class="pb-field-label">Giá cũ</label>
+                <input name="OldPrice" type="number" step="0.01" value="@(Model.OldPrice ?? 0)" />
+              </div>
+            </div>
+
+            <div class="pb-field">
+              <label class="pb-field-label">Mã kho (StockCode) <span class="required">*</span></label>
+              <input name="StockCode" value="@Model.StockCode" maxlength="50" />
+              <small class="pb-note">Lưu ý: SKU/StockCode không được phép sửa nếu sản phẩm có tồn/k/h lịch sử (server kiểm tra).</small>
+            </div>
+
+            <div class="pb-grid-2">
+              <div class="pb-field">
+                <label class="pb-field-label">Trạng thái</label>
+                <select name="StatusId">
+                  @if (ViewBag.Statuses is IEnumerable<WEBBANDIENTHOAI.Models.ProductStatus> statuses)
+                  {
+                      foreach(var s in statuses)
+                      {
+                          if (s.StatusId == Model.StatusId)
+                          {
+                              <option value="@s.StatusId" selected>@s.StatusName</option>
+                          }
+                          else
+                          {
+                              <option value="@s.StatusId">@s.StatusName</option>
+                          }
+                      }
+                  }
+                </select>
+              </div>
+
+              <div class="pb-field">
+                <label class="pb-field-label">Danh mục</label>
+                <select name="CategoryId">
+                  @if (ViewBag.Categories is IEnumerable<WEBBANDIENTHOAI.Models.Category> cats)
+                  {
+                      foreach(var c in cats)
+                      {
+                          if (c.CategoryId == Model.CategoryId)
+                          {
+                              <option value="@c.CategoryId" selected>@c.CategoryName</option>
+                          }
+                          else
+                          {
+                              <option value="@c.CategoryId">@c.CategoryName</option>
+                          }
+                      }
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="pb-field">
+              <label class="pb-field-label">Mô tả ngắn</label>
+              <textarea name="ShortDescription" maxlength="1000">@Model.ShortDescription</textarea>
+            </div>
+
+            @* Optionally render phone/laptop configuration panels if present *@
+            @if (Model.PhoneConfiguration != null)
+            {
+                <div class="pb-section">
+                    <label class="pb-label">Cấu hình Điện thoại (Phone)</label>
+                    <input name="Phone.CPU" value="@Model.PhoneConfiguration.CPU" placeholder="CPU" />
+                    <input name="Phone.RAM" value="@Model.PhoneConfiguration.RAM" placeholder="RAM" />
+                    <input name="Phone.InternalStorage" value="@Model.PhoneConfiguration.InternalStorage" placeholder="Bộ nhớ trong" />
+                </div>
+            }
+            @if (Model.LaptopConfiguration != null)
+            {
+                <div class="pb-section">
+                    <label class="pb-label">Cấu hình Laptop</label>
+                    <input name="Laptop.CPU" value="@Model.LaptopConfiguration.CPU" placeholder="CPU" />
+                    <input name="Laptop.RAM" value="@Model.LaptopConfiguration.RAM" placeholder="RAM" />
+                    <input name="Laptop.Storage" value="@Model.LaptopConfiguration.Storage" placeholder="Storage" />
+                </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="pb-modal-footer">
+        <button type="button" class="pb-btn pb-btn-secondary" data-action="cancel">Hủy</button>
+        <button type="submit" class="pb-btn pb-btn-primary">Lưu thay đổi</button>
+      </div>
+    </form>
+  </div>
+</div>

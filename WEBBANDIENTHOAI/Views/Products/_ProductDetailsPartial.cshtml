@@ -1,0 +1,64 @@
+﻿@model WEBBANDIENTHOAI.Models.Product
+
+<div class="bg-white rounded shadow p-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+            @if (Model.PrimaryImage != null)
+            {
+                <img src="@Url.Action("Image","Products", new { id = Model.PrimaryImage.ImageId })" alt="@Model.Name" class="w-full h-64 object-contain bg-gray-50 p-4 rounded" />
+            }
+            else
+            {
+                <div class="w-full h-64 bg-gray-100 flex items-center justify-center rounded">No image</div>
+            }
+        </div>
+
+        <div class="md:col-span-2">
+            <h2 class="text-2xl font-bold">@Model.Name</h2>
+            <p class="text-sm text-gray-500 mt-1">SKU: @Model.SKU — Mã kho: @Model.StockCode</p>
+
+            <div class="mt-4">
+                <div class="text-3xl font-semibold">@String.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:C0}", Model.Price)</div>
+                @if (Model.OldPrice.HasValue)
+                {
+                    <div class="text-sm text-gray-500 line-through">@String.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:C0}", Model.OldPrice.Value)</div>
+                }
+            </div>
+
+            <div class="mt-4 text-gray-700">
+                <p>@(Model.ShortDescription ?? "-")</p>
+            </div>
+
+            <div class="mt-6 space-x-2">
+                <a class="px-4 py-2 rounded bg-gray-200" href="@Url.Action("Index","Products")" data-loader="true">Quay lại</a>
+                <a class="px-4 py-2 rounded bg-green-600 text-white" href="@Url.Action("Edit","Products", new { id = Model.ProductId })">Sửa</a>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-6" />
+
+    <h3 class="font-semibold mb-2">Cấu hình</h3>
+    @if (Model.PhoneConfiguration != null)
+    {
+        <div>
+            <p>CPU: @Model.PhoneConfiguration.CPU</p>
+            <p>RAM: @Model.PhoneConfiguration.RAM</p>
+            <p>Bộ nhớ: @Model.PhoneConfiguration.InternalStorage</p>
+            <p>Pin: @Model.PhoneConfiguration.Battery</p>
+        </div>
+    }
+    else if (Model.LaptopConfiguration != null)
+    {
+        <div>
+            <p>CPU: @Model.LaptopConfiguration.CPU</p>
+            <p>RAM: @Model.LaptopConfiguration.RAM</p>
+            <p>Storage: @Model.LaptopConfiguration.Storage</p>
+            <p>GPU: @Model.LaptopConfiguration.GraphicsCard</p>
+        </div>
+    }
+    else
+    {
+        <div class="text-sm text-gray-500">Không có cấu hình chi tiết.</div>
+    }
+</div>

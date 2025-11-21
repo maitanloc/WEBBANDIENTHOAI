@@ -1,30 +1,33 @@
-﻿using System.Threading.Tasks;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using WEBBANDIENTHOAI.ViewModels;
+using WEBBANDIENTHOAI.Models;
 
 namespace WEBBANDIENTHOAI.Repository
 {
     public interface IProductRepository
     {
-        /// <summary>
-        /// Truy vấn phân trang kèm bộ lọc cơ bản (category, brand, price range, status, search, sort).
-        /// Trả về PagedResult chứa danh sách ProductListItemVm.
-        /// </summary>
-        Task<PagedResult<ProductListItemVm>> GetPagedAsync(ProductQueryFilter filter, int page = 1, int pageSize = 20);
-
-        /// <summary>
-        /// Lấy chi tiết sản phẩm (bao gồm PrimaryImage, Images, Phone/Laptop config).
-        /// </summary>
-        Task<ProductDetailsVm?> GetByIdWithDetailsAsync(int productId);
-
-        /// <summary>
-        /// Lấy product theo SKU (optional, có thể dùng cho URL friendly).
-        /// </summary>
-        Task<ProductDetailsVm?> GetBySkuWithDetailsAsync(string sku);
-
-        /// <summary>
-        /// Lấy raw image bytes theo ImageId (ProductImage.ImageId).
-        /// </summary>
+        Task<IEnumerable<ProductListItemVm>> GetAllForListWithEditableFlagAsync(int limit = 200);
+        Task<Product?> GetByIdWithIncludesAsync(int id);
+        Task<ProductListItemVm?> GetListItemByIdAsync(int id);
+        Task<bool> HasPendingImportAsync(int productId);
+        Task UpdateAsync(Product product); // Đã sửa từ bool thành void
         Task<byte[]?> GetImageBytesAsync(int imageId);
+
+        Task<IEnumerable<ProductStatus>> GetAllStatusesAsync();
+        Task<IEnumerable<Category>> GetAllCategoriesAsync();
+
+        Task<(IEnumerable<ProductListItemVm> Items, int TotalCount)> GetFilteredAsync(
+            string? search,
+            int? categoryId,
+            byte? statusId,
+            decimal? priceMin,
+            decimal? priceMax,
+            bool? hasImage,
+            string? sortBy,
+            int page,
+            int pageSize);
+
+        Task<int> SavePrimaryImageAsync(int productId, byte[] bytes, string? contentType);
     }
 }

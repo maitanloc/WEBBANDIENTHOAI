@@ -1,0 +1,167 @@
+﻿@model WEBBANDIENTHOAI.Models.Product
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <!-- Alert Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+            @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- Header with Actions -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Chi tiết sản phẩm</h1>
+            <p class="text-gray-600 mt-1">Quản lý thông tin sản phẩm trong hệ thống</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="@Url.Action("Index","Products")" 
+               class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2"
+               data-loader="true">
+                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                Quay lại
+            </a>
+          @if (ViewBag.CanEdit == true)
+{
+    <a href="@Url.Action("Edit","Products", new { id = Model.ProductId })" 
+       class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">edit</span>
+        Sửa sản phẩm
+    </a>
+}
+else
+{
+    <button class="px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed flex items-center gap-2" 
+            disabled title="Sản phẩm đã có tồn kho hoặc lịch sử nhập/xuất - không thể sửa">
+        <span class="material-symbols-outlined text-sm">edit_off</span>
+        Không thể sửa
+    </button>
+}
+        </div>
+    </div>
+
+    <!-- Product Details -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+                @if (Model.PrimaryImage != null)
+                {
+                    <img src="@Url.Action("Image","Products", new { id = Model.PrimaryImage.ImageId })" alt="@Model.Name" class="w-full h-64 object-contain bg-gray-50 p-4 rounded" />
+                }
+                else
+                {
+                    <div class="w-full h-64 bg-gray-100 flex items-center justify-center rounded">
+                        <span class="material-symbols-outlined text-4xl text-gray-400">image</span>
+                    </div>
+                }
+            </div>
+
+            <div class="md:col-span-2">
+                <h2 class="text-2xl font-bold">@Model.Name</h2>
+                <p class="text-sm text-gray-500 mt-1">SKU: @Model.SKU — Mã kho: @Model.StockCode</p>
+
+                <div class="mt-4">
+                    <div class="text-3xl font-semibold text-orange-600">@String.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:C0}", Model.Price)</div>
+                    @if (Model.OldPrice.HasValue)
+                    {
+                        <div class="text-sm text-gray-500 line-through">@String.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:C0}", Model.OldPrice.Value)</div>
+                    }
+                </div>
+
+                <div class="mt-4 text-gray-700">
+                    <p>@(Model.ShortDescription ?? "Chưa có mô tả")</p>
+                </div>
+
+                <div class="mt-6 grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="font-semibold">Hãng:</span>
+                        <span class="ml-2">@(Model.Brand ?? "Chưa có")</span>
+                    </div>
+                    <div>
+                        <span class="font-semibold">Trạng thái:</span>
+                        <span class="ml-2 @(Model.ProductStatus?.StatusName == "InStock" ? "text-green-600" : "text-gray-600")">
+                            @Model.ProductStatus?.StatusName
+                        </span>
+                    </div>
+                    <div>
+                        <span class="font-semibold">Danh mục:</span>
+                        <span class="ml-2">@Model.Category?.CategoryName</span>
+                    </div>
+                    <div>
+                        <span class="font-semibold">Màu sắc:</span>
+                        <span class="ml-2">@(Model.Color ?? "Chưa có")</span>
+                    </div>
+                    <div>
+                        <span class="font-semibold">Kích thước:</span>
+                        <span class="ml-2">@(Model.Size ?? "Chưa có")</span>
+                    </div>
+                    <div>
+                        <span class="font-semibold">Ngày tạo:</span>
+                        <span class="ml-2">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-6" />
+
+        <h3 class="font-semibold text-lg mb-4">Cấu hình</h3>
+        @if (Model.PhoneConfiguration != null)
+        {
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                    <span class="font-semibold">CPU:</span>
+                    <p class="mt-1">@Model.PhoneConfiguration.CPU</p>
+                </div>
+                <div>
+                    <span class="font-semibold">RAM:</span>
+                    <p class="mt-1">@Model.PhoneConfiguration.RAM</p>
+                </div>
+                <div>
+                    <span class="font-semibold">Bộ nhớ:</span>
+                    <p class="mt-1">@Model.PhoneConfiguration.InternalStorage</p>
+                </div>
+                <div>
+                    <span class="font-semibold">Pin:</span>
+                    <p class="mt-1">@Model.PhoneConfiguration.Battery</p>
+                </div>
+            </div>
+        }
+        else if (Model.LaptopConfiguration != null)
+        {
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                    <span class="font-semibold">CPU:</span>
+                    <p class="mt-1">@Model.LaptopConfiguration.CPU</p>
+                </div>
+                <div>
+                    <span class="font-semibold">RAM:</span>
+                    <p class="mt-1">@Model.LaptopConfiguration.RAM</p>
+                </div>
+                <div>
+                    <span class="font-semibold">Storage:</span>
+                    <p class="mt-1">@Model.LaptopConfiguration.Storage</p>
+                </div>
+                <div>
+                    <span class="font-semibold">GPU:</span>
+                    <p class="mt-1">@Model.LaptopConfiguration.GraphicsCard</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="text-sm text-gray-500">Không có cấu hình chi tiết.</div>
+        }
+    </div>
+</div>

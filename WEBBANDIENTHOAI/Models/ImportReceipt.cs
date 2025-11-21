@@ -32,5 +32,8 @@ namespace WebBanDienThoai.Models
 
         // Navigation
         public ICollection<ImportReceiptDetail> Details { get; set; }
+
+        // -> Thêm dòng này:
+        public bool IsFinalized { get; set; } = false;
     }
 }

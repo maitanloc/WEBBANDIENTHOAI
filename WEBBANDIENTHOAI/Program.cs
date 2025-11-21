@@ -1,3 +1,4 @@
+using FluentAssertions.Common;
 using Microsoft.EntityFrameworkCore;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Repository; // Thêm dòng này
@@ -8,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1) Load connection string
 // ========================
 var conn = builder.Configuration.GetConnectionString("DefaultConnection")
-           ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=PhoneShopFull;Integrated Security=True;TrustServerCertificate=True";
+           ?? "Data Source=DELL\\SQLEXPRESS02;Initial Catalog=web_dien_tu;Integrated Security=True;TrustServerCertificate=True";
 
 // ========================
 // 2) Add MVC services

@@ -1,0 +1,49 @@
+﻿@model WEBBANDIENTHOAI.Models.Product
+@{
+    Layout = null;
+}
+<link rel="stylesheet" href="~/css/products-edit.css" />
+
+<div class="pb-modal-overlay" role="dialog" aria-modal="true">
+  <div class="pb-modal-card">
+    <div class="pb-modal-header">
+      <h2 class="pb-modal-title">Chi tiết sản phẩm — @Model.Name</h2>
+      <button type="button" class="pb-modal-close" data-action="close">&times;</button>
+    </div>
+
+    <div class="pb-modal-body">
+      <div class="pb-grid">
+        <div class="pb-col-left">
+          <div class="pb-image-preview">
+            @if (Model.PrimaryImage != null)
+            {
+                <img src="@Url.Action("Image","Products", new { id = Model.PrimaryImage.ImageId })" alt="Primary" />
+            }
+            else
+            {
+                <div class="pb-no-image">No image</div>
+            }
+          </div>
+        </div>
+
+        <div class="pb-col-right">
+          <div class="pb-detail-row"><strong>Tên:</strong> @Model.Name</div>
+          <div class="pb-detail-row"><strong>SKU:</strong> @Model.SKU</div>
+          <div class="pb-detail-row"><strong>Giá:</strong> @String.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:C0}", Model.Price)</div>
+          <div class="pb-detail-row"><strong>Mã kho:</strong> @Model.StockCode</div>
+          <div class="pb-detail-row"><strong>Trạng thái:</strong> @Model.ProductStatus?.StatusName</div>
+          <div class="pb-detail-row"><strong>Danh mục:</strong> @Model.Category?.CategoryName</div>
+
+          <div class="pt-4">
+            <h4 class="pb-label">Mô tả</h4>
+            <p>@(Model.ShortDescription ?? "-")</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pb-modal-footer">
+      <button type="button" class="pb-btn pb-btn-secondary" data-action="close">Đóng</button>
+    </div>
+  </div>
+</div>

@@ -7,8 +7,9 @@ namespace WEBBANDIENTHOAI.Models
     public class Product
     {
         [Key]
-        public int ProductId { get; set; }   // ← đã sửa lỗi typo
+        public int ProductId { get; set; }
 
+        [Required]
         public int CategoryId { get; set; }
 
         [Required, MaxLength(60)]
@@ -35,7 +36,6 @@ namespace WEBBANDIENTHOAI.Models
         [MaxLength(100)]
         public string? Size { get; set; }
 
-        // FK tới ảnh chính (IsPrimary = 1)
         public int? ImageId { get; set; }
 
         [MaxLength(1000)]
@@ -47,26 +47,21 @@ namespace WEBBANDIENTHOAI.Models
 
         // Navigation properties
         [ForeignKey("CategoryId")]
-        public virtual Category Category { get; set; } = null!;
+        public virtual Category? Category { get; set; }
 
         [ForeignKey("StatusId")]
-        public virtual ProductStatus ProductStatus { get; set; } = null!;
+        public virtual ProductStatus? ProductStatus { get; set; }
 
-        // Ảnh chính
         [ForeignKey("ImageId")]
         public virtual ProductImage? PrimaryImage { get; set; }
 
-        // Tất cả ảnh của sản phẩm
         public virtual ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
-
-        // One-to-one config (Laptop / Phone)
         public virtual LaptopConfiguration? LaptopConfiguration { get; set; }
         public virtual PhoneConfiguration? PhoneConfiguration { get; set; }
-
-        // Các collection khác
         public virtual ICollection<ImportReceiptDetail> ImportDetails { get; set; } = new List<ImportReceiptDetail>();
         public virtual ICollection<ExportReceiptDetail> ExportDetails { get; set; } = new List<ExportReceiptDetail>();
         public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
         public virtual ICollection<CartDetail> CartDetails { get; set; } = new List<CartDetail>();
+        public virtual ICollection<Inventory> Inventory { get; set; } = new List<Inventory>();
     }
 }

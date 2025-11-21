@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WEBBANDIENTHOAI.Models
@@ -6,18 +7,13 @@ namespace WEBBANDIENTHOAI.Models
     public class ProductImage
     {
         [Key]
-        public int ImageId { get; set; } // (ImageId)
-
-        public int ProductId { get; set; } // (ProductId)
-
-        // Đúng với cột VARBINARY(MAX) trong DB
+        public int ImageId { get; set; }
+        public int ProductId { get; set; }
         public byte[]? ImagePath { get; set; }
-
-        public bool IsPrimary { get; set; } = false; // (IsPrimary)
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // (CreatedAt)
+        public bool IsPrimary { get; set; } = false;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [ForeignKey("ProductId")]
-        public Product Product { get; set; }
+        public virtual Product? Product { get; set; }
     }
 }

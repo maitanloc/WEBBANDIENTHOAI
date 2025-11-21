@@ -1,0 +1,69 @@
+﻿@model IEnumerable<WEBBANDIENTHOAI.ViewModels.ProductListItemVm>
+
+<div class="mb-4">
+  <form id="product-filter-form" class="flex gap-2 items-center">
+    <input name="search" placeholder="Tìm tên, SKU, mã kho..." class="border rounded px-2 py-1" />
+    <select name="statusId" class="border rounded px-2 py-1">
+      <option value="">Tất cả trạng thái</option>
+      <option value="1">Còn hàng</option>
+    </select>
+    <input name="priceMin" type="number" placeholder="Giá từ" class="border rounded px-2 py-1" />
+    <input name="priceMax" type="number" placeholder="đến" class="border rounded px-2 py-1" />
+    <button id="filter-apply" type="submit" class="px-3 py-1 bg-orange-500 text-white rounded">Lọc</button>
+  </form>
+</div>
+
+<table class="min-w-full bg-white rounded shadow">
+  <thead class="bg-gray-50">
+    <tr>
+      <th>Ảnh</th><th>Tên</th><th>SKU</th><th>Giá</th><th>Mã kho</th><th>Trạng thái</th><th class="text-right">Thao tác</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach(var item in Model)
+    {
+      <tr class="border-t">
+        <td class="px-4 py-3">
+          @if (item.PrimaryImageId != null)
+          {
+              <img src="@Url.Action("Image","Products", new { id = item.PrimaryImageId })" 
+                   class="w-16 h-16 object-cover rounded" 
+                   alt="@item.Name" />
+          }
+          else
+          {
+              <div class="w-16 h-16 bg-gray-100 rounded flex items-center justify-center text-gray-400">
+                  <span class="material-symbols-outlined text-sm">image</span>
+              </div>
+          }
+        </td>
+        <td>@item.Name</td>
+        <td>@item.SKU</td>
+        <td>@String.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:C0}", item.Price)</td>
+        <td>@item.StockCode</td>
+        <td>@item.StatusName</td>
+        <td class="text-right space-x-2">
+          <!-- Sử dụng thẻ a thay vì button để đảm bảo routing hoạt động -->
+          <a href="@Url.Action("Details", "Products", new { id = item.ProductId })" 
+             class="inline-block px-3 py-1 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 transition-colors">
+            Xem
+          </a>
+          @if (item.IsEditable)
+          {
+              <a href="@Url.Action("Edit", "Products", new { id = item.ProductId })" 
+                 class="inline-block px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+                Sửa
+              </a>
+          }
+          else
+          {
+              <button class="px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed" 
+                      disabled title="Sản phẩm đã có tồn kho hoặc lịch sử - không thể sửa">
+                Không sửa
+              </button>
+          }
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

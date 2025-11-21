@@ -7,25 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="DTOs\**" />
     <Compile Remove="Mappings\**" />
     <Compile Remove="Repositories\**" />
     <Compile Remove="Tests\**" />
-    <Content Remove="DTOs\**" />
     <Content Remove="Mappings\**" />
     <Content Remove="Repositories\**" />
     <Content Remove="Tests\**" />
-    <EmbeddedResource Remove="DTOs\**" />
     <EmbeddedResource Remove="Mappings\**" />
     <EmbeddedResource Remove="Repositories\**" />
     <EmbeddedResource Remove="Tests\**" />
-    <None Remove="DTOs\**" />
     <None Remove="Mappings\**" />
     <None Remove="Repositories\**" />
     <None Remove="Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="8.8.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">

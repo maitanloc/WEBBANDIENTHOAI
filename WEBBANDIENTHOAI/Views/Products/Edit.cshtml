@@ -1,0 +1,374 @@
+﻿@model WEBBANDIENTHOAI.Models.Product
+@{
+    ViewData["Title"] = "Sửa sản phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    var canEdit = ViewBag.CanEditProduct ?? true;
+    var canChangeKeys = ViewBag.CanChangeKeys ?? true;
+    
+    var skuInputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500";
+    var stockCodeInputClass = "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500";
+    
+    if (!canChangeKeys)
+    {
+        skuInputClass += " bg-gray-100 cursor-not-allowed";
+        stockCodeInputClass += " bg-gray-100 cursor-not-allowed";
+    }
+}
+
+<div class="container mx-auto px-4 py-8">
+    <!-- Alert Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+            @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Sửa sản phẩm</h1>
+            <p class="text-gray-600 mt-1">Cập nhật thông tin sản phẩm</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="@Url.Action("Details","Products", new { id = Model.ProductId })" 
+               class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                Quay lại
+            </a>
+            <a href="@Url.Action("Index","Products")" 
+               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+               data-loader="true">
+                <span class="material-symbols-outlined text-sm">list</span>
+                Danh sách
+            </a>
+        </div>
+    </div>
+
+    <!-- Edit Form -->
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="bg-white rounded-lg shadow-md overflow-hidden">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ProductId" />
+
+        <!-- Form Body -->
+        <div class="p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Column: Images & Info -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Primary Image -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ảnh chính</label>
+                        
+                        <div class="mb-3">
+                            @if (Model.PrimaryImage != null)
+                            {
+                                <img id="primary-preview" 
+                                     src="@Url.Action("Image","Products", new { id = Model.PrimaryImage.ImageId })" 
+                                     alt="Primary" 
+                                     class="w-full h-48 object-cover rounded border" />
+                            }
+                            else
+                            {
+                                <div id="primary-preview" class="w-full h-48 bg-gray-100 rounded border flex items-center justify-center text-gray-500">
+                                    <span class="material-symbols-outlined text-4xl">image</span>
+                                </div>
+                            }
+                        </div>
+
+                        <div>
+                            <input id="primaryImageInput" name="primaryImage" type="file" accept="image/*" 
+                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                            <p class="text-xs text-gray-500 mt-1">Kích thước tối đa 3MB. Định dạng: JPG, JPEG, PNG, GIF, WEBP</p>
+                        </div>
+                    </div>
+
+                    <!-- Product Information -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Thông tin hệ thống
+                        </label>
+                        <div class="text-sm text-gray-600 space-y-2">
+                            <div class="flex justify-between">
+                                <span>Ngày tạo:</span>
+                                <span class="font-medium">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>ID sản phẩm:</span>
+                                <span class="font-medium">@Model.ProductId</span>
+                            </div>
+                            @if (Model.Inventory != null && Model.Inventory.Any())
+                            {
+                                <div class="flex justify-between">
+                                    <span>Tồn kho hiện tại:</span>
+                                    <span class="font-medium">@Model.Inventory.First().CurrentQuantity</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Validation Rules -->
+                    @if (!canChangeKeys)
+                    {
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <h3 class="text-sm font-semibold text-yellow-800 mb-2">Hạn chế chỉnh sửa</h3>
+                            <ul class="text-xs text-yellow-700 space-y-1">
+                                <li>• Không thể thay đổi SKU/Mã kho do sản phẩm đã có lịch sử</li>
+                                <li>• Các trường khác vẫn có thể chỉnh sửa bình thường</li>
+                            </ul>
+                        </div>
+                    }
+                </div>
+
+                <!-- Right Column: Editable Fields -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Basic Information -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium text-gray-800 mb-4">Thông tin cơ bản</h3>
+                        
+                        <div class="space-y-4">
+                            <!-- Product Name -->
+                            <div>
+                                <label asp-for="Name" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Tên sản phẩm <span class="text-red-500">*</span>
+                                </label>
+                                <input asp-for="Name" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                <span asp-validation-for="Name" class="text-red-500 text-xs"></span>
+                            </div>
+
+                            <!-- SKU and Brand -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label asp-for="SKU" class="block text-sm font-medium text-gray-700 mb-1">
+                                        SKU <span class="text-red-500">*</span>
+                                    </label>
+                                    <input asp-for="SKU" class="@skuInputClass" readonly="@(!canChangeKeys ? "readonly" : null)" />
+                                    <span asp-validation-for="SKU" class="text-red-500 text-xs"></span>
+                                </div>
+                                <div>
+                                    <label asp-for="Brand" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Hãng
+                                    </label>
+                                    <input asp-for="Brand" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                            </div>
+
+                            <!-- Price Fields -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label asp-for="Price" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Giá <span class="text-red-500">*</span>
+                                    </label>
+                                    <input asp-for="Price" type="number" step="0.01" min="0" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                    <span asp-validation-for="Price" class="text-red-500 text-xs"></span>
+                                </div>
+                                <div>
+                                    <label asp-for="OldPrice" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Giá cũ
+                                    </label>
+                                    <input asp-for="OldPrice" type="number" step="0.01" min="0" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                            </div>
+
+                            <!-- Stock Code and Color -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label asp-for="StockCode" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Mã kho <span class="text-red-500">*</span>
+                                    </label>
+                                    <input asp-for="StockCode" class="@stockCodeInputClass" readonly="@(!canChangeKeys ? "readonly" : null)" />
+                                    <span asp-validation-for="StockCode" class="text-red-500 text-xs"></span>
+                                    @if (!canChangeKeys)
+                                    {
+                                        <small class="text-xs text-orange-600 mt-1">⚠️ Không thể thay đổi mã kho do sản phẩm đã có lịch sử nhập/xuất</small>
+                                    }
+                                </div>
+                                <div>
+                                    <label asp-for="Color" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Màu sắc
+                                    </label>
+                                    <input asp-for="Color" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                            </div>
+
+                            <!-- Size and Status -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label asp-for="Size" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Kích thước
+                                    </label>
+                                    <input asp-for="Size" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                                <div>
+                                    <label asp-for="StatusId" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Trạng thái
+                                    </label>
+                                    <select asp-for="StatusId" asp-items="ViewBag.StatusId" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"></select>
+                                </div>
+                            </div>
+
+                            <!-- Category -->
+                            <div>
+                                <label asp-for="CategoryId" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Danh mục
+                                </label>
+                                <select asp-for="CategoryId" asp-items="ViewBag.CategoryId" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"></select>
+                            </div>
+
+                            <!-- Short Description -->
+                            <div>
+                                <label asp-for="ShortDescription" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Mô tả ngắn
+                                </label>
+                                <textarea asp-for="ShortDescription" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" rows="3"></textarea>
+                                <div class="text-xs text-gray-500 mt-1 flex justify-between">
+                                    <span>Dùng để hiển thị ngắn gọn trên trang danh sách</span>
+                                    <span id="char-count">@(Model.ShortDescription?.Length ?? 0)/1000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Configuration Sections -->
+                    @if (Model.PhoneConfiguration != null)
+                    {
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4">Cấu hình Điện thoại</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">CPU</label>
+                                    <input name="PhoneConfiguration.CPU" value="@Model.PhoneConfiguration.CPU" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">RAM</label>
+                                    <input name="PhoneConfiguration.RAM" value="@Model.PhoneConfiguration.RAM" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Bộ nhớ trong</label>
+                                    <input name="PhoneConfiguration.InternalStorage" value="@Model.PhoneConfiguration.InternalStorage" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Pin</label>
+                                    <input name="PhoneConfiguration.Battery" value="@Model.PhoneConfiguration.Battery" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Hệ điều hành</label>
+                                    <input name="PhoneConfiguration.OperatingSystem" value="@Model.PhoneConfiguration.OperatingSystem" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Màn hình</label>
+                                    <input name="PhoneConfiguration.Screen" value="@Model.PhoneConfiguration.Screen" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.LaptopConfiguration != null)
+                    {
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4">Cấu hình Laptop</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">CPU</label>
+                                    <input name="LaptopConfiguration.CPU" value="@Model.LaptopConfiguration.CPU" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">RAM</label>
+                                    <input name="LaptopConfiguration.RAM" value="@Model.LaptopConfiguration.RAM" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Storage</label>
+                                    <input name="LaptopConfiguration.Storage" value="@Model.LaptopConfiguration.Storage" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">GPU</label>
+                                    <input name="LaptopConfiguration.GraphicsCard" value="@Model.LaptopConfiguration.GraphicsCard" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Pin</label>
+                                    <input name="LaptopConfiguration.Battery" value="@Model.LaptopConfiguration.Battery" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Hệ điều hành</label>
+                                    <input name="LaptopConfiguration.OperatingSystem" value="@Model.LaptopConfiguration.OperatingSystem" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end space-x-3">
+                <a href="@Url.Action("Details","Products", new { id = Model.ProductId })" 
+                   class="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    Hủy
+                </a>
+                <button type="submit" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                    Lưu thay đổi
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Xử lý preview ảnh
+            const primaryImageInput = document.getElementById('primaryImageInput');
+            if (primaryImageInput) {
+                primaryImageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Kiểm tra kích thước file
+                        if (file.size > 3 * 1024 * 1024) {
+                            alert('Kích thước ảnh không được vượt quá 3MB');
+                            this.value = '';
+                            return;
+                        }
+
+                        // Kiểm tra định dạng file
+                        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+                        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                        if (!allowedExtensions.includes(fileExtension)) {
+                            alert('Chỉ chấp nhận file ảnh (JPG, JPEG, PNG, GIF, WEBP)');
+                            this.value = '';
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const preview = document.getElementById('primary-preview');
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.alt = 'Primary';
+                            img.className = 'w-full h-48 object-cover rounded border';
+                            preview.innerHTML = '';
+                            preview.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // Xử lý đếm ký tự cho mô tả
+            const descriptionTextarea = document.querySelector('textarea[name="ShortDescription"]');
+            const charCount = document.getElementById('char-count');
+            
+            if (descriptionTextarea && charCount) {
+                descriptionTextarea.addEventListener('input', function() {
+                    charCount.textContent = this.value.length + '/1000';
+                });
+            }
+        });
+    </script>
+}
