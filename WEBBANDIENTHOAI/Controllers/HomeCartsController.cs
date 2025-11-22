@@ -157,8 +157,8 @@ namespace WEBBANDIENTHOAI.Controllers
                     ProductName = d.Product?.Name ?? "Sản phẩm lỗi",
                     // Logic lấy ảnh: Nếu PrimaryImage có Url thì lấy, không thì lấy ảnh mặc định
                     ImageUrl = d.Product?.PrimaryImage != null
-                        ? $"/images/products/{d.Product.PrimaryImage.ImagePath}"
-                        : "/images/default-product.png",
+    ? $"/Image/ProductImage/{d.Product.PrimaryImage.ImageId}"
+    : "/images/default-product.png",
                     Color = d.Product?.Color ?? "Đen",
                     Size = d.Product?.Size ?? "Tiêu chuẩn",
                     UnitPrice = d.UnitPrice,

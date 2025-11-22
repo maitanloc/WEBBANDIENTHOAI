@@ -42,7 +42,9 @@
                             <div class="flex items-center gap-4 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300" data-product-id="@item.ProductId">
                                 <input type="checkbox" class="item-checkbox h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" checked />
 
-                                <img src="@item.ImageUrl" class="w-20 h-20 object-cover rounded-xl" alt="@item.ProductName" />
+                                <img src="@item.ImageUrl"
+                                     class="w-24 h-24 object-contain rounded-xl bg-gray-100 p-1 shadow-sm"
+                                     alt="@item.ProductName" />
 
                                 <div class="flex-1">
                                     <h3 class="text-gray-800 dark:text-gray-200 font-semibold text-lg">@item.ProductName</h3>
