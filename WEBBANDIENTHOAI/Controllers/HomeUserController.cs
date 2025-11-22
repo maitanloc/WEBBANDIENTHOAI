@@ -32,23 +32,12 @@ namespace WEBBANDIENTHOAI.Controllers
             }
 
 
-            var topPhone = _context.Products
-       .Where(x => x.CategoryId == 1)
-       .OrderByDescending(x => x.Price)
-       .Take(2)
-       .Include(x => x.PrimaryImage)
-       .ToList();
+            // Lấy toàn bộ file banner trong folder wwwroot/images/banners
+            var bannerFiles = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/banners"))
+                                       .Select(Path.GetFileName)
+                                       .ToList();
 
-            var topLaptop = _context.Products
-                .Where(x => x.CategoryId == 2)
-                .OrderByDescending(x => x.Price)
-                .Take(2)
-                .Include(x => x.PrimaryImage)
-                .ToList();
-
-            var bannerProducts = topPhone.Concat(topLaptop).ToList();
-
-            ViewBag.BannerProducts = bannerProducts;
+            ViewBag.Banners = bannerFiles;
 
             var allProducts = _context.Products.Take(20).ToList();
 

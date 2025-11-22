@@ -48,13 +48,16 @@
     </style>
 
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<body class="bg-white dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
 
 <div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
 <div class="layout-container flex h-full grow flex-col">
 
 @* -------- HEADER -------- *@
-<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/20 bg-background-light/80 dark:bg-background-dark/80 px-4 sm:px-10 py-3 backdrop-blur-sm">
+            <header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap
+        border-b border-solid border-primary/20
+        bg-[#ffedd8]/90 dark:bg-background-dark/80
+        px-4 sm:px-10 py-3 backdrop-blur-sm">
 
     <div class="flex items-center gap-8">
                     <div class="flex items-center gap-3 text-gray-800 dark:text-white">
@@ -114,26 +117,19 @@
     @* ===== BANNER ===== *@
                     <div id="bannerSlider" class="relative w-full h-[480px] overflow-hidden rounded-xl">
 
-                        @foreach (var item in ViewBag.BannerProducts)
+                        @foreach (var file in ViewBag.Banners)
                         {
-                            <div class="banner-item absolute inset-0 transition-all duration-700 opacity-0">
+                            <div class="banner-item absolute inset-0 transition-all duration-[1500ms] opacity-0">
                                 <div class="relative w-full h-full bg-cover bg-center"
-                                     style="background-image: url('@Url.Action("GetProductImage", "HomeUser", new { imageId = item.PrimaryImage?.ImageId })');">
+                                     style="background-image: url('/images/banners/@file');">
 
-                                    <!-- LAYER MỜ -->
                                     <div class="absolute inset-0 bg-black/40"></div>
 
-                                    <!-- NỘI DUNG TRONG SLIDE -->
                                     <div class="relative flex flex-col justify-end p-10 h-full">
-                                        <h1 class="text-white text-4xl font-black drop-shadow-md">@item.Name</h1>
-
+                                        <h1 class="text-white text-4xl font-black drop-shadow-md">FOX Mobile</h1>
                                         <h2 class="text-white/90 text-sm mt-2">
-                                            Giá: @String.Format("{0:N0}₫", item.Price)
+                                            Sản Phẩm Nổi Bật
                                         </h2>
-
-                                        <button class="mt-4 px-4 h-10 rounded-lg font-bold bg-primary text-white">
-                                            Xem thêm chi tiết
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -241,5 +237,5 @@
     setInterval(() => {
         index = (index + 1) % slides.length;
         showSlide(index);
-    }, 3000);
+    }, 4000);
 </script>
