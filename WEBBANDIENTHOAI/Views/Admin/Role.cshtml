@@ -263,9 +263,9 @@
                     console.log('Role data:', result.data); // Debug log
                     console.log('RoleName:', result.data.RoleName); // Debug log
 
-                    document.getElementById('RoleId').value = result.data.RoleId;
-                    document.getElementById('RoleName').value = result.data.RoleName;
-                    document.getElementById('Description').value = result.data.Description || '';
+        document.getElementById('RoleId').value = result.data.roleId;
+        document.getElementById('RoleName').value = result.data.roleName; // Đã sửa
+        document.getElementById('Description').value = result.data.description || '';
                     document.getElementById('modalTitle').textContent = 'Sửa vai trò';
                     showModal();
                 } else {
