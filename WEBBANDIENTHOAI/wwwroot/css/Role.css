@@ -1,0 +1,180 @@
+﻿﻿ /* Role Management Styles */
+.role-management-container {
+    transition: all 0.3s ease;
+}
+
+.role-table-row {
+    transition: all 0.2s ease;
+}
+
+    .role-table-row:hover {
+        transform: translateY(-1px);
+    }
+
+/* Modal animations */
+.modal-enter {
+    animation: modalEnter 0.3s ease;
+}
+
+@keyframes modalEnter {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Form styles */
+.form-input:focus {
+    box-shadow: 0 0 0 2px rgba(242, 127, 13, 0.2);
+}
+
+/* Button transitions */
+.action-btn {
+    transition: all 0.2s ease;
+}
+
+    .action-btn:hover {
+        transform: scale(1.05);
+    }
+
+/* Success/Error message animations */
+.alert-message {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+    .loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        margin: -10px 0 0 -10px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #f27f0d;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+    .role-table-row {
+        border-color: #3c2d1e;
+    }
+
+        .role-table-row:hover {
+            background-color: rgba(242, 127, 13, 0.05);
+        }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .role-management-container {
+        padding: 1rem;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .modal-content {
+        margin: 1rem;
+        width: calc(100% - 2rem);
+    }
+}
+
+/* Custom scrollbar */
+.table-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f4ede7;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #f27f0d;
+    border-radius: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .table-container::-webkit-scrollbar-track {
+        background: #3c2d1e;
+    }
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #f27f0d;
+    outline-offset: 2px;
+}
+
+/* Modal enhancements */
+#roleModal .scale-100 {
+    transform: scale(1);
+    opacity: 1;
+}
+
+#roleModal .scale-95 {
+    transform: scale(0.95);
+    opacity: 0;
+}
+
+/* Input and textarea focus effects */
+.form-input:focus,
+textarea:focus {
+    box-shadow: 0 0 0 3px rgba(242, 127, 13, 0.15);
+    border-color: #f27f0d;
+}
+
+/* Button hover effects */
+#saveBtn:hover {
+    box-shadow: 0 4px 6px rgba(242, 127, 13, 0.2);
+}
+
+#cancelBtn:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .form-input:focus,
+    textarea:focus {
+        box-shadow: 0 0 0 3px rgba(242, 127, 13, 0.25);
+    }
+}

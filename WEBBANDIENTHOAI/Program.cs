@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1) Load connection string
 // ========================
 var conn = builder.Configuration.GetConnectionString("DefaultConnection")
-           ?? "Data Source=DELL\\SQLEXPRESS02;Initial Catalog=web_dien_tu;Integrated Security=True;TrustServerCertificate=True";
+           ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=web_dien_tu;Integrated Security=True;TrustServerCertificate=True";
 
 // ========================
 // 2) Add MVC services
@@ -28,6 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IProductStatusRepository, ProductStatusRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 
 
