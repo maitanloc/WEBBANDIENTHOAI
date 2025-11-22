@@ -176,15 +176,15 @@ public class AdminController : Controller
         return RedirectToAction("StaffList");
     }
 
+    // GET: Admin/StaffList - Quản lý nhân viên
     public async Task<IActionResult> StaffList()
     {
         var users = await _context.Users
             .Include(u => u.Role)
-            .Where(u => u.RoleId != 3) // nếu bạn muốn loại trừ role Customer (role id = 3)
-            .AsNoTracking()
+            .Where(u => u.RoleId != 3) // Loại trừ Customer
             .ToListAsync();
 
-        // TRÁNH trả tên partial không đúng: tên file trong project của bạn là "StaffListPartial.cshtml"
-        return PartialView("StaffListPartial", users);
+        ViewBag.Roles = await _context.Roles.Where(r => r.RoleId != 3).ToListAsync();
+        return View("StaffListPartial", users);
     }
 }
