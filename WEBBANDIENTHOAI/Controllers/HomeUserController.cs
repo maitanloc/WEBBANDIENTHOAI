@@ -60,6 +60,8 @@ namespace WEBBANDIENTHOAI.Controllers
             return File("~/images/default-product.png", "image/png");
         }
 
+
+
         
     }
 }

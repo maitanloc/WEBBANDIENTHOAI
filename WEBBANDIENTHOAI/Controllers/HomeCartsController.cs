@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.Repository;
+using Microsoft.AspNetCore.Http; // Cần để dùng Session
 
 namespace WEBBANDIENTHOAI.Controllers
 {
@@ -13,14 +14,43 @@ namespace WEBBANDIENTHOAI.Controllers
             _cartRepository = cartRepository;
         }
 
+        // --- HÀM MỚI: Lấy ID từ Session do AccountController tạo ra ---
+        private int? GetCurrentCustomerId()
+        {
+            // 1. Lấy chuỗi UserId từ Session (AccountController lưu dạng String)
+            var userIdString = HttpContext.Session.GetString("UserId");
+            var role = HttpContext.Session.GetString("RoleName");
+
+            // 2. Kiểm tra xem có dữ liệu không và Role có phải là Customer không
+            // (Để tránh trường hợp Admin đăng nhập nhưng lại vào giỏ hàng mua đồ - tùy logic dự án)
+            if (!string.IsNullOrEmpty(userIdString) && role == "Customer")
+            {
+                if (int.TryParse(userIdString, out int customerId))
+                {
+                    return customerId;
+                }
+            }
+
+            return null; // Chưa đăng nhập hoặc không phải Customer
+        }
+
         public async Task<IActionResult> Index()
         {
-            // Tạm thời dùng customerId = 1, sau này sẽ thay bằng customerId từ login
-            var customerId = 1;
+            // 1. Lấy ID người dùng hiện tại
+            var customerId = GetCurrentCustomerId();
 
-            var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId);
+            // 2. Nếu chưa đăng nhập -> Chuyển hướng về trang Login của AccountController
+            if (customerId == null)
+            {
+                // Lưu URL hiện tại để sau khi login thì quay lại (nếu muốn phát triển thêm)
+                return RedirectToAction("Login", "Account");
+            }
+
+            // 3. Lấy giỏ hàng từ DB
+            var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId.Value);
+
+            // 4. Map sang ViewModel
             var viewModel = MapToViewModel(cart);
-
             return View(viewModel);
         }
 
@@ -29,10 +59,16 @@ namespace WEBBANDIENTHOAI.Controllers
         {
             try
             {
-                var customerId = 1; // Tạm thời
-                await _cartRepository.AddToCartAsync(customerId, productId, quantity);
+                var customerId = GetCurrentCustomerId();
 
-                TempData["SuccessMessage"] = "Đã thêm sản phẩm vào giỏ hàng!";
+                // Nếu chưa login mà bấm thêm vào giỏ -> Báo lỗi bắt đăng nhập
+                if (customerId == null)
+                {
+                    return Json(new { success = false, message = "Vui lòng đăng nhập để mua hàng!", requireLogin = true });
+                }
+
+                await _cartRepository.AddToCartAsync(customerId.Value, productId, quantity);
+
                 return Json(new { success = true, message = "Đã thêm vào giỏ hàng" });
             }
             catch (Exception ex)
@@ -46,6 +82,12 @@ namespace WEBBANDIENTHOAI.Controllers
         {
             try
             {
+                // Kiểm tra login
+                if (GetCurrentCustomerId() == null)
+                {
+                    return Json(new { success = false, message = "Phiên đăng nhập hết hạn." });
+                }
+
                 await _cartRepository.UpdateCartItemAsync(cartDetailId, quantity);
                 return Json(new { success = true });
             }
@@ -60,6 +102,8 @@ namespace WEBBANDIENTHOAI.Controllers
         {
             try
             {
+                if (GetCurrentCustomerId() == null) return RedirectToAction("Login", "Account");
+
                 await _cartRepository.RemoveFromCartAsync(cartDetailId);
                 TempData["SuccessMessage"] = "Đã xóa sản phẩm khỏi giỏ hàng!";
                 return RedirectToAction("Index");
@@ -76,9 +120,12 @@ namespace WEBBANDIENTHOAI.Controllers
         {
             try
             {
-                var customerId = 1;
-                await _cartRepository.ClearCartAsync(customerId);
-                TempData["SuccessMessage"] = "Đã xóa tất cả sản phẩm trong giỏ hàng!";
+                var customerId = GetCurrentCustomerId();
+                if (customerId != null)
+                {
+                    await _cartRepository.ClearCartAsync(customerId.Value);
+                    TempData["SuccessMessage"] = "Đã xóa tất cả sản phẩm trong giỏ hàng!";
+                }
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -90,6 +137,16 @@ namespace WEBBANDIENTHOAI.Controllers
 
         private CartViewModel MapToViewModel(Cart cart)
         {
+            if (cart == null || cart.Details == null)
+            {
+                return new CartViewModel
+                {
+                    Items = new List<CartItemViewModel>(),
+                    ShippingFee = 0,
+                    Discount = 0
+                };
+            }
+
             return new CartViewModel
             {
                 CartId = cart.CartId,
@@ -97,16 +154,17 @@ namespace WEBBANDIENTHOAI.Controllers
                 {
                     CartDetailId = d.CartDetailId,
                     ProductId = d.ProductId,
-                    ProductName = d.Product.Name,
-                    ImageUrl = d.Product.PrimaryImage != null
-                        ? $"/images/products/{d.ProductId}.png" // Hoặc URL từ database
+                    ProductName = d.Product?.Name ?? "Sản phẩm lỗi",
+                    // Logic lấy ảnh: Nếu PrimaryImage có Url thì lấy, không thì lấy ảnh mặc định
+                    ImageUrl = d.Product?.PrimaryImage != null
+                        ? $"/images/products/{d.Product.PrimaryImage.ImagePath}"
                         : "/images/default-product.png",
-                    Color = d.Product.Color ?? "Đen",
-                    Size = d.Product.Size ?? "Mặc định",
+                    Color = d.Product?.Color ?? "Đen",
+                    Size = d.Product?.Size ?? "Tiêu chuẩn",
                     UnitPrice = d.UnitPrice,
                     Quantity = d.Quantity
                 }).ToList(),
-                ShippingFee = cart.Details.Any() ? 0 : 0, // Miễn phí vận chuyển
+                ShippingFee = 0,
                 Discount = 0
             };
         }

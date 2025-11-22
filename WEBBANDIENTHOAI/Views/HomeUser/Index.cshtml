@@ -85,55 +85,32 @@
 
 <!-- Categories Section -->
 <section class="mb-12" data-aos="fade-up">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Danh Mục Sản Phẩm</h2>
-        <a href="/categories" class="text-primary font-medium hover:text-primary-dark flex items-center text-sm">
-            Xem tất cả
-            <i class="fas fa-arrow-right ml-2"></i>
-        </a>
+    <div class="flex justify-center">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-4xl">
+            <a href="/products/smartphones"
+               class="flex flex-col items-center gap-4 rounded-xl border-2 border-orange-200 bg-white p-8 hover:shadow-xl text-center hover-lift group transition-all duration-300 hover:border-primary">
+                <div class="text-primary group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-mobile-alt text-4xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800 text-xl">Điện thoại</h3>
+                    <p class="text-gray-500 text-sm mt-1">Mẫu mới nhất</p>
+                </div>
+            </a>
+
+            <a href="/products/laptops"
+               class="flex flex-col items-center gap-4 rounded-xl border-2 border-orange-200 bg-white p-8 hover:shadow-xl text-center hover-lift group transition-all duration-300 hover:border-primary">
+                <div class="text-primary group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-laptop text-4xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800 text-xl">Laptop</h3>
+                    <p class="text-gray-500 text-sm mt-1">Hiệu năng cao</p>
+                </div>
+            </a>
+        </div>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <a href="/products/smartphones" class="flex flex-col items-center gap-4 rounded-xl border-2 border-orange-200 bg-white p-6 hover:shadow-xl text-center hover-lift group transition-all duration-300 hover:border-primary">
-            <div class="text-primary group-hover:scale-110 transition-transform duration-300">
-                <i class="fas fa-mobile-alt text-3xl"></i>
-            </div>
-            <div>
-                <h3 class="font-bold text-gray-800 text-lg">Điện thoại</h3>
-                <p class="text-gray-500 text-sm mt-1">Mẫu mới nhất</p>
-            </div>
-        </a>
-
-        <a href="/products/laptops" class="flex flex-col items-center gap-4 rounded-xl border-2 border-orange-200 bg-white p-6 hover:shadow-xl text-center hover-lift group transition-all duration-300 hover:border-primary">
-            <div class="text-primary group-hover:scale-110 transition-transform duration-300">
-                <i class="fas fa-laptop text-3xl"></i>
-            </div>
-            <div>
-                <h3 class="font-bold text-gray-800 text-lg">Laptop</h3>
-                <p class="text-gray-500 text-sm mt-1">Hiệu năng cao</p>
-            </div>
-        </a>
-
-        <a href="/products/tablets" class="flex flex-col items-center gap-4 rounded-xl border-2 border-orange-200 bg-white p-6 hover:shadow-xl text-center hover-lift group transition-all duration-300 hover:border-primary">
-            <div class="text-primary group-hover:scale-110 transition-transform duration-300">
-                <i class="fas fa-tablet-alt text-3xl"></i>
-            </div>
-            <div>
-                <h3 class="font-bold text-gray-800 text-lg">Máy tính bảng</h3>
-                <p class="text-gray-500 text-sm mt-1">Đa dạng mẫu mã</p>
-            </div>
-        </a>
-
-        <a href="/products/accessories" class="flex flex-col items-center gap-4 rounded-xl border-2 border-orange-200 bg-white p-6 hover:shadow-xl text-center hover-lift group transition-all duration-300 hover:border-primary">
-            <div class="text-primary group-hover:scale-110 transition-transform duration-300">
-                <i class="fas fa-headphones text-3xl"></i>
-            </div>
-            <div>
-                <h3 class="font-bold text-gray-800 text-lg">Phụ kiện</h3>
-                <p class="text-gray-500 text-sm mt-1">Chính hãng</p>
-            </div>
-        </a>
-    </div>
 </section>
 
 <!-- Featured Products Section -->
@@ -156,14 +133,15 @@
                         @if (sp.PrimaryImage != null)
                         {
                             <img src="@Url.Action("GetProductImage", "HomeUser", new { imageId = sp.PrimaryImage.ImageId })"
-                                 class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                                 class="w-full h-40 object-contain p-2 transition-transform duration-500 group-hover:scale-105 bg-white"
                                  alt="@sp.Name" />
                         }
                         else
                         {
                             <img src="/images/default-product.png"
-                                 class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                                 class="w-full h-40 object-contain p-2 transition-transform duration-500 group-hover:scale-105 bg-white"
                                  alt="@sp.Name" />
+
                         }
 
                         <!-- Product Badge -->

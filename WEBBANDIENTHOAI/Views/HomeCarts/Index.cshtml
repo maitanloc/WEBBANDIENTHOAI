@@ -1,194 +1,119 @@
-﻿@{
+﻿@model WEBBANDIENTHOAI.Models.CartViewModel
+
+@{
     Layout = "~/Views/Shared/_Layoutuser.cshtml";
     ViewData["Title"] = "Giỏ hàng - FOXMOBILE";
+    // Tính tổng tiền ngay tại View vì Model hiện tại chưa có biến GrandTotal
+    decimal grandTotal = Model.Items != null ? Model.Items.Sum(i => i.Quantity * i.UnitPrice) : 0;
 }
 
-<!-- Main Content -->
 <div class="container mx-auto px-4 py-8">
     <div class="flex flex-col flex-1">
 
-        <!-- Breadcrumbs -->
         <div class="flex flex-wrap gap-2 mb-6">
-            <a class="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="/">
-                <i class="fas fa-home mr-1"></i>
-                Trang chủ
-            </a>
-            <span class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">/</span>
             <span class="text-gray-800 dark:text-gray-200 text-sm font-medium leading-normal">Giỏ hàng</span>
         </div>
 
-        <!-- Page heading -->
         <div class="flex flex-wrap justify-between gap-3 mb-8">
             <h1 class="text-gray-800 dark:text-gray-100 text-3xl md:text-4xl font-bold leading-tight tracking-tight">Giỏ hàng của bạn</h1>
-            <span class="text-gray-500 dark:text-gray-400 text-sm">3 sản phẩm</span>
+            <span class="text-gray-500 dark:text-gray-400 text-sm">@(Model.Items?.Count ?? 0) sản phẩm</span>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        @if (Model.Items != null && Model.Items.Count > 0)
+        {
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div class="lg:col-span-2 flex flex-col gap-6">
 
-            <!-- Left Column - Cart Items -->
-            <div class="lg:col-span-2 flex flex-col gap-6">
-
-                <!-- Action Bar -->
-                <div class="flex items-center gap-4 bg-white dark:bg-gray-800 p-4 min-h-16 justify-between border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm">
-                    <div class="flex items-center gap-4">
-                        <input id="select-all" type="checkbox" class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" />
-                        <label for="select-all" class="text-base font-medium text-gray-800 dark:text-gray-200 cursor-pointer">Chọn tất cả (3 sản phẩm)</label>
+                    <div class="flex items-center gap-4 bg-white dark:bg-gray-800 p-4 min-h-16 justify-between border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <input id="select-all" type="checkbox" class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" />
+                            <label for="select-all" class="text-base font-medium text-gray-800 dark:text-gray-200 cursor-pointer">Chọn tất cả (@Model.Items.Count sản phẩm)</label>
+                        </div>
+                        <form asp-action="ClearCart" asp-controller="HomeCarts" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa hết giỏ hàng?');">
+                            <button type="submit" class="flex items-center gap-2 text-sm font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors">
+                                <i class="fas fa-trash-alt text-base"></i> Xoá tất cả
+                            </button>
+                        </form>
                     </div>
 
-                    <button class="flex items-center gap-2 text-sm font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors">
-                        <i class="fas fa-trash-alt text-base"></i>
-                        Xoá
-                    </button>
-                </div>
+                    <div class="flex flex-col gap-4">
+                        @foreach (var item in Model.Items)
+                        {
+                            <div class="flex items-center gap-4 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300" data-product-id="@item.ProductId">
+                                <input type="checkbox" class="item-checkbox h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" checked />
 
-                <!-- Product List -->
-                <div class="flex flex-col gap-4">
-                    <!-- Product Card 1 -->
-                    <div class="flex items-center gap-4 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" checked />
-                        <img src="/images/products/iphone16.png" class="w-20 h-20 object-cover rounded-xl" alt="iPhone 16 Pro Max" />
-                        <div class="flex-1">
-                            <h3 class="text-gray-800 dark:text-gray-200 font-semibold text-lg">iPhone 16 Pro Max 256GB</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Màu: Titan Đen</p>
-                            <p class="text-primary font-bold text-xl mt-2">32.000.000₫</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-minus text-xs"></i>
-                            </button>
-                            <input type="text" value="1" class="w-12 text-center border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent" />
-                            <button class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-plus text-xs"></i>
-                            </button>
-                        </div>
+                                <img src="@item.ImageUrl" class="w-20 h-20 object-cover rounded-xl" alt="@item.ProductName" />
+
+                                <div class="flex-1">
+                                    <h3 class="text-gray-800 dark:text-gray-200 font-semibold text-lg">@item.ProductName</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Mã SP: @item.ProductId | @item.Color</p>
+                                    <p class="text-primary font-bold text-xl mt-2">@item.UnitPrice.ToString("N0")₫</p>
+                                </div>
+
+                                <div class="flex items-center gap-2">
+                                    <button onclick="updateQuantity(@item.CartDetailId, @(item.Quantity - 1))" class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <i class="fas fa-minus text-xs"></i>
+                                    </button>
+
+                                    <input type="text" value="@item.Quantity" class="w-12 text-center border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent" readonly />
+
+                                    <button onclick="updateQuantity(@item.CartDetailId, @(item.Quantity + 1))" class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <i class="fas fa-plus text-xs"></i>
+                                    </button>
+
+                                    <form asp-action="RemoveItem" asp-controller="HomeCarts" method="post" class="ml-2">
+                                        <input type="hidden" name="cartDetailId" value="@item.CartDetailId" />
+                                        <button type="submit" class="text-red-500 hover:text-red-700">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
                     </div>
 
-                    <!-- Product Card 2 -->
-                    <div class="flex items-center gap-4 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" checked />
-                        <img src="/images/products/airpods-pro.png" class="w-20 h-20 object-cover rounded-xl" alt="AirPods Pro" />
-                        <div class="flex-1">
-                            <h3 class="text-gray-800 dark:text-gray-200 font-semibold text-lg">AirPods Pro 2</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Màu: Trắng</p>
-                            <p class="text-primary font-bold text-xl mt-2">5.990.000₫</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-minus text-xs"></i>
-                            </button>
-                            <input type="text" value="1" class="w-12 text-center border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent" />
-                            <button class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-plus text-xs"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Product Card 3 -->
-                    <div class="flex items-center gap-4 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" />
-                        <img src="/images/products/apple-watch.png" class="w-20 h-20 object-cover rounded-xl" alt="Apple Watch" />
-                        <div class="flex-1">
-                            <h3 class="text-gray-800 dark:text-gray-200 font-semibold text-lg">Apple Watch Series 9</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Màu: Midnight</p>
-                            <p class="text-primary font-bold text-xl mt-2">11.490.000₫</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-minus text-xs"></i>
-                            </button>
-                            <input type="text" value="1" class="w-12 text-center border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent" />
-                            <button class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-plus text-xs"></i>
-                            </button>
-                        </div>
+                    <div class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <a href="/" class="flex items-center gap-2 text-primary hover:text-primary-dark font-medium transition-colors">
+                            <i class="fas fa-arrow-left text-sm"></i> Tiếp tục mua sắm
+                        </a>
                     </div>
                 </div>
 
-                <!-- Continue Shopping -->
-                <div class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <a href="/products" class="flex items-center gap-2 text-primary hover:text-primary-dark font-medium transition-colors">
-                        <i class="fas fa-arrow-left text-sm"></i>
-                        Tiếp tục mua sắm
-                    </a>
-                    <button class="px-6 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-xl font-medium transition-colors">
-                        Cập nhật giỏ hàng
-                    </button>
-                </div>
+                <aside class="lg:col-span-1 sticky top-24">
+                    <div class="bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm flex flex-col gap-6">
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">Tóm tắt đơn hàng</h2>
 
+                        <div class="flex items-center justify-between">
+                            <p class="text-gray-600 dark:text-gray-400">Tạm tính (@Model.Items.Count sản phẩm)</p>
+                            <p class="font-medium text-gray-800 dark:text-gray-200">@grandTotal.ToString("N0")₫</p>
+                        </div>
+
+                        <div class="border-t border-dashed border-gray-300 dark:border-gray-600"></div>
+
+                        <div class="flex items-center justify-between">
+                            <p class="text-lg text-gray-600 dark:text-gray-400">Tổng cộng</p>
+                            <p class="font-bold text-2xl text-primary">@grandTotal.ToString("N0")₫</p>
+                        </div>
+
+                        <a href="/Checkout" class="flex w-full h-12 items-center justify-center bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105 gap-2">
+                            <span>Tiến hành thanh toán</span>
+                            <i class="fas fa-arrow-right text-sm"></i>
+                        </a>
+
+                    </div>
+                </aside>
             </div>
-
-            <!-- Right Column - Order Summary -->
-            <aside class="lg:col-span-1 sticky top-24">
-                <div class="bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm flex flex-col gap-6">
-
-                    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">Tóm tắt đơn hàng</h2>
-
-                    <div class="flex items-center justify-between">
-                        <p class="text-gray-600 dark:text-gray-400">Tạm tính (2 sản phẩm)</p>
-                        <p class="font-medium text-gray-800 dark:text-gray-200">37.990.000₫</p>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <p class="text-gray-600 dark:text-gray-400">Giảm giá</p>
-                        <p class="font-medium text-green-500 dark:text-green-400">- 500.000₫</p>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <p class="text-gray-600 dark:text-gray-400">Phí vận chuyển</p>
-                        <p class="font-medium text-gray-800 dark:text-gray-200">Miễn phí</p>
-                    </div>
-
-                    <div class="border-t border-dashed border-gray-300 dark:border-gray-600"></div>
-
-                    <!-- Coupon Code -->
-                    <div class="flex flex-col gap-3">
-                        <label class="font-medium text-gray-800 dark:text-gray-200">Mã giảm giá</label>
-                        <div class="flex gap-2">
-                            <input class="form-input flex-1 h-11 rounded-xl bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-primary focus:border-primary"
-                                   placeholder="Nhập mã giảm giá" />
-                            <button class="h-11 px-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-semibold transition-colors">
-                                Áp dụng
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-dashed border-gray-300 dark:border-gray-600"></div>
-
-                    <!-- Total -->
-                    <div class="flex items-center justify-between">
-                        <p class="text-lg text-gray-600 dark:text-gray-400">Tổng cộng</p>
-                        <p class="font-bold text-2xl text-primary">37.490.000₫</p>
-                    </div>
-
-                    <!-- Checkout Button -->
-                    <button class="flex w-full h-12 items-center justify-center bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105 gap-2">
-                        <span>Tiến hành thanh toán</span>
-                        <i class="fas fa-arrow-right text-sm"></i>
-                    </button>
-
-                    <!-- Trust Badges -->
-                    <div class="grid grid-cols-2 gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-shield-alt text-primary"></i>
-                            <span>Bảo mật</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-shipping-fast text-primary"></i>
-                            <span>Giao hàng nhanh</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-undo-alt text-primary"></i>
-                            <span>Đổi trả 7 ngày</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-headset text-primary"></i>
-                            <span>Hỗ trợ 24/7</span>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-
-        </div>
+        }
+        else
+        {
+            <div class="text-center py-16">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Giỏ hàng của bạn đang trống</h2>
+                <p class="text-gray-500 mb-8">Hãy quay lại trang chủ để chọn món hàng yêu thích nhé!</p>
+                <a href="/" class="px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-colors">
+                    Về trang chủ
+                </a>
+            </div>
+        }
     </div>
 </div>
 
@@ -203,90 +128,26 @@
 
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Quantity adjustment
-            const quantityButtons = document.querySelectorAll('.flex.items-center.gap-2 button');
-            quantityButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const input = this.parentElement.querySelector('input');
-                    let value = parseInt(input.value);
+        function updateQuantity(cartDetailId, newQuantity) {
+            if (newQuantity < 1) return;
 
-                    if (this.querySelector('.fa-minus')) {
-                        if (value > 1) {
-                            input.value = value - 1;
-                        }
-                    } else if (this.querySelector('.fa-plus')) {
-                        input.value = value + 1;
-                    }
-
-                    // Update cart total (you would implement this with actual calculations)
-                    updateCartTotal();
-                });
-            });
-
-            // Select all functionality
-            const selectAll = document.getElementById('select-all');
-            const itemCheckboxes = document.querySelectorAll('input[type="checkbox"]:not(#select-all)');
-
-            selectAll.addEventListener('change', function() {
-                itemCheckboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
-                });
-                updateCartTotal();
-            });
-
-            // Individual checkbox change
-            itemCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const allChecked = Array.from(itemCheckboxes).every(cb => cb.checked);
-                    selectAll.checked = allChecked;
-                    updateCartTotal();
-                });
-            });
-
-            function updateCartTotal() {
-                // Implement cart total update logic here
-                console.log('Cart updated');
-            }
-
-            // Coupon code application
-            const applyCouponButton = document.querySelector('.bg-primary');
-            applyCouponButton.addEventListener('click', function() {
-                const couponInput = this.parentElement.querySelector('input');
-                if (couponInput.value.trim() !== '') {
-                    // Simulate coupon application
-                    this.textContent = 'Đã áp dụng';
-                    this.classList.remove('bg-primary', 'hover:bg-primary-dark');
-                    this.classList.add('bg-green-500', 'hover:bg-green-600');
-                    this.disabled = true;
-
-                    // Show success message
-                    showNotification('Áp dụng mã giảm giá thành công!', 'success');
+            // Gửi Ajax request để cập nhật
+            fetch('/HomeCarts/UpdateQuantity', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `cartDetailId=${cartDetailId}&quantity=${newQuantity}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Load lại trang để cập nhật giá tiền
+                } else {
+                    alert(data.message);
                 }
-            });
-
-            // Notification function
-            function showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 ${
-                    type === 'success' ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'
-                }`;
-                notification.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-                        <span>${message}</span>
-                    </div>
-                `;
-
-                document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    notification.style.transform = 'translateX(100%)';
-                    setTimeout(() => {
-                        document.body.removeChild(notification);
-                    }, 300);
-                }, 3000);
-            }
-        });
+            })
+            .catch(error => console.error('Error:', error));
+        }
     </script>
 }
