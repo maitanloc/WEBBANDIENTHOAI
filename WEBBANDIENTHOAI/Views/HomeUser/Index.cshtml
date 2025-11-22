@@ -1,241 +1,441 @@
-﻿@{
+﻿@model IEnumerable<WEBBANDIENTHOAI.Models.Product>
+
+@{
+    Layout = "~/Views/Shared/_Layoutuser.cshtml";
     ViewData["Title"] = "FOXMOBILE - Cửa hàng Điện thoại & Laptop";
-    Layout = null;
 }
 
-<!DOCTYPE html>
-<html class="light" lang="vi">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#f48c25",
-                        "background-light": "#f8f7f5",
-                        "background-dark": "#221910",
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
-
-    <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
-
-</head>
-<body class="bg-white dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
-
-<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-<div class="layout-container flex h-full grow flex-col">
-
-@* -------- HEADER -------- *@
-            <header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap
-        border-b border-solid border-primary/20
-        bg-[#ffedd8]/90 dark:bg-background-dark/80
-        px-4 sm:px-10 py-3 backdrop-blur-sm">
-
-    <div class="flex items-center gap-8">
-                    <div class="flex items-center gap-3 text-gray-800 dark:text-white">
-                        <div class="size-12">
-                            <img src="/images/fox-mobile-logo.png" alt="FOX Mobile Logo" class="w-full h-full object-contain" />
+<!-- Hero Banner Slider -->
+<section class="mb-12" data-aos="fade-up">
+    <div id="bannerSlider" class="relative w-full h-[480px] overflow-hidden rounded-xl">
+        @if (ViewBag.Banners != null)
+        {
+            foreach (var file in ViewBag.Banners)
+            {
+                <div class="banner-item absolute inset-0 transition-all duration-[1500ms] opacity-0">
+                    <div class="relative w-full h-full bg-cover bg-center"
+                         style="background-image: url('/images/banners/@file');">
+                        <div class="absolute inset-0 bg-black/40"></div>
+                        <div class="relative flex flex-col justify-end p-10 h-full">
+                            <h1 class="text-white text-4xl font-black drop-shadow-md">FOX Mobile</h1>
+                            <h2 class="text-white/90 text-sm mt-2">
+                                Sản Phẩm Nổi Bật
+                            </h2>
                         </div>
-                        <h2 class="text-lg font-bold tracking-tight">FOX Mobile</h2>
                     </div>
-    </div>
-
-    @* ------- SEARCH -------- *@
-    <div class="hidden md:flex flex-1 justify-center px-8">
-        <label class="flex flex-col w-full !h-10 max-w-lg">
-            <div class="flex w-full items-stretch rounded-lg h-full">
-                <div class="text-gray-500 dark:text-gray-400 flex bg-gray-200/50 dark:bg-white/10 items-center justify-center pl-4 rounded-l-lg">
-                    <span class="material-symbols-outlined" style="font-size: 20px;">search</span>
                 </div>
-                <input class="form-input w-full flex-1 rounded-r-lg text-gray-800 dark:text-white bg-gray-200/50 dark:bg-white/10 border-none h-full px-4 text-sm"
-                       placeholder="Tìm kiếm sản phẩm..." />
-            </div>
-        </label>
-    </div>
-
-    @* ------ NAV + ICONS ------ *@
-    <div class="flex flex-1 justify-end gap-2 sm:gap-4">
-
-        <div class="hidden lg:flex items-center gap-6">
-            <a class="text-sm font-medium hover:text-primary dark:hover:text-primary">Điện thoại</a>
-            <a class="text-sm font-medium hover:text-primary dark:hover:text-primary">Laptop</a>
-            <a class="text-sm font-medium hover:text-primary dark:hover:text-primary">Khuyến mãi</a>
-        </div>
-
-        <div class="flex gap-2">
-                        <a href="@Url.Action("Index", "HomeCarts")"
-                           class="flex items-center justify-center rounded-lg h-10 w-10 bg-gray-200/50 dark:bg-white/10 hover:bg-gray-200/80">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">shopping_cart</span>
-                        </a>
-            <button class="flex items-center justify-center rounded-lg h-10 w-10 bg-gray-200/50 dark:bg-white/10 hover:bg-gray-200/80">
-                <span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
-            </button>
-        </div>
-
-                    <div class="bg-center bg-cover rounded-full size-10"
-                         style="background-image: url('@Url.Content("~/images/usernull.jpg")');">
+            }
+        }
+        else
+        {
+            <!-- Default banner if no banners available -->
+            <div class="banner-item absolute inset-0 transition-all duration-[1500ms] opacity-1">
+                <div class="relative w-full h-full bg-gradient-to-r from-primary to-primary-dark rounded-xl">
+                    <div class="absolute inset-0 bg-black/40"></div>
+                    <div class="relative flex flex-col justify-center items-center p-10 h-full text-center">
+                        <h1 class="text-white text-4xl font-black drop-shadow-md">FOXMOBILE</h1>
+                        <h2 class="text-white/90 text-lg mt-2">
+                            Thế giới công nghệ cao cấp
+                        </h2>
+                        <p class="text-white/80 mt-4 max-w-md">
+                            Khám phá những sản phẩm công nghệ mới nhất với giá tốt nhất
+                        </p>
                     </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
 
+<!-- Features Section -->
+<section class="py-12 bg-white mb-12" data-aos="fade-up">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-orange-50 p-6 rounded-xl text-center hover-lift border border-orange-100">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-shipping-fast text-xl text-white"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2 text-gray-800">Giao hàng miễn phí</h3>
+                <p class="text-gray-600 text-sm">Cho đơn hàng từ 2 triệu đồng</p>
+            </div>
+            <div class="bg-orange-50 p-6 rounded-xl text-center hover-lift border border-orange-100">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-shield-alt text-xl text-white"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2 text-gray-800">Bảo hành chính hãng</h3>
+                <p class="text-gray-600 text-sm">12 tháng tại trung tâm bảo hành</p>
+            </div>
+            <div class="bg-orange-50 p-6 rounded-xl text-center hover-lift border border-orange-100">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-sync-alt text-xl text-white"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2 text-gray-800">Đổi trả dễ dàng</h3>
+                <p class="text-gray-600 text-sm">Trong vòng 7 ngày đầu tiên</p>
+            </div>
+            <div class="bg-orange-50 p-6 rounded-xl text-center hover-lift border border-orange-100">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-headset text-xl text-white"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2 text-gray-800">Hỗ trợ 24/7</h3>
+                <p class="text-gray-600 text-sm">Tư vấn và giải đáp thắc mắc</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="mb-12" data-aos="fade-up">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Danh Mục Sản Phẩm</h2>
+        <a href="/categories" class="text-primary font-medium hover:text-primary-dark flex items-center text-sm">
+            Xem tất cả
+            <i class="fas fa-arrow-right ml-2"></i>
+        </a>
     </div>
 
-</header>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <a href="/products/smartphones" class="flex flex-col items-center gap-4 rounded-xl border-2 border-orange-200 bg-white p-6 hover:shadow-xl text-center hover-lift group transition-all duration-300 hover:border-primary">
+            <div class="text-primary group-hover:scale-110 transition-transform duration-300">
+                <i class="fas fa-mobile-alt text-3xl"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-gray-800 text-lg">Điện thoại</h3>
+                <p class="text-gray-500 text-sm mt-1">Mẫu mới nhất</p>
+            </div>
+        </a>
 
+        <a href="/products/laptops" class="flex flex-col items-center gap-4 rounded-xl border-2 border-orange-200 bg-white p-6 hover:shadow-xl text-center hover-lift group transition-all duration-300 hover:border-primary">
+            <div class="text-primary group-hover:scale-110 transition-transform duration-300">
+                <i class="fas fa-laptop text-3xl"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-gray-800 text-lg">Laptop</h3>
+                <p class="text-gray-500 text-sm mt-1">Hiệu năng cao</p>
+            </div>
+        </a>
 
-@* -------- MAIN CONTENT -------- *@
-<main class="flex flex-col flex-1 px-4 sm:px-10 md:px-20 lg:px-40 py-8">
+        <a href="/products/tablets" class="flex flex-col items-center gap-4 rounded-xl border-2 border-orange-200 bg-white p-6 hover:shadow-xl text-center hover-lift group transition-all duration-300 hover:border-primary">
+            <div class="text-primary group-hover:scale-110 transition-transform duration-300">
+                <i class="fas fa-tablet-alt text-3xl"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-gray-800 text-lg">Máy tính bảng</h3>
+                <p class="text-gray-500 text-sm mt-1">Đa dạng mẫu mã</p>
+            </div>
+        </a>
 
-<div class="layout-content-container flex flex-col w-full max-w-7xl mx-auto flex-1 gap-12">
+        <a href="/products/accessories" class="flex flex-col items-center gap-4 rounded-xl border-2 border-orange-200 bg-white p-6 hover:shadow-xl text-center hover-lift group transition-all duration-300 hover:border-primary">
+            <div class="text-primary group-hover:scale-110 transition-transform duration-300">
+                <i class="fas fa-headphones text-3xl"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-gray-800 text-lg">Phụ kiện</h3>
+                <p class="text-gray-500 text-sm mt-1">Chính hãng</p>
+            </div>
+        </a>
+    </div>
+</section>
 
-    @* ===== BANNER ===== *@
-                    <div id="bannerSlider" class="relative w-full h-[480px] overflow-hidden rounded-xl">
+<!-- Featured Products Section -->
+<section class="mb-12" data-aos="fade-up">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Sản Phẩm Nổi Bật</h2>
+        <a href="/products" class="text-primary font-medium hover:text-primary-dark flex items-center text-sm">
+            Xem tất cả
+            <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+    </div>
 
-                        @foreach (var file in ViewBag.Banners)
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var sp in Model)
+            {
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden group hover:shadow-xl transition-all duration-500 hover-lift">
+                    <div class="relative overflow-hidden">
+                        @if (sp.PrimaryImage != null)
                         {
-                            <div class="banner-item absolute inset-0 transition-all duration-[1500ms] opacity-0">
-                                <div class="relative w-full h-full bg-cover bg-center"
-                                     style="background-image: url('/images/banners/@file');">
+                            <img src="@Url.Action("GetProductImage", "HomeUser", new { imageId = sp.PrimaryImage.ImageId })"
+                                 class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                                 alt="@sp.Name" />
+                        }
+                        else
+                        {
+                            <img src="/images/default-product.png"
+                                 class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                                 alt="@sp.Name" />
+                        }
 
-                                    <div class="absolute inset-0 bg-black/40"></div>
-
-                                    <div class="relative flex flex-col justify-end p-10 h-full">
-                                        <h1 class="text-white text-4xl font-black drop-shadow-md">FOX Mobile</h1>
-                                        <h2 class="text-white/90 text-sm mt-2">
-                                            Sản Phẩm Nổi Bật
-                                        </h2>
-                                    </div>
-                                </div>
+                        <!-- Product Badge -->
+                        @if (sp.Price < 5000000)
+                        {
+                            <div class="absolute top-3 left-3">
+                                <span class="bg-gradient-to-r from-primary to-primary-dark text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                                    GIÁ TỐT
+                                </span>
                             </div>
                         }
+
+                        <!-- Quick Actions -->
+                        <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <button class="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-heart text-gray-600 text-sm"></i>
+                            </button>
+                        </div>
                     </div>
 
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-800 text-sm line-clamp-2 mb-2 leading-tight">@sp.Name</h3>
 
-    @* ===== CATEGORY ===== *@
-    <section>
-        <h2 class="text-gray-800 dark:text-white text-[22px] font-bold px-4 pb-4">Danh Mục Sản Phẩm</h2>
+                        @if (!string.IsNullOrEmpty(sp.ShortDescription))
+                        {
+                            <p class="text-gray-500 text-xs line-clamp-2 mb-3 leading-relaxed">
+                                @sp.ShortDescription
+                            </p>
+                        }
 
-        <div class="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 p-0 md:p-4">
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex flex-col">
+                                <span class="text-primary font-bold text-lg">
+                                    @String.Format("{0:N0}₫", sp.Price)
+                                </span>
+                                @if (sp.OldPrice > sp.Price)
+                                {
+                                    <span class="text-gray-400 text-sm line-through">
+                                        @String.Format("{0:N0}₫", sp.OldPrice)
+                                    </span>
+                                }
+                            </div>
 
-            <div class="flex flex-col items-center gap-3 rounded-xl border border-primary/20 p-4 hover:shadow-lg">
-                <div class="text-primary">
-                    <span class="material-symbols-outlined" style="font-size:28px;">phone_iphone</span>
+                            <form asp-controller="Cart" asp-action="Add" method="post" class="add-to-cart-form" data-product="@sp.ProductId">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="productId" value="@sp.ProductId" />
+                                <button type="submit" class="w-10 h-10 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl flex items-center justify-center hover:shadow-lg transition-all duration-300 transform hover:scale-105 group/btn">
+                                    <i class="fas fa-shopping-cart text-sm group-hover/btn:scale-110 transition-transform"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Rating and Reviews -->
+                        <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                            <div class="flex items-center space-x-1">
+                                <div class="flex text-yellow-400">
+                                    <i class="fas fa-star text-xs"></i>
+                                    <i class="fas fa-star text-xs"></i>
+                                    <i class="fas fa-star text-xs"></i>
+                                    <i class="fas fa-star text-xs"></i>
+                                    <i class="fas fa-star-half-alt text-xs"></i>
+                                </div>
+                                <span class="text-gray-500 text-xs ml-1">(128)</span>
+                            </div>
+                            <span class="text-green-600 text-xs font-medium bg-green-50 px-2 py-1 rounded-full">
+                                Còn hàng
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <h3 class="font-bold">Điện thoại</h3>
-                <p class="text-gray-500 text-sm">Mẫu mới nhất</p>
-            </div>
-
-            <div class="flex flex-col items-center gap-3 rounded-xl border border-primary/20 p-4 hover:shadow-lg">
-                <div class="text-primary">
-                    <span class="material-symbols-outlined" style="font-size:28px;">laptop_mac</span>
+            }
+        }
+        else
+        {
+            <div class="col-span-full text-center py-16">
+                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-box-open text-3xl text-gray-400"></i>
                 </div>
-                <h3 class="font-bold">Laptop</h3>
-                <p class="text-gray-500 text-sm">Hiệu năng cao</p>
+                <h3 class="text-xl font-semibold text-gray-600 mb-2">Không có sản phẩm</h3>
+                <p class="text-gray-500 mb-6">Hiện tại không có sản phẩm nào để hiển thị.</p>
+                <a href="/products" class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl hover:bg-primary-dark transition-colors font-medium">
+                    <i class="fas fa-store"></i>
+                    Khám phá sản phẩm
+                </a>
             </div>
+        }
+    </div>
+</section>
 
-        </div>
-    </section>
-
-
-    @* ===== FEATURED PRODUCTS ===== *@
-                    <h2 class="text-gray-800 dark:text-white text-[22px] font-bold px-4 pb-4">Sản Phẩm Nổi Bật</h2>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                        @foreach (var sp in Model)
-{
-    <div class="flex flex-col gap-4 rounded-xl overflow-hidden border border-primary/20 bg-background-light dark:bg-background-dark/50 shadow-sm hover:shadow-xl group">
-        <div class="aspect-square p-4 flex items-center justify-center bg-white dark:bg-gray-800">
-            @if (sp.PrimaryImage != null)
-            {
-                <img src="@Url.Action("GetProductImage", "HomeUser", new { imageId = sp.PrimaryImage.ImageId })" 
-                     class="h-40 object-contain group-hover:scale-105 transition-transform" 
-                     alt="@sp.Name" />
-            }
-            else
-            {
-                <!-- Hiển thị hình ảnh mặc định nếu sản phẩm không có ảnh -->
-                <img src="/images/default-product.png" 
-                     class="h-40 object-contain group-hover:scale-105 transition-transform" 
-                     alt="@sp.Name" />
-            }
+<!-- Promotional Banner -->
+<section class="mb-12" data-aos="fade-up">
+    <div class="bg-gradient-to-r from-primary to-primary-dark rounded-2xl p-8 text-white relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\" 60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
         </div>
 
-        <div class="p-4 flex flex-col gap-2">
-            <h3 class="font-bold">@sp.Name</h3>
-            <p class="text-sm text-gray-500 flex-1">@sp.ShortDescription</p>
-
-            <div class="flex items-center justify-between mt-4">
-                <span class="font-bold text-lg text-primary">
-                    @String.Format("{0:N0}₫", sp.Price)
-                </span>
-
-                <button class="flex items-center justify-center size-9 bg-primary/20 text-primary rounded-full hover:bg-primary hover:text-white transition">
-                    <span class="material-symbols-outlined">add_shopping_cart</span>
+        <div class="relative flex flex-col md:flex-row items-center justify-between">
+            <div class="mb-6 md:mb-0 md:mr-8 text-center md:text-left">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2">Đăng ký nhận tin khuyến mãi</h2>
+                <p class="opacity-90 max-w-md">Nhận thông báo về sản phẩm mới và ưu đãi đặc biệt hàng tuần</p>
+            </div>
+            <div class="flex w-full md:w-96">
+                <input type="email" placeholder="Email của bạn"
+                       class="flex-1 px-4 py-3 rounded-l-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">
+                <button class="bg-white text-primary px-6 py-3 rounded-r-xl font-bold hover:bg-gray-100 transition-colors">
+                    Đăng ký
                 </button>
             </div>
         </div>
     </div>
+</section>
+
+<!-- Trust Indicators -->
+<section class="py-8 bg-gray-50 rounded-2xl" data-aos="fade-up">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div class="flex flex-col items-center">
+                <div class="w-12 h-12 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-3">
+                    <i class="fas fa-shield-alt text-primary text-xl"></i>
+                </div>
+                <p class="font-semibold text-gray-800">Bảo hành chính hãng</p>
+                <p class="text-gray-600 text-sm">12-24 tháng</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-12 h-12 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-3">
+                    <i class="fas fa-truck text-primary text-xl"></i>
+                </div>
+                <p class="font-semibold text-gray-800">Giao hàng toàn quốc</p>
+                <p class="text-gray-600 text-sm">Miễn phí từ 2TR</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-12 h-12 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-3">
+                    <i class="fas fa-undo-alt text-primary text-xl"></i>
+                </div>
+                <p class="font-semibold text-gray-800">Đổi trả dễ dàng</p>
+                <p class="text-gray-600 text-sm">Trong 7 ngày</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-12 h-12 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-3">
+                    <i class="fas fa-headset text-primary text-xl"></i>
+                </div>
+                <p class="font-semibold text-gray-800">Hỗ trợ 24/7</p>
+                <p class="text-gray-600 text-sm">1800 1234</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Styles {
+    <style>
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+
+            .hover-lift:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+            }
+    </style>
 }
 
+@section Scripts {
+    <script>
+        // Banner Slider
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize banner slider
+            let index = 0;
+            const slides = document.querySelectorAll("#bannerSlider .banner-item");
+
+            function showSlide(i) {
+                slides.forEach((slide, idx) => {
+                    slide.style.opacity = idx === i ? "1" : "0";
+                    slide.style.zIndex = idx === i ? "5" : "1";
+                });
+            }
+
+            if (slides.length > 0) {
+                showSlide(index);
+
+                setInterval(() => {
+                    index = (index + 1) % slides.length;
+                    showSlide(index);
+                }, 4000);
+            }
+
+            // Add to cart functionality
+            const addToCartForms = document.querySelectorAll('.add-to-cart-form');
+            addToCartForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const formData = new FormData(this);
+                    const productId = this.dataset.product;
+                    const button = this.querySelector('button');
+
+                    // Show loading state
+                    const originalHTML = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    button.disabled = true;
+
+                    // Simulate API call
+                    setTimeout(() => {
+                        // Show success state
+                        button.innerHTML = '<i class="fas fa-check"></i>';
+                        button.classList.remove('from-primary', 'to-primary-dark');
+                        button.classList.add('bg-green-500');
+
+                        // Update cart count
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount) {
+                            const currentCount = parseInt(cartCount.textContent) || 0;
+                            cartCount.textContent = currentCount + 1;
+                            cartCount.classList.add('animate-bounce');
+                            setTimeout(() => cartCount.classList.remove('animate-bounce'), 1000);
+                        }
+
+                        // Show success message
+                        showNotification('Đã thêm sản phẩm vào giỏ hàng!', 'success');
+
+                        // Reset button after 2 seconds
+                        setTimeout(() => {
+                            button.innerHTML = originalHTML;
+                            button.classList.remove('bg-green-500');
+                            button.classList.add('from-primary', 'to-primary-dark');
+                            button.disabled = false;
+                        }, 2000);
+                    }, 1000);
+                });
+            });
+
+            // Notification function
+            function showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 ${
+                    type === 'success' ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'
+                }`;
+                notification.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                        <span>${message}</span>
                     </div>
+                `;
 
-        @* === Bạn có thể làm tương tự cho card 2, 3, 4 === *@
+                // Add to page
+                document.body.appendChild(notification);
 
-    </div>
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            }
 
-</div>
-
-</main>
-
-</div>
-</div>
-
-</body>
-</html>
-
-
-<script>
-    let index = 0;
-    const slides = document.querySelectorAll("#bannerSlider .banner-item");
-
-    function showSlide(i) {
-        slides.forEach((slide, idx) => {
-            slide.style.opacity = idx === i ? "1" : "0";
-            slide.style.zIndex = idx === i ? "5" : "1";
+            // Initialize AOS
+            if (typeof AOS !== 'undefined') {
+                AOS.init({
+                    duration: 800,
+                    once: true,
+                    offset: 100
+                });
+            }
         });
-    }
-
-    showSlide(index);
-
-    setInterval(() => {
-        index = (index + 1) % slides.length;
-        showSlide(index);
-    }, 4000);
-</script>
+    </script>
+}
