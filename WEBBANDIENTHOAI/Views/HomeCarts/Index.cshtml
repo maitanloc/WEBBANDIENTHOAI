@@ -75,7 +75,7 @@
                     </div>
 
                     <div class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
-                        <a href="/" class="flex items-center gap-2 text-primary hover:text-primary-dark font-medium transition-colors">
+                        <a asp-controller="HomeUser" asp-action="Index" class="flex items-center gap-2 text-primary hover:text-primary-dark font-medium transition-colors">
                             <i class="fas fa-arrow-left text-sm"></i> Tiếp tục mua sắm
                         </a>
                     </div>
@@ -111,7 +111,7 @@
             <div class="text-center py-16">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Giỏ hàng của bạn đang trống</h2>
                 <p class="text-gray-500 mb-8">Hãy quay lại trang chủ để chọn món hàng yêu thích nhé!</p>
-                <a href="/" class="px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-colors">
+                <a asp-controller="HomeUser" asp-action="Index" class="px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-colors">
                     Về trang chủ
                 </a>
             </div>
