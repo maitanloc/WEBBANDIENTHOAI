@@ -19,13 +19,13 @@ namespace WEBBANDIENTHOAI.Controllers
         public async Task<IActionResult> ProductStatuses()
         {
             var statuses = await _productStatusRepository.GetAllWithProductsAsync();
-            return View("~/Views/Product/ProductStatuses.cshtml", statuses);
+            return View("~/Views/Products/ProductStatuses.cshtml", statuses);
         }
 
         // POST: Product/CreateStatus
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Product/CreateStatus")]
+        [Route("Products/CreateStatus")]
         public async Task<IActionResult> CreateStatus(CreateProductStatusDto dto)
         {
             if (ModelState.IsValid)
@@ -58,7 +58,7 @@ namespace WEBBANDIENTHOAI.Controllers
         // POST: Product/EditStatus
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Product/EditStatus")]
+        [Route("Products/EditStatus")]
         public async Task<IActionResult> EditStatus(UpdateProductStatusDto dto)
         {
             if (ModelState.IsValid)
@@ -95,7 +95,7 @@ namespace WEBBANDIENTHOAI.Controllers
         // POST: Product/DeleteStatus
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Product/DeleteStatus")]
+        [Route("Products/DeleteStatus")]
         public async Task<IActionResult> DeleteStatus(byte id)
         {
             var hasProducts = await _productStatusRepository.HasProductsAsync(id);
