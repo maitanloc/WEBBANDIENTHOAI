@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WEBBANDIENTHOAI.Data;
+using WEBBANDIENTHOAI.Helpers;
+using WEBBANDIENTHOAI.Models;
 
 namespace WEBBANDIENTHOAI.Controllers
 {
@@ -8,7 +10,6 @@ namespace WEBBANDIENTHOAI.Controllers
     {
         private readonly AppDbContext _context;
 
-        // ⭐ BẮT BUỘC PHẢI CÓ CONSTRUCTOR NÀY
         public HomeUserController(AppDbContext context)
         {
             _context = context;
@@ -16,22 +17,37 @@ namespace WEBBANDIENTHOAI.Controllers
 
         public IActionResult Index()
         {
-            // Lấy 8 sản phẩm nổi bật – hoặc tất cả
+            // Lấy sản phẩm bao gồm cả hình ảnh chính
             var featuredProducts = _context.Products
+                .Include(p => p.PrimaryImage) // QUAN TRỌNG: Include hình ảnh
                 .OrderByDescending(p => p.CreatedAt)
+                .Take(8)
                 .ToList();
 
-            // Lấy role từ session
+            // Kiểm tra role
             var role = HttpContext.Session.GetString("RoleName");
-
-            // Nếu không phải Customer -> quay về Login
             if (role != "Customer")
             {
                 return RedirectToAction("Login", "Account");
             }
 
-            return View(featuredProducts); // nhớ trả data ra View
+            return View(featuredProducts);
         }
 
+        // Action để hiển thị hình ảnh từ database
+        public IActionResult GetProductImage(int imageId)
+        {
+            var image = _context.ProductImages.FirstOrDefault(pi => pi.ImageId == imageId);
+
+            if (image?.ImagePath != null && image.ImagePath.Length > 0)
+            {
+                // Sử dụng ImageHelper để xác định content type
+                string contentType = ImageHelper.GetContentType(image.ImagePath);
+                return File(image.ImagePath, contentType);
+            }
+
+            // Trả về hình ảnh mặc định nếu không tìm thấy
+            return File("~/images/default-product.png", "image/png");
+        }
     }
 }

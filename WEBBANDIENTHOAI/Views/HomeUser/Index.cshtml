@@ -166,29 +166,40 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
                         @foreach (var sp in Model)
-                        {
-                            <div class="flex flex-col gap-4 rounded-xl overflow-hidden border border-primary/20 bg-background-light dark:bg-background-dark/50 shadow-sm hover:shadow-xl group">
-                                <div class="aspect-square p-4 flex items-center justify-center bg-white dark:bg-gray-800">
-                                    <img src="@($"/images/products/{sp.ImageId}.jpg")"
-                                         class="h-40 object-contain group-hover:scale-105 transition-transform" />
-                                </div>
+{
+    <div class="flex flex-col gap-4 rounded-xl overflow-hidden border border-primary/20 bg-background-light dark:bg-background-dark/50 shadow-sm hover:shadow-xl group">
+        <div class="aspect-square p-4 flex items-center justify-center bg-white dark:bg-gray-800">
+            @if (sp.PrimaryImage != null)
+            {
+                <img src="@Url.Action("GetProductImage", "HomeUser", new { imageId = sp.PrimaryImage.ImageId })" 
+                     class="h-40 object-contain group-hover:scale-105 transition-transform" 
+                     alt="@sp.Name" />
+            }
+            else
+            {
+                <!-- Hiển thị hình ảnh mặc định nếu sản phẩm không có ảnh -->
+                <img src="/images/default-product.png" 
+                     class="h-40 object-contain group-hover:scale-105 transition-transform" 
+                     alt="@sp.Name" />
+            }
+        </div>
 
-                                <div class="p-4 flex flex-col gap-2">
-                                    <h3 class="font-bold">@sp.Name</h3>
-                                    <p class="text-sm text-gray-500 flex-1">@sp.ShortDescription</p>
+        <div class="p-4 flex flex-col gap-2">
+            <h3 class="font-bold">@sp.Name</h3>
+            <p class="text-sm text-gray-500 flex-1">@sp.ShortDescription</p>
 
-                                    <div class="flex items-center justify-between mt-4">
-                                        <span class="font-bold text-lg text-primary">
-                                            @String.Format("{0:N0}₫", sp.Price)
-                                        </span>
+            <div class="flex items-center justify-between mt-4">
+                <span class="font-bold text-lg text-primary">
+                    @String.Format("{0:N0}₫", sp.Price)
+                </span>
 
-                                        <button class="flex items-center justify-center size-9 bg-primary/20 text-primary rounded-full hover:bg-primary hover:text-white transition">
-                                            <span class="material-symbols-outlined">add_shopping_cart</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        }
+                <button class="flex items-center justify-center size-9 bg-primary/20 text-primary rounded-full hover:bg-primary hover:text-white transition">
+                    <span class="material-symbols-outlined">add_shopping_cart</span>
+                </button>
+            </div>
+        </div>
+    </div>
+}
 
                     </div>
 
