@@ -88,17 +88,18 @@
         </div>
 
         <div class="flex gap-2">
-            <button class="flex items-center justify-center rounded-lg h-10 w-10 bg-gray-200/50 dark:bg-white/10 hover:bg-gray-200/80">
-                <span class="material-symbols-outlined" style="font-size: 20px;">shopping_cart</span>
-            </button>
+                        <a href="@Url.Action("Index", "HomeCarts")"
+                           class="flex items-center justify-center rounded-lg h-10 w-10 bg-gray-200/50 dark:bg-white/10 hover:bg-gray-200/80">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">shopping_cart</span>
+                        </a>
             <button class="flex items-center justify-center rounded-lg h-10 w-10 bg-gray-200/50 dark:bg-white/10 hover:bg-gray-200/80">
                 <span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
             </button>
         </div>
 
-        <div class="bg-center bg-cover rounded-full size-10"
-             style='background-image:url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWYrMaT3ySxtBCkjNkMzf---PeGg879mBd0Ss2iDhMCRqdSsVhXvOBvzWu7IBMcgt2iZj4blpWqCV4CaxIwJyK9fRus7cbcxcQrjGcG90a7DeWlRDNTx4656T0Msqb4PV4FKTonssgQ5num_pgwl4E4dw3KXwHVpQP_PaOR_ice0kJnf8n1C9iyIcCM7hLESEJhwICT4arTvzqePflVFoDCwm_oiRK--esXKPvSHRN34wJWBm9r-Ac7D08-_QISSlhSLrnrDFQBvo");'>
-        </div>
+                    <div class="bg-center bg-cover rounded-full size-10"
+                         style="background-image: url('@Url.Content("~/images/usernull.jpg")');">
+                    </div>
 
     </div>
 
@@ -111,28 +112,34 @@
 <div class="layout-content-container flex flex-col w-full max-w-7xl mx-auto flex-1 gap-12">
 
     @* ===== BANNER ===== *@
-    <div class="@@container">
-        <div class="@@\[480px\]:p-0">
-            <div class="relative flex min-h-[480px] flex-col gap-6 bg-cover bg-center 
-                        @@\[480px\]:rounded-xl items-start justify-end px-6 pb-10"
-                 style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuArnnKLLO3CIL7dOLuFqEacdZZnY5rcCUsj8FiLZTMmaq2v3u6gW9NODPYP02BSwHUPlpqnHpdBCpbatbQMMi1tgdKwHWpmGkKvBYmAekOHeQVquXOVP5pCf8Hp-RzbiDZ6evO_u7YakCt4uPZ1Gh0NwiWFQDxarJZ3n8GAPCo6wtHbLWlUrcomL2TCojIXawF_ILQ8NOj1PGDZvPJr4lpLUO0XfHrTFnk_G14P2jvoJY38jv6Hj-qV5jCezuMAH2-Z-etbjMzLm-8");'>
+                    <div id="bannerSlider" class="relative w-full h-[480px] overflow-hidden rounded-xl">
 
-                <div class="flex flex-col gap-4 text-left max-w-2xl">
-                    <h1 class="text-white text-4xl font-black drop-shadow-md">
-                        iPhone 15 Pro Max - Đỉnh Cao Công Nghệ
-                    </h1>
-                    <h2 class="text-white/90 text-sm drop-shadow-sm">
-                        Trải nghiệm sức mạnh và hiệu năng vượt trội ngay hôm nay.
-                    </h2>
-                </div>
+                        @foreach (var item in ViewBag.BannerProducts)
+                        {
+                            <div class="banner-item absolute inset-0 transition-all duration-700 opacity-0">
+                                <div class="relative w-full h-full bg-cover bg-center"
+                                     style="background-image: url('@Url.Action("GetProductImage", "HomeUser", new { imageId = item.PrimaryImage?.ImageId })');">
 
-                <button class="flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-white font-bold hover:bg-primary/90 transition-all shadow-lg">
-                    Khám Phá Ngay
-                </button>
+                                    <!-- LAYER MỜ -->
+                                    <div class="absolute inset-0 bg-black/40"></div>
 
-            </div>
-        </div>
-    </div>
+                                    <!-- NỘI DUNG TRONG SLIDE -->
+                                    <div class="relative flex flex-col justify-end p-10 h-full">
+                                        <h1 class="text-white text-4xl font-black drop-shadow-md">@item.Name</h1>
+
+                                        <h2 class="text-white/90 text-sm mt-2">
+                                            Giá: @String.Format("{0:N0}₫", item.Price)
+                                        </h2>
+
+                                        <button class="mt-4 px-4 h-10 rounded-lg font-bold bg-primary text-white">
+                                            Xem thêm chi tiết
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
 
     @* ===== CATEGORY ===== *@
     <section>
@@ -217,3 +224,22 @@
 </body>
 </html>
 
+
+<script>
+    let index = 0;
+    const slides = document.querySelectorAll("#bannerSlider .banner-item");
+
+    function showSlide(i) {
+        slides.forEach((slide, idx) => {
+            slide.style.opacity = idx === i ? "1" : "0";
+            slide.style.zIndex = idx === i ? "5" : "1";
+        });
+    }
+
+    showSlide(index);
+
+    setInterval(() => {
+        index = (index + 1) % slides.length;
+        showSlide(index);
+    }, 3000);
+</script>

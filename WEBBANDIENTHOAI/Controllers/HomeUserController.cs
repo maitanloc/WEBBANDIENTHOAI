@@ -31,6 +31,27 @@ namespace WEBBANDIENTHOAI.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
+
+            var topPhone = _context.Products
+       .Where(x => x.CategoryId == 1)
+       .OrderByDescending(x => x.Price)
+       .Take(2)
+       .Include(x => x.PrimaryImage)
+       .ToList();
+
+            var topLaptop = _context.Products
+                .Where(x => x.CategoryId == 2)
+                .OrderByDescending(x => x.Price)
+                .Take(2)
+                .Include(x => x.PrimaryImage)
+                .ToList();
+
+            var bannerProducts = topPhone.Concat(topLaptop).ToList();
+
+            ViewBag.BannerProducts = bannerProducts;
+
+            var allProducts = _context.Products.Take(20).ToList();
+
             return View(featuredProducts);
         }
 
@@ -49,5 +70,7 @@ namespace WEBBANDIENTHOAI.Controllers
             // Trả về hình ảnh mặc định nếu không tìm thấy
             return File("~/images/default-product.png", "image/png");
         }
+
+        
     }
 }
