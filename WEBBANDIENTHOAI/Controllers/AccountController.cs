@@ -25,7 +25,7 @@ namespace WEBBANDIENTHOAI.Controllers
                 var role = HttpContext.Session.GetString("RoleName") ?? "";
                 if (role == "Admin") return RedirectToAction("Index", "Admin");
                 if (role == "Staff") return RedirectToAction("Index", "Staff");
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "HomeUser"); // ✅ Trỏ về HomeUser/Index
             }
 
             // View: Views/Account/LoginRegister.cshtml

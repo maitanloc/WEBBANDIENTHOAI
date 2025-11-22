@@ -475,7 +475,7 @@
                                 Đồng hành cùng bạn trong hành trình khám phá thế giới công nghệ. Chất lượng - Uy tín - Đẳng cấp.
                             </p>
                             <div class="flex space-x-4">
-                                <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
+                                <a href="https://www.facebook.com/share/1BruCUcK9c/" target="_blank" class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
                                     <i class="fab fa-facebook-f"></i>
                                 </a>
                                 <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
@@ -636,15 +636,14 @@
             offset: 100
         });
 
-        // Loading Screen
+        // Loading Screen (Fast version)
         window.addEventListener('load', function() {
             const loadingScreen = document.getElementById('loadingScreen');
             const progressFill = document.querySelector('.progress-fill');
 
-            // Simulate loading progress
             let progress = 0;
             const interval = setInterval(() => {
-                progress += Math.random() * 15;
+                progress += Math.random() * 30; // Tăng nhanh hơn
                 if (progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
@@ -652,11 +651,11 @@
                         loadingScreen.style.opacity = '0';
                         setTimeout(() => {
                             loadingScreen.style.display = 'none';
-                        }, 500);
-                    }, 300);
+                        }, 300); // Fade out nhanh hơn
+                    }, 100); // Chờ ít hơn
                 }
                 progressFill.style.width = progress + '%';
-            }, 200);
+            }, 100); // Cập nhật nhanh hơn
         });
 
         // Header Scroll Effect
