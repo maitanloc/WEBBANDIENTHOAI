@@ -1,0 +1,142 @@
+﻿@{
+    ViewData["Title"] = "Giỏ hàng - TechShop";
+    Layout = "_Layout";   // Nếu bạn có layout, giữ lại. Nếu không dùng layout thì xóa dòng này.
+}
+
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+
+<!-- TopNavBar -->
+<header class="w-full bg-white dark:bg-[#1C1611] border-b border-solid border-[#E5E7EB] dark:border-gray-800 sticky top-0 z-50 shadow-sm">
+    <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center gap-8">
+                <div class="flex items-center gap-2 text-primary">
+                    <div class="size-6">
+                        <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-bold leading-tight tracking-[-0.015em] text-[#181411] dark:text-gray-100">TechShop</h2>
+                </div>
+
+                <label class="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
+                    <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+                        <div class="text-[#8a7560] dark:text-gray-400 flex bg-[#F0F0F0] dark:bg-gray-800 items-center justify-center pl-3 rounded-l-lg">
+                            <span class="material-symbols-outlined text-xl">search</span>
+                        </div>
+                        <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#181411] dark:text-gray-200 focus:outline-0 focus:ring-0 border-none bg-[#F0F0F0] dark:bg-gray-800 h-full placeholder:text-[#8a7560] dark:placeholder:text-gray-500 px-4 rounded-l-none pl-2 text-sm font-normal leading-normal" placeholder="Tìm kiếm sản phẩm..." />
+                    </div>
+                </label>
+            </div>
+
+            <div class="flex flex-1 justify-end items-center gap-4">
+                <nav class="hidden lg:flex items-center gap-6">
+                    <a class="text-[#181411] dark:text-gray-300 hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Khuyến mãi</a>
+                </nav>
+
+                <div class="flex gap-2">
+                    <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 bg-transparent hover:bg-primary/10 text-[#181411] dark:text-gray-300 dark:hover:bg-primary/20 transition-colors"></button>
+
+                    <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 bg-primary/10 text-primary dark:bg-primary/20 transition-colors relative">
+                        <span class="material-symbols-outlined">shopping_cart</span>
+                        <span class="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">3</span>
+                    </button>
+
+                    <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 bg-transparent hover:bg-primary/10 text-[#181411] dark:text-gray-300 dark:hover:bg-primary/20 transition-colors">
+                        <span class="material-symbols-outlined">person</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="layout-container flex h-full grow flex-col">
+    <div class="container mx-auto px-4 py-8">
+        <div class="layout-content-container flex flex-col flex-1">
+
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap gap-2 mb-4">
+                <a class="text-[#6B7280] dark:text-gray-400 hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="/">Trang chủ</a>
+                <span class="text-[#6B7280] dark:text-gray-400 text-sm font-medium leading-normal">/</span>
+                <span class="text-[#1F2937] dark:text-gray-200 text-sm font-medium leading-normal">Giỏ hàng</span>
+            </div>
+
+            <!-- Page heading -->
+            <div class="flex flex-wrap justify-between gap-3 mb-6">
+                <h1 class="text-[#1F2937] dark:text-gray-100 text-3xl md:text-4xl font-bold leading-tight tracking-tight">Giỏ hàng của bạn</h1>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+                <!-- Left Column -->
+                <div class="lg:col-span-2 flex flex-col gap-6">
+
+                    <!-- Action Bar -->
+                    <div class="flex items-center gap-4 bg-white dark:bg-[#1C1611] p-4 min-h-14 justify-between border border-[#E5E7EB] dark:border-gray-800 rounded-xl shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <input id="select-all" type="checkbox" class="h-5 w-5 rounded border-[#E5E7EB] dark:border-gray-600 text-primary focus:ring-primary/50" />
+                            <label for="select-all" class="text-base font-medium text-[#1F2937] dark:text-gray-200 cursor-pointer">Chọn tất cả (3 sản phẩm)</label>
+                        </div>
+
+                        <button class="flex items-center gap-2 text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-400">
+                            <span class="material-symbols-outlined text-base">delete</span>
+                            Xoá
+                        </button>
+                    </div>
+
+                    <!-- PRODUCT LIST (nguyên bản như HTML của bạn) -->
+                    @* --- Bạn giữ nguyên tất cả Product Card như HTML gốc --- *@
+
+                    <!-- Product Card -->
+                    <!-- ... Toàn bộ phần sản phẩm bạn paste lại y nguyên ... -->
+
+                </div>
+
+                <!-- Right Column (Checkout) -->
+                <aside class="lg:col-span-1 sticky top-24">
+                    <div class="bg-white dark:bg-[#1C1611] p-6 border border-[#E5E7EB] dark:border-gray-800 rounded-xl shadow-sm flex flex-col gap-6">
+
+                        <h2 class="text-xl font-bold">Tóm tắt đơn hàng</h2>
+
+                        <div class="flex items-center justify-between">
+                            <p class="text-[#6B7280] dark:text-gray-400">Tạm tính (2 sản phẩm)</p>
+                            <p class="font-medium text-[#1F2937] dark:text-gray-200">61.480.000₫</p>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <p class="text-[#6B7280] dark:text-gray-400">Giảm giá</p>
+                            <p class="font-medium text-green-600 dark:text-green-400">- 500.000₫</p>
+                        </div>
+
+                        <div class="border-t border-dashed border-[#E5E7EB] dark:border-gray-700"></div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="font-medium">Mã giảm giá</label>
+                            <div class="flex gap-2">
+                                <input class="form-input w-full h-11 rounded-lg bg-gray-50 dark:bg-gray-800 border-[#E5E7EB] dark:border-gray-700" placeholder="Nhập mã giảm giá" />
+                                <button class="h-11 px-4 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg font-semibold">Áp dụng</button>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-dashed border-[#E5E7EB] dark:border-gray-700"></div>
+
+                        <div class="flex items-center justify-between">
+                            <p class="text-lg text-[#6B7280] dark:text-gray-400">Tổng cộng</p>
+                            <p class="font-bold text-2xl text-primary">60.980.000₫</p>
+                        </div>
+
+                        <button class="flex w-full h-12 items-center justify-center bg-primary text-white font-bold rounded-xl shadow-lg hover:bg-orange-600 gap-2">
+                            <span>Tiến hành thanh toán</span>
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </button>
+
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+</div>
