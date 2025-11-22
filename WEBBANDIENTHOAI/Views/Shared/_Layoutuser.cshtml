@@ -31,9 +31,6 @@
     <!-- AOS Animation -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <!-- Splide Slider -->
-   
-
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -117,56 +114,6 @@
             background-clip: text;
         }
 
-        /* Shine effect */
-        .shine-effect {
-            position: relative;
-            overflow: hidden;
-        }
-
-            .shine-effect::before {
-                content: '';
-                position: absolute;
-                top: -50%;
-                left: -50%;
-                width: 200%;
-                height: 200%;
-                background: linear-gradient( 45deg, transparent, rgba(255, 255, 255, 0.1), transparent );
-                transform: rotate(45deg);
-                transition: all 0.6s;
-            }
-
-            .shine-effect:hover::before {
-                animation: shine 1.5s;
-            }
-
-        
-
-        {
-            transform: rotate(45deg) translateX(-100%);
-        }
-
-        100% {
-            transform: rotate(45deg) translateX(100%);
-        }
-
-        }
-
-       
-
-        {
-            transform: translateY(0px);
-        }
-
-        50% {
-            transform: translateY(-10px);
-        }
-
-        }
-
-        .floating {
-            animation: float 6s ease-in-out infinite;
-        }
-
         /* Progress bar */
         .progress-bar {
             width: 100%;
@@ -181,11 +128,104 @@
             background: linear-gradient(90deg, #f48c25, #f59e0b);
             transition: width 0.3s ease;
         }
+
+        /* === POPUP XÁC NHẬN ĐĂNG XUẤT === */
+        .logout-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .logout-popup {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .logout-image {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .logout-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .logout-message {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .logout-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .logout-btn-cancel {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+            .logout-btn-cancel:hover {
+                background: #4b5563;
+            }
+
+        .logout-btn-confirm {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+            .logout-btn-confirm:hover {
+                background: #dc2626;
+            }
     </style>
 
     @RenderSection("Styles", required: false)
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200 antialiased">
+    <!-- POPUP XÁC NHẬN ĐĂNG XUẤT -->
+    <div id="logout-popup" class="logout-overlay">
+        <div class="logout-popup">
+            <img src="/images/hỏi đăng xuất.png" alt="Xác nhận đăng xuất" class="logout-image" />
+            <h3 class="logout-title">Xác nhận đăng xuất</h3>
+            <p class="logout-message">Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?</p>
+            <div class="logout-buttons">
+                <button id="logout-cancel" class="logout-btn-cancel">Hủy</button>
+                <button id="logout-confirm" class="logout-btn-confirm">Đăng xuất</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Loading Screen -->
     <div id="loadingScreen" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex items-center justify-center transition-opacity duration-500">
         <div class="text-center">
@@ -367,17 +407,17 @@
                             </div>
                         </div>
 
-                        <!-- User Profile with Enhanced Dropdown -->
-                        <div class="relative group">
-                            <button class="flex items-center gap-2 rounded-xl px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200">
+                        <!-- User Profile with Click Dropdown -->
+                        <div class="relative" id="user-profile-container">
+                            <button id="user-profile-button" class="flex items-center gap-2 rounded-xl px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200">
                                 <div class="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-sm font-semibold">
                                     U
                                 </div>
-                                <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform group-hover:rotate-180"></i>
+                                <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="user-profile-chevron"></i>
                             </button>
 
                             <!-- Enhanced User Dropdown -->
-                            <div class="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden group-hover:block z-50 overflow-hidden">
+                            <div id="user-profile-dropdown" class="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden z-50 overflow-hidden">
                                 <div class="p-4 border-b border-gray-100 dark:border-gray-700">
                                     <div class="flex items-center gap-3">
                                         <div class="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white font-semibold">
@@ -408,10 +448,10 @@
                                         <i class="fas fa-cog text-gray-500 w-5"></i>
                                         <span>Cài đặt</span>
                                     </a>
-                                    <a href="/logout" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors">
+                                    <button class="logout-trigger w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors text-left">
                                         <i class="fas fa-sign-out-alt w-5"></i>
                                         <span>Đăng xuất</span>
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -625,7 +665,6 @@
 
     <!-- JavaScript Libraries -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    
 
     <!-- Main JavaScript -->
     <script>
@@ -643,7 +682,7 @@
 
             let progress = 0;
             const interval = setInterval(() => {
-                progress += Math.random() * 30; // Tăng nhanh hơn
+                progress += Math.random() * 30;
                 if (progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
@@ -651,11 +690,11 @@
                         loadingScreen.style.opacity = '0';
                         setTimeout(() => {
                             loadingScreen.style.display = 'none';
-                        }, 300); // Fade out nhanh hơn
-                    }, 100); // Chờ ít hơn
+                        }, 300);
+                    }, 100);
                 }
                 progressFill.style.width = progress + '%';
-            }, 100); // Cập nhật nhanh hơn
+            }, 100);
         });
 
         // Header Scroll Effect
@@ -745,18 +784,76 @@
             }
         }
 
-        // Initialize Splide Sliders (if any)
+        // User Profile Dropdown với Click thay vì Hover
         document.addEventListener('DOMContentLoaded', function() {
-            const sliders = document.querySelectorAll('.splide');
-            sliders.forEach(slider => {
-                new Splide(slider, {
-                    type: 'loop',
-                    perPage: 1,
-                    autoplay: true,
-                    interval: 5000,
-                    pauseOnHover: true,
-                    pauseOnFocus: true
-                }).mount();
+            const userProfileButton = document.getElementById('user-profile-button');
+            const userProfileDropdown = document.getElementById('user-profile-dropdown');
+            const userProfileChevron = document.getElementById('user-profile-chevron');
+            const logoutTriggers = document.querySelectorAll('.logout-trigger');
+            const logoutPopup = document.getElementById('logout-popup');
+            const logoutCancel = document.getElementById('logout-cancel');
+            const logoutConfirm = document.getElementById('logout-confirm');
+
+            // Toggle dropdown khi click
+            if (userProfileButton) {
+                userProfileButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isHidden = userProfileDropdown.classList.contains('hidden');
+
+                    // Đóng tất cả dropdown khác (nếu có) và mở/đóng dropdown này
+                    userProfileDropdown.classList.toggle('hidden', !isHidden);
+                    userProfileChevron.classList.toggle('rotate-180', !isHidden);
+                });
+            }
+
+            // Đóng dropdown khi click ra ngoài
+            document.addEventListener('click', function() {
+                userProfileDropdown.classList.add('hidden');
+                userProfileChevron.classList.remove('rotate-180');
+            });
+
+            // Ngăn đóng dropdown khi click vào dropdown
+            userProfileDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // XỬ LÝ POPUP ĐĂNG XUẤT
+            function showLogoutPopup() {
+                logoutPopup.style.display = 'flex';
+            }
+
+            function hideLogoutPopup() {
+                logoutPopup.style.display = 'none';
+            }
+
+            // Gán sự kiện cho các nút đăng xuất
+            logoutTriggers.forEach(trigger => {
+                trigger.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showLogoutPopup();
+                    // Đóng dropdown user profile
+                    userProfileDropdown.classList.add('hidden');
+                    userProfileChevron.classList.remove('rotate-180');
+                });
+            });
+
+            // Xử lý nút hủy
+            logoutCancel.addEventListener('click', function() {
+                hideLogoutPopup();
+            });
+
+            // Xử lý nút xác nhận đăng xuất
+            logoutConfirm.addEventListener('click', function() {
+                hideLogoutPopup();
+                // Chuyển đến trang đăng xuất
+                window.location.href = '/Account/Logout';
+            });
+
+            // Đóng popup khi click bên ngoài
+            logoutPopup.addEventListener('click', function(e) {
+                if (e.target === logoutPopup) {
+                    hideLogoutPopup();
+                }
             });
         });
 
