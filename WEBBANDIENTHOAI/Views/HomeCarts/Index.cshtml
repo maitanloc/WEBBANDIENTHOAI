@@ -4,7 +4,6 @@
     Layout = "~/Views/Shared/_Layoutuser.cshtml";
     ViewData["Title"] = "Giỏ hàng - FOXMOBILE";
     // Tính tổng tiền ngay tại View vì Model hiện tại chưa có biến GrandTotal
-    decimal grandTotal = Model.Items != null ? Model.Items.Sum(i => i.Quantity * i.UnitPrice) : 0;
 }
 
 <div class="container mx-auto px-4 py-8">
@@ -39,7 +38,11 @@
                     <div class="flex flex-col gap-4">
                         @foreach (var item in Model.Items)
                         {
-                            <div class="flex items-center gap-4 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300" data-product-id="@item.ProductId">
+                            <div class="flex items-center gap-4 p-6 cart-item bg-white dark:bg-gray-800 border
+     border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm"
+                                 data-price="@item.UnitPrice"
+                                 data-quantity="@item.Quantity">
+
                                 <input type="checkbox" class="item-checkbox h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" checked />
 
                                 <img src="@item.ImageUrl"
@@ -87,14 +90,16 @@
 
                         <div class="flex items-center justify-between">
                             <p class="text-gray-600 dark:text-gray-400">Tạm tính (@Model.Items.Count sản phẩm)</p>
-                            <p class="font-medium text-gray-800 dark:text-gray-200">@grandTotal.ToString("N0")₫</p>
+                            <p id="total-price" class="font-bold text-2xl text-primary">0₫</p>
+
                         </div>
 
                         <div class="border-t border-dashed border-gray-300 dark:border-gray-600"></div>
 
                         <div class="flex items-center justify-between">
                             <p class="text-lg text-gray-600 dark:text-gray-400">Tổng cộng</p>
-                            <p class="font-bold text-2xl text-primary">@grandTotal.ToString("N0")₫</p>
+                            <p id="subtotal-price" class="font-medium text-gray-800 dark:text-gray-200">0₫</p>
+
                         </div>
 
                         <a href="/Checkout" class="flex w-full h-12 items-center justify-center bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105 gap-2">
@@ -151,5 +156,99 @@
             })
             .catch(error => console.error('Error:', error));
         }
+
+
+                // Xử lý chọn tất cả
+        const selectAllCheckbox = document.getElementById("select-all");
+        const itemCheckboxes = document.querySelectorAll(".item-checkbox");
+
+        // Khi click vào chọn tất cả
+        selectAllCheckbox.addEventListener("change", function () {
+            itemCheckboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+        });
+
+        // Khi thay đổi từng checkbox sản phẩm
+        itemCheckboxes.forEach(cb => {
+            cb.addEventListener("change", function () {
+                const allChecked = Array.from(itemCheckboxes).every(x => x.checked);
+                const noneChecked = Array.from(itemCheckboxes).every(x => !x.checked);
+
+                // Nếu tất cả đều tích → select-all được tích
+                if (allChecked) {
+                    selectAllCheckbox.checked = true;
+                    selectAllCheckbox.indeterminate = false;
+                }
+                // Nếu không có cái nào tích → select-all bỏ tích
+                else if (noneChecked) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                }
+                // Nếu có cái tích cái không → trạng thái "indeterminate"
+                else {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = true;
+                }
+            });
+        });
+
+        // Hàm cập nhật số lượng
+        function updateQuantity(cartDetailId, newQuantity) {
+            if (newQuantity < 1) return;
+
+            fetch('/HomeCarts/UpdateQuantity', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `cartDetailId=${cartDetailId}&quantity=${newQuantity}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
     </script>
+
+    <script>
+        function formatMoney(amount) {
+            return amount.toLocaleString("vi-VN") + "₫";
+        }
+
+        function updateTotal() {
+            let subtotal = 0;
+
+            document.querySelectorAll(".cart-item").forEach((item, index) => {
+                const checkbox = item.querySelector(".item-checkbox");
+
+                if (checkbox.checked) {
+                    const price = parseFloat(item.dataset.price);
+                    const quantity = parseInt(item.dataset.quantity);
+
+                    subtotal += price * quantity;
+                }
+            });
+
+            document.getElementById("subtotal-price").textContent = formatMoney(subtotal);
+            document.getElementById("total-price").textContent = formatMoney(subtotal);
+        }
+
+        // Khi load trang → tính tổng ngay
+        window.addEventListener("DOMContentLoaded", updateTotal);
+
+        // Khi tick / bỏ tick sản phẩm
+        document.querySelectorAll(".item-checkbox").forEach(cb => {
+            cb.addEventListener("change", updateTotal);
+        });
+
+        // Khi click chọn tất cả
+        document.getElementById("select-all")?.addEventListener("change", updateTotal);
+    </script>
+
 }
+
