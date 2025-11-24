@@ -185,7 +185,8 @@
                                 }
                             </div>
 
-                            <form asp-controller="Cart" asp-action="Add" method="post" class="add-to-cart-form" data-product="@sp.ProductId">
+                            <!-- SỬA FORM Ở ĐÂY -->
+                            <form asp-controller="HomeCarts" asp-action="AddToCart" method="post" class="add-to-cart-form" data-product="@sp.ProductId">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="productId" value="@sp.ProductId" />
                                 <button type="submit" class="w-10 h-10 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl flex items-center justify-center hover:shadow-lg transition-all duration-300 transform hover:scale-105 group/btn">
@@ -335,13 +336,12 @@
                 }, 4000);
             }
 
-            // Add to cart functionality
+            // Add to cart functionality - ĐÃ SỬA
             const addToCartForms = document.querySelectorAll('.add-to-cart-form');
             addToCartForms.forEach(form => {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
 
-                    const formData = new FormData(this);
                     const productId = this.dataset.product;
                     const button = this.querySelector('button');
 
@@ -350,33 +350,63 @@
                     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                     button.disabled = true;
 
-                    // Simulate API call
-                    setTimeout(() => {
-                        // Show success state
-                        button.innerHTML = '<i class="fas fa-check"></i>';
-                        button.classList.remove('from-primary', 'to-primary-dark');
-                        button.classList.add('bg-green-500');
+                    // Gửi request đến server thực tế
+                    fetch('/HomeCarts/AddToCart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: `productId=${productId}&quantity=1`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success state
+                            button.innerHTML = '<i class="fas fa-check"></i>';
+                            button.classList.remove('from-primary', 'to-primary-dark');
+                            button.classList.add('bg-green-500');
 
-                        // Update cart count
-                        const cartCount = document.querySelector('.cart-count');
-                        if (cartCount) {
-                            const currentCount = parseInt(cartCount.textContent) || 0;
-                            cartCount.textContent = currentCount + 1;
-                            cartCount.classList.add('animate-bounce');
-                            setTimeout(() => cartCount.classList.remove('animate-bounce'), 1000);
+                            // Update cart count
+                            const cartCount = document.querySelector('.cart-count');
+                            if (cartCount) {
+                                const currentCount = parseInt(cartCount.textContent) || 0;
+                                cartCount.textContent = currentCount + 1;
+                                cartCount.classList.add('animate-bounce');
+                                setTimeout(() => cartCount.classList.remove('animate-bounce'), 1000);
+                            }
+
+                            // Show success message
+                            showNotification('Đã thêm sản phẩm vào giỏ hàng!', 'success');
+
+                            // Reset button after 2 seconds
+                            setTimeout(() => {
+                                button.innerHTML = originalHTML;
+                                button.classList.remove('bg-green-500');
+                                button.classList.add('from-primary', 'to-primary-dark');
+                                button.disabled = false;
+                            }, 2000);
+                        } else {
+                            if (data.requireLogin) {
+                                if (confirm('Bạn cần đăng nhập để mua hàng. Đến trang đăng nhập?')) {
+                                    window.location.href = '/Account/Login';
+                                } else {
+                                    // Reset button nếu user không muốn login
+                                    button.innerHTML = originalHTML;
+                                    button.disabled = false;
+                                }
+                            } else {
+                                showNotification(data.message, 'error');
+                                button.innerHTML = originalHTML;
+                                button.disabled = false;
+                            }
                         }
-
-                        // Show success message
-                        showNotification('Đã thêm sản phẩm vào giỏ hàng!', 'success');
-
-                        // Reset button after 2 seconds
-                        setTimeout(() => {
-                            button.innerHTML = originalHTML;
-                            button.classList.remove('bg-green-500');
-                            button.classList.add('from-primary', 'to-primary-dark');
-                            button.disabled = false;
-                        }, 2000);
-                    }, 1000);
+                    })
+                    .catch(error => {
+                        showNotification('Có lỗi xảy ra khi thêm vào giỏ hàng', 'error');
+                        button.innerHTML = originalHTML;
+                        button.disabled = false;
+                    });
                 });
             });
 
@@ -385,11 +415,11 @@
                 // Create notification element
                 const notification = document.createElement('div');
                 notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 ${
-                    type === 'success' ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'
+                    type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
                 }`;
                 notification.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
                         <span>${message}</span>
                     </div>
                 `;

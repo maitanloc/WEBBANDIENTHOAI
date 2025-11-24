@@ -8,8 +8,8 @@ namespace WEBBANDIENTHOAI.Repository
     {
         Task<Cart> GetCartByCustomerIdAsync(int customerId);
         Task AddToCartAsync(int customerId, int productId, int quantity = 1);
-        Task UpdateCartItemAsync(int cartDetailId, int quantity);
-        Task RemoveFromCartAsync(int cartDetailId);
+        Task UpdateCartItemAsync(int customerId, int productId, int quantity);
+        Task RemoveFromCartAsync(int customerId, int productId);
         Task ClearCartAsync(int customerId);
     }
 
@@ -27,7 +27,6 @@ namespace WEBBANDIENTHOAI.Repository
             return await _context.Carts
                 .Include(c => c.Details)
                     .ThenInclude(d => d.Product)
-                        .ThenInclude(p => p.PrimaryImage)
                 .FirstOrDefaultAsync(c => c.CustomerId == customerId)
                 ?? await CreateNewCartAsync(customerId);
         }
@@ -50,17 +49,20 @@ namespace WEBBANDIENTHOAI.Repository
             var cart = await GetCartByCustomerIdAsync(customerId);
             var product = await _context.Products.FindAsync(productId);
 
-            if (product == null) return;
+            if (product == null)
+                throw new Exception("Sản phẩm không tồn tại");
 
-            var existingItem = cart.Details.FirstOrDefault(d => d.ProductId == productId);
+            var existingItem = cart.Details?.FirstOrDefault(d => d.ProductId == productId);
 
             if (existingItem != null)
             {
                 existingItem.Quantity += quantity;
-                existingItem.UnitPrice = product.Price;
             }
             else
             {
+                if (cart.Details == null)
+                    cart.Details = new List<CartDetail>();
+
                 cart.Details.Add(new CartDetail
                 {
                     ProductId = productId,
@@ -73,22 +75,33 @@ namespace WEBBANDIENTHOAI.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateCartItemAsync(int cartDetailId, int quantity)
+        public async Task UpdateCartItemAsync(int customerId, int productId, int quantity)
         {
-            var cartDetail = await _context.CartDetails.FindAsync(cartDetailId);
-            if (cartDetail != null && quantity > 0)
+            var cart = await GetCartByCustomerIdAsync(customerId);
+            var cartItem = cart.Details?.FirstOrDefault(d => d.ProductId == productId);
+
+            if (cartItem != null)
             {
-                cartDetail.Quantity = quantity;
+                if (quantity <= 0)
+                {
+                    _context.CartDetails.Remove(cartItem);
+                }
+                else
+                {
+                    cartItem.Quantity = quantity;
+                }
                 await _context.SaveChangesAsync();
             }
         }
 
-        public async Task RemoveFromCartAsync(int cartDetailId)
+        public async Task RemoveFromCartAsync(int customerId, int productId)
         {
-            var cartDetail = await _context.CartDetails.FindAsync(cartDetailId);
-            if (cartDetail != null)
+            var cart = await GetCartByCustomerIdAsync(customerId);
+            var cartItem = cart.Details?.FirstOrDefault(d => d.ProductId == productId);
+
+            if (cartItem != null)
             {
-                _context.CartDetails.Remove(cartDetail);
+                _context.CartDetails.Remove(cartItem);
                 await _context.SaveChangesAsync();
             }
         }
@@ -96,8 +109,11 @@ namespace WEBBANDIENTHOAI.Repository
         public async Task ClearCartAsync(int customerId)
         {
             var cart = await GetCartByCustomerIdAsync(customerId);
-            _context.CartDetails.RemoveRange(cart.Details);
-            await _context.SaveChangesAsync();
+            if (cart.Details != null && cart.Details.Any())
+            {
+                _context.CartDetails.RemoveRange(cart.Details);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
