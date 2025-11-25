@@ -40,6 +40,9 @@ IF OBJECT_ID('dbo.Customers','U') IS NOT NULL DROP TABLE dbo.Customers;
 IF OBJECT_ID('dbo.Users','U') IS NOT NULL DROP TABLE dbo.Users;
 IF OBJECT_ID('dbo.Roles','U') IS NOT NULL DROP TABLE dbo.Roles;
 IF OBJECT_ID('dbo.AuditLogs','U') IS NOT NULL DROP TABLE dbo.AuditLogs;
+-- 🔥 THÊM DROP CHO 2 BẢNG MỚI
+IF OBJECT_ID('dbo.PasswordResetTokens','U') IS NOT NULL DROP TABLE dbo.PasswordResetTokens;
+IF OBJECT_ID('dbo.OTPCodes','U') IS NOT NULL DROP TABLE dbo.OTPCodes;
 GO
 
 -- ============================
@@ -339,6 +342,44 @@ CREATE TABLE dbo.AuditLogs
     Action NVARCHAR(250) NULL,
     Details NVARCHAR(MAX) NULL
 );
+GO
+
+-- ============================
+-- OTP & PASSWORD RESET TABLES
+-- ============================
+CREATE TABLE dbo.OTPCodes
+(
+    OTPId INT IDENTITY(1,1) PRIMARY KEY,
+    Code NVARCHAR(6) NOT NULL,
+    Email NVARCHAR(150) NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    ExpiresAt DATETIME2 NOT NULL,
+    IsUsed BIT NOT NULL DEFAULT 0,
+    Attempts INT NOT NULL DEFAULT 0
+);
+GO
+
+CREATE TABLE dbo.PasswordResetTokens
+(
+    TokenId INT IDENTITY(1,1) PRIMARY KEY,
+    Token NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(150) NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    ExpiresAt DATETIME2 NOT NULL,
+    IsUsed BIT NOT NULL DEFAULT 0
+);
+GO
+
+-- Indexes cho OTPCodes
+CREATE INDEX IX_OTPCodes_Email_Code ON dbo.OTPCodes(Email, Code);
+CREATE INDEX IX_OTPCodes_CreatedAt ON dbo.OTPCodes(CreatedAt);
+CREATE INDEX IX_OTPCodes_ExpiresAt ON dbo.OTPCodes(ExpiresAt);
+GO
+
+-- Indexes cho PasswordResetTokens
+CREATE INDEX IX_PasswordResetTokens_Token ON dbo.PasswordResetTokens(Token);
+CREATE INDEX IX_PasswordResetTokens_Email ON dbo.PasswordResetTokens(Email);
+CREATE INDEX IX_PasswordResetTokens_ExpiresAt ON dbo.PasswordResetTokens(ExpiresAt);
 GO
 
 -- ============================
@@ -796,4 +837,5 @@ VALUES
 GO
 
 PRINT '=== DATABASE PhoneShopFull ĐÃ TẠO THÀNH CÔNG 100% - 20 SẢN PHẨM + ĐẦY ĐỦ DỮ LIỆU ===';
+PRINT '=== ĐÃ THÊM 2 BẢNG MỚI: OTPCodes VÀ PasswordResetTokens CHO CHỨC NĂNG QUÊN MẬT KHẨU ===';
 GO
