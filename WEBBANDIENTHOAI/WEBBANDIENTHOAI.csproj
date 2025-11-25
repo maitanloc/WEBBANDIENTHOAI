@@ -9,27 +9,36 @@
   <ItemGroup>
     <Compile Remove="Mappings\**" />
     <Compile Remove="Repositories\**" />
-    <Compile Remove="Tests\**" />
     <Content Remove="Mappings\**" />
     <Content Remove="Repositories\**" />
-    <Content Remove="Tests\**" />
     <EmbeddedResource Remove="Mappings\**" />
     <EmbeddedResource Remove="Repositories\**" />
-    <EmbeddedResource Remove="Tests\**" />
     <None Remove="Mappings\**" />
     <None Remove="Repositories\**" />
-    <None Remove="Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="8.8.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="MySql.Data" Version="9.5.0" />
+    <PackageReference Include="NUnit" Version="4.4.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Tests\UnitTests\Helpers\" />
+    <Folder Include="Tests\UnitTests\IntergrationTests\" />
+    <Folder Include="Tests\UnitTests\Common\" />
+    <Folder Include="Tests\UnitTests\TestData\" />
+    <Folder Include="Tests\UnitTests\Services\" />
   </ItemGroup>
 
 </Project>

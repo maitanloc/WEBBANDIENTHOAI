@@ -21,7 +21,7 @@ namespace WEBBANDIENTHOAI.Repository
         {
             var products = await _context.Products
                 .AsNoTracking()
-                .Include(p => p.PrimaryImage) // Quan trọng: include ảnh
+                .Include(p => p.PrimaryImage)
                 .Include(p => p.ProductStatus)
                 .Include(p => p.Inventory)
                 .Include(p => p.ImportDetails)
@@ -41,7 +41,7 @@ namespace WEBBANDIENTHOAI.Repository
                 StockCode = p.StockCode,
                 StatusId = p.StatusId,
                 StatusName = p.ProductStatus?.StatusName,
-                PrimaryImageId = p.PrimaryImage?.ImageId, // Sẽ không null nếu có ảnh
+                PrimaryImageId = p.PrimaryImage?.ImageId,
                 IsEditable = CanEditProduct(p)
             });
 
@@ -112,72 +112,78 @@ namespace WEBBANDIENTHOAI.Repository
 
         public async Task<byte[]?> GetImageBytesAsync(int imageId)
         {
-            var img = await _context.ProductImages.FirstOrDefaultAsync(i => i.ImageId == imageId);
+            var img = await _context.ProductImages
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i => i.ImageId == imageId);
             return img?.ImagePath;
         }
 
         public async Task<(IEnumerable<ProductListItemVm> Items, int TotalCount)> GetFilteredAsync(
-            string? search,
-            int? categoryId,
-            byte? statusId,
-            decimal? priceMin,
-            decimal? priceMax,
-            bool? hasImage,
-            string? sortBy,
-            int page,
-            int pageSize)
+      string? search,
+      int? categoryId,
+      byte? statusId,
+      decimal? priceMin,
+      decimal? priceMax,
+      bool? hasImage,
+      string? sortBy,
+      int page,
+      int pageSize)
         {
-            var query = _context.Products
-                .AsNoTracking()
-                .Include(p => p.PrimaryImage)
-                .Include(p => p.ProductStatus)
-                .Include(p => p.Inventory)
-                .Include(p => p.ImportDetails)
-                    .ThenInclude(ird => ird.ImportReceipt)
-                .Include(p => p.ExportDetails)
-                .AsQueryable();
+            // Sửa lỗi: Tách query base để tránh include không cần thiết khi đếm tổng
+            var baseQuery = _context.Products.AsNoTracking();
 
-            // Apply filters
+            // Apply filters - chỉ áp dụng trên base query trước
             if (!string.IsNullOrWhiteSpace(search))
             {
                 var searchTerm = search.Trim();
-                query = query.Where(p =>
+                baseQuery = baseQuery.Where(p =>
                     p.Name.Contains(searchTerm) ||
                     p.SKU.Contains(searchTerm) ||
                     p.StockCode.Contains(searchTerm));
             }
 
             if (categoryId.HasValue)
-                query = query.Where(p => p.CategoryId == categoryId.Value);
+                baseQuery = baseQuery.Where(p => p.CategoryId == categoryId.Value);
 
             if (statusId.HasValue)
-                query = query.Where(p => p.StatusId == statusId.Value);
+                baseQuery = baseQuery.Where(p => p.StatusId == statusId.Value);
 
             if (priceMin.HasValue)
-                query = query.Where(p => p.Price >= priceMin.Value);
+                baseQuery = baseQuery.Where(p => p.Price >= priceMin.Value);
             if (priceMax.HasValue)
-                query = query.Where(p => p.Price <= priceMax.Value);
+                baseQuery = baseQuery.Where(p => p.Price <= priceMax.Value);
 
             if (hasImage.HasValue)
             {
-                if (hasImage.Value)
-                    query = query.Where(p => p.ImageId != null);
-                else
-                    query = query.Where(p => p.ImageId == null);
+                baseQuery = hasImage.Value
+                    ? baseQuery.Where(p => p.ImageId != null)
+                    : baseQuery.Where(p => p.ImageId == null);
             }
 
-            // Sort
-            query = sortBy switch
+            // Đếm tổng trước khi include (hiệu năng tốt hơn)
+            var total = await baseQuery.CountAsync();
+
+            // Tạo query với includes cho dữ liệu chi tiết
+            var detailedQuery = baseQuery
+                .Include(p => p.PrimaryImage)
+                .Include(p => p.ProductStatus)
+                .Include(p => p.Inventory)
+                .Include(p => p.ImportDetails)
+                    .ThenInclude(ird => ird.ImportReceipt)
+                .Include(p => p.ExportDetails);
+
+            // SỬA LỖI: Tạo biến IQueryable riêng cho phần sort
+            IQueryable<Product> sortedQuery = sortBy switch
             {
-                "price_asc" => query.OrderBy(p => p.Price),
-                "price_desc" => query.OrderByDescending(p => p.Price),
-                "name_asc" => query.OrderBy(p => p.Name),
-                "name_desc" => query.OrderByDescending(p => p.Name),
-                _ => query.OrderByDescending(p => p.CreatedAt)
+                "price_asc" => detailedQuery.OrderBy(p => p.Price),
+                "price_desc" => detailedQuery.OrderByDescending(p => p.Price),
+                "name_asc" => detailedQuery.OrderBy(p => p.Name),
+                "name_desc" => detailedQuery.OrderByDescending(p => p.Name),
+                _ => detailedQuery.OrderByDescending(p => p.CreatedAt)
             };
 
-            var total = await query.CountAsync();
-            var items = await query
+            // Phân trang
+            var items = await sortedQuery
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -203,19 +209,21 @@ namespace WEBBANDIENTHOAI.Repository
         {
             var product = await _context.Products.FindAsync(productId);
             if (product == null)
-                throw new System.Exception("Product not found");
+                throw new System.Exception($"Product with ID {productId} not found");
 
+            // Tạo image mới
             var image = new ProductImage
             {
                 ProductId = productId,
                 ImagePath = bytes,
                 IsPrimary = true,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = System.DateTime.UtcNow
             };
 
-            _context.ProductImages.Add(image);
+            await _context.ProductImages.AddAsync(image);
             await _context.SaveChangesAsync();
 
+            // Cập nhật ImageId cho product
             product.ImageId = image.ImageId;
             await _context.SaveChangesAsync();
 
@@ -238,14 +246,20 @@ namespace WEBBANDIENTHOAI.Repository
                 .ToListAsync();
         }
 
-        // Helper method to check if product can be edited
+        // Helper method to check if product can be edited - SỬA LOGIC QUAN TRỌNG
         private bool CanEditProduct(Product product)
         {
-            var hasInventory = product.Inventory?.Any() == true;
-            var hasExportHistory = product.ExportDetails?.Any() == true;
-            var hasPendingImport = product.ImportDetails?.Any(ird =>
-                ird.ImportReceipt?.IsFinalized == false) == true;
+            // FIX: Kiểm tra null trước khi gọi Any()
+            var hasInventory = product.Inventory != null && product.Inventory.Any();
+            var hasExportHistory = product.ExportDetails != null && product.ExportDetails.Any();
 
+            // FIX: Kiểm tra ImportDetails và ImportReceipt null
+            var hasPendingImport = product.ImportDetails != null &&
+                product.ImportDetails.Any(ird =>
+                    ird.ImportReceipt != null &&
+                    ird.ImportReceipt.IsFinalized == false);
+
+            // Điều kiện: Có inventory VÀ không có export history VÀ không có pending import
             return hasInventory && !hasExportHistory && !hasPendingImport;
         }
     }

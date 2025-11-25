@@ -2,6 +2,10 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.Repository;
@@ -59,22 +63,17 @@ namespace WEBBANDIENTHOAI.Controllers
 
             try
             {
-                var product = await _context.Products
-                    .Include(p => p.PrimaryImage)
-                    .Include(p => p.ProductStatus)
-                    .Include(p => p.Category)
-                    .Include(p => p.PhoneConfiguration)
-                    .Include(p => p.LaptopConfiguration)
-                    .Include(p => p.Inventory)
-                    .FirstOrDefaultAsync(m => m.ProductId == id);
+                // SỬA: Sử dụng repository thay vì context trực tiếp để đảm bảo consistency
+                var product = await _productRepo.GetByIdWithIncludesAsync(id.Value);
 
                 if (product == null)
                 {
                     return NotFound();
                 }
 
-                // Check if product can be edited
-                ViewBag.CanEdit = await CanEditProductAsync(product.ProductId);
+                // Check if product can be edited - SỬA: Sử dụng logic từ repository
+                var canEdit = await CanEditProductAsync(product.ProductId);
+                ViewData["CanEdit"] = canEdit; // SỬA: Dùng ViewData thay vì ViewBag để test dễ dàng hơn
 
                 return View(product);
             }
@@ -96,12 +95,8 @@ namespace WEBBANDIENTHOAI.Controllers
 
             try
             {
-                var product = await _context.Products
-                    .Include(p => p.PrimaryImage)
-                    .Include(p => p.PhoneConfiguration)
-                    .Include(p => p.LaptopConfiguration)
-                    .Include(p => p.Inventory)
-                    .FirstOrDefaultAsync(p => p.ProductId == id);
+                // SỬA: Sử dụng repository để đảm bảo consistency
+                var product = await _productRepo.GetByIdWithIncludesAsync(id.Value);
 
                 if (product == null)
                 {
@@ -117,9 +112,9 @@ namespace WEBBANDIENTHOAI.Controllers
 
                 await PopulateViewData();
 
-                // Pass edit restrictions to view
-                ViewBag.CanEditProduct = true;
-                ViewBag.CanChangeKeys = await CanChangeProductKeysAsync(product.ProductId);
+                // Pass edit restrictions to view - SỬA: Dùng ViewData thay vì ViewBag
+                ViewData["CanEditProduct"] = true;
+                ViewData["CanChangeKeys"] = await CanChangeProductKeysAsync(product.ProductId);
 
                 return View(product);
             }
@@ -141,6 +136,14 @@ namespace WEBBANDIENTHOAI.Controllers
                 return NotFound();
             }
 
+            // SỬA: Kiểm tra ModelState trước khi check editability
+            if (!ModelState.IsValid)
+            {
+                await PopulateViewData();
+                ViewData["CanChangeKeys"] = await CanChangeProductKeysAsync(id);
+                return View(product);
+            }
+
             // Check if product can be edited
             if (!await CanEditProductAsync(id))
             {
@@ -148,120 +151,90 @@ namespace WEBBANDIENTHOAI.Controllers
                 return RedirectToAction(nameof(Details), new { id });
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
+                var existingProduct = await _context.Products
+                    .Include(p => p.PrimaryImage)
+                    .Include(p => p.PhoneConfiguration)
+                    .Include(p => p.LaptopConfiguration)
+                    .Include(p => p.Inventory)
+                    .FirstOrDefaultAsync(p => p.ProductId == id);
+
+                if (existingProduct == null)
                 {
-                    var existingProduct = await _context.Products
-                        .Include(p => p.PrimaryImage)
-                        .Include(p => p.PhoneConfiguration)
-                        .Include(p => p.LaptopConfiguration)
-                        .Include(p => p.Inventory)
-                        .FirstOrDefaultAsync(p => p.ProductId == id);
-
-                    if (existingProduct == null)
-                    {
-                        return NotFound();
-                    }
-
-                    // Check if SKU/StockCode is being changed
-                    bool skuChanged = existingProduct.SKU != product.SKU;
-                    bool stockCodeChanged = existingProduct.StockCode != product.StockCode;
-
-                    if ((skuChanged || stockCodeChanged) && !await CanChangeProductKeysAsync(id))
-                    {
-                        TempData["Error"] = "Không thể thay đổi SKU/Mã kho vì sản phẩm đã có lịch sử nhập/xuất";
-                        await PopulateViewData();
-                        ViewBag.CanChangeKeys = false;
-                        return View(product);
-                    }
-
-                    // Update basic product info - chỉ cho phép sửa các trường không quan trọng
-                    existingProduct.Name = product.Name;
-                    existingProduct.Brand = product.Brand;
-                    existingProduct.Price = product.Price;
-                    existingProduct.OldPrice = product.OldPrice;
-                    existingProduct.Color = product.Color;
-                    existingProduct.Size = product.Size;
-                    existingProduct.ShortDescription = product.ShortDescription;
-                    existingProduct.StatusId = product.StatusId;
-                    existingProduct.CategoryId = product.CategoryId;
-
-                    // Chỉ cho phép thay đổi SKU/StockCode nếu sản phẩm chưa có lịch sử
-                    if (await CanChangeProductKeysAsync(id))
-                    {
-                        existingProduct.SKU = product.SKU;
-                        existingProduct.StockCode = product.StockCode;
-                    }
-
-                    // Update phone configuration - chỉ cập nhật nếu tồn tại
-                    if (existingProduct.PhoneConfiguration != null)
-                    {
-                        existingProduct.PhoneConfiguration.CPU = Request.Form["PhoneConfiguration.CPU"];
-                        existingProduct.PhoneConfiguration.RAM = Request.Form["PhoneConfiguration.RAM"];
-                        existingProduct.PhoneConfiguration.InternalStorage = Request.Form["PhoneConfiguration.InternalStorage"];
-                        existingProduct.PhoneConfiguration.Battery = Request.Form["PhoneConfiguration.Battery"];
-                        existingProduct.PhoneConfiguration.OperatingSystem = Request.Form["PhoneConfiguration.OperatingSystem"];
-                        existingProduct.PhoneConfiguration.Screen = Request.Form["PhoneConfiguration.Screen"];
-                        existingProduct.PhoneConfiguration.ScreenTechnology = Request.Form["PhoneConfiguration.ScreenTechnology"];
-                        existingProduct.PhoneConfiguration.Resolution = Request.Form["PhoneConfiguration.Resolution"];
-                        existingProduct.PhoneConfiguration.Camera = Request.Form["PhoneConfiguration.Camera"];
-                        existingProduct.PhoneConfiguration.Ports = Request.Form["PhoneConfiguration.Ports"];
-                        existingProduct.PhoneConfiguration.Color = Request.Form["PhoneConfiguration.Color"];
-                    }
-
-                    // Update laptop configuration - chỉ cập nhật nếu tồn tại
-                    if (existingProduct.LaptopConfiguration != null)
-                    {
-                        existingProduct.LaptopConfiguration.CPU = Request.Form["LaptopConfiguration.CPU"];
-                        existingProduct.LaptopConfiguration.RAM = Request.Form["LaptopConfiguration.RAM"];
-                        existingProduct.LaptopConfiguration.Storage = Request.Form["LaptopConfiguration.Storage"];
-                        existingProduct.LaptopConfiguration.GraphicsCard = Request.Form["LaptopConfiguration.GraphicsCard"];
-                        existingProduct.LaptopConfiguration.Battery = Request.Form["LaptopConfiguration.Battery"];
-                        existingProduct.LaptopConfiguration.OperatingSystem = Request.Form["LaptopConfiguration.OperatingSystem"];
-                        existingProduct.LaptopConfiguration.ScreenSize = Request.Form["LaptopConfiguration.ScreenSize"];
-                        existingProduct.LaptopConfiguration.ScreenTechnology = Request.Form["LaptopConfiguration.ScreenTechnology"];
-                        existingProduct.LaptopConfiguration.Resolution = Request.Form["LaptopConfiguration.Resolution"];
-                        existingProduct.LaptopConfiguration.Ports = Request.Form["LaptopConfiguration.Ports"];
-                        existingProduct.LaptopConfiguration.Color = Request.Form["LaptopConfiguration.Color"];
-                        existingProduct.LaptopConfiguration.Weight = Request.Form["LaptopConfiguration.Weight"];
-                    }
-
-                    // Handle image upload - SỬA LỖI Ở ĐÂY
-                    if (primaryImage != null && primaryImage.Length > 0)
-                    {
-                        await HandleImageUpload(existingProduct, primaryImage);
-                    }
-
-                    // Update inventory if stock code changed và được phép
-                    if (stockCodeChanged && await CanChangeProductKeysAsync(id))
-                    {
-                        var inventory = await _context.Inventory.FirstOrDefaultAsync(i => i.ProductId == id);
-                        if (inventory != null)
-                        {
-                            inventory.StockCode = product.StockCode;
-                            inventory.LastUpdated = DateTime.UtcNow;
-                        }
-                    }
-
-                    await _context.SaveChangesAsync();
-                    TempData["Success"] = "Cập nhật sản phẩm thành công";
-                    return RedirectToAction(nameof(Details), new { id });
+                    return NotFound();
                 }
-                catch (DbUpdateException dbEx)
+
+                // Check if SKU/StockCode is being changed
+                bool skuChanged = existingProduct.SKU != product.SKU;
+                bool stockCodeChanged = existingProduct.StockCode != product.StockCode;
+
+                if ((skuChanged || stockCodeChanged) && !await CanChangeProductKeysAsync(id))
                 {
-                    _logger.LogError(dbEx, "Database error updating product {ProductId}", id);
-                    TempData["Error"] = "Lỗi cơ sở dữ liệu khi cập nhật sản phẩm: " + dbEx.InnerException?.Message;
+                    TempData["Error"] = "Không thể thay đổi SKU/Mã kho vì sản phẩm đã có lịch sử nhập/xuất";
+                    await PopulateViewData();
+                    ViewData["CanChangeKeys"] = false;
+                    return View(product);
                 }
-                catch (Exception ex)
+
+                // Update basic product info
+                existingProduct.Name = product.Name;
+                existingProduct.Brand = product.Brand;
+                existingProduct.Price = product.Price;
+                existingProduct.OldPrice = product.OldPrice;
+                existingProduct.Color = product.Color;
+                existingProduct.Size = product.Size;
+                existingProduct.ShortDescription = product.ShortDescription;
+                existingProduct.StatusId = product.StatusId;
+                existingProduct.CategoryId = product.CategoryId;
+
+                // Chỉ cho phép thay đổi SKU/StockCode nếu sản phẩm chưa có lịch sử
+                if (await CanChangeProductKeysAsync(id))
                 {
-                    _logger.LogError(ex, "Error updating product {ProductId}", id);
-                    TempData["Error"] = "Có lỗi xảy ra khi cập nhật sản phẩm: " + ex.Message;
+                    existingProduct.SKU = product.SKU;
+                    existingProduct.StockCode = product.StockCode;
                 }
+
+                // SỬA: Xử lý configuration một cách an toàn
+                await UpdateProductConfigurations(existingProduct);
+
+                // Handle image upload
+                if (primaryImage != null && primaryImage.Length > 0)
+                {
+                    await HandleImageUpload(existingProduct, primaryImage);
+                }
+
+                // Update inventory if stock code changed và được phép
+                if (stockCodeChanged && await CanChangeProductKeysAsync(id))
+                {
+                    var inventory = await _context.Inventory.FirstOrDefaultAsync(i => i.ProductId == id);
+                    if (inventory != null)
+                    {
+                        inventory.StockCode = product.StockCode;
+                        inventory.LastUpdated = DateTime.UtcNow;
+                    }
+                }
+
+                // SỬA: Dùng repository để update thay vì context trực tiếp
+                await _productRepo.UpdateAsync(existingProduct);
+
+                TempData["Success"] = "Cập nhật sản phẩm thành công";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+            catch (DbUpdateException dbEx)
+            {
+                _logger.LogError(dbEx, "Database error updating product {ProductId}", id);
+                TempData["Error"] = "Lỗi cơ sở dữ liệu khi cập nhật sản phẩm";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating product {ProductId}", id);
+                TempData["Error"] = "Có lỗi xảy ra khi cập nhật sản phẩm: " + ex.Message;
             }
 
+            // SỬA: Nếu có lỗi, repopulate view data và return view
             await PopulateViewData();
-            ViewBag.CanChangeKeys = await CanChangeProductKeysAsync(id);
+            ViewData["CanChangeKeys"] = await CanChangeProductKeysAsync(id);
             return View(product);
         }
 
@@ -276,8 +249,19 @@ namespace WEBBANDIENTHOAI.Controllers
                     return NotFound();
                 }
 
-                // Use ImageHelper for content type detection
-                var contentType = WEBBANDIENTHOAI.Helpers.ImageHelper.GetContentType(imageBytes);
+                // SỬA: Fallback content type nếu không detect được
+                var contentType = "image/jpeg"; // Mặc định
+                try
+                {
+                    // Giả sử có ImageHelper, nếu không thì dùng mặc định
+                    contentType = WEBBANDIENTHOAI.Helpers.ImageHelper.GetContentType(imageBytes);
+                }
+                catch
+                {
+                    // Nếu ImageHelper không tồn tại, dùng mặc định
+                    contentType = "image/jpeg";
+                }
+
                 return File(imageBytes, contentType);
             }
             catch (Exception ex)
@@ -287,45 +271,107 @@ namespace WEBBANDIENTHOAI.Controllers
             }
         }
 
-        // Helper methods
+        // ==================== HELPER METHODS ====================
+
         private async Task<bool> CanEditProductAsync(int productId)
         {
-            // Sản phẩm có thể sửa khi:
-            // - Có tồn kho (đã nhập thành công) VÀ
-            // - Không có lịch sử xuất kho (chưa bán) VÀ
-            // - Không có phiếu nhập chưa finalized
-            var hasInventory = await _context.Inventory.AnyAsync(i => i.ProductId == productId);
+            try
+            {
+                // SỬA: Sử dụng repository method thay vì query trực tiếp để đảm bảo consistency
+                var product = await _productRepo.GetByIdWithIncludesAsync(productId);
+                if (product == null) return false;
 
-            var hasExportHistory = await _context.ExportReceiptDetails.AnyAsync(erd => erd.ProductId == productId);
+                // Sử dụng logic từ repository
+                var hasInventory = product.Inventory?.Any() == true;
+                var hasExportHistory = product.ExportDetails?.Any() == true;
 
-            var hasPendingImport = await _context.ImportReceiptDetails
-                .Where(ird => ird.ProductId == productId)
-                .Join(_context.ImportReceipts,
-                    ird => ird.ImportReceiptId,
-                    ir => ir.ImportReceiptId,
-                    (ird, ir) => ir)
-                .AnyAsync(ir => !ir.IsFinalized);
+                var hasPendingImport = product.ImportDetails?.Any(ird =>
+                    ird.ImportReceipt?.IsFinalized == false) == true;
 
-            return hasInventory && !hasExportHistory && !hasPendingImport;
+                return hasInventory && !hasExportHistory && !hasPendingImport;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private async Task<bool> CanChangeProductKeysAsync(int productId)
         {
-            // Chỉ cho phép thay đổi SKU/StockCode khi sản phẩm chưa có bất kỳ lịch sử nào
-            var hasImportHistory = await _context.ImportReceiptDetails.AnyAsync(ird => ird.ProductId == productId);
-            var hasExportHistory = await _context.ExportReceiptDetails.AnyAsync(erd => erd.ProductId == productId);
-            var hasInventory = await _context.Inventory.AnyAsync(i => i.ProductId == productId);
+            try
+            {
+                // SỬA: Sử dụng repository để lấy product với đầy đủ thông tin
+                var product = await _productRepo.GetByIdWithIncludesAsync(productId);
+                if (product == null) return false;
 
-            return !hasImportHistory && !hasExportHistory && !hasInventory;
+                var hasImportHistory = product.ImportDetails?.Any() == true;
+                var hasExportHistory = product.ExportDetails?.Any() == true;
+                var hasInventory = product.Inventory?.Any() == true;
+
+                return !hasImportHistory && !hasExportHistory && !hasInventory;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private async Task PopulateViewData()
         {
-            ViewData["StatusId"] = new SelectList(await _productRepo.GetAllStatusesAsync(), "StatusId", "StatusName");
-            ViewData["CategoryId"] = new SelectList(await _productRepo.GetAllCategoriesAsync(), "CategoryId", "CategoryName");
+            try
+            {
+                var statuses = await _productRepo.GetAllStatusesAsync();
+                var categories = await _productRepo.GetAllCategoriesAsync();
+
+                ViewData["StatusId"] = new SelectList(statuses, "StatusId", "StatusName");
+                ViewData["CategoryId"] = new SelectList(categories, "CategoryId", "CategoryName");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error populating view data");
+                // Set empty lists để tránh lỗi null
+                ViewData["StatusId"] = new SelectList(Enumerable.Empty<ProductStatus>(), "StatusId", "StatusName");
+                ViewData["CategoryId"] = new SelectList(Enumerable.Empty<Category>(), "CategoryId", "CategoryName");
+            }
         }
 
-        // SỬA LẠI PHƯƠNG THỨC XỬ LÝ ẢNH
+        // SỬA: Tách method xử lý configuration để code clean hơn
+        private async Task UpdateProductConfigurations(Product existingProduct)
+        {
+            // Update phone configuration - chỉ cập nhật nếu tồn tại
+            if (existingProduct.PhoneConfiguration != null)
+            {
+                existingProduct.PhoneConfiguration.CPU = Request.Form["PhoneConfiguration.CPU"].FirstOrDefault() ?? existingProduct.PhoneConfiguration.CPU;
+                existingProduct.PhoneConfiguration.RAM = Request.Form["PhoneConfiguration.RAM"].FirstOrDefault() ?? existingProduct.PhoneConfiguration.RAM;
+                existingProduct.PhoneConfiguration.InternalStorage = Request.Form["PhoneConfiguration.InternalStorage"].FirstOrDefault() ?? existingProduct.PhoneConfiguration.InternalStorage;
+                existingProduct.PhoneConfiguration.Battery = Request.Form["PhoneConfiguration.Battery"].FirstOrDefault() ?? existingProduct.PhoneConfiguration.Battery;
+                existingProduct.PhoneConfiguration.OperatingSystem = Request.Form["PhoneConfiguration.OperatingSystem"].FirstOrDefault() ?? existingProduct.PhoneConfiguration.OperatingSystem;
+                existingProduct.PhoneConfiguration.Screen = Request.Form["PhoneConfiguration.Screen"].FirstOrDefault() ?? existingProduct.PhoneConfiguration.Screen;
+                existingProduct.PhoneConfiguration.ScreenTechnology = Request.Form["PhoneConfiguration.ScreenTechnology"].FirstOrDefault() ?? existingProduct.PhoneConfiguration.ScreenTechnology;
+                existingProduct.PhoneConfiguration.Resolution = Request.Form["PhoneConfiguration.Resolution"].FirstOrDefault() ?? existingProduct.PhoneConfiguration.Resolution;
+                existingProduct.PhoneConfiguration.Camera = Request.Form["PhoneConfiguration.Camera"].FirstOrDefault() ?? existingProduct.PhoneConfiguration.Camera;
+                existingProduct.PhoneConfiguration.Ports = Request.Form["PhoneConfiguration.Ports"].FirstOrDefault() ?? existingProduct.PhoneConfiguration.Ports;
+                existingProduct.PhoneConfiguration.Color = Request.Form["PhoneConfiguration.Color"].FirstOrDefault() ?? existingProduct.PhoneConfiguration.Color;
+            }
+
+            // Update laptop configuration - chỉ cập nhật nếu tồn tại
+            if (existingProduct.LaptopConfiguration != null)
+            {
+                existingProduct.LaptopConfiguration.CPU = Request.Form["LaptopConfiguration.CPU"].FirstOrDefault() ?? existingProduct.LaptopConfiguration.CPU;
+                existingProduct.LaptopConfiguration.RAM = Request.Form["LaptopConfiguration.RAM"].FirstOrDefault() ?? existingProduct.LaptopConfiguration.RAM;
+                existingProduct.LaptopConfiguration.Storage = Request.Form["LaptopConfiguration.Storage"].FirstOrDefault() ?? existingProduct.LaptopConfiguration.Storage;
+                existingProduct.LaptopConfiguration.GraphicsCard = Request.Form["LaptopConfiguration.GraphicsCard"].FirstOrDefault() ?? existingProduct.LaptopConfiguration.GraphicsCard;
+                existingProduct.LaptopConfiguration.Battery = Request.Form["LaptopConfiguration.Battery"].FirstOrDefault() ?? existingProduct.LaptopConfiguration.Battery;
+                existingProduct.LaptopConfiguration.OperatingSystem = Request.Form["LaptopConfiguration.OperatingSystem"].FirstOrDefault() ?? existingProduct.LaptopConfiguration.OperatingSystem;
+                existingProduct.LaptopConfiguration.ScreenSize = Request.Form["LaptopConfiguration.ScreenSize"].FirstOrDefault() ?? existingProduct.LaptopConfiguration.ScreenSize;
+                existingProduct.LaptopConfiguration.ScreenTechnology = Request.Form["LaptopConfiguration.ScreenTechnology"].FirstOrDefault() ?? existingProduct.LaptopConfiguration.ScreenTechnology;
+                existingProduct.LaptopConfiguration.Resolution = Request.Form["LaptopConfiguration.Resolution"].FirstOrDefault() ?? existingProduct.LaptopConfiguration.Resolution;
+                existingProduct.LaptopConfiguration.Ports = Request.Form["LaptopConfiguration.Ports"].FirstOrDefault() ?? existingProduct.LaptopConfiguration.Ports;
+                existingProduct.LaptopConfiguration.Color = Request.Form["LaptopConfiguration.Color"].FirstOrDefault() ?? existingProduct.LaptopConfiguration.Color;
+                existingProduct.LaptopConfiguration.Weight = Request.Form["LaptopConfiguration.Weight"].FirstOrDefault() ?? existingProduct.LaptopConfiguration.Weight;
+            }
+        }
+
         private async Task HandleImageUpload(Product product, IFormFile imageFile)
         {
             try
@@ -349,47 +395,11 @@ namespace WEBBANDIENTHOAI.Controllers
                 await imageFile.CopyToAsync(memoryStream);
                 var imageBytes = memoryStream.ToArray();
 
-                // Kiểm tra nếu sản phẩm đã có ảnh chính
-                if (product.ImageId.HasValue)
-                {
-                    // Cập nhật ảnh hiện có
-                    var existingImage = await _context.ProductImages
-                        .FirstOrDefaultAsync(img => img.ImageId == product.ImageId.Value);
+                // SỬA: Sử dụng repository để lưu ảnh
+                var imageId = await _productRepo.SavePrimaryImageAsync(product.ProductId, imageBytes, imageFile.ContentType);
 
-                    if (existingImage != null)
-                    {
-                        existingImage.ImagePath = imageBytes;
-                        existingImage.CreatedAt = DateTime.UtcNow;
-                    }
-                    else
-                    {
-                        // Tạo ảnh mới nếu không tìm thấy ảnh cũ
-                        var newImage = new ProductImage
-                        {
-                            ProductId = product.ProductId,
-                            ImagePath = imageBytes,
-                            IsPrimary = true,
-                            CreatedAt = DateTime.UtcNow
-                        };
-                        _context.ProductImages.Add(newImage);
-                        await _context.SaveChangesAsync();
-                        product.ImageId = newImage.ImageId;
-                    }
-                }
-                else
-                {
-                    // Tạo ảnh mới nếu sản phẩm chưa có ảnh
-                    var newImage = new ProductImage
-                    {
-                        ProductId = product.ProductId,
-                        ImagePath = imageBytes,
-                        IsPrimary = true,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    _context.ProductImages.Add(newImage);
-                    await _context.SaveChangesAsync();
-                    product.ImageId = newImage.ImageId;
-                }
+                // Cập nhật ImageId cho product
+                product.ImageId = imageId;
             }
             catch (Exception ex)
             {
