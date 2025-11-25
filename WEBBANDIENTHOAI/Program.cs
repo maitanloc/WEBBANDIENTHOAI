@@ -1,7 +1,9 @@
 using FluentAssertions.Common;
 using Microsoft.EntityFrameworkCore;
 using WEBBANDIENTHOAI.Data;
-using WEBBANDIENTHOAI.Repository; // Thêm dòng này
+using WEBBANDIENTHOAI.Repositories;
+using WEBBANDIENTHOAI.Repository;
+using WEBBANDIENTHOAI.Services; // Thêm dòng này
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1) Load connection string
 // ========================
 var conn = builder.Configuration.GetConnectionString("DefaultConnection")
-           ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=web_dien_tu;Integrated Security=True;TrustServerCertificate=True";
+           ?? "Data Source=DELL\\SQLEXPRESS02;Initial Catalog=web_dien_tu;Integrated Security=True;TrustServerCertificate=True";
 
 // ========================
 // 2) Add MVC services
@@ -31,6 +33,18 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+// Đăng ký services
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IOTPService, OTPService>();
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<IMailService, MailService>();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 
 

@@ -4,172 +4,211 @@
 <!DOCTYPE html>
 <html lang="vi" class="light">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Đăng nhập / Đăng ký — WebBánĐiệnThoại</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Đăng nhập / Đăng ký — WebBánĐiệnThoại</title>
 
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com" rel="preconnect" />
-  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-
-  <!-- local CSS -->
-  <link rel="stylesheet" href="~/css/auth.css" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/auth.css" />
 </head>
 
 <body>
-  <div class="flex min-h-screen items-center justify-center p-6">
-    <div class="w-full max-w-4xl card rounded-2xl shadow-2xl blur-bg overflow-hidden">
-      <div class="md:flex">
-        <!-- LEFT INFO -->
-        <aside class="side-info md:w-1/2 p-8 bg-white/40 backdrop-blur-sm border-r border-white/40 relative">
-          <div class="mb-6">
-            <div class="inline-flex items-center gap-3 mb-3">
-              <span class="material-symbols-outlined text-3xl text-primary">storefront</span>
-              <h3 class="text-2xl font-bold">Fox Mobile</h3>
+    <!-- Thông báo Success/Error -->
+    @if (ViewBag.Success != null)
+    {
+        <div class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>@ViewBag.Success</span>
             </div>
-            <p class="text-sm text-gray-700/80">Mua bán điện thoại, laptop, TV &amp; phụ kiện — an toàn, chuyên nghiệp.</p>
-          </div>
+        </div>
+    }
 
-          <div class="mt-6 space-y-3">
-            <div class="flex items-start gap-3">
-              <div class="rounded-full bg-primary/10 p-2"><span class="material-symbols-outlined text-primary">local_shipping</span></div>
-              <div>
-                <div class="font-semibold">Giao hàng nhanh</div>
-                <div class="text-sm text-gray-600/80">Tối ưu vận chuyển toàn quốc.</div>
-              </div>
+    @if (ViewBag.Error != null)
+    {
+        <div class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined">error</span>
+                <span>@ViewBag.Error</span>
             </div>
-            <div class="flex items-start gap-3">
-              <div class="rounded-full bg-primary/10 p-2"><span class="material-symbols-outlined text-primary">settings</span></div>
-              <div>
-                <div class="font-semibold">Quản lý tồn kho</div>
-                <div class="text-sm text-gray-600/80">Theo dõi, cảnh báo sắp hết hàng.</div>
-              </div>
-            </div>
-            <div class="flex items-start gap-3">
-              <div class="rounded-full bg-primary/10 p-2"><span class="material-symbols-outlined text-primary">shield</span></div>
-              <div>
-                <div class="font-semibold">Bảo mật</div>
-                <div class="text-sm text-gray-600/80">Mã hóa mật khẩu, xác thực an toàn.</div>
-              </div>
-            </div>
-          </div>
+        </div>
+    }
 
-          <div class="mt-auto text-xs text-gray-600/70 pt-4">© 2025 WebBánĐiệnThoại</div>
-
-          <div class="absolute bottom-0 left-0 w-full">
-            <img class="cao" id="cao" src="~/images/cao_fone-removebg-preview.png" alt="phone" />
-          </div>
-        </aside>
-
-        <!-- RIGHT: LOGIN / REGISTER -->
-        <main class="relative md:w-1/2 p-6 sm:p-8">
-          <div class="flex items-center justify-between mb-6">
-            <div>
-              <h1 class="text-2xl font-extrabold text-gray-900">Đăng nhập / Đăng ký</h1>
-              <p class="text-sm text-gray-600/90">Truy cập hệ thống để bắt đầu</p>
-            </div>
-
-            <div class="flex gap-2">
-              <button id="btnLogin" type="button" class="px-4 py-2 rounded-md bg-primary text-white text-sm font-semibold shadow-md hover:shadow-lg transition">Đăng nhập</button>
-              <button id="btnRegister" type="button" class="px-4 py-2 rounded-md border border-gray-300 text-sm hover:bg-gray-50">Đăng ký</button>
-            </div>
-          </div>
-
-          <div class="relative panel-wrap h-[520px]">
-
-            @if (ViewBag.Error != null) {
-              <div class="mb-4 text-sm text-red-600">@ViewBag.Error</div>
-            }
-            @if (ViewBag.Message != null) {
-              <div class="mb-4 text-sm text-green-600">@ViewBag.Message</div>
-            }
-
-            <!-- LOGIN PANEL -->
-            <section id="loginPanel" class="panel visible bg-white/60 backdrop-blur-sm rounded-xl">
-              <form asp-controller="Account" asp-action="Login" method="post" class="h-full flex flex-col justify-between" autocomplete="on">
-                @Html.AntiForgeryToken()
-                <div>
-                  <label class="block text-sm font-medium mb-2" for="loginId">Email hoặc tên đăng nhập</label>
-                  <input id="loginId" name="identifier" type="text" required class="w-full rounded-lg border border-gray-200 px-4 py-3 mb-4 focus:ring-2 focus:ring-primary/30" placeholder="user@domain.com hoặc username" />
-
-                  <label class="block text-sm font-medium mb-2" for="loginPw">Mật khẩu</label>
-                  <div class="flex gap-2">
-                    <input id="loginPw" name="password" type="password" required class="flex-1 rounded-l-lg border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-primary/30" placeholder="Mật khẩu" />
-                    <button type="button" id="toggleLogin" class="rounded-r-lg border border-gray-200 px-3 py-2 bg-white/50" aria-label="Hiện/ẩn mật khẩu">
-                      <span class="material-symbols-outlined">visibility</span>
-                    </button>
-                  </div>
-
-                  <div class="flex items-center justify-between mt-4">
-                    <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="h-4 w-4" name="remember"> Ghi nhớ</label>
-                    <a href="@Url.Action("ForgotPassword","Account")" class="text-sm text-primary">Quên mật khẩu?</a>
-                  </div>
-                </div>
-
-                <div>
-                  <button type="submit" class="mt-6 w-full rounded-lg bg-primary py-3 text-white font-bold shadow-sm hover:shadow-md transition">Đăng nhập</button>
-
-                  <div class="my-4 flex items-center">
-                    <div class="flex-1 h-px bg-gray-200"></div>
-                    <div class="px-3 text-xs text-gray-500">hoặc</div>
-                    <div class="flex-1 h-px bg-gray-200"></div>
-                  </div>
-
-                  <button type="button" onclick="window.location.href='@Url.Action("ExternalLogin","Account", new { provider = "Google" })'" class="w-full border border-gray-200 rounded-lg py-3 flex items-center justify-center gap-3 hover:bg-gray-50 transition">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#EA4335" d="M10.2 12v3.2h5.4c-.2 1.5-1.6 4.3-5.4 4.3-3.3 0-6-2.7-6-6s2.7-6 6-6c1.8 0 3 .7 3.9 1.4l2.7-2.6C16.4 4 14.5 3 12 3 7.6 3 4 6.6 4 11s3.6 8 8 8c4.6 0 7.1-3 7.1-7.2 0-.5 0-.8-.1-1.2H10.2z"/></svg>
-                    <span>Tiếp tục với Google</span>
-                  </button>
-
-                  <p class="text-xs text-gray-600 mt-3">Chưa có tài khoản? 
-                    <button type="button" id="jumpRegister" class="text-primary font-semibold">Đăng ký ngay</button>
-                  </p>
-                </div>
-              </form>
-            </section>
-
-            <!-- REGISTER PANEL -->
-            <section id="registerPanel" class="panel hidden-right bg-white/60 backdrop-blur-sm rounded-xl">
-              <form asp-controller="Account" asp-action="Register" method="post" class="h-full flex flex-col justify-between">
-                @Html.AntiForgeryToken()
-                <div>
-                  <label class="block text-sm font-medium mb-2" for="regName">Họ và tên</label>
-                  <input id="regName" name="fullname" type="text" required class="w-full rounded-lg border border-gray-200 px-4 py-3 mb-3" placeholder="Họ và tên" />
-
-                  <label class="block text-sm font-medium mb-2" for="regEmail">Email</label>
-                  <input id="regEmail" name="email" type="email" required class="w-full rounded-lg border border-gray-200 px-4 py-3 mb-3" placeholder="email@domain.com" />
-
-                  <label class="block text-sm font-medium mb-2" for="regPhone">Số điện thoại</label>
-                  <input id="regPhone" name="phone" type="tel" class="w-full rounded-lg border border-gray-200 px-4 py-3 mb-3" placeholder="0912xxxxxx" />
-
-                  <label class="block text-sm font-medium mb-2" for="regPw">Mật khẩu</label>
-                  <div class="mb-2">
-                    <div class="flex gap-2">
-                      <input id="regPw" name="password" type="password" required class="flex-1 rounded-l-lg border border-gray-200 px-4 py-3" placeholder="Ít nhất 8 ký tự" />
-                      <button type="button" id="toggleReg" class="rounded-r-lg border border-gray-200 px-3 py-2 bg-white/50" aria-label="Hiện/ẩn mật khẩu">
-                        <span class="material-symbols-outlined">visibility</span>
-                      </button>
+    <div class="flex min-h-screen items-center justify-center p-6">
+        <div class="w-full max-w-4xl card rounded-2xl shadow-2xl blur-bg overflow-hidden">
+            <div class="md:flex">
+                <!-- LEFT INFO -->
+                <aside class="side-info md:w-1/2 p-8 bg-white/40 backdrop-blur-sm border-r border-white/40 relative">
+                    <div class="mb-6">
+                        <div class="inline-flex items-center gap-3 mb-3">
+                            <span class="material-symbols-outlined text-3xl text-primary">storefront</span>
+                            <h3 class="text-2xl font-bold">Fox Mobile</h3>
+                        </div>
+                        <p class="text-sm text-gray-700/80">Mua bán điện thoại, laptop, TV &amp; phụ kiện — an toàn, chuyên nghiệp.</p>
                     </div>
-                    <div class="mt-2 pw-meter"><div id="bar" class="pw-bar"></div></div>
-                    <div id="pwLabel" class="text-xs text-gray-500 mt-1">Mật khẩu: <span id="pwText" class="font-medium">—</span></div>
-                  </div>
-                </div>
 
-                <div>
-                  <button type="submit" class="mt-6 w-full rounded-lg bg-primary py-3 text-white font-bold shadow-sm hover:shadow-md transition">Tạo tài khoản</button>
-                  <p class="text-xs text-gray-600 mt-4">Đã có tài khoản? <button type="button" id="jumpLogin" class="text-primary font-semibold">Đăng nhập</button></p>
-                </div>
-              </form>
-            </section>
+                    <div class="mt-6 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="rounded-full bg-primary/10 p-2"><span class="material-symbols-outlined text-primary">local_shipping</span></div>
+                            <div>
+                                <div class="font-semibold">Giao hàng nhanh</div>
+                                <div class="text-sm text-gray-600/80">Tối ưu vận chuyển toàn quốc.</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="rounded-full bg-primary/10 p-2"><span class="material-symbols-outlined text-primary">settings</span></div>
+                            <div>
+                                <div class="font-semibold">Quản lý tồn kho</div>
+                                <div class="text-sm text-gray-600/80">Theo dõi, cảnh báo sắp hết hàng.</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="rounded-full bg-primary/10 p-2"><span class="material-symbols-outlined text-primary">shield</span></div>
+                            <div>
+                                <div class="font-semibold">Bảo mật</div>
+                                <div class="text-sm text-gray-600/80">Mã hóa mật khẩu, xác thực an toàn.</div>
+                            </div>
+                        </div>
+                    </div>
 
-          </div>
-        </main>
-      </div>
+                    <div class="mt-auto text-xs text-gray-600/70 pt-4">© 2025 WebBánĐiệnThoại</div>
+
+                    <div class="absolute bottom-0 left-0 w-full">
+                        <img class="cao" id="cao" src="~/images/cao_fone-removebg-preview.png" alt="phone" />
+                    </div>
+                </aside>
+
+                <!-- RIGHT: LOGIN / REGISTER -->
+                <main class="relative md:w-1/2 p-6 sm:p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-gray-900">Đăng nhập / Đăng ký</h1>
+                            <p class="text-sm text-gray-600/90">Truy cập hệ thống để bắt đầu</p>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button id="btnLogin" type="button" class="px-4 py-2 rounded-md bg-primary text-white text-sm font-semibold shadow-md hover:shadow-lg transition">Đăng nhập</button>
+                            <button id="btnRegister" type="button" class="px-4 py-2 rounded-md border border-gray-300 text-sm hover:bg-gray-50">Đăng ký</button>
+                        </div>
+                    </div>
+
+                    <div class="relative panel-wrap h-[520px]">
+
+                        @if (ViewBag.Error != null)
+                        {
+                            <div class="mb-4 text-sm text-red-600">@ViewBag.Error</div>
+                        }
+                        @if (ViewBag.Message != null)
+                        {
+                            <div class="mb-4 text-sm text-green-600">@ViewBag.Message</div>
+                        }
+
+                        <!-- LOGIN PANEL -->
+                        <section id="loginPanel" class="panel visible bg-white/60 backdrop-blur-sm rounded-xl">
+                            <form asp-controller="Account" asp-action="Login" method="post" class="h-full flex flex-col justify-between" autocomplete="on">
+                                @Html.AntiForgeryToken()
+                                <div>
+                                    <label class="block text-sm font-medium mb-2" for="loginId">Email hoặc tên đăng nhập</label>
+                                    <input id="loginId" name="identifier" type="text" required class="w-full rounded-lg border border-gray-200 px-4 py-3 mb-4 focus:ring-2 focus:ring-primary/30" placeholder="user@domain.com hoặc username" />
+
+                                    <label class="block text-sm font-medium mb-2" for="loginPw">Mật khẩu</label>
+                                    <div class="flex gap-2">
+                                        <input id="loginPw" name="password" type="password" required class="flex-1 rounded-l-lg border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-primary/30" placeholder="Mật khẩu" />
+                                        <button type="button" id="toggleLogin" class="rounded-r-lg border border-gray-200 px-3 py-2 bg-white/50" aria-label="Hiện/ẩn mật khẩu">
+                                            <span class="material-symbols-outlined">visibility</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="flex items-center justify-between mt-4">
+                                        <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="h-4 w-4" name="remember"> Ghi nhớ</label>
+                                        <a href="@Url.Action("ForgotPassword", "Account")" class="text-sm text-primary">Quên mật khẩu?</a>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <button type="submit" class="mt-6 w-full rounded-lg bg-primary py-3 text-white font-bold shadow-sm hover:shadow-md transition">Đăng nhập</button>
+
+                                    <div class="my-4 flex items-center">
+                                        <div class="flex-1 h-px bg-gray-200"></div>
+                                        <div class="px-3 text-xs text-gray-500">hoặc</div>
+                                        <div class="flex-1 h-px bg-gray-200"></div>
+                                    </div>
+
+                                    <button type="button" onclick="window.location.href='@Url.Action("ExternalLogin", "Account", new { provider = "Google" })'" class="w-full border border-gray-200 rounded-lg py-3 flex items-center justify-center gap-3 hover:bg-gray-50 transition">
+                                        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#EA4335" d="M10.2 12v3.2h5.4c-.2 1.5-1.6 4.3-5.4 4.3-3.3 0-6-2.7-6-6s2.7-6 6-6c1.8 0 3 .7 3.9 1.4l2.7-2.6C16.4 4 14.5 3 12 3 7.6 3 4 6.6 4 11s3.6 8 8 8c4.6 0 7.1-3 7.1-7.2 0-.5 0-.8-.1-1.2H10.2z" /></svg>
+                                        <span>Tiếp tục với Google</span>
+                                    </button>
+
+                                    <p class="text-xs text-gray-600 mt-3">
+                                        Chưa có tài khoản?
+                                        <button type="button" id="jumpRegister" class="text-primary font-semibold">Đăng ký ngay</button>
+                                    </p>
+                                </div>
+                            </form>
+                        </section>
+
+                        <!-- REGISTER PANEL -->
+                        <section id="registerPanel" class="panel hidden-right bg-white/60 backdrop-blur-sm rounded-xl">
+                            <form asp-controller="Account" asp-action="Register" method="post" class="h-full flex flex-col justify-between">
+                                @Html.AntiForgeryToken()
+                                <div>
+                                    <label class="block text-sm font-medium mb-2" for="regName">Họ và tên</label>
+                                    <input id="regName" name="fullname" type="text" required class="w-full rounded-lg border border-gray-200 px-4 py-3 mb-3" placeholder="Họ và tên" />
+
+                                    <label class="block text-sm font-medium mb-2" for="regEmail">Email</label>
+                                    <input id="regEmail" name="email" type="email" required class="w-full rounded-lg border border-gray-200 px-4 py-3 mb-3" placeholder="email@domain.com" />
+
+                                    <label class="block text-sm font-medium mb-2" for="regPhone">Số điện thoại</label>
+                                    <input id="regPhone" name="phone" type="tel" class="w-full rounded-lg border border-gray-200 px-4 py-3 mb-3" placeholder="0912xxxxxx" />
+
+                                    <!-- THÊM TRƯỜNG ĐỊA CHỈ VÀO ĐÂY -->
+                                    <label class="block text-sm font-medium mb-2" for="regAddress">Địa chỉ</label>
+                                    <input id="regAddress" name="address" type="text" class="w-full rounded-lg border border-gray-200 px-4 py-3 mb-3" placeholder="Địa chỉ nhận hàng" />
+
+                                    <label class="block text-sm font-medium mb-2" for="regPw">Mật khẩu</label>
+                                    <div class="mb-2">
+                                        <div class="flex gap-2">
+                                            <input id="regPw" name="password" type="password" required class="flex-1 rounded-l-lg border border-gray-200 px-4 py-3" placeholder="Ít nhất 8 ký tự" />
+                                            <button type="button" id="toggleReg" class="rounded-r-lg border border-gray-200 px-3 py-2 bg-white/50" aria-label="Hiện/ẩn mật khẩu">
+                                                <span class="material-symbols-outlined">visibility</span>
+                                            </button>
+                                        </div>
+                                        <div class="mt-2 pw-meter"><div id="bar" class="pw-bar"></div></div>
+                                        <div id="pwLabel" class="text-xs text-gray-500 mt-1">Mật khẩu: <span id="pwText" class="font-medium">—</span></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <button type="submit" class="mt-6 w-full rounded-lg bg-primary py-3 text-white font-bold shadow-sm hover:shadow-md transition">Tạo tài khoản</button>
+                                    <p class="text-xs text-gray-600 mt-4">Đã có tài khoản? <button type="button" id="jumpLogin" class="text-primary font-semibold">Đăng nhập</button></p>
+                                </div>
+                            </form>
+                        </section>
+
+                    </div>
+                </main>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- local JS -->
-  <script src="~/js/auth.js"></script>
+    <!-- local JS -->
+    <script src="~/js/auth.js"></script>
+
+    <!-- Script tự động ẩn thông báo -->
+    <script>
+        // Tự động ẩn thông báo sau 5 giây
+        setTimeout(() => {
+            const notifications = document.querySelectorAll('.fixed.top-4');
+            notifications.forEach(notification => {
+                notification.style.transition = 'opacity 0.5s ease';
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 500);
+            });
+        }, 5000);
+    </script>
 </body>
 </html>

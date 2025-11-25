@@ -1,0 +1,225 @@
+﻿@model WEBBANDIENTHOAI.Models.VerifyOTPModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi" class="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Xác minh OTP — FOXMOBILE</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/verify-otp.css" />
+</head>
+
+<body>
+    <!-- Thông báo Success/Error -->
+    @if (ViewBag.Success != null)
+    {
+        <div class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>@ViewBag.Success</span>
+            </div>
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>@TempData["Success"]</span>
+            </div>
+        </div>
+    }
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined">error</span>
+                <span>@ViewBag.Error</span>
+            </div>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined">error</span>
+                <span>@TempData["Error"]</span>
+            </div>
+        </div>
+    }
+
+    <div class="flex min-h-screen items-center justify-center p-6">
+        <div class="w-full max-w-4xl card rounded-2xl shadow-2xl blur-bg overflow-hidden">
+            <div class="md:flex">
+                <!-- LEFT INFO -->
+                <aside class="side-info md:w-1/2 p-8 bg-white/40 backdrop-blur-sm border-r border-white/40 relative">
+                    <div class="mb-6">
+                        <div class="inline-flex items-center gap-3 mb-3">
+                            <span class="material-symbols-outlined text-3xl text-primary">storefront</span>
+                            <h3 class="text-2xl font-bold">Fox Mobile</h3>
+                        </div>
+                        <p class="text-sm text-gray-700/80">Mua bán điện thoại, laptop, TV &amp; phụ kiện — an toàn, chuyên nghiệp.</p>
+                    </div>
+
+                    <div class="mt-6 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="rounded-full bg-primary/10 p-2"><span class="material-symbols-outlined text-primary">verified</span></div>
+                            <div>
+                                <div class="font-semibold">Xác minh OTP</div>
+                                <div class="text-sm text-gray-600/80">Nhập mã 6 số từ email</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="rounded-full bg-primary/10 p-2"><span class="material-symbols-outlined text-primary">schedule</span></div>
+                            <div>
+                                <div class="font-semibold">Mã có hiệu lực</div>
+                                <div class="text-sm text-gray-600/80">10 phút kể từ khi gửi</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="rounded-full bg-primary/10 p-2"><span class="material-symbols-outlined text-primary">security</span></div>
+                            <div>
+                                <div class="font-semibold">Bảo mật</div>
+                                <div class="text-sm text-gray-600/80">Giới hạn 5 lần nhập sai</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hiển thị số lần thử còn lại -->
+                    @if (ViewBag.AttemptsLeft != null)
+                    {
+                        <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-blue-600 text-sm">info</span>
+                                <span class="text-sm text-blue-700">Số lần thử còn lại: <strong>@ViewBag.AttemptsLeft/5</strong></span>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mt-auto text-xs text-gray-600/70 pt-4">© 2024 FOXMOBILE</div>
+
+                    
+                </aside>
+
+                <!-- RIGHT: VERIFY OTP -->
+                <main class="relative md:w-1/2 p-6 sm:p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-gray-900">Xác minh OTP</h1>
+                            <p class="text-sm text-gray-600/90">Nhập mã xác thực từ email: <strong>@Model.Email</strong></p>
+                        </div>
+
+                        <a href="@Url.Action("ForgotPassword", "Account")" class="px-4 py-2 rounded-md border border-gray-300 text-sm hover:bg-gray-50 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">arrow_back</span>
+                            Quay lại
+                        </a>
+                    </div>
+
+                    <div class="bg-white/60 backdrop-blur-sm rounded-xl p-6">
+                        <form asp-controller="Account" asp-action="VerifyOTP" method="post" id="verifyForm">
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" asp-for="Email" />
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium mb-2" asp-for="OTP">Mã OTP</label>
+                                <input asp-for="OTP" type="text" required maxlength="6"
+                                       class="w-full rounded-lg border border-gray-200 px-4 py-3 text-center text-xl font-mono focus:ring-2 focus:ring-primary/30"
+                                       placeholder="123456" />
+                                <span asp-validation-for="OTP" class="text-red-500 text-sm mt-1 block"></span>
+                                <p class="text-xs text-gray-500 mt-2">Nhập đúng 6 chữ số từ email</p>
+                            </div>
+
+                            <button type="submit" class="w-full rounded-lg bg-primary py-3 text-white font-bold shadow-sm hover:shadow-md transition mb-4">
+                                Xác minh OTP
+                            </button>
+
+                            <div class="text-center space-y-3">
+                                <p class="text-sm text-gray-600">
+                                    Không nhận được mã?
+                                    <!-- SỬA: Dùng button thay vì form lồng nhau -->
+                                    <button type="button" id="resendOtpButton" class="text-primary font-semibold hover:underline bg-transparent border-none p-0 cursor-pointer">
+                                        Gửi lại mã
+                                    </button>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script tự động ẩn thông báo -->
+    <script>
+        setTimeout(() => {
+            const notifications = document.querySelectorAll('.fixed.top-4');
+            notifications.forEach(notification => {
+                notification.style.transition = 'opacity 0.5s ease';
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 500);
+            });
+        }, 5000);
+
+        // Auto focus vào input OTP
+        document.getElementById('OTP')?.focus();
+
+        // Xử lý nút gửi lại mã bằng JavaScript
+        document.getElementById('resendOtpButton')?.addEventListener('click', function() {
+            const button = this;
+            const originalText = button.innerHTML;
+            const email = document.querySelector('input[name="Email"]').value;
+
+            // Vô hiệu hóa nút và hiển thị trạng thái loading
+            button.disabled = true;
+            button.innerHTML = 'Đang gửi...';
+
+            // Tạo form data
+            const formData = new FormData();
+            formData.append('email', email);
+
+            // Thêm anti-forgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+
+            // Gửi request POST
+            fetch('@Url.Action("ResendOTP", "Account")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.redirected) {
+                    // Nếu có redirect, chuyển hướng trang
+                    window.location.href = response.url;
+                } else {
+                    // Nếu không, tải lại trang để hiển thị thông báo
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi gửi lại mã. Vui lòng thử lại.');
+                button.disabled = false;
+                button.innerHTML = originalText;
+            });
+
+            // Tự động enable lại sau 5 giây (phòng trường hợp có lỗi)
+            setTimeout(() => {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

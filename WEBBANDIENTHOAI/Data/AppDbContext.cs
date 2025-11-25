@@ -4,42 +4,37 @@ using WEBBANDIENTHOAI.Models;
 
 namespace WEBBANDIENTHOAI.Data
 {
-    /// <summary>
-    /// AppDbContext - ánh xạ các bảng trong database.
-    /// Ghi chú: các class model (Product, Inventory, ExportReceipt, ImportReceipt, ...) phải có trong namespace WEBBANDIENTHOAI.Models.
-    /// Nếu thiếu model nào, bạn tạo model tương ứng theo schema SQL trước khi migrate / run.
-    /// </summary>
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         // Core entities (Users/Customers/Roles)
-        public DbSet<User> Users { get; set; }                 // (Users: Người dùng/nhân viên)
-        public DbSet<Role> Roles { get; set; }                 // (Roles: Quyền)
-        public DbSet<Customer> Customers { get; set; }         // (Customers: Khách hàng)
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
         // Catalog
-        public DbSet<Category> Categories { get; set; }        // (Categories: Danh mục)
-        public DbSet<ProductStatus> ProductStatuses { get; set; } // (ProductStatuses: Trạng thái sản phẩm)
-        public DbSet<Product> Products { get; set; }           // (Products: Sản phẩm)
-        public DbSet<ProductImage> ProductImages { get; set; } // (ProductImages: Ảnh sản phẩm)
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<ProductStatus> ProductStatuses { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductImage> ProductImages { get; set; }
 
         // Inventory / Warehouse
-        public DbSet<Inventory> Inventory { get; set; }        // (Inventory: Tồn kho) -- đặt tên Inventory để khớp controller cũ
-        public DbSet<Inventory> Inventories { get; set; }      // (Inventories: cùng entity - optional, tiện cho plural)
-        public DbSet<InventoryHistory> InventoryHistory { get; set; } // (InventoryHistory: Lịch sử tồn kho)
+        public DbSet<Inventory> Inventory { get; set; }
+        public DbSet<Inventory> Inventories { get; set; }
+        public DbSet<InventoryHistory> InventoryHistory { get; set; }
 
         // Import / Export receipts
-        public DbSet<ImportReceipt> ImportReceipts { get; set; }         // (ImportReceipts: Phiếu nhập)
-        public DbSet<ImportReceiptDetail> ImportReceiptDetails { get; set; } // (chi tiết nhập)
-        public DbSet<ExportReceipt> ExportReceipts { get; set; }         // (ExportReceipts: Phiếu xuất)
-        public DbSet<ExportReceiptDetail> ExportReceiptDetails { get; set; } // (chi tiết xuất)
+        public DbSet<ImportReceipt> ImportReceipts { get; set; }
+        public DbSet<ImportReceiptDetail> ImportReceiptDetails { get; set; }
+        public DbSet<ExportReceipt> ExportReceipts { get; set; }
+        public DbSet<ExportReceiptDetail> ExportReceiptDetails { get; set; }
 
         // Orders / Cart
-        public DbSet<Order> Orders { get; set; }               // (Orders: Đơn hàng)
-        public DbSet<OrderDetail> OrderDetails { get; set; }   // (OrderDetails: Chi tiết đơn)
-        public DbSet<Cart> Carts { get; set; }                 // (Carts: Giỏ hàng)
-        public DbSet<CartDetail> CartDetails { get; set; }     // (CartDetails)
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartDetail> CartDetails { get; set; }
 
         // Device configurations
         public DbSet<LaptopConfiguration> LaptopConfigurations { get; set; }
@@ -48,11 +43,15 @@ namespace WEBBANDIENTHOAI.Data
         // Audit / Logs
         public DbSet<AuditLog> AuditLogs { get; set; }
 
+        // 🔥 THÊM CÁC MODELS MỚI CHO FORGOT PASSWORD
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<OTPCode> OTPCodes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Map entity -> table names (theo script SQL bạn dùng)
+            // Map entity -> table names
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<Role>().ToTable("Roles");
             modelBuilder.Entity<Customer>().ToTable("Customers");
@@ -81,7 +80,11 @@ namespace WEBBANDIENTHOAI.Data
 
             modelBuilder.Entity<AuditLog>().ToTable("AuditLogs");
 
-            // 🔥 FIX QUAN HỆ Product ↔ ProductImage
+            // 🔥 THÊM CẤU HÌNH CHO CÁC TABLE MỚI
+            modelBuilder.Entity<PasswordResetToken>().ToTable("PasswordResetTokens");
+            modelBuilder.Entity<OTPCode>().ToTable("OTPCodes");
+
+            // 🔥 CẤU HÌNH QUAN HỆ Product ↔ ProductImage
             modelBuilder.Entity<Product>()
                 .HasMany(p => p.Images)
                 .WithOne(pi => pi.Product)
@@ -96,12 +99,35 @@ namespace WEBBANDIENTHOAI.Data
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Indexes / constraints you may want (ví dụ)
+            // 🔥 CẤU HÌNH CHO PASSWORD RESET TOKENS
+            modelBuilder.Entity<PasswordResetToken>(entity =>
+            {
+                entity.HasKey(prt => prt.TokenId);
+                entity.Property(prt => prt.Token).IsRequired().HasMaxLength(100);
+                entity.Property(prt => prt.Email).IsRequired().HasMaxLength(150);
+                entity.Property(prt => prt.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.HasIndex(prt => prt.Token).IsUnique();
+                entity.HasIndex(prt => prt.Email);
+            });
+
+            // 🔥 CẤU HÌNH CHO OTP CODES
+            modelBuilder.Entity<OTPCode>(entity =>
+            {
+                entity.HasKey(otp => otp.OTPId);
+                entity.Property(otp => otp.Code).IsRequired().HasMaxLength(6);
+                entity.Property(otp => otp.Email).IsRequired().HasMaxLength(150);
+                entity.Property(otp => otp.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.HasIndex(otp => new { otp.Email, otp.Code });
+                entity.HasIndex(otp => otp.CreatedAt);
+            });
+
+            // Indexes / constraints
             modelBuilder.Entity<Product>().HasIndex(p => p.SKU).IsUnique(false);
             modelBuilder.Entity<Inventory>().HasIndex(i => i.StockCode);
             modelBuilder.Entity<Order>().HasIndex(o => o.OrderDate);
+
+            // 🔥 THÊM INDEX CHO CUSTOMER EMAIL (quan trọng cho forgot password)
+            modelBuilder.Entity<Customer>().HasIndex(c => c.Email).IsUnique();
         }
-
-
     }
 }

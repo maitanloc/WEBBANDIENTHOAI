@@ -1,25 +1,36 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace WEBBANDIENTHOAI.Services
 {
-    // Hàm giúp hash mật khẩu tương thích với HASHBYTES('SHA2_256', ...)
     public static class PasswordHasher
     {
-        public static byte[] Hash(string plain)
+        public static byte[] Hash(string password)
         {
-            if (plain == null) plain = string.Empty;
-            using var sha = SHA256.Create();
-            return sha.ComputeHash(Encoding.UTF8.GetBytes(plain));
+            using (var sha256 = SHA256.Create())
+            {
+                return sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            }
         }
 
-        public static bool Verify(string plain, byte[] hash)
+        public static bool Verify(string password, byte[] passwordHash)
         {
-            var h = Hash(plain);
-            if (hash == null) return false;
-            if (h.Length != hash.Length) return false;
-            for (int i = 0; i < h.Length; i++)
-                if (h[i] != hash[i]) return false;
+            var hashedInput = Hash(password);
+            return CompareByteArrays(hashedInput, passwordHash);
+        }
+
+        private static bool CompareByteArrays(byte[] array1, byte[] array2)
+        {
+            if (array1.Length != array2.Length)
+                return false;
+
+            for (int i = 0; i < array1.Length; i++)
+            {
+                if (array1[i] != array2[i])
+                    return false;
+            }
+
             return true;
         }
     }

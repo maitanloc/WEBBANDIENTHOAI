@@ -6,7 +6,7 @@ namespace WEBBANDIENTHOAI.Models
     public class Customer
     {
         [Key]
-        public int CustomerId { get; set; } // CustomerId: Mã khách hàng
+        public int CustomerId { get; set; }
 
         [Required, MaxLength(150)]
         public string FullName { get; set; }
@@ -20,10 +20,14 @@ namespace WEBBANDIENTHOAI.Models
         [MaxLength(30)]
         public string Phone { get; set; }
 
+        [Required, MaxLength(12)]
+        public string CitizenID { get; set; }
+
         [MaxLength(300)]
         public string Address { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
         public bool IsActive { get; set; } = true;
     }
 }
