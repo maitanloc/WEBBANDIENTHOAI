@@ -1,0 +1,209 @@
+﻿@{
+    ViewData["Title"] = "Thanh toán";
+    Layout = "~/Views/Shared/_Layoutuser.cshtml";  // đổi lại đúng layout của bạn
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+<style type="text/tailwindcss">
+    .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+    }
+</style>
+
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#f27f0d",
+                    "background-light": "#f8f7f5",
+                    "background-dark": "#221910",
+                },
+                fontFamily: {
+                    "display": ["Inter", "sans-serif"]
+                },
+                borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+            },
+        },
+    }
+</script>
+
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+    <div class="layout-container flex h-full grow flex-col">
+
+        <main class="flex-1 w-full max-w-7xl mx-auto px-4 lg:px-10 py-8 lg:py-12">
+            <div class="flex flex-col lg:flex-row lg:space-x-12">
+
+                <!-- Left Column -->
+                <div class="w-full lg:w-3/5">
+
+                    <div class="flex flex-wrap gap-2 pb-6">
+                        <a class="text-primary/80 dark:text-primary/70 text-sm font-medium">Giỏ hàng</a>
+                        <span class="text-primary/80 dark:text-primary/70 text-sm font-medium">/</span>
+                        <span class="text-[#1c140d] dark:text-white text-sm font-medium">Thanh toán</span>
+                        <span class="text-gray-400 dark:text-gray-500 text-sm font-medium">/</span>
+                        <span class="text-gray-400 dark:text-gray-500 text-sm font-medium">Hoàn tất</span>
+                    </div>
+
+                    <div class="space-y-8">
+
+                        <!-- Contact Information -->
+                        <div>
+                            <h2 class="text-[#1c140d] dark:text-white text-[22px] font-bold pb-3">Thông tin liên hệ</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label class="flex flex-col">
+                                    <p class="text-[#1c140d] dark:text-gray-300 pb-2">Email</p>
+                                    <input type="email" class="form-input rounded-lg border bg-background-light dark:bg-gray-800 h-12 px-4"
+                                           value="@Model.Email" readonly />
+                                </label>
+
+                                <label class="flex flex-col">
+                                    <p class="text-[#1c140d] dark:text-gray-300 pb-2">Số điện thoại</p>
+                                    <input type="tel" class="form-input rounded-lg border bg-background-light dark:bg-gray-800 h-12 px-4"
+                                           value="@Model.Phone" placeholder="Nhập số điện thoại" />
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Information -->
+                        <div>
+                            <h2 class="text-[#1c140d] dark:text-white text-[22px] font-bold pb-3">Thông tin nhận hàng</h2>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label class="flex flex-col col-span-2">
+                                    <p class="text-[#1c140d] dark:text-gray-300 pb-2">Họ và tên người nhận</p>
+                                    <input type="text" class="form-input rounded-lg border bg-background-light dark:bg-gray-800 h-12 px-4"
+                                           value="@Model.FullName" placeholder="Nguyễn Văn A" />
+                                </label>
+
+                                <label class="flex flex-col col-span-2">
+                                    <p class="text-[#1c140d] dark:text-gray-300 pb-2">Địa chỉ </p>
+                                    <input type="text" class="form-input rounded-lg border bg-background-light dark:bg-gray-800 h-12 px-4"
+                                           value="@Model.Address" placeholder="Ví dụ: 123 Đường ABC" />
+                                </label>
+
+                                <label class="flex flex-col col-span-2">
+                                    <p class="text-[#1c140d] dark:text-gray-300 pb-2">Ghi chú</p>
+                                    <textarea class="form-textarea rounded-lg border bg-background-light dark:bg-gray-800 p-4"
+                                              placeholder="Ghi chú về đơn hàng..."></textarea>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div>
+                            <h2 class="text-[#1c140d] dark:text-white text-[22px] font-bold pb-3">Phương thức thanh toán</h2>
+
+                            <div class="space-y-3">
+                                <label class="flex items-center p-4 rounded-lg border-2 border-primary bg-primary/10 cursor-pointer">
+                                    <input type="radio" name="payment-method" checked class="form-radio h-5 w-5 text-primary" />
+                                    <span class="ml-4 flex-1">Thanh toán khi nhận hàng (COD)</span>
+                                    <span class="material-symbols-outlined text-2xl">local_shipping</span>
+                                </label>
+
+                                <label class="flex items-center p-4 rounded-lg border bg-background-light dark:bg-gray-800 cursor-pointer">
+                                    <input type="radio" name="payment-method" class="form-radio h-5 w-5 text-primary" />
+                                    <span class="ml-4 flex-1">Chuyển khoản qua ngân hàng (QR)</span>
+                                    <span class="material-symbols-outlined text-2xl">qr_code_2</span>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="w-full lg:w-2/5 mt-10 lg:mt-0">
+                    <div class="sticky top-28 space-y-6">
+
+                        <div class="border rounded-xl p-6 bg-white dark:bg-background-dark shadow-sm">
+                            <h2 class="text-xl font-bold mb-4">Tóm tắt đơn hàng</h2>
+
+                            <div class="space-y-4">
+                                <!-- Product item -->
+                                <div class="flex items-center space-x-4">
+                                    <div class="relative">
+                                        <img class="w-20 h-20 rounded-lg object-cover border"
+                                             src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcDTsj048E-Fc4bQuck02YOHNCfp20O1vqvX1UzilaGAIWRhK-HtysKYlj6FebcwQipMU01YjJulECTCbPWsGEGqz9D0V6MJomTs4Fmz_-BwodvpDFMYVJEYwHsP52ESuzGVZeUqqylALduthHefd5zZM2EGzwCpY3hSTe8U3HsIbcRP9-S6ComBCseG1-o96HloTIkzj80X_tJ8UDMZuyi30y98abXjDGtdwdG8LqYKVYMIWn7ixKtSbzHHSjinRa6pOmNBap8bs" />
+                                        <span class="absolute -top-2 -right-2 bg-primary text-white text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full">1</span>
+                                    </div>
+
+                                    <div class="flex-1">
+                                        <p class="font-semibold">iPhone 14 Pro Max - 256GB</p>
+                                        <p class="text-sm text-[#9c7349]">Màu: Tím Đậm</p>
+                                    </div>
+
+                                    <p class="font-semibold text-base">28.990.000₫</p>
+                                </div>
+
+                                <!-- Product 2 -->
+                                <div class="flex items-center space-x-4">
+                                    <div class="relative">
+                                        <img class="w-20 h-20 rounded-lg object-cover border"
+                                             src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHdP7MwNV4Rb0GBnEK6NEJbPxIzPAQSHHVYIW0RaM6ytBSbCZY1c497V-qerkSdUJkBEtU1E2YTn-DVYHMHPYaOMYDLB3CgeKyAsoCkEiJiXi_lTJ1BkB3JSSW2uV3hGEgQ4lO64AkVRc3VResg4uEnImBUzrXK-r9bzOTq3se5nA8WNa6pl20G57_URjFfI8Qr8tjgQDpLg8l2AyjROpa6tY7EfHSKrOzrmgN2H56ymOuLSOL2ooA9SKOsnBiRKiMHGn-DI4B51E" />
+                                        <span class="absolute -top-2 -right-2 bg-primary text-white text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full">1</span>
+                                    </div>
+
+                                    <div class="flex-1">
+                                        <p class="font-semibold">MacBook Pro 14" M2 Pro</p>
+                                        <p class="text-sm text-[#9c7349]">16GB – 512GB SSD</p>
+                                    </div>
+
+                                    <p class="font-semibold text-base">45.500.000₫</p>
+                                </div>
+
+                            </div>
+
+                            <div class="border-t my-5"></div>
+
+                            <div class="flex items-end gap-3">
+                                <label class="flex-1">
+                                    <p class="text-sm font-medium pb-2">Mã giảm giá</p>
+                                    <input type="text" class="form-input rounded-lg border bg-background-light dark:bg-gray-800 h-12 px-4" placeholder="Nhập mã giảm giá" />
+                                </label>
+                                <button class="bg-primary/20 text-primary font-semibold h-12 px-5 rounded-lg">Áp dụng</button>
+                            </div>
+
+                            <div class="border-t my-5"></div>
+
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <p class="text-[#9c7349]">Tạm tính</p>
+                                    <p class="font-medium">74.490.000₫</p>
+                                </div>
+
+                                <div class="flex justify-between items-center">
+                                    <p class="text-[#9c7349]">Phí vận chuyển</p>
+                                    <p class="font-medium">Miễn phí</p>
+                                </div>
+                            </div>
+
+                            <div class="border-t my-5"></div>
+
+                            <div class="flex justify-between items-center">
+                                <p class="text-lg font-semibold">Tổng cộng</p>
+                                <p class="text-2xl font-bold text-primary">74.490.000₫</p>
+                            </div>
+
+                        </div>
+
+                        <button class="w-full bg-primary text-white text-lg font-semibold rounded-lg h-14 shadow-lg">
+                            Hoàn tất đơn hàng
+                        </button>
+
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+</div>

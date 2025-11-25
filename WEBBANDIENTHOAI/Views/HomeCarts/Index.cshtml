@@ -115,7 +115,9 @@
                             <p class="font-medium text-gray-800 dark:text-gray-200">@Model.GrandTotal.ToString("N0")₫</p>
                         </div>
 
-                        <a href="/Checkout" class="flex w-full h-12 items-center justify-center bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105 gap-2">
+                        <a asp-controller="ThanhToan"
+                           asp-action="Index"
+                           class="flex w-full h-12 items-center justify-center bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105 gap-2">
                             <span>Tiến hành thanh toán</span>
                             <i class="fas fa-arrow-right text-sm"></i>
                         </a>
