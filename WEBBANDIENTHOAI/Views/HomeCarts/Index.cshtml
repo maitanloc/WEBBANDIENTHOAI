@@ -104,15 +104,19 @@
                         <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">Tóm tắt đơn hàng</h2>
 
                         <div class="flex items-center justify-between">
-                            <p class="text-gray-600 dark:text-gray-400">Tạm tính (@Model.TotalItems sản phẩm)</p>
-                            <p class="font-bold text-2xl text-primary">@Model.GrandTotal.ToString("N0")₫</p>
+                            <p class="text-gray-600 dark:text-gray-400">Tạm tính</p>
+                            <p id="subtotal-price" class="font-bold text-2xl text-primary">
+                                @Model.GrandTotal.ToString("N0")₫
+                            </p>
                         </div>
 
                         <div class="border-t border-dashed border-gray-300 dark:border-gray-600"></div>
 
                         <div class="flex items-center justify-between">
                             <p class="text-lg text-gray-600 dark:text-gray-400">Tổng cộng</p>
-                            <p class="font-medium text-gray-800 dark:text-gray-200">@Model.GrandTotal.ToString("N0")₫</p>
+                            <p id="total-price" class="font-medium text-gray-800 dark:text-gray-200">
+                                @Model.GrandTotal.ToString("N0")₫
+                            </p>
                         </div>
 
                         <a asp-controller="ThanhToan"
@@ -174,19 +178,54 @@
             });
         }
 
-        // Xử lý chọn tất cả
         const selectAllCheckbox = document.getElementById("select-all");
-        const itemCheckboxes = document.querySelectorAll(".item-checkbox");
 
-        selectAllCheckbox?.addEventListener("change", function () {
-            itemCheckboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+        // Format tiền
+        function formatMoney(amount) {
+            return amount.toLocaleString("vi-VN") + "₫";
+        }
+
+        // Tính tổng
+        function updateTotal() {
+            let subtotal = 0;
+            const items = document.querySelectorAll(".cart-item");
+
+            items.forEach(item => {
+                const cb = item.querySelector(".item-checkbox");
+                if (cb.checked) {
+                    const price = parseFloat(item.dataset.price);
+                    const quantity = parseInt(item.dataset.quantity);
+                    subtotal += price * quantity;
+                }
+            });
+
+            // Nếu 0 sản phẩm được check → tổng = 0
+            document.getElementById("subtotal-price").textContent = formatMoney(subtotal);
+            document.getElementById("total-price").textContent = formatMoney(subtotal);
+        }
+
+        // Khi trang load lên
+        window.addEventListener("DOMContentLoaded", function () {
+            const itemCheckboxes = document.querySelectorAll(".item-checkbox");
+
+            if (itemCheckboxes.length > 0) {
+                // ⭐ Luôn check sản phẩm đầu tiên
+                itemCheckboxes.forEach(cb => cb.checked = false);
+                itemCheckboxes[0].checked = true;
+            }
+
+            updateTotal();
         });
 
-        itemCheckboxes.forEach(cb => {
-            cb.addEventListener("change", function () {
+        // Event cho các checkbox item
+        document.addEventListener("change", function (e) {
+            if (e.target.classList.contains("item-checkbox")) {
+                const itemCheckboxes = document.querySelectorAll(".item-checkbox");
+
                 const allChecked = Array.from(itemCheckboxes).every(x => x.checked);
                 const noneChecked = Array.from(itemCheckboxes).every(x => !x.checked);
 
+                // Cập nhật trạng thái ô "chọn tất cả"
                 if (allChecked) {
                     selectAllCheckbox.checked = true;
                     selectAllCheckbox.indeterminate = false;
@@ -199,40 +238,16 @@
                     selectAllCheckbox.checked = false;
                     selectAllCheckbox.indeterminate = true;
                 }
-            });
+
+                updateTotal();
+            }
         });
 
-        // Tính tổng tiền khi chọn/bỏ chọn sản phẩm
-        function formatMoney(amount) {
-            return amount.toLocaleString("vi-VN") + "₫";
-        }
-
-        function updateTotal() {
-            let subtotal = 0;
-
-            document.querySelectorAll(".cart-item").forEach((item, index) => {
-                const checkbox = item.querySelector(".item-checkbox");
-
-                if (checkbox.checked) {
-                    const price = parseFloat(item.dataset.price);
-                    const quantity = parseInt(item.dataset.quantity);
-                    subtotal += price * quantity;
-                }
-            });
-
-            document.getElementById("subtotal-price").textContent = formatMoney(subtotal);
-            document.getElementById("total-price").textContent = formatMoney(subtotal);
-        }
-
-        // Khi load trang → tính tổng ngay
-        window.addEventListener("DOMContentLoaded", updateTotal);
-
-        // Khi tick / bỏ tick sản phẩm
-        document.querySelectorAll(".item-checkbox").forEach(cb => {
-            cb.addEventListener("change", updateTotal);
+        // Nút chọn tất cả
+        selectAllCheckbox?.addEventListener("change", function () {
+            const itemCheckboxes = document.querySelectorAll(".item-checkbox");
+            itemCheckboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
+            updateTotal();
         });
-
-        // Khi click chọn tất cả
-        document.getElementById("select-all")?.addEventListener("change", updateTotal);
     </script>
 }
