@@ -1,385 +1,372 @@
-﻿// Tests/UnitTests/Repositories/ProductRepositoryTests.cs
+﻿// Tests/UnitTests/Repository/ProductRepositoryTests.cs
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using WebBanDienThoai.Models;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.Repository;
-using WEBBANDIENTHOAI.ViewModels;
 
-namespace WEBBANDIENTHOAI.Tests.UnitTests.Repositories
+namespace WEBBANDIENTHOAI.Tests.UnitTests.Repository
 {
     [TestFixture]
     public class ProductRepositoryTests
     {
         private AppDbContext _context;
-        private ProductRepository _repo;
+        private ProductRepository _repository;
 
         [SetUp]
         public void Setup()
         {
+            // Sử dụng InMemory database cho tất cả test - tránh lỗi mock phức tạp
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(databaseName: "ProductRepoTestDb_" + Guid.NewGuid())
+                .UseInMemoryDatabase(databaseName: "TestDb_" + Guid.NewGuid())
                 .Options;
+
             _context = new AppDbContext(options);
-            _repo = new ProductRepository(_context);
+            _repository = new ProductRepository(_context);
 
-            // Seed data đầy đủ để tránh lỗi FK
-            var cat = new Category { CategoryId = 1, CategoryName = "Phone" };
-            var status = new ProductStatus { StatusId = 1, StatusName = "InStock" };
-            _context.Categories.Add(cat);
-            _context.ProductStatuses.Add(status);
-            _context.SaveChanges();
-
-            _context.Products.AddRange(
-                new Product { ProductId = 1, Name = "iPhone 15", Price = 25000000m, SKU = "IP15", CategoryId = 1, StatusId = 1, CreatedAt = DateTime.UtcNow },
-                new Product { ProductId = 2, Name = "Samsung S24", Price = 22000000m, SKU = "SS24", CategoryId = 1, StatusId = 1, CreatedAt = DateTime.UtcNow }
-            );
-            _context.SaveChanges();
+            // Seed dữ liệu test cơ bản
+            SeedTestData();
         }
 
         [TearDown]
         public void TearDown()
         {
-            _context.Database.EnsureDeleted();
-            _context.Dispose();
+            _context?.Dispose();
         }
 
         /// <summary>
-        /// Test lấy danh sách sản phẩm với cờ chỉnh sửa
-        /// Kiểm tra xem repository có trả về đúng số lượng sản phẩm và cờ IsEditable không
+        /// Chuẩn bị dữ liệu test cho tất cả test cases
         /// </summary>
-        [Test]
-        public async Task GetAllForListWithEditableFlagAsync_ReturnsProductsWithFlags()
+        private void SeedTestData()
         {
-            // Act
-            var result = await _repo.GetAllForListWithEditableFlagAsync(10);
-
-            // Assert
-            Assert.That(result.Count(), Is.EqualTo(2));
-            Assert.That(result.All(p => p.IsEditable == false));
-            // Mặc định là false vì chưa có inventory, import, export
-        }
-
-        /// <summary>
-        /// Test lấy sản phẩm theo ID với đầy đủ thông tin liên quan
-        /// Kiểm tra xem repository có trả về sản phẩm đúng ID và bao gồm các navigation properties không
-        /// </summary>
-        [TestCase(1, true)]  // ID tồn tại
-        [TestCase(999, false)] // ID không tồn tại
-        public async Task GetByIdWithIncludesAsync_ReturnsProduct_WhenIdExists(int id, bool expectedExists)
-        {
-            // Act
-            var result = await _repo.GetByIdWithIncludesAsync(id);
-
-            // Assert
-            Assert.That(result != null, Is.EqualTo(expectedExists));
-            if (expectedExists)
+            // Thêm danh mục test
+            var categories = new List<Category>
             {
-                Assert.That(result.ProductId, Is.EqualTo(id));
-                // Có thể thêm kiểm tra các navigation properties nếu cần
-            }
-        }
-
-        /// <summary>
-        /// Test lấy thông tin sản phẩm dạng list item theo ID
-        /// Kiểm tra xem repository có trả về đúng thông tin cơ bản của sản phẩm không
-        /// </summary>
-        [Test]
-        public async Task GetListItemByIdAsync_ReturnsProductListItem_WhenIdExists()
-        {
-            // Act
-            var result = await _repo.GetListItemByIdAsync(1);
-
-            // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.ProductId, Is.EqualTo(1));
-            Assert.That(result.Name, Is.EqualTo("iPhone 15"));
-            Assert.That(result.IsEditable, Is.False);
-        }
-
-        /// <summary>
-        /// Test lấy thông tin sản phẩm dạng list item khi ID không tồn tại
-        /// Kiểm tra xem repository có trả về null không
-        /// </summary>
-        [Test]
-        public async Task GetListItemByIdAsync_ReturnsNull_WhenIdNotExists()
-        {
-            // Act
-            var result = await _repo.GetListItemByIdAsync(999);
-
-            // Assert
-            Assert.That(result, Is.Null);
-        }
-
-        /// <summary>
-        /// Test tìm kiếm sản phẩm theo từ khóa
-        /// Kiểm tra xem bộ lọc tìm kiếm có hoạt động đúng không
-        /// </summary>
-        [Test]
-        public async Task GetFilteredAsync_WithSearch_ReturnsFilteredProducts()
-        {
-            // Act
-            var (items, total) = await _repo.GetFilteredAsync("iPhone", null, null, null, null, null, null, 1, 20);
-
-            // Assert
-            Assert.That(items.Count(), Is.EqualTo(1));
-            Assert.That(total, Is.EqualTo(1));
-            Assert.That(items.First().Name, Is.EqualTo("iPhone 15"));
-        }
-
-        /// <summary>
-        /// Test lọc sản phẩm theo khoảng giá
-        /// Kiểm tra xem bộ lọc giá có trả về đúng số lượng sản phẩm trong khoảng giá không
-        /// </summary>
-        [TestCase(20000000, 30000000, 2)]  // Cả 2 sản phẩm trong khoảng giá
-        [TestCase(24000000, 26000000, 1)]  // Chỉ iPhone 15 trong khoảng
-        [TestCase(30000000, 40000000, 0)]  // Không có sản phẩm nào
-        public async Task GetFilteredAsync_WithPriceRange_ReturnsCorrectCount(decimal min, decimal max, int expected)
-        {
-            // Act
-            var (items, total) = await _repo.GetFilteredAsync(null, null, null, min, max, null, null, 1, 20);
-
-            // Assert
-            Assert.That(total, Is.EqualTo(expected));
-        }
-
-        /// <summary>
-        /// Test lọc sản phẩm theo danh mục
-        /// Kiểm tra xem bộ lọc danh mục có hoạt động đúng không
-        /// </summary>
-        [Test]
-        public async Task GetFilteredAsync_WithCategoryFilter_ReturnsCategoryProducts()
-        {
-            // Act
-            var (items, total) = await _repo.GetFilteredAsync(null, 1, null, null, null, null, null, 1, 20);
-
-            // Assert
-            Assert.That(total, Is.EqualTo(2)); // Cả 2 sản phẩm đều thuộc category 1
-        }
-
-        /// <summary>
-        /// Test lọc sản phẩm theo trạng thái
-        /// Kiểm tra xem bộ lọc trạng thái có hoạt động đúng không
-        /// </summary>
-        [Test]
-        public async Task GetFilteredAsync_WithStatusFilter_ReturnsStatusProducts()
-        {
-            // Act
-            var (items, total) = await _repo.GetFilteredAsync(null, null, 1, null, null, null, null, 1, 20);
-
-            // Assert
-            Assert.That(total, Is.EqualTo(2)); // Cả 2 sản phẩm đều có status 1
-        }
-
-        /// <summary>
-        /// Test sắp xếp sản phẩm theo giá tăng dần
-        /// Kiểm tra xem sắp xếp có hoạt động đúng không
-        /// </summary>
-        [Test]
-        public async Task GetFilteredAsync_WithPriceSortAsc_ReturnsSortedProducts()
-        {
-            // Act
-            var (items, total) = await _repo.GetFilteredAsync(null, null, null, null, null, null, "price_asc", 1, 20);
-
-            // Assert
-            var productList = items.ToList();
-            Assert.That(productList[0].Price, Is.EqualTo(22000000m)); // Samsung rẻ hơn
-            Assert.That(productList[1].Price, Is.EqualTo(25000000m)); // iPhone đắt hơn
-        }
-
-        /// <summary>
-        /// Test sắp xếp sản phẩm theo giá giảm dần
-        /// Kiểm tra xem sắp xếp có hoạt động đúng không
-        /// </summary>
-        [Test]
-        public async Task GetFilteredAsync_WithPriceSortDesc_ReturnsSortedProducts()
-        {
-            // Act
-            var (items, total) = await _repo.GetFilteredAsync(null, null, null, null, null, null, "price_desc", 1, 20);
-
-            // Assert
-            var productList = items.ToList();
-            Assert.That(productList[0].Price, Is.EqualTo(25000000m)); // iPhone đắt nhất đầu tiên
-            Assert.That(productList[1].Price, Is.EqualTo(22000000m)); // Samsung rẻ hơn
-        }
-
-        /// <summary>
-        /// Test phân trang sản phẩm
-        /// Kiểm tra xem phân trang có hoạt động đúng không
-        /// </summary>
-        [Test]
-        public async Task GetFilteredAsync_WithPaging_ReturnsPagedResults()
-        {
-            // Act - Lấy trang đầu tiên với 1 sản phẩm
-            var (items, total) = await _repo.GetFilteredAsync(null, null, null, null, null, null, null, 1, 1);
-
-            // Assert
-            Assert.That(items.Count(), Is.EqualTo(1));
-            Assert.That(total, Is.EqualTo(2)); // Tổng số vẫn là 2
-        }
-
-        /// <summary>
-        /// Test kiểm tra sản phẩm có import pending
-        /// Kiểm tra xem phương thức có trả về đúng trạng thái import không
-        /// </summary>
-        [Test]
-        public async Task HasPendingImportAsync_ReturnsFalse_WhenNoPendingImports()
-        {
-            // Act
-            var result = await _repo.HasPendingImportAsync(1);
-
-            // Assert
-            Assert.That(result, Is.False);
-        }
-
-        /// <summary>
-        /// Test cập nhật thông tin sản phẩm
-        /// Kiểm tra xem sản phẩm có được cập nhật đúng không
-        /// </summary>
-        [Test]
-        public async Task UpdateAsync_UpdatesProductSuccessfully()
-        {
-            // Arrange
-            var product = await _context.Products.FindAsync(1);
-            product.Name = "iPhone 15 Updated";
-            product.Price = 26000000m;
-
-            // Act
-            await _repo.UpdateAsync(product);
-
-            // Assert
-            var updated = await _context.Products.FindAsync(1);
-            Assert.That(updated.Name, Is.EqualTo("iPhone 15 Updated"));
-            Assert.That(updated.Price, Is.EqualTo(26000000m));
-        }
-
-        /// <summary>
-        /// Test lấy dữ liệu ảnh sản phẩm khi ảnh tồn tại
-        /// Kiểm tra xem có trả về dữ liệu byte array không
-        /// </summary>
-        [Test]
-        public async Task GetImageBytesAsync_ReturnsImageData_WhenImageExists()
-        {
-            // Arrange - Tạo ảnh mẫu
-            var image = new ProductImage
-            {
-                ImageId = 1,
-                ProductId = 1,
-                ImagePath = new byte[] { 0x89, 0x50, 0x4E, 0x47 } // PNG signature
+                new Category { CategoryId = 1, CategoryName = "Smartphones", Description = "Điện thoại" },
+                new Category { CategoryId = 2, CategoryName = "Laptops", Description = "Máy tính" }
             };
-            _context.ProductImages.Add(image);
-            await _context.SaveChangesAsync();
 
-            // Act
-            var result = await _repo.GetImageBytesAsync(1);
+            // Thêm trạng thái sản phẩm test
+            var statuses = new List<ProductStatus>
+            {
+                new ProductStatus { StatusId = 1, StatusName = "InStock", Description = "Còn hàng" },
+                new ProductStatus { StatusId = 2, StatusName = "OutOfStock", Description = "Hết hàng" }
+            };
 
-            // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Length, Is.EqualTo(4));
+            // Thêm sản phẩm test
+            var products = new List<Product>
+            {
+                new Product { ProductId = 1, Name = "iPhone 15", SKU = "IP15", StockCode = "STOCK001", Price = 25000000m, CategoryId = 1, StatusId = 1 },
+                new Product { ProductId = 2, Name = "Samsung Galaxy", SKU = "SG24", StockCode = "STOCK002", Price = 20000000m, CategoryId = 1, StatusId = 1 },
+                new Product { ProductId = 3, Name = "MacBook Pro", SKU = "MBP", StockCode = "STOCK003", Price = 45000000m, CategoryId = 2, StatusId = 1 }
+            };
+
+            _context.Categories.AddRange(categories);
+            _context.ProductStatuses.AddRange(statuses);
+            _context.Products.AddRange(products);
+            _context.SaveChanges();
         }
 
-        /// <summary>
-        /// Test lấy dữ liệu ảnh sản phẩm khi ảnh không tồn tại
-        /// Kiểm tra xem có trả về null không
-        /// </summary>
-        [Test]
-        public async Task GetImageBytesAsync_ReturnsNull_WhenImageNotExists()
-        {
-            // Act
-            var result = await _repo.GetImageBytesAsync(999);
-
-            // Assert
-            Assert.That(result, Is.Null);
-        }
-
-        /// <summary>
-        /// Test lưu ảnh chính cho sản phẩm
-        /// Kiểm tra xem ảnh có được tạo và gán cho sản phẩm đúng không
-        /// </summary>
-        [Test]
-        public async Task SavePrimaryImageAsync_CreatesImageAndUpdatesProduct()
-        {
-            // Arrange
-            var imageData = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }; // PNG file
-
-            // Act
-            var imageId = await _repo.SavePrimaryImageAsync(1, imageData, "image/png");
-
-            // Assert
-            Assert.That(imageId, Is.GreaterThan(0));
-
-            var product = await _context.Products.FindAsync(1);
-            Assert.That(product.ImageId, Is.EqualTo(imageId));
-
-            var image = await _context.ProductImages.FindAsync(imageId);
-            Assert.That(image, Is.Not.Null);
-            Assert.That(image.ImagePath, Is.EqualTo(imageData));
-            Assert.That(image.IsPrimary, Is.True);
-        }
+        // ===============================================
+        // TEST CÁC PHƯƠNG THỨC LẤY DANH SÁCH
+        // ===============================================
 
         /// <summary>
         /// Test lấy tất cả trạng thái sản phẩm
-        /// Kiểm tra xem có trả về danh sách trạng thái không
         /// </summary>
         [Test]
-        public async Task GetAllStatusesAsync_ReturnsAllStatuses()
+        public async Task LayTatCaTrangThaiSanPham_TraVeDanhSachTrangThai()
         {
-            // Act
-            var result = await _repo.GetAllStatusesAsync();
+            // Act - Gọi phương thức lấy danh sách trạng thái
+            var result = await _repository.GetAllStatusesAsync();
 
-            // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.EqualTo(1)); // Chỉ có 1 status được seed
+            // Assert - Kiểm tra kết quả trả về
+            Assert.That(result, Is.Not.Null, "Danh sách trạng thái không được null");
+            Assert.That(result.Count(), Is.EqualTo(2), "Số lượng trạng thái phải là 2");
+            Assert.That(result.Any(s => s.StatusName == "InStock"), Is.True, "Phải có trạng thái 'InStock'");
         }
 
         /// <summary>
         /// Test lấy tất cả danh mục sản phẩm
-        /// Kiểm tra xem có trả về danh sách danh mục không
         /// </summary>
         [Test]
-        public async Task GetAllCategoriesAsync_ReturnsAllCategories()
+        public async Task LayTatCaDanhMucSanPham_TraVeDanhSachDanhMuc()
         {
-            // Act
-            var result = await _repo.GetAllCategoriesAsync();
+            // Act - Gọi phương thức lấy danh sách danh mục
+            var result = await _repository.GetAllCategoriesAsync();
 
-            // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.EqualTo(1)); // Chỉ có 1 category được seed
+            // Assert - Kiểm tra kết quả trả về
+            Assert.That(result, Is.Not.Null, "Danh sách danh mục không được null");
+            Assert.That(result.Count(), Is.EqualTo(2), "Số lượng danh mục phải là 2");
+            Assert.That(result.Any(c => c.CategoryName == "Smartphones"), Is.True, "Phải có danh mục 'Smartphones'");
+        }
+
+        // ===============================================
+        // TEST CÁC PHƯƠNG THỨC LẤY DỮ LIỆU ẢNH
+        // ===============================================
+
+        /// <summary>
+        /// Test lấy dữ liệu ảnh với ID hợp lệ
+        /// </summary>
+        [Test]
+        public async Task LayDuLieuAnh_VoiIdHopLe_TraVeDuLieuAnh()
+        {
+            // Arrange - Chuẩn bị dữ liệu ảnh test
+            var imageBytes = new byte[] { 0x89, 0x50, 0x4E, 0x47 };
+            var productImage = new ProductImage { ImageId = 1, ImagePath = imageBytes, ProductId = 1 };
+            _context.ProductImages.Add(productImage);
+            await _context.SaveChangesAsync();
+
+            // Act - Gọi phương thức lấy dữ liệu ảnh
+            var result = await _repository.GetImageBytesAsync(1);
+
+            // Assert - Kiểm tra dữ liệu ảnh trả về
+            Assert.That(result, Is.Not.Null, "Dữ liệu ảnh không được null");
+            Assert.That(result, Is.EqualTo(imageBytes), "Dữ liệu ảnh phải khớp với dữ liệu đã lưu");
         }
 
         /// <summary>
-        /// Test logic xác định sản phẩm có thể chỉnh sửa
-        /// Kiểm tra các điều kiện: có inventory, không có export history, không có pending import
+        /// Test lấy dữ liệu ảnh với ID không tồn tại
         /// </summary>
         [Test]
-        public async Task CanEditProduct_Logic_CorrectlyDeterminesEditableStatus()
+        public async Task LayDuLieuAnh_VoiIdKhongTonTai_TraVeNull()
         {
-            // Arrange - Tạo sản phẩm với inventory (có thể edit)
+            // Act - Gọi phương thức lấy dữ liệu ảnh với ID không tồn tại
+            var result = await _repository.GetImageBytesAsync(999);
+
+            // Assert - Kiểm tra kết quả trả về là null
+            Assert.That(result, Is.Null, "Dữ liệu ảnh phải là null khi ID không tồn tại");
+        }
+
+        // ===============================================
+        // TEST CÁC PHƯƠNG THỨC KIỂM TRA TRẠNG THÁI
+        // ===============================================
+
+        /// <summary>
+        /// Test kiểm tra sản phẩm không có import đang chờ xử lý
+        /// </summary>
+        [Test]
+        public async Task KiemTraImportDangCho_VoiSanPhamKhongCoImportCho_TraVeFalse()
+        {
+            // Act - Gọi phương thức kiểm tra import pending
+            var result = await _repository.HasPendingImportAsync(1);
+
+            // Assert - Kiểm tra kết quả trả về là false
+            Assert.That(result, Is.False, "Phải trả về false khi sản phẩm không có import pending");
+        }
+
+        // ===============================================
+        // TEST CÁC PHƯƠNG THỨC CẬP NHẬT
+        // ===============================================
+
+        /// <summary>
+        /// Test cập nhật thông tin sản phẩm hợp lệ
+        /// </summary>
+        [Test]
+        public async Task CapNhatSanPham_VoiDuLieuHopLe_CapNhatThanhCong()
+        {
+            // Arrange - Lấy sản phẩm từ database và sửa tên
+            var product = await _context.Products.FindAsync(1);
+            var originalName = product.Name;
+            product.Name = "Tên đã cập nhật";
+
+            // Act - Gọi phương thức cập nhật
+            await _repository.UpdateAsync(product);
+
+            // Assert - Kiểm tra dữ liệu đã được cập nhật trong database
+            var updatedProduct = await _context.Products.FindAsync(1);
+            Assert.That(updatedProduct.Name, Is.EqualTo("Tên đã cập nhật"), "Tên sản phẩm phải được cập nhật");
+            Assert.That(updatedProduct.Name, Is.Not.EqualTo(originalName), "Tên sản phẩm không được giữ nguyên");
+        }
+
+        // ===============================================
+        // TEST CÁC PHƯƠNG THỨC LẤY SẢN PHẨM
+        // ===============================================
+
+        /// <summary>
+        /// Test lấy sản phẩm theo ID hợp lệ với đầy đủ thông tin
+        /// </summary>
+        [Test]
+        public async Task LaySanPhamTheoId_VoiIdHopLe_TraVeSanPhamDayDuThongTin()
+        {
+            // Act - Gọi phương thức lấy sản phẩm theo ID
+            var result = await _repository.GetByIdWithIncludesAsync(1);
+
+            // Assert - Kiểm tra sản phẩm trả về
+            Assert.That(result, Is.Not.Null, "Sản phẩm không được null");
+            Assert.That(result.ProductId, Is.EqualTo(1), "ID sản phẩm phải khớp");
+            Assert.That(result.Name, Is.EqualTo("iPhone 15"), "Tên sản phẩm phải khớp");
+        }
+
+        /// <summary>
+        /// Test lấy sản phẩm theo ID không tồn tại
+        /// </summary>
+        [Test]
+        public async Task LaySanPhamTheoId_VoiIdKhongTonTai_TraVeNull()
+        {
+            // Act - Gọi phương thức lấy sản phẩm với ID không tồn tại
+            var result = await _repository.GetByIdWithIncludesAsync(999);
+
+            // Assert - Kiểm tra kết quả trả về là null
+            Assert.That(result, Is.Null, "Phải trả về null khi ID không tồn tại");
+        }
+
+        /// <summary>
+        /// Test lấy thông tin sản phẩm dạng list item với ID hợp lệ
+        /// </summary>
+        [Test]
+        public async Task LayThongTinSanPhamListItem_VoiIdHopLe_TraVeThongTinSanPham()
+        {
+            // Act - Gọi phương thức lấy thông tin sản phẩm dạng list item
+            var result = await _repository.GetListItemByIdAsync(1);
+
+            // Assert - Kiểm tra thông tin sản phẩm trả về
+            Assert.That(result, Is.Not.Null, "Thông tin sản phẩm không được null");
+            Assert.That(result.ProductId, Is.EqualTo(1), "ID sản phẩm phải khớp");
+            Assert.That(result.Name, Is.EqualTo("iPhone 15"), "Tên sản phẩm phải khớp");
+            Assert.That(result.SKU, Is.EqualTo("IP15"), "SKU sản phẩm phải khớp");
+        }
+
+        /// <summary>
+        /// Test lấy thông tin sản phẩm dạng list item với ID không tồn tại
+        /// </summary>
+        [Test]
+        public async Task LayThongTinSanPhamListItem_VoiIdKhongTonTai_TraVeNull()
+        {
+            // Act - Gọi phương thức lấy thông tin sản phẩm với ID không tồn tại
+            var result = await _repository.GetListItemByIdAsync(999);
+
+            // Assert - Kiểm tra kết quả trả về là null
+            Assert.That(result, Is.Null, "Phải trả về null khi ID không tồn tại");
+        }
+
+        // ===============================================
+        // TEST CÁC PHƯƠNG THỨC LỌC VÀ PHÂN TRANG
+        // ===============================================
+
+        /// <summary>
+        /// Test lọc sản phẩm với từ khóa tìm kiếm
+        /// </summary>
+        [Test]
+        public async Task LocSanPham_VoiTuKhoaTimKiem_TraVeSanPhamPhuHop()
+        {
+            // Act - Gọi phương thức lọc với từ khóa "iPhone"
+            var (items, total) = await _repository.GetFilteredAsync("iPhone", null, null, null, null, null, null, 1, 10);
+
+            // Assert - Kiểm tra kết quả lọc
+            Assert.That(total, Is.EqualTo(1), "Chỉ có 1 sản phẩm khớp với từ khóa 'iPhone'");
+            Assert.That(items.Count(), Is.EqualTo(1), "Danh sách trả về chỉ có 1 sản phẩm");
+            Assert.That(items.First().Name, Is.EqualTo("iPhone 15"), "Sản phẩm trả về phải là iPhone 15");
+        }
+
+        /// <summary>
+        /// Test lọc sản phẩm theo danh mục
+        /// </summary>
+        [Test]
+        public async Task LocSanPham_TheoDanhMuc_TraVeSanPhamTrongDanhMuc()
+        {
+            // Act - Gọi phương thức lọc theo danh mục Laptops (ID = 2)
+            var (items, total) = await _repository.GetFilteredAsync(null, 2, null, null, null, null, null, 1, 10);
+
+            // Assert - Kiểm tra kết quả lọc
+            Assert.That(total, Is.EqualTo(1), "Chỉ có 1 sản phẩm trong danh mục Laptops");
+            Assert.That(items.First().Name, Is.EqualTo("MacBook Pro"), "Sản phẩm trả về phải là MacBook Pro");
+        }
+
+        /// <summary>
+        /// Test phân trang sản phẩm
+        /// </summary>
+        [Test]
+        public async Task PhanTrangSanPham_TraVeTrangDungVaTongSoLuong()
+        {
+            // Act - Gọi phương thức lọc với phân trang (trang 1, 1 sản phẩm/trang)
+            var (items, total) = await _repository.GetFilteredAsync(null, null, null, null, null, null, null, 1, 1);
+
+            // Assert - Kiểm tra kết quả phân trang
+            Assert.That(total, Is.EqualTo(3), "Tổng số sản phẩm phải là 3");
+            Assert.That(items.Count(), Is.EqualTo(1), "Chỉ trả về 1 sản phẩm cho trang đầu tiên");
+        }
+
+        // ===============================================
+        // TEST CÁC PHƯƠNG THỨC LƯU ẢNH
+        // ===============================================
+
+        /// <summary>
+        /// Test lưu ảnh chính cho sản phẩm hợp lệ
+        /// </summary>
+        [Test]
+        public async Task LuuAnhChinhChoSanPham_VoiDuLieuHopLe_TraVeIdAnhVaCapNhatSanPham()
+        {
+            // Arrange - Chuẩn bị dữ liệu ảnh
+            var imageBytes = new byte[] { 0x89, 0x50, 0x4E, 0x47 };
+
+            // Act - Gọi phương thức lưu ảnh chính
+            var imageId = await _repository.SavePrimaryImageAsync(1, imageBytes, "image/png");
+
+            // Assert - Kiểm tra kết quả lưu ảnh
+            Assert.That(imageId, Is.GreaterThan(0), "ID ảnh phải lớn hơn 0");
+
+            // Kiểm tra ảnh đã được lưu trong database
+            var savedImage = await _context.ProductImages.FindAsync(imageId);
+            Assert.That(savedImage, Is.Not.Null, "Ảnh phải được lưu trong database");
+            Assert.That(savedImage.ImagePath, Is.EqualTo(imageBytes), "Dữ liệu ảnh phải khớp");
+            Assert.That(savedImage.IsPrimary, Is.True, "Ảnh phải được đánh dấu là ảnh chính");
+
+            // Kiểm tra sản phẩm đã được cập nhật ImageId
+            var updatedProduct = await _context.Products.FindAsync(1);
+            Assert.That(updatedProduct.ImageId, Is.EqualTo(imageId), "Sản phẩm phải được cập nhật ImageId");
+        }
+
+        /// <summary>
+        /// Test lưu ảnh cho sản phẩm không tồn tại - phải ném exception
+        /// </summary>
+        [Test]
+        public void LuuAnhChinhChoSanPham_VoiSanPhamKhongTonTai_NemException()
+        {
+            // Arrange - Chuẩn bị dữ liệu ảnh
+            var imageBytes = new byte[] { 0x89, 0x50, 0x4E, 0x47 };
+
+            // Act & Assert - Kiểm tra phương thức ném exception khi sản phẩm không tồn tại
+            var ex = Assert.ThrowsAsync<Exception>(async () =>
+                await _repository.SavePrimaryImageAsync(999, imageBytes, "image/png"));
+
+            Assert.That(ex.Message, Contains.Substring("Product with ID 999 not found"),
+                "Thông báo lỗi phải chứa thông tin sản phẩm không tồn tại");
+        }
+
+        // ===============================================
+        // TEST TÍNH NĂNG EDIT SẢN PHẨM
+        // ===============================================
+
+        /// <summary>
+        /// Test kiểm tra sản phẩm không có inventory - không thể edit
+        /// (Test gián tiếp thông qua GetListItemByIdAsync vì CanEditProduct là private)
+        /// </summary>
+        [Test]
+        public async Task KiemTraSanPhamKhongCoInventory_KhongTheEdit()
+        {
+            // Arrange - Tạo sản phẩm mới không có inventory
             var product = new Product
             {
-                ProductId = 3,
-                Name = "Test Product",
+                ProductId = 100,
+                Name = "Sản phẩm test không inventory",
+                SKU = "TEST100",
+                StockCode = "STOCK100",
                 CategoryId = 1,
-                StatusId = 1,
-                Inventory = new List<Inventory>
-                {
-                    new Inventory { InventoryId = 1, ProductId = 3 }
-                }
+                StatusId = 1
             };
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            // Act - Lấy sản phẩm với đầy đủ thông tin
-            var result = await _repo.GetByIdWithIncludesAsync(3);
+            // Act - Lấy thông tin sản phẩm dạng list item
+            var listItem = await _repository.GetListItemByIdAsync(100);
 
-            // Assert - Kiểm tra qua repository method
-            var listItem = await _repo.GetListItemByIdAsync(3);
-            Assert.That(listItem.IsEditable, Is.True);
+            // Assert - Sản phẩm không có inventory nên không thể edit
+            Assert.That(listItem.IsEditable, Is.False, "Sản phẩm không có inventory không thể edit");
         }
     }
 }

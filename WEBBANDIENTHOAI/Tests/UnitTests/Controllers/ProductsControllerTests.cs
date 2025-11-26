@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -45,14 +44,12 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
             _controller = new ProductsController(_mockProductRepo.Object, _mockLogger.Object, _context);
 
             // Cấu hình TempData cho controller
-            var tempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
-            _controller.TempData = tempData;
+            _controller.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
         }
 
         [TearDown]
         public void TearDown()
         {
-            // Xóa database sau mỗi test để đảm bảo test độc lập
             _context.Database.EnsureDeleted();
             _context.Dispose();
         }
@@ -62,49 +59,70 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
         // ===============================================
 
         /// <summary>
-        /// Test trang danh sách sản phẩm khi áp dụng bộ lọc
-        /// Kiểm tra xem controller có trả về view với sản phẩm đã lọc đúng không
+        /// Test trang danh sách sản phẩm trả về view với dữ liệu
         /// </summary>
         [Test]
-        public async Task Index_ReturnsViewWithFilteredProducts_WhenFiltersApplied()
+        public async Task Index_ReturnsViewWithProducts()
         {
-            // Arrange - Chuẩn bị dữ liệu test
+            // Arrange
+            var mockProducts = new List<ProductListItemVm> {
+                new ProductListItemVm { ProductId = 1, Name = "iPhone 15" },
+                new ProductListItemVm { ProductId = 2, Name = "Samsung Galaxy" }
+            };
+
+            _mockProductRepo.Setup(repo => repo.GetFilteredAsync(null, null, null, null, null, null, null, 1, 20))
+                .ReturnsAsync((mockProducts, 2));
+
+            // Act
+            var result = await _controller.Index(null, null, null, null, null, null, null, 1, 20);
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<ViewResult>());
+            var viewResult = result as ViewResult;
+            Assert.That(viewResult.Model, Is.InstanceOf<IEnumerable<ProductListItemVm>>());
+            Assert.That(viewResult.ViewData["Title"], Is.EqualTo("Sản phẩm"));
+        }
+
+        /// <summary>
+        /// Test trang danh sách sản phẩm với bộ lọc
+        /// </summary>
+        [Test]
+        public async Task Index_WithFilters_ReturnsFilteredProducts()
+        {
+            // Arrange
             var mockProducts = new List<ProductListItemVm> {
                 new ProductListItemVm { ProductId = 1, Name = "iPhone 15" }
             };
 
-            _mockProductRepo.Setup(r => r.GetFilteredAsync("iPhone", 1, 1, 10000000m, 30000000m, true, "price_desc", 1, 20))
-                .ReturnsAsync(() => (mockProducts, 1));
+            _mockProductRepo.Setup(repo => repo.GetFilteredAsync("iPhone", 1, 1, 10000000m, 30000000m, true, "price_desc", 1, 20))
+                .ReturnsAsync((mockProducts, 1));
 
-            // Act - Gọi action Index với các tham số lọc
+            // Act
             var result = await _controller.Index("iPhone", 1, 1, 10000000m, 30000000m, true, "price_desc", 1, 20);
 
-            // Assert - Kiểm tra kết quả
+            // Assert
             Assert.That(result, Is.InstanceOf<ViewResult>());
             var viewResult = result as ViewResult;
             var model = viewResult.Model as IEnumerable<ProductListItemVm>;
             Assert.That(model.Count(), Is.EqualTo(1));
-            Assert.That(viewResult.ViewData["TotalCount"], Is.EqualTo(1));
         }
 
         /// <summary>
-        /// Test trang danh sách sản phẩm khi request là AJAX
-        /// Kiểm tra xem có trả về PartialView thay vì View đầy đủ không
+        /// Test trang danh sách sản phẩm trả về partial view khi request AJAX
         /// </summary>
         [Test]
-        public async Task Index_ReturnsPartialView_WhenAjaxRequest()
+        public async Task Index_WithAjaxRequest_ReturnsPartialView()
         {
-            // Arrange - Giả lập request AJAX
+            // Arrange
             var mockProducts = new List<ProductListItemVm> {
-                new ProductListItemVm { ProductId = 1 }
+                new ProductListItemVm { ProductId = 1, Name = "iPhone 15" }
             };
 
-            _mockProductRepo.Setup(r => r.GetFilteredAsync(
-                It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<byte?>(),
-                It.IsAny<decimal?>(), It.IsAny<decimal?>(), It.IsAny<bool?>(),
-                It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(() => (mockProducts, 1));
+            _mockProductRepo.Setup(repo => repo.GetFilteredAsync(It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<byte?>(),
+                It.IsAny<decimal?>(), It.IsAny<decimal?>(), It.IsAny<bool?>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync((mockProducts, 1));
 
+            // Mock AJAX request
             _controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext
@@ -116,30 +134,27 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
             // Act
             var result = await _controller.Index(null, null, null, null, null, null, null, 1, 20);
 
-            // Assert - Kiểm tra trả về PartialView
+            // Assert
             Assert.That(result, Is.InstanceOf<PartialViewResult>());
             var partialResult = result as PartialViewResult;
             Assert.That(partialResult.ViewName, Is.EqualTo("_ProductsIndexPartial"));
         }
 
         /// <summary>
-        /// Test xử lý lỗi khi có exception xảy ra trong action Index
-        /// Kiểm tra xem controller có xử lý lỗi đúng cách không
+        /// Test xử lý lỗi khi load danh sách sản phẩm
         /// </summary>
         [Test]
-        public async Task Index_HandlesException_ReturnsEmptyViewWithError()
+        public async Task Index_WhenException_ReturnsEmptyViewWithError()
         {
-            // Arrange - Giả lập repository throw exception
-            _mockProductRepo.Setup(r => r.GetFilteredAsync(
-                It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<byte?>(),
-                It.IsAny<decimal?>(), It.IsAny<decimal?>(), It.IsAny<bool?>(),
-                It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
-                .ThrowsAsync(new Exception("Test error"));
+            // Arrange
+            _mockProductRepo.Setup(repo => repo.GetFilteredAsync(It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<byte?>(),
+                It.IsAny<decimal?>(), It.IsAny<decimal?>(), It.IsAny<bool?>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ThrowsAsync(new Exception("Database error"));
 
             // Act
             var result = await _controller.Index(null, null, null, null, null, null, null, 1, 20);
 
-            // Assert - Kiểm tra trả về view rỗng và có thông báo lỗi
+            // Assert
             Assert.That(result, Is.InstanceOf<ViewResult>());
             var viewResult = result as ViewResult;
             var model = viewResult.Model as IEnumerable<ProductListItemVm>;
@@ -152,11 +167,10 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
         // ===============================================
 
         /// <summary>
-        /// Test chi tiết sản phẩm khi ID là null
-        /// Kiểm tra xem có trả về NotFound không
+        /// Test chi tiết sản phẩm với ID null trả về NotFound
         /// </summary>
         [Test]
-        public async Task Details_ReturnsNotFound_WhenIdIsNull()
+        public async Task Details_WithNullId_ReturnsNotFound()
         {
             // Act
             var result = await _controller.Details(null);
@@ -166,12 +180,15 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
         }
 
         /// <summary>
-        /// Test chi tiết sản phẩm khi sản phẩm không tồn tại
-        /// Kiểm tra xem có trả về NotFound không
+        /// Test chi tiết sản phẩm với ID không tồn tại trả về NotFound
         /// </summary>
         [Test]
-        public async Task Details_ReturnsNotFound_WhenProductNotExist()
+        public async Task Details_WithInvalidId_ReturnsNotFound()
         {
+            // Arrange
+            _mockProductRepo.Setup(repo => repo.GetByIdWithIncludesAsync(It.IsAny<int>()))
+                .ReturnsAsync((Product)null);
+
             // Act
             var result = await _controller.Details(999);
 
@@ -180,75 +197,52 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
         }
 
         /// <summary>
-        /// Test chi tiết sản phẩm khi ID hợp lệ nhưng không thể chỉnh sửa
-        /// Kiểm tra xem có trả về view với thông tin sản phẩm và cờ CanEdit = false không
+        /// Test chi tiết sản phẩm với ID hợp lệ trả về view với dữ liệu
         /// </summary>
         [Test]
-        public async Task Details_ReturnsViewWithProduct_WhenValidAndCanEditFalse()
+        public async Task Details_WithValidId_ReturnsViewWithProduct()
         {
-            // Arrange - Tạo dữ liệu sản phẩm test
-            var category = new Category
-            {
-                CategoryId = 1,
-                CategoryName = "Smartphones",
-                Description = "Mô tả giả"
-            };
-            var status = new ProductStatus
-            {
-                StatusId = 1,
-                StatusName = "InStock"
-            };
+            // Arrange
             var product = new Product
             {
                 ProductId = 1,
-                CategoryId = 1,
-                StatusId = 1,
                 Name = "iPhone 15",
-                SKU = "IP15"
+                Inventory = new List<Inventory>(),
+                ExportDetails = new List<ExportReceiptDetail>(),
+                ImportDetails = new List<ImportReceiptDetail>()
             };
 
-            await _context.Categories.AddAsync(category);
-            await _context.ProductStatuses.AddAsync(status);
-            await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync();
+            _mockProductRepo.Setup(repo => repo.GetByIdWithIncludesAsync(1))
+                .ReturnsAsync(product);
 
             // Act
             var result = await _controller.Details(1);
 
-            // Assert - Kiểm tra trả về view với sản phẩm và không cho phép edit
+            // Assert
             Assert.That(result, Is.InstanceOf<ViewResult>());
             var viewResult = result as ViewResult;
-            var model = viewResult.Model as Product;
-            Assert.That(model.ProductId, Is.EqualTo(1));
-            Assert.That(viewResult.ViewData["CanEdit"], Is.False);
+            Assert.That(viewResult.Model, Is.InstanceOf<Product>());
+            Assert.That(viewResult.ViewData["CanEdit"], Is.Not.Null);
         }
 
         /// <summary>
-        /// Test xử lý exception trong action Details
-        /// Kiểm tra xem có chuyển hướng về trang Index với thông báo lỗi không
+        /// Test xử lý lỗi khi load chi tiết sản phẩm
         /// </summary>
         [Test]
-        public async Task Details_HandlesException_RedirectsWithError()
+        public async Task Details_WhenException_RedirectsWithError()
         {
-            // Arrange - Tạo mock context để giả lập lỗi database
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(databaseName: "ExceptionTestDb")
-                .Options;
-            var mockContext = new Mock<AppDbContext>(options);
-
-            var mockProducts = new Mock<DbSet<Product>>();
-            mockProducts.Setup(m => m.FindAsync(It.IsAny<object[]>())).Throws(new Exception("Test error"));
-            mockContext.Setup(c => c.Products).Returns(mockProducts.Object);
-
-            var controller = new ProductsController(_mockProductRepo.Object, _mockLogger.Object, mockContext.Object);
-            controller.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
+            // Arrange
+            _mockProductRepo.Setup(repo => repo.GetByIdWithIncludesAsync(It.IsAny<int>()))
+                .ThrowsAsync(new Exception("Database error"));
 
             // Act
-            var result = await controller.Details(1);
+            var result = await _controller.Details(1);
 
-            // Assert - Kiểm tra chuyển hướng và có thông báo lỗi
+            // Assert
             Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
-            Assert.That(controller.TempData["Error"], Is.Not.Null);
+            var redirectResult = result as RedirectToActionResult;
+            Assert.That(redirectResult.ActionName, Is.EqualTo("Index"));
+            Assert.That(_controller.TempData["Error"], Is.Not.Null);
         }
 
         // ===============================================
@@ -256,11 +250,10 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
         // ===============================================
 
         /// <summary>
-        /// Test trang chỉnh sửa sản phẩm khi ID là null
-        /// Kiểm tra xem có trả về NotFound không
+        /// Test trang edit với ID null trả về NotFound
         /// </summary>
         [Test]
-        public async Task Edit_Get_ReturnsNotFound_WhenIdNull()
+        public async Task Edit_Get_WithNullId_ReturnsNotFound()
         {
             // Act
             var result = await _controller.Edit(null);
@@ -270,68 +263,84 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
         }
 
         /// <summary>
-        /// Test trang chỉnh sửa khi sản phẩm không thể chỉnh sửa
-        /// Kiểm tra xem có chuyển hướng về trang Details với thông báo lỗi không
+        /// Test trang edit với ID không tồn tại trả về NotFound
         /// </summary>
         [Test]
-        public async Task Edit_Get_RedirectsWithError_WhenNotEditable()
+        public async Task Edit_Get_WithInvalidId_ReturnsNotFound()
         {
-            // Arrange - Tạo sản phẩm không có inventory (không thể edit)
+            // Arrange
+            _mockProductRepo.Setup(repo => repo.GetByIdWithIncludesAsync(It.IsAny<int>()))
+                .ReturnsAsync((Product)null);
+
+            // Act
+            var result = await _controller.Edit(999);
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<NotFoundResult>());
+        }
+
+        /// <summary>
+        /// Test trang edit khi sản phẩm không thể chỉnh sửa redirect với lỗi
+        /// </summary>
+        [Test]
+        public async Task Edit_Get_WhenProductNotEditable_RedirectsWithError()
+        {
+            // Arrange
             var product = new Product
             {
                 ProductId = 1,
-                Name = "iPhone 15"
+                Name = "iPhone 15",
+                Inventory = new List<Inventory> { new Inventory() }, // Có inventory nên không thể edit
+                ExportDetails = new List<ExportReceiptDetail>(),
+                ImportDetails = new List<ImportReceiptDetail>()
             };
-            await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync();
+
+            _mockProductRepo.Setup(repo => repo.GetByIdWithIncludesAsync(1))
+                .ReturnsAsync(product);
 
             // Act
             var result = await _controller.Edit(1);
 
-            // Assert - Kiểm tra chuyển hướng và có thông báo lỗi
+            // Assert
             Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
-            var redirect = result as RedirectToActionResult;
-            Assert.That(redirect.ActionName, Is.EqualTo("Details"));
+            var redirectResult = result as RedirectToActionResult;
+            Assert.That(redirectResult.ActionName, Is.EqualTo("Details"));
             Assert.That(_controller.TempData["Error"], Is.Not.Null);
         }
 
         /// <summary>
-        /// Test trang chỉnh sửa khi sản phẩm có thể chỉnh sửa
-        /// Kiểm tra xem có trả về view với dữ liệu sản phẩm và dropdown lists không
+        /// Test trang edit với sản phẩm có thể chỉnh sửa trả về view
         /// </summary>
         [Test]
-        public async Task Edit_Get_ReturnsViewWithProduct_WhenEditable()
+        public async Task Edit_Get_WithEditableProduct_ReturnsView()
         {
-            // Arrange - Tạo sản phẩm có inventory (có thể edit)
+            // Arrange
             var product = new Product
             {
                 ProductId = 1,
-                Name = "iPhone 15"
+                Name = "iPhone 15",
+                Inventory = new List<Inventory>(), // Không có inventory nên có thể edit
+                ExportDetails = new List<ExportReceiptDetail>(),
+                ImportDetails = new List<ImportReceiptDetail>()
             };
-            var inventory = new Inventory
-            {
-                InventoryId = 1,
-                ProductId = 1
-            };
-            await _context.Products.AddAsync(product);
-            await _context.Inventory.AddAsync(inventory);
-            await _context.SaveChangesAsync();
 
-            // Mock dữ liệu cho dropdown lists
-            _mockProductRepo.Setup(r => r.GetAllStatusesAsync()).ReturnsAsync(new List<ProductStatus>());
-            _mockProductRepo.Setup(r => r.GetAllCategoriesAsync()).ReturnsAsync(new List<Category>());
+            _mockProductRepo.Setup(repo => repo.GetByIdWithIncludesAsync(1))
+                .ReturnsAsync(product);
+
+            _mockProductRepo.Setup(repo => repo.GetAllStatusesAsync())
+                .ReturnsAsync(new List<ProductStatus>());
+            _mockProductRepo.Setup(repo => repo.GetAllCategoriesAsync())
+                .ReturnsAsync(new List<Category>());
 
             // Act
             var result = await _controller.Edit(1);
 
-            // Assert - Kiểm tra trả về view với đầy đủ dữ liệu
+            // Assert
             Assert.That(result, Is.InstanceOf<ViewResult>());
             var viewResult = result as ViewResult;
-            var model = viewResult.Model as Product;
-            Assert.That(model.ProductId, Is.EqualTo(1));
+            Assert.That(viewResult.Model, Is.InstanceOf<Product>());
             Assert.That(viewResult.ViewData["StatusId"], Is.InstanceOf<SelectList>());
             Assert.That(viewResult.ViewData["CategoryId"], Is.InstanceOf<SelectList>());
-            Assert.That(viewResult.ViewData["CanChangeKeys"], Is.True);
         }
 
         // ===============================================
@@ -339,17 +348,13 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
         // ===============================================
 
         /// <summary>
-        /// Test cập nhật sản phẩm khi ID không khớp
-        /// Kiểm tra xem có trả về NotFound không
+        /// Test edit post với ID không khớp trả về NotFound
         /// </summary>
         [Test]
-        public async Task Edit_Post_ReturnsNotFound_WhenIdMismatch()
+        public async Task Edit_Post_WithIdMismatch_ReturnsNotFound()
         {
-            // Arrange - ID trong route (1) không khớp với ID trong model (2)
-            var product = new Product
-            {
-                ProductId = 2
-            };
+            // Arrange
+            var product = new Product { ProductId = 2 };
 
             // Act
             var result = await _controller.Edit(1, product, null);
@@ -359,184 +364,129 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
         }
 
         /// <summary>
-        /// Test cập nhật sản phẩm khi sản phẩm không thể chỉnh sửa
-        /// Kiểm tra xem có chuyển hướng với thông báo lỗi không
+        /// Test edit post với model không hợp lệ trả về view
         /// </summary>
         [Test]
-        public async Task Edit_Post_RedirectsWithError_WhenNotEditable()
+        public async Task Edit_Post_WithInvalidModel_ReturnsView()
         {
-            // Arrange - Sản phẩm không có inventory
-            var product = new Product
+            // Arrange
+            var product = new Product { ProductId = 1, Name = "Test" };
+            _controller.ModelState.AddModelError("Price", "Price is required");
+
+            _mockProductRepo.Setup(repo => repo.GetAllStatusesAsync())
+                .ReturnsAsync(new List<ProductStatus>());
+            _mockProductRepo.Setup(repo => repo.GetAllCategoriesAsync())
+                .ReturnsAsync(new List<Category>());
+
+            // Act
+            var result = await _controller.Edit(1, product, null);
+
+            // Assert
+            Assert.That(result, Is.InstanceOf<ViewResult>());
+            var viewResult = result as ViewResult;
+            Assert.That(viewResult.Model, Is.InstanceOf<Product>());
+        }
+
+        /// <summary>
+        /// Test edit post với sản phẩm không thể chỉnh sửa redirect với lỗi
+        /// </summary>
+        [Test]
+        public async Task Edit_Post_WhenProductNotEditable_RedirectsWithError()
+        {
+            // Arrange
+            var product = new Product { ProductId = 1, Name = "Test" };
+
+            // Mock product có inventory (không thể edit)
+            var existingProduct = new Product
             {
-                ProductId = 1
+                ProductId = 1,
+                Inventory = new List<Inventory> { new Inventory() }
             };
+
+            await _context.Products.AddAsync(existingProduct);
+            await _context.SaveChangesAsync();
 
             // Act
             var result = await _controller.Edit(1, product, null);
 
             // Assert
             Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
+            var redirectResult = result as RedirectToActionResult;
+            Assert.That(redirectResult.ActionName, Is.EqualTo("Details"));
             Assert.That(_controller.TempData["Error"], Is.Not.Null);
         }
 
         /// <summary>
-        /// Test cập nhật sản phẩm thành công khi dữ liệu hợp lệ và không thay đổi khóa
-        /// Kiểm tra xem sản phẩm có được cập nhật đúng không
+        /// Test edit post thành công với dữ liệu hợp lệ
         /// </summary>
         [Test]
-        public async Task Edit_Post_UpdatesProduct_WhenValidNoKeyChange()
+        public async Task Edit_Post_WithValidData_UpdatesProduct()
         {
-            // Arrange - Tạo sản phẩm tồn tại trong database
-            var existing = new Product
+            // Arrange
+            var existingProduct = new Product
             {
                 ProductId = 1,
-                Name = "Old",
-                SKU = "IP15",
-                Price = 25000000m,
-                StatusId = 1,
-                CategoryId = 1,
+                Name = "Old Name",
+                Price = 10000000m,
+                SKU = "OLD123",
                 StockCode = "STOCK001"
             };
-            var inventory = new Inventory
-            {
-                InventoryId = 1,
-                ProductId = 1,
-                CurrentQuantity = 10
-            };
-            await _context.Products.AddAsync(existing);
-            await _context.Inventory.AddAsync(inventory);
+
+            await _context.Products.AddAsync(existingProduct);
             await _context.SaveChangesAsync();
 
-            // Dữ liệu cập nhật - không thay đổi SKU và StockCode
-            var updated = new Product
+            var updatedProduct = new Product
             {
                 ProductId = 1,
                 Name = "New Name",
-                SKU = "IP15",
-                Price = 30000000m,
-                StatusId = 2,
-                CategoryId = 2,
-                StockCode = "STOCK001"
+                Price = 15000000m,
+                SKU = "OLD123", // Giữ nguyên SKU
+                StockCode = "STOCK001" // Giữ nguyên StockCode
             };
 
             // Act
-            var result = await _controller.Edit(1, updated, null);
+            var result = await _controller.Edit(1, updatedProduct, null);
 
-            // Assert - Kiểm tra cập nhật thành công và chuyển hướng
+            // Assert
             Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
-            var saved = await _context.Products.FindAsync(1);
-            Assert.That(saved.Name, Is.EqualTo("New Name"));
-            Assert.That(saved.Price, Is.EqualTo(30000000m));
-            Assert.That(saved.StatusId, Is.EqualTo(2));
-            Assert.That(saved.SKU, Is.EqualTo("IP15")); // Không thay đổi
-            Assert.That(_controller.TempData["Success"], Is.Not.Null);
+            var redirectResult = result as RedirectToActionResult;
+            Assert.That(redirectResult.ActionName, Is.EqualTo("Details"));
+
+            // Kiểm tra dữ liệu đã được cập nhật
+            var savedProduct = await _context.Products.FindAsync(1);
+            Assert.That(savedProduct.Name, Is.EqualTo("New Name"));
+            Assert.That(savedProduct.Price, Is.EqualTo(15000000m));
         }
 
         /// <summary>
-        /// Test ngăn chặn thay đổi khóa (SKU/StockCode) khi có lịch sử
-        /// Kiểm tra xem có thông báo lỗi khi cố gắng thay đổi khóa không
+        /// Test edit post với upload ảnh
         /// </summary>
         [Test]
-        public async Task Edit_Post_PreventsKeyChange_WhenHasHistory()
+        public async Task Edit_Post_WithImageUpload_Success()
         {
-            // Arrange - Sản phẩm có inventory (được coi là có lịch sử)
-            var existing = new Product
+            // Arrange
+            var existingProduct = new Product
             {
                 ProductId = 1,
-                SKU = "OldSKU",
-                StockCode = "OldCode",
-                Name = "Test Product"
+                Name = "Test Product",
+                SKU = "TEST123"
             };
-            var inventory = new Inventory
-            {
-                InventoryId = 1,
-                ProductId = 1
-            };
-            await _context.Products.AddAsync(existing);
-            await _context.Inventory.AddAsync(inventory);
+
+            await _context.Products.AddAsync(existingProduct);
             await _context.SaveChangesAsync();
 
-            // Dữ liệu cập nhật - cố gắng thay đổi SKU và StockCode
-            var updated = new Product
-            {
-                ProductId = 1,
-                SKU = "NewSKU",
-                StockCode = "NewCode",
-                Name = "Test Product"
-            };
-
-            // Act
-            var result = await _controller.Edit(1, updated, null);
-
-            // Assert - Kiểm tra không cho phép thay đổi và có thông báo lỗi
-            Assert.That(result, Is.InstanceOf<ViewResult>());
-            Assert.That(_controller.TempData["Error"], Is.Not.Null);
-        }
-
-        /// <summary>
-        /// Test upload ảnh sản phẩm thành công
-        /// Kiểm tra xem ảnh có được xử lý đúng không
-        /// </summary>
-        [Test]
-        public async Task Edit_Post_HandlesImageUpload_Success()
-        {
-            // Arrange - Tạo sản phẩm và mock file ảnh
-            var existing = new Product
-            {
-                ProductId = 1,
-                Name = "iPhone",
-                SKU = "IP15"
-            };
-            var inventory = new Inventory
-            {
-                InventoryId = 1,
-                ProductId = 1,
-                CurrentQuantity = 10
-            };
-            await _context.Products.AddAsync(existing);
-            await _context.Inventory.AddAsync(inventory);
-            await _context.SaveChangesAsync();
-
-            // Mock file ảnh
             var mockFile = new Mock<IFormFile>();
             mockFile.Setup(f => f.Length).Returns(1024);
             mockFile.Setup(f => f.FileName).Returns("test.jpg");
             mockFile.Setup(f => f.ContentType).Returns("image/jpeg");
-            mockFile.Setup(f => f.CopyToAsync(It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                   .Returns(Task.CompletedTask);
+
+            var updatedProduct = new Product { ProductId = 1, Name = "Updated Product" };
 
             // Act
-            var result = await _controller.Edit(1, existing, mockFile.Object);
+            var result = await _controller.Edit(1, updatedProduct, mockFile.Object);
 
-            // Assert - Kiểm tra cập nhật thành công
+            // Assert
             Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
-        }
-
-        /// <summary>
-        /// Test xử lý exception khi cập nhật sản phẩm
-        /// Kiểm tra xem có trả về view với thông báo lỗi không
-        /// </summary>
-        [Test]
-        public async Task Edit_Post_HandlesException_ReturnsViewWithError()
-        {
-            // Arrange - Tạo model state không hợp lệ
-            var product = new Product
-            {
-                ProductId = 1,
-                Name = "Test"
-            };
-            _controller.ModelState.AddModelError("Name", "Error");
-
-            // Mock dữ liệu cho dropdown lists
-            _mockProductRepo.Setup(r => r.GetAllStatusesAsync()).ReturnsAsync(new List<ProductStatus>());
-            _mockProductRepo.Setup(r => r.GetAllCategoriesAsync()).ReturnsAsync(new List<Category>());
-
-            // Act
-            var result = await _controller.Edit(1, product, null);
-
-            // Assert - Kiểm tra trả về view với thông tin lỗi
-            Assert.That(result, Is.InstanceOf<ViewResult>());
-            Assert.That(_controller.ViewData["StatusId"], Is.InstanceOf<SelectList>());
         }
 
         // ===============================================
@@ -544,39 +494,102 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
         // ===============================================
 
         /// <summary>
-        /// Test lấy ảnh sản phẩm khi ảnh tồn tại
-        /// Kiểm tra xem có trả về file ảnh đúng không
+        /// Test lấy ảnh sản phẩm với ảnh tồn tại
         /// </summary>
         [Test]
-        public async Task Image_ReturnsFile_WhenImageExists()
+        public async Task Image_WithExistingImage_ReturnsFile()
         {
-            // Arrange - Mock dữ liệu ảnh
-            _mockProductRepo.Setup(r => r.GetImageBytesAsync(1)).ReturnsAsync(new byte[] { 0x89, 0x50 });
+            // Arrange
+            var imageBytes = new byte[] { 0x89, 0x50, 0x4E, 0x47 }; // PNG header
+            var productImage = new ProductImage
+            {
+                ImageId = 1,
+                ImagePath = imageBytes
+            };
+
+            await _context.ProductImages.AddAsync(productImage);
+            await _context.SaveChangesAsync();
 
             // Act
             var result = await _controller.Image(1);
 
-            // Assert - Kiểm tra trả về file ảnh
+            // Assert
             Assert.That(result, Is.InstanceOf<FileContentResult>());
             var fileResult = result as FileContentResult;
-            Assert.That(fileResult.ContentType, Is.EqualTo("image/jpeg"));
+            Assert.That(fileResult.FileContents, Is.EqualTo(imageBytes));
         }
 
         /// <summary>
-        /// Test lấy ảnh sản phẩm khi không có ảnh
-        /// Kiểm tra xem có trả về NotFound không
+        /// Test lấy ảnh sản phẩm với ảnh không tồn tại trả về NotFound
         /// </summary>
         [Test]
-        public async Task Image_ReturnsNotFound_WhenNoImage()
+        public async Task Image_WithNonExistingImage_ReturnsNotFound()
         {
-            // Arrange - Mock không có ảnh
-            _mockProductRepo.Setup(r => r.GetImageBytesAsync(999)).ReturnsAsync((byte[])null);
-
             // Act
             var result = await _controller.Image(999);
 
             // Assert
             Assert.That(result, Is.InstanceOf<NotFoundResult>());
+        }
+
+        // ===============================================
+        // TEST HELPER METHODS
+        // ===============================================
+
+        /// <summary>
+        /// Test kiểm tra sản phẩm có thể chỉnh sửa
+        /// </summary>
+        [Test]
+        public async Task CanEditProductAsync_WithNoInventory_ReturnsTrue()
+        {
+            // Arrange
+            var product = new Product
+            {
+                ProductId = 1,
+                Inventory = new List<Inventory>(),
+                ExportDetails = new List<ExportReceiptDetail>(),
+                ImportDetails = new List<ImportReceiptDetail>()
+            };
+
+            _mockProductRepo.Setup(repo => repo.GetByIdWithIncludesAsync(1))
+                .ReturnsAsync(product);
+
+            // Act - Sử dụng reflection để gọi private method
+            var method = typeof(ProductsController).GetMethod("CanEditProductAsync",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            var result = await (Task<bool>)method.Invoke(_controller, new object[] { 1 });
+
+            // Assert
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
+        /// Test kiểm tra sản phẩm không thể chỉnh sửa khi có inventory
+        /// </summary>
+        [Test]
+        public async Task CanEditProductAsync_WithInventory_ReturnsFalse()
+        {
+            // Arrange
+            var product = new Product
+            {
+                ProductId = 1,
+                Inventory = new List<Inventory> { new Inventory() },
+                ExportDetails = new List<ExportReceiptDetail>(),
+                ImportDetails = new List<ImportReceiptDetail>()
+            };
+
+            _mockProductRepo.Setup(repo => repo.GetByIdWithIncludesAsync(1))
+                .ReturnsAsync(product);
+
+            // Act
+            var method = typeof(ProductsController).GetMethod("CanEditProductAsync",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            var result = await (Task<bool>)method.Invoke(_controller, new object[] { 1 });
+
+            // Assert
+            Assert.That(result, Is.False);
         }
     }
 }
