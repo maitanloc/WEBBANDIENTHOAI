@@ -11,44 +11,32 @@
 
 <div class="max-w-7xl mx-auto px-4 my-10">
 
-    <!-- FILTER & SORT BAR -->
-    <div class="bg-white p-4 rounded-xl shadow mb-6 flex flex-wrap gap-3 items-center">
+    <!-- FORM FILTER & SORT -->
+    <form id="filterSortForm" method="get" action="/HomeUser/Laptops" class="bg-white p-4 rounded-xl shadow mb-6 flex flex-wrap gap-4 items-center">
 
         <!-- BRAND FILTER -->
-        <div class="flex gap-2 flex-wrap">
-            <a href="/HomeUser/Laptops"
-               class="px-4 py-2 rounded-lg border @(string.IsNullOrEmpty(selectedBrand) ? "bg-primary text-white" : "border-gray-300")">
-                Tất cả
-            </a>
-
-            @foreach (var b in brands)
-            {
-                <a href="/HomeUser/Laptops?brand=@b&sort=@selectedSort"
-                   class="px-4 py-2 rounded-lg border hover:bg-primary hover:text-white transition
-                        @(selectedBrand == b ? "bg-primary text-white" : "border-gray-300")">
-                    @b
-                </a>
-            }
+        <div>
+            <label for="brand-select" class="sr-only">Thương hiệu</label>
+            <select name="brand" id="brand-select" class="form-select block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                <option value="">Tất cả thương hiệu</option>
+                @foreach (var b in brands)
+                {
+                    <option value="@b" selected="@(selectedBrand == b ? "selected" : null)">@b</option>
+                }
+            </select>
         </div>
 
         <!-- SORT FILTER -->
-        <div class="ml-auto flex gap-3">
-            <a href="/HomeUser/Laptops?brand=@selectedBrand&sort=price_asc"
-               class="px-4 py-2 rounded-lg border @(selectedSort=="price_asc" ? "bg-primary text-white" : "border-gray-300")">
-                Giá tăng dần
-            </a>
-
-            <a href="/HomeUser/Laptops?brand=@selectedBrand&sort=price_desc"
-               class="px-4 py-2 rounded-lg border @(selectedSort=="price_desc" ? "bg-primary text-white" : "border-gray-300")">
-                Giá giảm dần
-            </a>
-
-            <a href="/HomeUser/Laptops?brand=@selectedBrand&sort=newest"
-               class="px-4 py-2 rounded-lg border @(selectedSort=="newest" ? "bg-primary text-white" : "border-gray-300")">
-                Mới nhất
-            </a>
+        <div>
+            <label for="sort-select" class="sr-only">Sắp xếp</label>
+            <select name="sort" id="sort-select" class="form-select block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                <option value="newest" selected="@(selectedSort == "newest" ? "selected" : null)">Mới nhất</option>
+                <option value="price_asc" selected="@(selectedSort == "price_asc" ? "selected" : null)">Giá tăng dần</option>
+                <option value="price_desc" selected="@(selectedSort == "price_desc" ? "selected" : null)">Giá giảm dần</option>
+            </select>
         </div>
-    </div>
+    </form>
+
 
     <h2 class="text-2xl font-bold text-gray-800 mb-6">
         Laptop mới nhất
@@ -99,3 +87,15 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.getElementById('brand-select').addEventListener('change', function () {
+            document.getElementById('filterSortForm').submit();
+        });
+
+        document.getElementById('sort-select').addEventListener('change', function () {
+            document.getElementById('filterSortForm').submit();
+        });
+    </script>
+}
