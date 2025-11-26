@@ -10,6 +10,7 @@ using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.Repository;
 using WEBBANDIENTHOAI.ViewModels;
+using WEBBANDIENTHOAI.Helpers;
 
 namespace WEBBANDIENTHOAI.Controllers
 {
@@ -126,7 +127,6 @@ namespace WEBBANDIENTHOAI.Controllers
             }
         }
 
-        // POST: Products/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ProductId,Name,SKU,Brand,Price,OldPrice,StockCode,Color,Size,ShortDescription,StatusId,CategoryId")] Product product, IFormFile? primaryImage)
@@ -136,7 +136,6 @@ namespace WEBBANDIENTHOAI.Controllers
                 return NotFound();
             }
 
-            // SỬA: Kiểm tra ModelState trước khi check editability
             if (!ModelState.IsValid)
             {
                 await PopulateViewData();
@@ -144,20 +143,19 @@ namespace WEBBANDIENTHOAI.Controllers
                 return View(product);
             }
 
-            // Check if product can be edited
             if (!await CanEditProductAsync(id))
             {
                 TempData["Error"] = "Sản phẩm không thể sửa do đã có lịch sử nhập/xuất hoặc đang trong quá trình nhập hàng";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
+            // Sử dụng transaction
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
             try
             {
                 var existingProduct = await _context.Products
                     .Include(p => p.PrimaryImage)
-                    .Include(p => p.PhoneConfiguration)
-                    .Include(p => p.LaptopConfiguration)
-                    .Include(p => p.Inventory)
                     .FirstOrDefaultAsync(p => p.ProductId == id);
 
                 if (existingProduct == null)
@@ -178,61 +176,48 @@ namespace WEBBANDIENTHOAI.Controllers
                 }
 
                 // Update basic product info
-                existingProduct.Name = product.Name;
-                existingProduct.Brand = product.Brand;
-                existingProduct.Price = product.Price;
-                existingProduct.OldPrice = product.OldPrice;
-                existingProduct.Color = product.Color;
-                existingProduct.Size = product.Size;
-                existingProduct.ShortDescription = product.ShortDescription;
-                existingProduct.StatusId = product.StatusId;
-                existingProduct.CategoryId = product.CategoryId;
+                await _context.Database.ExecuteSqlRawAsync(@"
+            UPDATE Products 
+            SET Name = {0}, Brand = {1}, Price = {2}, OldPrice = {3}, 
+                Color = {4}, Size = {5}, ShortDescription = {6}, 
+                StatusId = {7}, CategoryId = {8}
+            WHERE ProductId = {9}",
+                    product.Name, product.Brand ?? "", product.Price, product.OldPrice,
+                    product.Color ?? "", product.Size ?? "", product.ShortDescription ?? "",
+                    product.StatusId, product.CategoryId, id);
 
                 // Chỉ cho phép thay đổi SKU/StockCode nếu sản phẩm chưa có lịch sử
                 if (await CanChangeProductKeysAsync(id))
                 {
-                    existingProduct.SKU = product.SKU;
-                    existingProduct.StockCode = product.StockCode;
+                    await _context.Database.ExecuteSqlRawAsync(@"
+                UPDATE Products 
+                SET SKU = {0}, StockCode = {1} 
+                WHERE ProductId = {2}",
+                        product.SKU, product.StockCode, id);
                 }
 
-                // SỬA: Xử lý configuration một cách an toàn
+                // Xử lý configuration
                 await UpdateProductConfigurations(existingProduct);
 
-                // Handle image upload
+                // Handle image upload - QUAN TRỌNG: xử lý ảnh sau cùng
                 if (primaryImage != null && primaryImage.Length > 0)
                 {
                     await HandleImageUpload(existingProduct, primaryImage);
                 }
 
-                // Update inventory if stock code changed và được phép
-                if (stockCodeChanged && await CanChangeProductKeysAsync(id))
-                {
-                    var inventory = await _context.Inventory.FirstOrDefaultAsync(i => i.ProductId == id);
-                    if (inventory != null)
-                    {
-                        inventory.StockCode = product.StockCode;
-                        inventory.LastUpdated = DateTime.UtcNow;
-                    }
-                }
-
-                // SỬA: Dùng repository để update thay vì context trực tiếp
-                await _productRepo.UpdateAsync(existingProduct);
+                // Commit transaction
+                await transaction.CommitAsync();
 
                 TempData["Success"] = "Cập nhật sản phẩm thành công";
                 return RedirectToAction(nameof(Details), new { id });
             }
-            catch (DbUpdateException dbEx)
-            {
-                _logger.LogError(dbEx, "Database error updating product {ProductId}", id);
-                TempData["Error"] = "Lỗi cơ sở dữ liệu khi cập nhật sản phẩm";
-            }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 _logger.LogError(ex, "Error updating product {ProductId}", id);
                 TempData["Error"] = "Có lỗi xảy ra khi cập nhật sản phẩm: " + ex.Message;
             }
 
-            // SỬA: Nếu có lỗi, repopulate view data và return view
             await PopulateViewData();
             ViewData["CanChangeKeys"] = await CanChangeProductKeysAsync(id);
             return View(product);
@@ -243,26 +228,21 @@ namespace WEBBANDIENTHOAI.Controllers
         {
             try
             {
-                var imageBytes = await _productRepo.GetImageBytesAsync(id);
-                if (imageBytes == null || imageBytes.Length == 0)
+                // Sử dụng raw SQL để lấy ảnh
+                var image = await _context.ProductImages
+                    .FromSqlRaw("SELECT * FROM ProductImages WHERE ImageId = {0}", id)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync();
+
+                if (image?.ImagePath == null || image.ImagePath.Length == 0)
                 {
                     return NotFound();
                 }
 
-                // SỬA: Fallback content type nếu không detect được
-                var contentType = "image/jpeg"; // Mặc định
-                try
-                {
-                    // Giả sử có ImageHelper, nếu không thì dùng mặc định
-                    contentType = WEBBANDIENTHOAI.Helpers.ImageHelper.GetContentType(imageBytes);
-                }
-                catch
-                {
-                    // Nếu ImageHelper không tồn tại, dùng mặc định
-                    contentType = "image/jpeg";
-                }
+                // Sử dụng ImageHelper để xác định content type
+                var contentType = ImageHelper.GetContentType(image.ImagePath);
 
-                return File(imageBytes, contentType);
+                return File(image.ImagePath, contentType);
             }
             catch (Exception ex)
             {
@@ -376,13 +356,12 @@ namespace WEBBANDIENTHOAI.Controllers
         {
             try
             {
-                // Kiểm tra kích thước file
+                // Kiểm tra kích thước và định dạng file (giữ nguyên)
                 if (imageFile.Length > 3 * 1024 * 1024)
                 {
                     throw new InvalidOperationException("Kích thước ảnh không được vượt quá 3MB");
                 }
 
-                // Kiểm tra định dạng file
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
                 var fileExtension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
                 if (!allowedExtensions.Contains(fileExtension))
@@ -395,11 +374,36 @@ namespace WEBBANDIENTHOAI.Controllers
                 await imageFile.CopyToAsync(memoryStream);
                 var imageBytes = memoryStream.ToArray();
 
-                // SỬA: Sử dụng repository để lưu ảnh
-                var imageId = await _productRepo.SavePrimaryImageAsync(product.ProductId, imageBytes, imageFile.ContentType);
+                // Nếu đã có ảnh, UPDATE ảnh hiện có thay vì xóa và tạo mới
+                if (product.ImageId.HasValue)
+                {
+                    await _context.Database.ExecuteSqlRawAsync(
+                        "UPDATE ProductImages SET ImagePath = {0}, CreatedAt = {1} WHERE ImageId = {2}",
+                        imageBytes, DateTime.UtcNow, product.ImageId.Value);
 
-                // Cập nhật ImageId cho product
-                product.ImageId = imageId;
+                    // Không cần thay đổi ImageId của product
+                }
+                else
+                {
+                    // Nếu chưa có ảnh, tạo mới
+                    await _context.Database.ExecuteSqlRawAsync(
+                        @"INSERT INTO ProductImages (ProductId, ImagePath, IsPrimary, CreatedAt) 
+                  VALUES ({0}, {1}, {2}, {3})",
+                        product.ProductId, imageBytes, true, DateTime.UtcNow);
+
+                    // Lấy ImageId mới và cập nhật cho product
+                    var newImageId = await _context.ProductImages
+                        .Where(img => img.ProductId == product.ProductId && img.IsPrimary)
+                        .OrderByDescending(img => img.CreatedAt)
+                        .Select(img => img.ImageId)
+                        .FirstOrDefaultAsync();
+
+                    await _context.Database.ExecuteSqlRawAsync(
+                        "UPDATE Products SET ImageId = {0} WHERE ProductId = {1}",
+                        newImageId, product.ProductId);
+
+                    product.ImageId = newImageId;
+                }
             }
             catch (Exception ex)
             {

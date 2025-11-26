@@ -8,9 +8,14 @@ namespace WEBBANDIENTHOAI.Models
     {
         [Key]
         public int ImageId { get; set; }
+
         public int ProductId { get; set; }
-        public byte[]? ImagePath { get; set; }
+
+        [Required]
+        public byte[] ImagePath { get; set; } = Array.Empty<byte>();
+
         public bool IsPrimary { get; set; } = false;
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [ForeignKey("ProductId")]
