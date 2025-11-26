@@ -93,12 +93,104 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
+        /* === POPUP XÁC NHẬN ĐĂNG XUẤT === */
+        .logout-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .logout-popup {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .logout-image {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .logout-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .logout-message {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .logout-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .logout-btn-cancel {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+            .logout-btn-cancel:hover {
+                background: #4b5563;
+            }
+
+        .logout-btn-confirm {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+            .logout-btn-confirm:hover {
+                background: #dc2626;
+            }
     </style>
 
     @RenderSection("Styles", required: false)
 </head>
 
 <body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200 antialiased">
+    <!-- POPUP XÁC NHẬN ĐĂNG XUẤT -->
+    <div id="logout-popup" class="logout-overlay">
+        <div class="logout-popup">
+            <img src="~/images/hỏi đăng xuất.png" alt="Xác nhận đăng xuất" class="logout-image" />
+            <h3 class="logout-title">Xác nhận đăng xuất</h3>
+            <p class="logout-message">Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?</p>
+            <div class="logout-buttons">
+                <button id="logout-cancel" class="logout-btn-cancel">Hủy</button>
+                <button id="logout-confirm" class="logout-btn-confirm">Đăng xuất</button>
+            </div>
+        </div>
+    </div>
     <!-- Welcome Notification -->
     @if (ViewBag.IsLoggedIn == true && !string.IsNullOrEmpty(ViewBag.CustomerName?.ToString()))
     {
@@ -679,15 +771,54 @@
                 e.stopPropagation();
             });
 
-            // Xử lý đăng xuất
+            // XỬ LÝ POPUP ĐĂNG XUẤT
+            const logoutPopup = document.getElementById('logout-popup');
+            const logoutCancel = document.getElementById('logout-cancel');
+            const logoutConfirm = document.getElementById('logout-confirm');
+
+            function showLogoutPopup() {
+                if (logoutPopup) logoutPopup.style.display = 'flex';
+            }
+
+            function hideLogoutPopup() {
+                if (logoutPopup) logoutPopup.style.display = 'none';
+            }
+
+            // Gán sự kiện cho các nút đăng xuất
             logoutTriggers.forEach(trigger => {
                 trigger.addEventListener('click', function(e) {
                     e.preventDefault();
-                    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                        window.location.href = '/Account/Logout';
-                    }
+                    // Đóng dropdown trước khi mở popup
+                    if (userProfileDropdown) userProfileDropdown.classList.add('hidden');
+                    if (userProfileChevron) userProfileChevron.classList.remove('rotate-180');
+                    showLogoutPopup();
                 });
             });
+
+            // Xử lý nút hủy
+            if (logoutCancel) {
+                logoutCancel.addEventListener('click', function() {
+                    hideLogoutPopup();
+                });
+            }
+
+            // Xử lý nút xác nhận đăng xuất
+            if (logoutConfirm) {
+                logoutConfirm.addEventListener('click', function() {
+                    hideLogoutPopup();
+                    // Optional: show a loader here
+                    window.location.href = '/Account/Logout';
+                });
+            }
+
+            // Đóng popup khi click bên ngoài
+            if (logoutPopup) {
+                logoutPopup.addEventListener('click', function(e) {
+                    if (e.target === logoutPopup) {
+                        hideLogoutPopup();
+                    }
+                });
+            }
         });
 
         // Dark Mode Toggle
