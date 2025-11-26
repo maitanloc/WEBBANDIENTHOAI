@@ -1,24 +1,26 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using WEBBANDIENTHOAI.Models;
 
-public class OrderDetail
+namespace WEBBANDIENTHOAI.Models
 {
-    [Key]
-    public int OrderDetailId { get; set; } // (OrderDetailId)
+    public class OrderDetail
+    {
+        [Key]
+        public int OrderDetailId { get; set; }
 
-    public int OrderId { get; set; } // (OrderId)
+        public int OrderId { get; set; }
 
-    public int ProductId { get; set; } // (ProductId)
+        public int ProductId { get; set; }
 
-    public int Quantity { get; set; } // (Quantity)
+        public int Quantity { get; set; }
 
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal UnitPrice { get; set; } // (UnitPrice)
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal UnitPrice { get; set; }
 
-    [ForeignKey("OrderId")]
-    public Order Order { get; set; }
+        [ForeignKey("OrderId")]
+        public Order Order { get; set; }
 
-    [ForeignKey("ProductId")]
-    public Product Product { get; set; }
+        [ForeignKey("ProductId")]
+        public Product Product { get; set; }
+    }
 }

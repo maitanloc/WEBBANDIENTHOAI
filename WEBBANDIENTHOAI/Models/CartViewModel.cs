@@ -19,9 +19,9 @@
         public string ImageUrl { get; set; }
         public string Color { get; set; }
         public string Size { get; set; }
-        public decimal UnitPrice { get; set; }
+        public decimal Price { get; set; } // Đổi từ UnitPrice thành Price
         public int Quantity { get; set; }
-        public decimal Total => UnitPrice * Quantity;
+        public decimal Total => Price * Quantity;
         public bool IsSelected { get; set; } = true;
     }
 }
