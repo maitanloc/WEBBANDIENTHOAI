@@ -322,6 +322,67 @@ namespace WEBBANDIENTHOAI.Controllers
             return View(await query.ToListAsync());
         }
 
+        public async Task<IActionResult> AllProducts(string? brand, string? sort, int page = 1)
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            var role = HttpContext.Session.GetString("RoleName");
+
+            if (!string.IsNullOrEmpty(userId) && role == "Customer")
+            {
+                var customerId = int.Parse(userId);
+                var customer = await _customerRepository.GetCustomerByIdAsync(customerId);
+
+                if (customer != null)
+                {
+                    ViewBag.CustomerName = customer.FullName;
+                    ViewBag.CustomerEmail = customer.Email;
+                    ViewBag.CustomerPhone = customer.Phone;
+                    ViewBag.IsLoggedIn = true;
+                }
+            }
+
+            var query = _context.Products
+                .Include(p => p.PrimaryImage)
+                .Where(p => p.StatusId == 1);
+
+            if (!string.IsNullOrEmpty(brand))
+                query = query.Where(p => p.Brand == brand);
+
+            switch (sort)
+            {
+                case "price_asc":
+                    query = query.OrderBy(p => p.Price);
+                    break;
+
+                case "price_desc":
+                    query = query.OrderByDescending(p => p.Price);
+                    break;
+
+                case "newest":
+                    query = query.OrderByDescending(p => p.CreatedAt);
+                    break;
+
+                default:
+                    query = query.OrderByDescending(p => p.CreatedAt);
+                    break;
+            }
+
+            ViewBag.Brands = await _context.Products
+                .Select(p => p.Brand)
+                .Distinct()
+                .ToListAsync();
+
+            const int PageSize = 12;
+            var totalItems = await query.CountAsync();
+            var products = await query.Skip((page - 1) * PageSize).Take(PageSize).ToListAsync();
+
+            ViewData["TotalPages"] = (int)Math.Ceiling(totalItems / (double)PageSize);
+            ViewData["CurrentPage"] = page;
+
+
+            return View(products);
+        }
+
 
 
     }
