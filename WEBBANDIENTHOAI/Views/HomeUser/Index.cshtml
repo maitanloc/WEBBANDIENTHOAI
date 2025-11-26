@@ -3,6 +3,8 @@
 @{
     Layout = "~/Views/Shared/_Layoutuser.cshtml";
     ViewData["Title"] = "FOXMOBILE - Cửa hàng Điện thoại & Laptop";
+    var topPhones = ViewBag.TopPhones as List<WEBBANDIENTHOAI.Models.Product>;
+    var topLaptops = ViewBag.TopLaptops as List<WEBBANDIENTHOAI.Models.Product>;
 }
 
 <!-- Hero Banner Slider -->
@@ -87,7 +89,9 @@
 <section class="mb-12" data-aos="fade-up">
     <div class="flex justify-center">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-4xl">
-            <a href="/products/smartphones"
+
+            <!-- Điện thoại -->
+            <a href="/HomeUser/Smartphones"
                class="flex flex-col items-center gap-4 rounded-xl border-2 border-orange-200 bg-white p-8 hover:shadow-xl text-center hover-lift group transition-all duration-300 hover:border-primary">
                 <div class="text-primary group-hover:scale-110 transition-transform duration-300">
                     <i class="fas fa-mobile-alt text-4xl"></i>
@@ -98,7 +102,8 @@
                 </div>
             </a>
 
-            <a href="/products/laptops"
+            <!-- Laptop -->
+            <a href="/HomeUser/Laptops"
                class="flex flex-col items-center gap-4 rounded-xl border-2 border-orange-200 bg-white p-8 hover:shadow-xl text-center hover-lift group transition-all duration-300 hover:border-primary">
                 <div class="text-primary group-hover:scale-110 transition-transform duration-300">
                     <i class="fas fa-laptop text-4xl"></i>
@@ -108,9 +113,11 @@
                     <p class="text-gray-500 text-sm mt-1">Hiệu năng cao</p>
                 </div>
             </a>
+
         </div>
     </div>
 </section>
+
 
 <!-- Featured Products Section -->
 <section class="mb-12" data-aos="fade-up">
@@ -123,11 +130,16 @@
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        @if (Model != null && Model.Any())
+
+        @if ((topPhones != null && topPhones.Any()) || (topLaptops != null && topLaptops.Any()))
         {
-            foreach (var sp in Model)
+            <!-- Gộp 2 danh sách -->
+            var products = new List<WEBBANDIENTHOAI.Models.Product>();
+            if (topPhones != null) { products.AddRange(topPhones); }
+            if (topLaptops != null) { products.AddRange(topLaptops); }
+
+            foreach (var sp in products)
             {
-                <!-- BAO BỌC TOÀN BỘ SẢN PHẨM BẰNG THẺ A -->
                 <a href="@Url.Action("ProductDetails", "HomeUser", new { id = sp.ProductId })"
                    class="block product-card">
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden group hover:shadow-xl transition-all duration-500 hover-lift cursor-pointer h-full flex flex-col">
@@ -145,7 +157,6 @@
                                      alt="@sp.Name" />
                             }
 
-                            <!-- Product Badge -->
                             @if (sp.Price < 5000000)
                             {
                                 <div class="absolute top-3 left-3">
@@ -155,7 +166,6 @@
                                 </div>
                             }
 
-                            <!-- Quick Actions -->
                             <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 <button type="button"
                                         class="wishlist-btn w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -189,7 +199,6 @@
                                         }
                                     </div>
 
-                                    <!-- NÚT THÊM VÀO GIỎ - THÊM STOP PROPAGATION -->
                                     <form asp-controller="HomeCarts" asp-action="AddToCart" method="post"
                                           class="add-to-cart-form"
                                           data-product="@sp.ProductId"
@@ -203,7 +212,6 @@
                                     </form>
                                 </div>
 
-                                <!-- Rating and Reviews -->
                                 <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                                     <div class="flex items-center space-x-1">
                                         <div class="flex text-yellow-400">
@@ -240,6 +248,7 @@
             </div>
         }
     </div>
+</section>
 </section>
 
 <!-- Promotional Banner -->

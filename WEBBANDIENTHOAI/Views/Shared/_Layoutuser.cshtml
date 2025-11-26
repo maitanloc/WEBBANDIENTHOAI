@@ -364,7 +364,10 @@
                                             </div>
                                             <div>
                                                 <p class="font-semibold text-gray-800 dark:text-white">@ViewBag.CustomerName</p>
-                                                <p class="text-sm text-gray-500 dark:text-gray-400">@ViewBag.CustomerEmail</p>
+                                                @if (!string.IsNullOrEmpty(ViewBag.CustomerEmail?.ToString()))
+                                                {
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400">@ViewBag.CustomerEmail</p>
+                                                }
                                                 @if (!string.IsNullOrEmpty(ViewBag.CustomerPhone?.ToString()))
                                                 {
                                                     <p class="text-xs text-gray-400">@ViewBag.CustomerPhone</p>
