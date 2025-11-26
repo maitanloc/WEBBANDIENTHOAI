@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1) Load connection string
 // ========================
 var conn = builder.Configuration.GetConnectionString("DefaultConnection")
-           ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=web_dien_tu;Integrated Security=True;TrustServerCertificate=True";
+           ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=web_dien_tu;Integrated Security=True;Trust Server Certificate=True";
 
 // ========================
 // 2) Add MVC services
