@@ -1,0 +1,98 @@
+﻿@model IEnumerable<WEBBANDIENTHOAI.Models.Product>
+
+@{
+    Layout = "~/Views/Shared/_Layoutuser.cshtml";
+    ViewData["Title"] = "Điện thoại";
+
+    var brands = ViewBag.Brands as List<string>;
+    string selectedBrand = Context.Request.Query["brand"];
+    string selectedSort = Context.Request.Query["sort"];
+}
+
+<div class="max-w-7xl mx-auto px-4 my-10">
+
+    <!-- FILTER & SORT BAR -->
+    <div class="bg-white p-4 rounded-xl shadow mb-6 flex flex-wrap gap-3 items-center">
+
+        <!-- BRAND FILTER -->
+        <div class="flex gap-2 flex-wrap">
+            <a href="/HomeUser/Smartphones"
+               class="px-4 py-2 rounded-lg border @(string.IsNullOrEmpty(selectedBrand) ? "bg-primary text-white" : "border-gray-300")">
+                Tất cả
+            </a>
+
+            @foreach (var b in brands)
+            {
+                <a href="/HomeUser/Smartphones?brand=@b&sort=@selectedSort"
+                   class="px-4 py-2 rounded-lg border hover:bg-primary hover:text-white transition
+                        @(selectedBrand == b ? "bg-primary text-white" : "border-gray-300")">
+                    @b
+                </a>
+            }
+        </div>
+
+        <!-- SORT FILTER -->
+        <div class="ml-auto flex gap-3">
+            <a href="/HomeUser/Smartphones?brand=@selectedBrand&sort=price_asc"
+               class="px-4 py-2 rounded-lg border @(selectedSort=="price_asc" ? "bg-primary text-white" : "border-gray-300")">
+                Giá tăng dần
+            </a>
+
+            <a href="/HomeUser/Smartphones?brand=@selectedBrand&sort=price_desc"
+               class="px-4 py-2 rounded-lg border @(selectedSort=="price_desc" ? "bg-primary text-white" : "border-gray-300")">
+                Giá giảm dần
+            </a>
+
+            <a href="/HomeUser/Smartphones?brand=@selectedBrand&sort=newest"
+               class="px-4 py-2 rounded-lg border @(selectedSort=="newest" ? "bg-primary text-white" : "border-gray-300")">
+                Mới nhất
+            </a>
+        </div>
+    </div>
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+        Điện thoại mới nhất
+    </h2>
+
+    <!-- PRODUCT GRID -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+        @foreach (var sp in Model)
+        {
+            <a href="@Url.Action("ProductDetails", "HomeUser", new { id = sp.ProductId })"
+               class="group bg-white rounded-2xl border shadow-sm hover:shadow-xl transition-all duration-300 p-4 flex flex-col">
+
+                <div class="relative">
+                    <img src="@Url.Action("GetProductImage", "HomeUser", new { imageId = sp.PrimaryImage?.ImageId })"
+                         class="w-full h-40 object-contain group-hover:scale-105 transition-transform duration-300" />
+
+                    <span class="absolute top-2 left-2 bg-primary text-white text-xs px-3 py-1 rounded-full shadow">
+                        MỚI
+                    </span>
+                </div>
+
+                <h3 class="mt-3 font-semibold text-gray-800 line-clamp-2 text-sm min-h-[40px]">
+                    @sp.Name
+                </h3>
+
+                <div class="mt-2">
+                    <span class="text-primary font-bold text-lg">
+                        @String.Format("{0:N0}₫", sp.Price)
+                    </span>
+
+                    @if (sp.OldPrice > sp.Price)
+                    {
+                        <span class="text-gray-400 text-sm line-through ml-2">
+                            @String.Format("{0:N0}₫", sp.OldPrice)
+                        </span>
+                    }
+                </div>
+
+                <button class="mt-4 w-full bg-primary text-white py-2 rounded-xl font-medium hover:bg-primary-dark transition">
+                    Xem chi tiết
+                </button>
+
+            </a>
+        }
+    </div>
+</div>

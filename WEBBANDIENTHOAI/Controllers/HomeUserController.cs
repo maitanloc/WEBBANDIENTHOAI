@@ -53,13 +53,25 @@ namespace WEBBANDIENTHOAI.Controllers
                     ViewBag.IsLoggedIn = false;
                 }
 
-                // Lấy sản phẩm nổi bật
-                var featuredProducts = await _context.Products
+
+                // ========== LẤY 4 ĐIỆN THOẠI GIÁ CAO NHẤT ==========
+                var topPhones = await _context.Products
                     .Include(p => p.PrimaryImage)
-                    .Where(p => p.StatusId == 1) // Chỉ lấy sản phẩm còn hàng
-                    .OrderByDescending(p => p.CreatedAt)
-                    .Take(8)
+                    .Where(p => p.StatusId == 1 && p.CategoryId == 1)
+                    .OrderByDescending(p => p.Price)
+                    .Take(4)
                     .ToListAsync();
+
+                // ========== LẤY 4 LAPTOP GIÁ CAO NHẤT ==========
+                var topLaptops = await _context.Products
+                    .Include(p => p.PrimaryImage)
+                    .Where(p => p.StatusId == 1 && p.CategoryId == 2)
+                    .OrderByDescending(p => p.Price)
+                    .Take(4)
+                    .ToListAsync();
+
+                ViewBag.TopPhones = topPhones;
+                ViewBag.TopLaptops = topLaptops;
 
                 // Lấy banner
                 var bannerPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/banners");
@@ -69,7 +81,7 @@ namespace WEBBANDIENTHOAI.Controllers
 
                 ViewBag.Banners = bannerFiles;
 
-                return View(featuredProducts);
+                return View();
             }
             catch (Exception ex)
             {
@@ -78,6 +90,8 @@ namespace WEBBANDIENTHOAI.Controllers
                 return RedirectToAction("Login", "Account");
             }
         }
+
+        
 
         // Các action khác giữ nguyên...
         public async Task<IActionResult> ProductDetails(int id)
@@ -197,5 +211,83 @@ namespace WEBBANDIENTHOAI.Controllers
 
             return File("~/images/default-product.png", "image/png");
         }
+
+        public async Task<IActionResult> Smartphones(string? brand, string? sort)
+        {
+            var query = _context.Products
+                .Include(p => p.PrimaryImage)
+                .Where(p => p.CategoryId == 1 && p.StatusId == 1);
+
+            if (!string.IsNullOrEmpty(brand))
+                query = query.Where(p => p.Brand == brand);
+
+            switch (sort)
+            {
+                case "price_asc":
+                    query = query.OrderBy(p => p.Price);
+                    break;
+
+                case "price_desc":
+                    query = query.OrderByDescending(p => p.Price);
+                    break;
+
+                case "newest":
+                    query = query.OrderByDescending(p => p.CreatedAt);
+                    break;
+
+                default:
+                    query = query.OrderByDescending(p => p.CreatedAt);
+                    break;
+            }
+
+            ViewBag.Brands = await _context.Products
+                .Where(p => p.CategoryId == 1)
+                .Select(p => p.Brand)
+                .Distinct()
+                .ToListAsync();
+
+            return View(await query.ToListAsync());
+        }
+
+
+        public async Task<IActionResult> Laptops(string? brand, string? sort)
+{
+    var query = _context.Products
+        .Include(p => p.PrimaryImage)
+        .Where(p => p.CategoryId == 2 && p.StatusId == 1);
+
+    if (!string.IsNullOrEmpty(brand))
+        query = query.Where(p => p.Brand == brand);
+
+    switch (sort)
+    {
+        case "price_asc":
+            query = query.OrderBy(p => p.Price);
+            break;
+
+        case "price_desc":
+            query = query.OrderByDescending(p => p.Price);
+            break;
+
+        case "newest":
+            query = query.OrderByDescending(p => p.CreatedAt);
+            break;
+
+        default:
+            query = query.OrderByDescending(p => p.CreatedAt);
+            break;
+    }
+
+    ViewBag.Brands = await _context.Products
+        .Where(p => p.CategoryId == 2)
+        .Select(p => p.Brand)
+        .Distinct()
+        .ToListAsync();
+
+    return View(await query.ToListAsync());
+}
+
+
+
     }
 }
