@@ -6,7 +6,7 @@ namespace WEBBANDIENTHOAI.Controllers
     public class CustomerController : Controller
     {
          private readonly AppDbContext _context;
-
+             
     public CustomerController(AppDbContext context)
     {
         _context = context;
