@@ -122,6 +122,8 @@ namespace WEBBANDIENTHOAI.Controllers
                 if (customer != null)
                 {
                     ViewBag.CustomerName = customer.FullName;
+                    ViewBag.CustomerEmail = customer.Email;
+                    ViewBag.CustomerPhone = customer.Phone;
                     ViewBag.IsLoggedIn = true;
                 }
             }
@@ -214,6 +216,23 @@ namespace WEBBANDIENTHOAI.Controllers
 
         public async Task<IActionResult> Smartphones(string? brand, string? sort)
         {
+            var userId = HttpContext.Session.GetString("UserId");
+            var role = HttpContext.Session.GetString("RoleName");
+
+            if (!string.IsNullOrEmpty(userId) && role == "Customer")
+            {
+                var customerId = int.Parse(userId);
+                var customer = await _customerRepository.GetCustomerByIdAsync(customerId);
+
+                if (customer != null)
+                {
+                    ViewBag.CustomerName = customer.FullName;
+                    ViewBag.CustomerEmail = customer.Email;
+                    ViewBag.CustomerPhone = customer.Phone;
+                    ViewBag.IsLoggedIn = true;
+                }
+            }
+
             var query = _context.Products
                 .Include(p => p.PrimaryImage)
                 .Where(p => p.CategoryId == 1 && p.StatusId == 1);
@@ -250,42 +269,58 @@ namespace WEBBANDIENTHOAI.Controllers
         }
 
 
-        public async Task<IActionResult> Laptops(string? brand, string? sort)
-{
-    var query = _context.Products
-        .Include(p => p.PrimaryImage)
-        .Where(p => p.CategoryId == 2 && p.StatusId == 1);
+                public async Task<IActionResult> Laptops(string? brand, string? sort)
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            var role = HttpContext.Session.GetString("RoleName");
 
-    if (!string.IsNullOrEmpty(brand))
-        query = query.Where(p => p.Brand == brand);
+            if (!string.IsNullOrEmpty(userId) && role == "Customer")
+            {
+                var customerId = int.Parse(userId);
+                var customer = await _customerRepository.GetCustomerByIdAsync(customerId);
 
-    switch (sort)
-    {
-        case "price_asc":
-            query = query.OrderBy(p => p.Price);
-            break;
+                if (customer != null)
+                {
+                    ViewBag.CustomerName = customer.FullName;
+                    ViewBag.CustomerEmail = customer.Email;
+                    ViewBag.CustomerPhone = customer.Phone;
+                    ViewBag.IsLoggedIn = true;
+                }
+            }
+            var query = _context.Products
+                .Include(p => p.PrimaryImage)
+                .Where(p => p.CategoryId == 2 && p.StatusId == 1);
 
-        case "price_desc":
-            query = query.OrderByDescending(p => p.Price);
-            break;
+            if (!string.IsNullOrEmpty(brand))
+                query = query.Where(p => p.Brand == brand);
 
-        case "newest":
-            query = query.OrderByDescending(p => p.CreatedAt);
-            break;
+            switch (sort)
+            {
+                case "price_asc":
+                    query = query.OrderBy(p => p.Price);
+                    break;
 
-        default:
-            query = query.OrderByDescending(p => p.CreatedAt);
-            break;
-    }
+                case "price_desc":
+                    query = query.OrderByDescending(p => p.Price);
+                    break;
 
-    ViewBag.Brands = await _context.Products
-        .Where(p => p.CategoryId == 2)
-        .Select(p => p.Brand)
-        .Distinct()
-        .ToListAsync();
+                case "newest":
+                    query = query.OrderByDescending(p => p.CreatedAt);
+                    break;
 
-    return View(await query.ToListAsync());
-}
+                default:
+                    query = query.OrderByDescending(p => p.CreatedAt);
+                    break;
+            }
+
+            ViewBag.Brands = await _context.Products
+                .Where(p => p.CategoryId == 2)
+                .Select(p => p.Brand)
+                .Distinct()
+                .ToListAsync();
+
+            return View(await query.ToListAsync());
+        }
 
 
 
