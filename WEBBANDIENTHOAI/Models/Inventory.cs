@@ -30,5 +30,6 @@ namespace WebBanDienThoai.Models
         public Product Product { get; set; }
 
         public ICollection<InventoryHistory> History { get; set; }
+        public int StockQuantity { get; internal set; }
     }
 }

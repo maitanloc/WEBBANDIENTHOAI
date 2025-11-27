@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Repositories;
 using WEBBANDIENTHOAI.Repository;
-using WEBBANDIENTHOAI.Services; // Thêm dòng này
+using WEBBANDIENTHOAI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,18 +39,15 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IOTPService, OTPService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IMailService, MailService>();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
 
+// ===============================================
+// 5) Cấu hình quan trọng cho Chatbot và Session
+// ===============================================
 
+// 5a) Đăng ký HttpClient để gọi API Gemini
+builder.Services.AddHttpClient();
 
-// ========================
-// 5) Enable Session
-// ========================
+// 5b) Thêm Session (Đã có trong code của bạn, giữ nguyên cấu hình này)
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -75,7 +72,8 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseSession();       // must be before UseAuthorization
+// Cần phải có UseSession TRƯỚC UseAuthorization
+app.UseSession();
 app.UseAuthorization();
 
 // ========================
@@ -83,9 +81,6 @@ app.UseAuthorization();
 // ========================
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// ========================
-// Run
-// ========================
 app.Run();

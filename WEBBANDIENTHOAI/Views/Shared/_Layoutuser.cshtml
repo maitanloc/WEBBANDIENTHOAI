@@ -173,6 +173,36 @@
             .logout-btn-confirm:hover {
                 background: #dc2626;
             }
+
+        /* === CHAT WIDGET STYLES === */
+        #chat-container {
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: #f48c25;
+            border-radius: 4px;
+        }
     </style>
 
     @RenderSection("Styles", required: false)
@@ -639,10 +669,51 @@
         </div>
     </div>
 
-    <!-- JavaScript Libraries -->
+    <div id="chat-widget" class="fixed bottom-6 right-6 z-50">
+        <button id="chat-toggle" class="w-14 h-14 bg-primary hover:bg-primary-dark rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
+            <i class="fas fa-headset text-white text-xl"></i>
+            <span class="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full animate-ping"></span>
+            <span class="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full"></span>
+        </button>
+
+        <div id="chat-container" class="hidden absolute bottom-16 right-0 w-80 h-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col">
+            <div class="bg-gradient-to-r from-primary to-primary-dark p-4 text-white">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white rounded-full overflow-hidden">
+                            <img src="~/images/nhân viên tư vấn.png" alt="Nhân viên tư vấn" class="w-full h-full object-cover">
+                        </div>
+
+                        <div class="flex flex-col">
+                            <span class="font-semibold text-base">FOX AI</span>
+                            <span class="text-xs opacity-80">Nhân viên tư vấn</span>
+                        </div>
+                    </div>
+
+                    <button id="chat-close" class="text-white hover:text-gray-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-900 space-y-4">
+            </div>
+
+            <div class="border-t border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-800">
+                <div class="flex items-center gap-2">
+                    <input type="text" id="chat-input" placeholder="Type your message..."
+                                         class="flex-1 bg-gray-100 dark:bg-gray-700 border-none rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                    <button id="chat-send" class="w-10 h-10 bg-primary hover:bg-primary-dark rounded-full flex items-center justify-center transition-colors">
+                        <i class="fas fa-paper-plane text-white text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
-    <!-- Main JavaScript -->
     <script>
         // Close welcome notification
         function closeWelcome() {
@@ -686,7 +757,7 @@
                         }, 300);
                     }, 100);
                 }
-                progressFill.style.width = progress + '%';
+                if (progressFill) progressFill.style.width = progress + '%';
             }, 100);
         });
 
@@ -696,9 +767,9 @@
 
         window.addEventListener('scroll', () => {
             if (window.scrollY > 100) {
-                header.classList.add('scrolled');
+                if (header) header.classList.add('scrolled');
             } else {
-                header.classList.remove('scrolled');
+                if (header) header.classList.remove('scrolled');
             }
             lastScrollY = window.scrollY;
         });
@@ -707,7 +778,7 @@
         const globalSearch = document.getElementById('globalSearch');
         const searchSuggestions = document.getElementById('searchSuggestions');
 
-        if (globalSearch) {
+        if (globalSearch && searchSuggestions) {
             globalSearch.addEventListener('focus', () => {
                 searchSuggestions.classList.remove('hidden');
             });
@@ -735,14 +806,16 @@
                 );
 
                 const suggestionsContainer = searchSuggestions.querySelector('.max-h-60');
-                suggestionsContainer.innerHTML = filtered.map(item => `
-                    <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-search text-gray-400"></i>
-                            <span class="text-gray-700 dark:text-gray-300">${item}</span>
+                if (suggestionsContainer) {
+                    suggestionsContainer.innerHTML = filtered.map(item => `
+                        <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-search text-gray-400"></i>
+                                <span class="text-gray-700 dark:text-gray-300">${item}</span>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `).join('');
+                }
             });
         }
 
@@ -754,7 +827,7 @@
             const logoutTriggers = document.querySelectorAll('.logout-trigger');
 
             // Toggle dropdown khi click
-            if (userProfileButton) {
+            if (userProfileButton && userProfileDropdown && userProfileChevron) {
                 userProfileButton.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const isHidden = userProfileDropdown.classList.contains('hidden');
@@ -765,14 +838,18 @@
 
             // Đóng dropdown khi click ra ngoài
             document.addEventListener('click', function() {
-                userProfileDropdown.classList.add('hidden');
-                userProfileChevron.classList.remove('rotate-180');
+                if (userProfileDropdown && userProfileChevron) {
+                    userProfileDropdown.classList.add('hidden');
+                    userProfileChevron.classList.remove('rotate-180');
+                }
             });
 
             // Ngăn đóng dropdown khi click vào dropdown
-            userProfileDropdown.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
+            if (userProfileDropdown) {
+                userProfileDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
 
             // XỬ LÝ POPUP ĐĂNG XUẤT
             const logoutPopup = document.getElementById('logout-popup');
@@ -835,6 +912,194 @@
         if (localStorage.getItem('darkMode') === 'true') {
             document.documentElement.classList.add('dark');
         }
+
+
+        // =======================================================
+        // 🤖 CHAT WIDGET FUNCTIONALITY (ĐÃ SỬA CHO CẤU TRÚC HTML MỚI)
+        // =======================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lấy các phần tử DOM
+            const chatToggle = document.getElementById('chat-toggle');
+            const chatContainer = document.getElementById('chat-container'); // Khối chat chính
+            const chatClose = document.getElementById('chat-close');
+            const chatInput = document.getElementById('chat-input');
+            const chatSend = document.getElementById('chat-send');
+            const chatMessagesContainer = document.getElementById('chat-messages'); // Khu vực chứa tin nhắn
+            const chatClear = document.getElementById('chat-clear'); // Bạn cần thêm nút này vào HTML Header
+
+            // Đường dẫn Avatar (Sử dụng đường dẫn của bạn)
+            const aiAvatarUrl = '/images/nhân viên tư vấn.png';
+
+            // Class Tailwind cho màu sắc
+            const userBg = 'bg-indigo-500 text-white';
+            const aiBg = 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200';
+
+            // Hàm tạo tin nhắn trên giao diện
+            function createMessageElement(text, sender, isLoading = false) {
+                const messageWrapper = document.createElement('div');
+                messageWrapper.className = `flex gap-2 mb-4 ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+
+                const innerContent = document.createElement('div');
+                innerContent.className = 'flex-1 max-w-[85%]';
+
+                // Nếu là tin nhắn AI, thêm Avatar và căn chỉnh
+                if (sender === 'ai') {
+                    messageWrapper.classList.add('items-start', 'justify-start');
+
+                    // Thêm Avatar
+                    const avatarDiv = document.createElement('div');
+                    avatarDiv.className = 'w-8 h-8 bg-primary rounded-full overflow-hidden flex-shrink-0';
+                    avatarDiv.innerHTML = `<img src="${aiAvatarUrl}" alt="Fox AI" class="w-full h-full object-cover">`;
+                    messageWrapper.appendChild(avatarDiv);
+
+                    innerContent.className = 'flex-1';
+                } else {
+                    messageWrapper.classList.add('justify-end');
+                    innerContent.className = 'flex-none';
+                }
+
+
+                // Nội dung tin nhắn chính
+                const messageBubble = document.createElement('div');
+                messageBubble.className = `rounded-lg p-3 shadow-sm ${sender === 'user' ? userBg : aiBg}`;
+
+                if (isLoading) {
+                    messageBubble.id = 'loading-message';
+                    messageBubble.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Fox AI đang gõ...';
+                } else {
+                    // Xử lý xuống dòng và hiển thị nội dung
+                    messageBubble.innerHTML = text.replace(/\n/g, '<br>');
+                }
+
+                innerContent.appendChild(messageBubble);
+
+                // Thêm bubble vào wrapper
+                messageWrapper.appendChild(innerContent);
+
+                chatMessagesContainer.appendChild(messageWrapper);
+                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight; // Cuộn xuống dưới
+                return messageWrapper;
+            }
+
+            // Hàm tải lịch sử chat
+            async function loadHistory() {
+                try {
+                    // Gọi action GetChatHistory trong ChatController
+                    const response = await fetch('/Chat/GetChatHistory');
+                    const history = await response.json();
+
+                    chatMessagesContainer.innerHTML = ''; // Xóa nội dung cũ
+
+                    if (history.length === 0) {
+                        createMessageElement("Chào bạn! Tôi là Fox AI, chuyên gia tư vấn công nghệ của FOXMOBILE. Tôi có thể giúp bạn tìm kiếm Điện thoại hoặc Laptop phù hợp!", 'ai');
+                    } else {
+                        history.forEach(msg => {
+                            createMessageElement(msg.userPrompt, 'user');
+                            createMessageElement(msg.aiResponse, 'ai');
+                        });
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi tải lịch sử chat:', error);
+                }
+            }
+
+
+            // Hàm gửi tin nhắn
+            async function sendMessage() {
+                const userPrompt = chatInput.value.trim();
+                if (userPrompt === '') return;
+
+                // 1. Hiển thị tin nhắn người dùng
+                createMessageElement(userPrompt, 'user');
+                chatInput.value = '';
+                chatInput.disabled = true;
+                chatSend.disabled = true;
+
+                // 2. Hiện tin nhắn Loading
+                const loadingMsg = createMessageElement('', 'ai', true);
+
+                try {
+                    // 3. Gửi tin nhắn đến Controller
+                    const response = await fetch('/Chat/Ask', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ UserPrompt: userPrompt })
+                    });
+
+                    const data = await response.json();
+
+                    // 4. Xóa loading và hiển thị câu trả lời
+                    const existingLoading = document.getElementById('loading-message');
+                    if (existingLoading) existingLoading.remove();
+
+                    if (data.success) {
+                        createMessageElement(data.aiResponse, 'ai');
+                    } else {
+                        createMessageElement("Xin lỗi, Fox AI gặp lỗi: " + (data.message || "Không nhận được phản hồi từ server."), 'ai');
+                    }
+
+                } catch (error) {
+                    const existingLoading = document.getElementById('loading-message');
+                    if (existingLoading) existingLoading.remove();
+                    createMessageElement("Lỗi kết nối. Vui lòng kiểm tra Server và API Key.", 'ai');
+                    console.error('Lỗi gửi tin nhắn:', error);
+                } finally {
+                    chatInput.disabled = false;
+                    chatSend.disabled = false;
+                    chatInput.focus();
+                }
+            }
+
+            // Hàm xóa lịch sử
+            async function clearHistory() {
+                 if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử chat không?")) {
+                    await fetch('/Chat/ClearHistory', { method: 'POST' });
+                    loadHistory();
+                 }
+            }
+
+            // --- KÍCH HOẠT CÁC CHỨC NĂNG CHATBOT ---
+
+            // Toggle chat visibility
+            if (chatToggle && chatContainer) {
+                chatToggle.addEventListener('click', function() {
+                    chatContainer.classList.toggle('hidden');
+                    if (!chatContainer.classList.contains('hidden')) {
+                         loadHistory(); // Tải lịch sử khi mở
+                         chatInput.focus();
+                    }
+                });
+            }
+
+            // Close chat
+            if (chatClose && chatContainer) {
+                chatClose.addEventListener('click', function() {
+                    chatContainer.classList.add('hidden');
+                });
+            }
+
+            // Send message on button click
+            if (chatSend) {
+                chatSend.addEventListener('click', sendMessage);
+            }
+
+            // Send message on Enter key
+            if (chatInput) {
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            // Xử lý nút xóa lịch sử (Nếu bạn thêm ID chat-clear vào HTML)
+            if (chatClear) {
+                chatClear.addEventListener('click', clearHistory);
+            }
+        });
     </script>
 
     @RenderSection("Scripts", required: false)
