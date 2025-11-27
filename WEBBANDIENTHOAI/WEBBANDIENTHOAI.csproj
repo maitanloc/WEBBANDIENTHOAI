@@ -9,12 +9,32 @@
   <ItemGroup>
     <Compile Remove="Mappings\**" />
     <Compile Remove="Repositories\**" />
+    <Compile Remove="Tests\UnitTests\Common\**" />
+    <Compile Remove="Tests\UnitTests\Helpers\**" />
+    <Compile Remove="Tests\UnitTests\IntergrationTests\**" />
+    <Compile Remove="Tests\UnitTests\Services\**" />
+    <Compile Remove="Tests\UnitTests\TestData\**" />
     <Content Remove="Mappings\**" />
     <Content Remove="Repositories\**" />
+    <Content Remove="Tests\UnitTests\Common\**" />
+    <Content Remove="Tests\UnitTests\Helpers\**" />
+    <Content Remove="Tests\UnitTests\IntergrationTests\**" />
+    <Content Remove="Tests\UnitTests\Services\**" />
+    <Content Remove="Tests\UnitTests\TestData\**" />
     <EmbeddedResource Remove="Mappings\**" />
     <EmbeddedResource Remove="Repositories\**" />
+    <EmbeddedResource Remove="Tests\UnitTests\Common\**" />
+    <EmbeddedResource Remove="Tests\UnitTests\Helpers\**" />
+    <EmbeddedResource Remove="Tests\UnitTests\IntergrationTests\**" />
+    <EmbeddedResource Remove="Tests\UnitTests\Services\**" />
+    <EmbeddedResource Remove="Tests\UnitTests\TestData\**" />
     <None Remove="Mappings\**" />
     <None Remove="Repositories\**" />
+    <None Remove="Tests\UnitTests\Common\**" />
+    <None Remove="Tests\UnitTests\Helpers\**" />
+    <None Remove="Tests\UnitTests\IntergrationTests\**" />
+    <None Remove="Tests\UnitTests\Services\**" />
+    <None Remove="Tests\UnitTests\TestData\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,14 +51,6 @@
     <PackageReference Include="MySql.Data" Version="9.5.0" />
     <PackageReference Include="NUnit" Version="4.4.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Tests\UnitTests\Helpers\" />
-    <Folder Include="Tests\UnitTests\IntergrationTests\" />
-    <Folder Include="Tests\UnitTests\Common\" />
-    <Folder Include="Tests\UnitTests\TestData\" />
-    <Folder Include="Tests\UnitTests\Services\" />
   </ItemGroup>
 
 </Project>
