@@ -66,6 +66,30 @@ namespace WEBBANDIENTHOAI.Controllers
             }
         }
 
+        public async Task<IActionResult> BuyNow(int productId, int quantity = 1)
+        {
+            var customerId = GetCurrentCustomerId();
+            if (customerId == null)
+            {
+                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập và lưu lại trang định quay về
+                return RedirectToAction("LoginRegister", "Account", new { returnUrl = Url.Action("Productdetails", "HomeUser", new { id = productId }) });
+            }
+
+            try
+            {
+                await _cartRepository.AddToCartAsync(customerId.Value, productId, quantity);
+
+                // Chuyển hướng thẳng đến trang thanh toán với ID sản phẩm vừa thêm
+                return RedirectToAction("Index", "ThanhToan", new { selectedProductIds = productId.ToString() });
+            }
+            catch (Exception)
+            {
+                // Xử lý lỗi nếu có, ví dụ: hiển thị thông báo lỗi và quay lại trang chi tiết sản phẩm
+                TempData["ErrorMessage"] = "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.";
+                return RedirectToAction("Productdetails", "HomeUser", new { id = productId });
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> UpdateQuantity(int productId, int quantity)
         {

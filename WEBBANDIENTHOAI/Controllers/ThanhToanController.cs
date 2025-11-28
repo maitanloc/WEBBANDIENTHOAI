@@ -16,7 +16,6 @@ namespace WEBBANDIENTHOAI.Controllers
             _context = context;
         }
 
-        [HttpPost]
         public IActionResult Index(string selectedProductIds)
         {
             var customerId = HttpContext.Session.GetString("UserId");
