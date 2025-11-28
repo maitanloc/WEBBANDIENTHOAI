@@ -502,6 +502,19 @@
                 });
             });
 
+            const buyNowBtn = document.getElementById('buyNowBtn');
+            buyNowBtn.addEventListener('click', function () {
+                const productId = @Model.ProductId;
+                const quantity = parseInt(quantityInput.value);
+
+                // Hiển thị trạng thái loading
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Đang xử lý...</span>';
+                this.disabled = true;
+
+                // Chuyển hướng đến trang BuyNow
+                window.location.href = `/HomeCarts/BuyNow?productId=${productId}&quantity=${quantity}`;
+            });
+
             // Load related products
             loadRelatedProducts();
 
