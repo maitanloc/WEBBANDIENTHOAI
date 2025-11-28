@@ -35,6 +35,10 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+
+// THÊM DÒNG NÀY - Đăng ký repository cho kho hàng
+builder.Services.AddScoped<IKhohangRepository, KhohangRepository>();
+
 // Đăng ký services
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IOTPService, OTPService>();
@@ -72,8 +76,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseRouting();
-builder.Services.AddSession();
-// Cần phải có UseSession TRƯỚC UseAuthorization
+
+// SỬA LỖI: Di chuyển UseSession sau UseRouting và trước MapControllerRoute
 app.UseSession();
 app.UseAuthorization();
 

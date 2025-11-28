@@ -1,0 +1,234 @@
+﻿@model IEnumerable<WebBanDienThoai.Models.Inventory>
+
+@{
+    ViewData["Title"] = "Quản lý kho hàng";
+    var totalItems = ViewBag.TotalItems ?? 0;
+    var lowStockItems = ViewBag.LowStockItems ?? 0;
+    var searchTerm = ViewBag.SearchTerm as string;
+    var isLowStockView = ViewBag.IsLowStockView as bool? ?? false;
+}
+
+<!-- FONT + TONE MÀU CHUẨN FILE HTML -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #f8f7f5;
+    }
+
+    :root {
+        --primary: #f48c25;
+        --primary-20: rgba(244, 140, 37, 0.2);
+        --primary-10: rgba(244, 140, 37, 0.1);
+        --primary-5: rgba(244, 140, 37, 0.05);
+        --text-main: #1c140d;
+        --text-sub: #9c7349;
+        --bg-light: #f8f7f5;
+        --bg-card: #f4ede7;
+        --border-light: #e8dbce;
+    }
+
+    .text-primary {
+        color: var(--primary);
+    }
+
+    .bg-primary {
+        background-color: var(--primary);
+    }
+
+    .bg-primary\/20 {
+        background-color: var(--primary-20);
+    }
+
+    .bg-primary\/10 {
+        background-color: var(--primary-10);
+    }
+
+    .bg-primary\/5 {
+        background-color: var(--primary-5);
+    }
+</style>
+
+<div class="max-w-7xl mx-auto">
+
+    <!-- HEADER -->
+    <header class="mb-6">
+        <h1 class="text-[var(--text-main)] text-4xl font-black tracking-[-0.03em]">
+            Bảng điều khiển quản lý kho hàng
+        </h1>
+
+        <!-- STAT CARDS -->
+        <div class="flex flex-wrap gap-4 mt-4">
+            <div class="rounded-lg p-4 border border-[var(--border-light)] bg-[var(--bg-card)]">
+                <div class="text-2xl font-bold text-[var(--text-main)]">@totalItems</div>
+                <div class="text-sm text-[var(--text-sub)]">Tổng sản phẩm</div>
+            </div>
+
+            <div class="rounded-lg p-4 border border-[var(--border-light)] bg-[var(--bg-card)]">
+                <div class="text-2xl font-bold text-[#dc2626]">@lowStockItems</div>
+                <div class="text-sm text-[var(--text-sub)]">Sắp hết hàng</div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(searchTerm))
+            {
+                <div class="rounded-lg p-4 border border-[var(--border-light)] bg-[var(--bg-card)]">
+                    <div class="text-sm text-[var(--text-sub)]">
+                        Kết quả tìm kiếm:
+                        <span class="font-semibold text-[var(--text-main)]">"@searchTerm"</span>
+                        <a href="@Url.Action("Index")" class="ml-2 text-primary hover:underline">✕</a>
+                    </div>
+                </div>
+            }
+
+            @if (isLowStockView)
+            {
+                <div class="rounded-lg p-4 border border-[var(--border-light)] bg-[var(--bg-card)]">
+                    <div class="text-sm text-[var(--text-sub)]">
+                        Đang xem sản phẩm sắp hết hàng
+                        <a href="@Url.Action("Index")" class="ml-2 text-primary hover:underline">✕</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </header>
+
+    <!-- SEARCH + ACTIONS -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+
+        <!-- SEARCH -->
+        <form method="post" asp-action="Search" class="w-full md:max-w-md">
+            <label class="flex flex-col h-12 w-full">
+                <div class="flex w-full items-center rounded-lg h-full bg-[var(--bg-card)]">
+                    <span class="material-symbols-outlined text-[var(--text-sub)] pl-4">search</span>
+                    <input name="searchTerm"
+                           value="@searchTerm"
+                           class="flex-1 rounded-r-lg bg-transparent px-4 text-[var(--text-main)]
+                                  placeholder:text-[var(--text-sub)] focus:outline-none"
+                           placeholder="Tìm kiếm sản phẩm, vị trí..." />
+                </div>
+            </label>
+        </form>
+
+        <!-- ACTION BUTTONS -->
+        <div class="flex items-center gap-2">
+
+            <a href="@Url.Action("LowStock")"
+               class="flex items-center rounded-lg h-12 bg-[#fef2f2] text-[#dc2626] px-5 gap-2 hover:bg-[#fee2e2] transition">
+                <span class="material-symbols-outlined !text-xl">warning</span>
+                Sắp hết hàng
+            </a>
+
+            <button class="p-2 rounded-lg text-[var(--text-main)] hover:bg-primary/10">
+                <span class="material-symbols-outlined">filter_list</span>
+            </button>
+
+            <button class="flex items-center rounded-lg h-12 px-5 bg-primary/20 text-primary gap-2 hover:bg-primary/30 transition">
+                <span class="material-symbols-outlined !text-xl" style="font-variation-settings:'FILL'1;">login</span>
+                Nhập hàng
+            </button>
+
+            <button class="flex items-center rounded-lg h-12 px-5 bg-primary/20 text-primary gap-2 hover:bg-primary/30 transition">
+                <span class="material-symbols-outlined !text-xl" style="font-variation-settings:'FILL'1;">logout</span>
+                Xuất hàng
+            </button>
+
+            <button class="flex items-center rounded-lg h-12 px-5 bg-primary text-white gap-2 hover:bg-opacity-90 transition"
+                    onclick="window.location.href = '@Url.Action("ExportExcel", "Kho")';">
+                <span class="material-symbols-outlined !text-xl" style="font-variation-settings:'FILL'1;">print</span>
+                Xuất Excel
+            </button>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="w-full">
+        <div class="overflow-hidden rounded-lg border border-[var(--border-light)] bg-[var(--bg-light)]">
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[1024px]">
+
+                    <!-- HEADER -->
+                    <thead class="bg-[var(--bg-card)]">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Mã kho</th>
+                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Mã tồn kho</th>
+                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Tên sản phẩm</th>
+                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Hiện tại</th>
+                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Tối thiểu</th>
+                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Tối đa</th>
+                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Vị trí</th>
+                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Cập nhật</th>
+                        </tr>
+                    </thead>
+
+                    <!-- ROWS -->
+                    <tbody class="divide-y divide-[var(--border-light)]">
+                        @foreach (var item in Model)
+                        {
+                            <tr class="hover:bg-primary/5 @(item.CurrentQuantity <= item.MinimumQuantity ? "bg-red-50" : "")">
+
+                                <td class="px-4 py-2 text-[var(--text-sub)]">@item.InventoryId</td>
+                                <td class="px-4 py-2 text-[var(--text-sub)]">@item.StockCode</td>
+
+                                <td class="px-4 py-2 text-[var(--text-main)]">
+                                    @if (item.Product != null)
+                                    {
+                                        <div>
+                                            <div class="font-medium">@item.Product.Name</div>
+                                            <div class="text-xs text-[var(--text-sub)]">@item.Product.SKU</div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-[var(--text-sub)]">Chưa có thông tin</span>
+                                    }
+
+                                    @if (item.CurrentQuantity <= item.MinimumQuantity)
+                                    {
+                                        <span class="ml-2 px-2 py-1 text-xs bg-[#dc2626] text-white rounded-full">
+                                            CẢNH BÁO
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="px-4 py-2 text-[var(--text-sub)]">@item.CurrentQuantity</td>
+                                <td class="px-4 py-2 text-[var(--text-sub)]">@item.MinimumQuantity</td>
+                                <td class="px-4 py-2 text-[var(--text-sub)]">@item.MaximumQuantity</td>
+
+                                <td class="px-4 py-2">
+                                    <button class="h-8 px-4 rounded-lg bg-[var(--bg-card)] text-[var(--text-main)] w-full">
+                                        @item.Location
+                                    </button>
+                                </td>
+
+                                <td class="px-4 py-2 text-[var(--text-sub)]">
+                                    @item.LastUpdated.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    @if (!Model.Any())
+    {
+        <div class="text-center py-12">
+            <span class="material-symbols-outlined text-6xl text-[var(--text-sub)]">inventory_2</span>
+            <p class="mt-4 text-[var(--text-sub)]">Không có dữ liệu tồn kho</p>
+
+            @if (!string.IsNullOrEmpty(searchTerm))
+            {
+                <a href="@Url.Action("Index")" class="mt-2 inline-flex items-center text-primary hover:underline">
+                    <span class="material-symbols-outlined text-lg">arrow_back</span>
+                    Quay lại danh sách đầy đủ
+                </a>
+            }
+        </div>
+    }
+</div>
