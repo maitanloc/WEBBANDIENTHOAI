@@ -1,0 +1,400 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layoutuser.cshtml";
+    ViewData["Title"] = "Chính Sách Giao Hàng - FOXMOBILE";
+}
+
+<section class="mb-8" data-aos="fade-up">
+    <div class="bg-gradient-to-r from-[#FF6600] to-[#E55A00] rounded-2xl p-8 text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\" 60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        </div>
+        <div class="relative text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Chính Sách Giao Hàng</h1>
+            <p class="text-lg opacity-90 max-w-2xl mx-auto">Fox Mobile cam kết giao hàng nhanh chóng và đáng tin cậy trên toàn quốc</p>
+        </div>
+    </div>
+</section>
+
+<section class="mb-12" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <div class="flex flex-wrap gap-4">
+                    <button class="shipping-nav-btn active px-4 py-2 bg-[#FF6600] text-white rounded-lg font-medium transition-all" data-target="thoi-gian">
+                        Thời gian giao hàng
+                    </button>
+                    <button class="shipping-nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all" data-target="phi-van-chuyen">
+                        Phí vận chuyển
+                    </button>
+                    <button class="shipping-nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all" data-target="theo-doi">
+                        Theo dõi đơn hàng
+                    </button>
+                    <button class="shipping-nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all" data-target="doi-tra">
+                        Đổi trả & Hoàn tiền
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6 md:p-8">
+                <div id="thoi-gian" class="shipping-content active">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-clock text-[#FF6600] mr-3"></i>
+                            Thời gian giao hàng
+                        </h2>
+
+                        <div class="overflow-x-auto mb-8">
+                            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                <thead class="bg-[#FF6600] text-white">
+                                    <tr>
+                                        <th class="py-3 px-4 text-left">Khu vực</th>
+                                        <th class="py-3 px-4 text-left">Nội thành</th>
+                                        <th class="py-3 px-4 text-left">Ngoại thành</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-gray-200">
+                                        <td class="py-3 px-4 font-medium">Hồ Chí Minh & Biên Hòa</td>
+                                        <td class="py-3 px-4">
+                                            <ul class="list-disc ml-5 space-y-1">
+                                                <li>Giao nhanh 2 giờ (áp dụng cho khu vực có bán kính giao hàng &lt; 10km)</li>
+                                                <li>Trong vòng 24h cho các khoảng cách xa hơn 10km</li>
+                                            </ul>
+                                        </td>
+                                        <td class="py-3 px-4">Trong vòng 24h</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-200">
+                                        <td class="py-3 px-4 font-medium">Các tỉnh thành khác</td>
+                                        <td class="py-3 px-4">Trong vòng 1-2 ngày</td>
+                                        <td class="py-3 px-4">Trong vòng 2-3 ngày</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 font-medium">Vùng sâu, vùng xa</td>
+                                        <td colspan="2" class="py-3 px-4">Trong vòng 3-5 ngày</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-blue-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">Lưu ý quan trọng</h4>
+                                    <p class="text-gray-600">Thời gian giao hàng trên áp dụng với các đơn hàng xác nhận trước 15h30, các đơn hàng sau thời gian này sẽ được tính cho ngày kế tiếp. Thời gian giao hàng không bao gồm Chủ nhật và các ngày Lễ, Tết.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="phi-van-chuyen" class="shipping-content hidden">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-shipping-fast text-[#FF6600] mr-3"></i>
+                            Phí vận chuyển
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="bg-green-50 border border-green-200 rounded-xl p-6">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mr-4">
+                                        <i class="fas fa-truck text-white text-lg"></i>
+                                    </div>
+                                    <h3 class="font-bold text-gray-800 text-lg">Miễn phí vận chuyển</h3>
+                                </div>
+                                <ul class="text-gray-600 space-y-2">
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-2 text-sm"></i>
+                                        Đơn hàng từ 500.000đ trở lên
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-2 text-sm"></i>
+                                        Thành viên VIP của Fox Mobile
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-2 text-sm"></i>
+                                        Chương trình khuyến mãi đặc biệt
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mr-4">
+                                        <i class="fas fa-money-bill-wave text-white text-lg"></i>
+                                    </div>
+                                    <h3 class="font-bold text-gray-800 text-lg">Phí vận chuyển</h3>
+                                </div>
+                                <ul class="text-gray-600 space-y-2">
+                                    <li class="flex items-center">
+                                        <i class="fas fa-info-circle text-yellow-500 mr-2 text-sm"></i>
+                                        Đơn hàng dưới 500.000đ: 20.000đ
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-info-circle text-yellow-500 mr-2 text-sm"></i>
+                                        Phụ thu hàng cồng kềnh: 30.000đ
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-info-circle text-yellow-500 mr-2 text-sm"></i>
+                                        Vùng sâu vùng xa: 30.000đ
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-red-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">Hàng cồng kềnh</h4>
+                                    <p class="text-gray-600 mb-3">Đơn hàng được xác định là cồng kềnh nếu rơi vào một trong các trường hợp sau: Khối lượng thực tế &gt; 8kg, Khối lượng quy đổi &gt; 10kg (DxRxC/5000), Cả 3 chiều có kích thước lớn hơn 35cm, Cả 2 chiều có kích thước lớn hơn 45cm, Chỉ cần một chiều có kích thước lớn hơn 50cm.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="theo-doi" class="shipping-content hidden">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-map-marker-alt text-[#FF6600] mr-3"></i>
+                            Theo dõi đơn hàng
+                        </h2>
+
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 bg-[#FF6600] bg-opacity-10 rounded-full flex items-center justify-center mr-4 mt-1">
+                                    <i class="fas fa-user text-[#FF6600]"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-lg mb-2">Theo dõi qua tài khoản</h3>
+                                    <p class="text-gray-600">Đăng nhập vào tài khoản Fox Mobile của bạn để xem chi tiết trạng thái đơn hàng, lịch sử mua hàng và thông tin giao hàng.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 bg-[#FF6600] bg-opacity-10 rounded-full flex items-center justify-center mr-4 mt-1">
+                                    <i class="fas fa-sms text-[#FF6600]"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-lg mb-2">Thông báo qua SMS/Email</h3>
+                                    <p class="text-gray-600">Chúng tôi sẽ gửi thông báo qua SMS và Email khi đơn hàng của bạn được xác nhận, đang giao và đã giao thành công.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 bg-[#FF6600] bg-opacity-10 rounded-full flex items-center justify-center mr-4 mt-1">
+                                    <i class="fas fa-headset text-[#FF6600]"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-lg mb-2">Hỗ trợ trực tiếp</h3>
+                                    <p class="text-gray-600">Liên hệ hotline 1800 1234 để được hỗ trợ trực tiếp về tình trạng đơn hàng của bạn.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 bg-gray-50 rounded-xl p-6">
+                            <h3 class="font-bold text-gray-800 text-lg mb-4">Các trạng thái đơn hàng</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-center">
+                                    <i class="fas fa-clock text-[#FF6600] mr-3"></i>
+                                    <span class="text-gray-700">Chờ xác nhận</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                                    <span class="text-gray-700">Đã xác nhận</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-box text-blue-500 mr-3"></i>
+                                    <span class="text-gray-700">Đang đóng gói</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-shipping-fast text-orange-500 mr-3"></i>
+                                    <span class="text-gray-700">Đang vận chuyển</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-double text-green-500 mr-3"></i>
+                                    <span class="text-gray-700">Giao hàng thành công</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-times-circle text-red-500 mr-3"></i>
+                                    <span class="text-gray-700">Đã hủy</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="doi-tra" class="shipping-content hidden">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-exchange-alt text-[#FF6600] mr-3"></i>
+                            Đổi trả & Hoàn tiền
+                        </h2>
+
+                        <div class="space-y-6 mb-8">
+                            <div class="bg-white border border-gray-200 rounded-xl p-6 hover-lift">
+                                <h3 class="font-bold text-gray-800 text-lg mb-3 flex items-center">
+                                    <i class="fas fa-undo text-purple-500 mr-2"></i>
+                                    Chính sách đổi trả
+                                </h3>
+                                <p class="text-gray-600 mb-3">Áp dụng đổi trả trong vòng 7 ngày kể từ ngày nhận hàng đối với sản phẩm lỗi kỹ thuật do nhà sản xuất.</p>
+                                <ul class="text-gray-600 list-disc ml-5 space-y-1">
+                                    <li>Sản phẩm phải còn nguyên vẹn, không trầy xước</li>
+                                    <li>Còn đầy đủ phụ kiện, hộp và tem niêm phong</li>
+                                    <li>Không áp dụng với phụ kiện, sim số, thẻ nhớ</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-white border border-gray-200 rounded-xl p-6 hover-lift">
+                                <h3 class="font-bold text-gray-800 text-lg mb-3 flex items-center">
+                                    <i class="fas fa-money-bill-wave text-green-500 mr-2"></i>
+                                    Chính sách hoàn tiền
+                                </h3>
+                                <p class="text-gray-600 mb-3">Thời gian hoàn tiền tùy thuộc vào phương thức thanh toán ban đầu:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-wallet text-[#FF6600] mr-3"></i>
+                                        <span class="text-gray-700">Tiền mặt: Hoàn ngay</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-credit-card text-[#FF6600] mr-3"></i>
+                                        <span class="text-gray-700">Chuyển khoản: 3-5 ngày</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-university text-[#FF6600] mr-3"></i>
+                                        <span class="text-gray-700">Thẻ ATM: 7-10 ngày</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-globe text-[#FF6600] mr-3"></i>
+                                        <span class="text-gray-700">Thẻ quốc tế: 10-15 ngày</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-yellow-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">Điều kiện không áp dụng đổi trả</h4>
+                                    <p class="text-gray-600">Sản phẩm đã qua sử dụng, có dấu hiệu hư hỏng do người dùng, sản phẩm không còn nguyên vẹn, mất hộp hoặc phụ kiện, sản phẩm đã hết thời gian bảo hành.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-12" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="bg-gradient-to-r from-[#FF6600] to-[#E55A00] rounded-2xl p-8 text-white">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h2 class="text-2xl font-bold mb-4">Câu hỏi về giao hàng?</h2>
+                    <p class="opacity-90 mb-6">Đội ngũ hỗ trợ của Fox Mobile luôn sẵn sàng giải đáp mọi thắc mắc về chính sách giao hàng</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-shipping-fast w-6 mr-3"></i>
+                            <span class="font-medium">Bộ phận Giao hàng & Hỗ trợ</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-phone w-6 mr-3"></i>
+                            <span class="font-medium">Hotline: 1800 1234</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope w-6 mr-3"></i>
+                            <span class="font-medium">Email: support@foxmobile.com</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="w-32 h-32 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-truck text-white text-4xl"></i>
+                    </div>
+                    <p class="opacity-90 mb-4">Giao hàng nhanh chóng - Phục vụ tận tâm</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-12" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+            <div class="flex items-start">
+                <i class="fas fa-sync-alt text-yellow-500 text-xl mr-3 mt-1"></i>
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-2">Cập nhật chính sách</h4>
+                    <p class="text-gray-600 mb-3">Chính sách giao hàng có thể được cập nhật để phù hợp với quy định pháp luật và cải thiện dịch vụ. Mọi thay đổi sẽ được thông báo trên website ít nhất 15 ngày trước khi có hiệu lực.</p>
+                    <p class="text-sm text-gray-500">Lần cập nhật gần nhất: <span id="current-date"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hover-lift {
+        transition: all 0.3s ease;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+    .shipping-content {
+        transition: all 0.3s ease;
+    }
+
+    .shipping-nav-btn.active {
+        background: linear-gradient(135deg, #FF6600 0%, #E55A00 100%);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentDate = new Date();
+        document.getElementById('current-date').textContent = currentDate.toLocaleDateString('vi-VN');
+
+        const navButtons = document.querySelectorAll('.shipping-nav-btn');
+        const contentSections = document.querySelectorAll('.shipping-content');
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const target = this.getAttribute('data-target');
+
+                navButtons.forEach(btn => {
+                    btn.classList.remove('active', 'bg-[#FF6600]', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                this.classList.add('active', 'bg-[#FF6600]', 'text-white');
+                this.classList.remove('bg-gray-200', 'text-gray-700');
+
+                contentSections.forEach(section => {
+                    section.classList.add('hidden');
+                    section.classList.remove('active');
+                });
+
+                const targetSection = document.getElementById(target);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                    targetSection.classList.add('active');
+                }
+            });
+        });
+
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 100
+            });
+        }
+    });
+</script>

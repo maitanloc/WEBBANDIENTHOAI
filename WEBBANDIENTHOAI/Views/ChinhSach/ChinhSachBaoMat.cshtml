@@ -1,0 +1,430 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layoutuser.cshtml";
+    ViewData["Title"] = "Chính Sách Bảo Mật - FOXMOBILE";
+}
+
+<!-- Hero Banner -->
+<section class="mb-8" data-aos="fade-up">
+    <div class="bg-gradient-to-r from-primary to-primary-dark rounded-2xl p-8 text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\" 60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        </div>
+        <div class="relative text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Chính Sách Bảo Mật Thông Tin</h1>
+            <p class="text-lg opacity-90 max-w-2xl mx-auto">Fox Mobile cam kết bảo vệ thông tin cá nhân của khách hàng với tiêu chuẩn bảo mật cao nhất</p>
+        </div>
+    </div>
+</section>
+
+<!-- Privacy Content -->
+<section class="mb-12" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Privacy Navigation -->
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <div class="flex flex-wrap gap-4">
+                    <button class="privacy-nav-btn active px-4 py-2 bg-primary text-white rounded-lg font-medium transition-all" data-target="thu-thap">
+                        Thu thập thông tin
+                    </button>
+                    <button class="privacy-nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all" data-target="su-dung">
+                        Sử dụng thông tin
+                    </button>
+                    <button class="privacy-nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all" data-target="bao-mat">
+                        Bảo mật
+                    </button>
+                    <button class="privacy-nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all" data-target="quyen-loi">
+                        Quyền lợi khách hàng
+                    </button>
+                </div>
+            </div>
+
+            <!-- Privacy Content -->
+            <div class="p-6 md:p-8">
+                <!-- Thu thập thông tin -->
+                <div id="thu-thap" class="privacy-content active">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-database text-primary mr-3"></i>
+                            Thu thập thông tin
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mr-4">
+                                        <i class="fas fa-user text-white text-lg"></i>
+                                    </div>
+                                    <h3 class="font-bold text-gray-800 text-lg">Thông tin cá nhân</h3>
+                                </div>
+                                <ul class="text-gray-600 space-y-2">
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-blue-500 mr-2 text-sm"></i>
+                                        Họ tên, email, số điện thoại
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-blue-500 mr-2 text-sm"></i>
+                                        Địa chỉ giao hàng
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-blue-500 mr-2 text-sm"></i>
+                                        Thông tin đăng nhập
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-green-50 border border-green-200 rounded-xl p-6">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mr-4">
+                                        <i class="fas fa-shopping-cart text-white text-lg"></i>
+                                    </div>
+                                    <h3 class="font-bold text-gray-800 text-lg">Thông tin giao dịch</h3>
+                                </div>
+                                <ul class="text-gray-600 space-y-2">
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-2 text-sm"></i>
+                                        Lịch sử mua hàng
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-2 text-sm"></i>
+                                        Sản phẩm đã xem
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-2 text-sm"></i>
+                                        Phương thức thanh toán
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-yellow-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">Cam kết minh bạch</h4>
+                                    <p class="text-gray-600">Fox Mobile chỉ thu thập thông tin cần thiết để phục vụ cho việc mua sắm và chăm sóc khách hàng. Mọi thông tin đều được thu thập với sự đồng ý của khách hàng.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sử dụng thông tin -->
+                <div id="su-dung" class="privacy-content hidden">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-cogs text-primary mr-3"></i>
+                            Sử dụng thông tin
+                        </h2>
+
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mr-4 mt-1">
+                                    <i class="fas fa-shipping-fast text-primary"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-lg mb-2">Xử lý đơn hàng</h3>
+                                    <p class="text-gray-600">Thông tin được sử dụng để xác nhận đơn hàng, giao hàng và hỗ trợ sau bán hàng.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mr-4 mt-1">
+                                    <i class="fas fa-headset text-primary"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-lg mb-2">Hỗ trợ khách hàng</h3>
+                                    <p class="text-gray-600">Giải đáp thắc mắc, xử lý khiếu nại và cung cấp dịch vụ chăm sóc khách hàng.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mr-4 mt-1">
+                                    <i class="fas fa-bullhorn text-primary"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-lg mb-2">Marketing & Khuyến mãi</h3>
+                                    <p class="text-gray-600">Gửi thông tin về sản phẩm mới, chương trình khuyến mãi (chỉ khi có sự đồng ý của khách hàng).</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mr-4 mt-1">
+                                    <i class="fas fa-chart-line text-primary"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-lg mb-2">Cải thiện dịch vụ</h3>
+                                    <p class="text-gray-600">Phân tích để nâng cao chất lượng dịch vụ và trải nghiệm mua sắm.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảo mật -->
+                <div id="bao-mat" class="privacy-content hidden">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-shield-alt text-primary mr-3"></i>
+                            Bảo mật thông tin
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-lock text-green-500 mr-2"></i>
+                                    Biện pháp bảo mật
+                                </h3>
+                                <div class="space-y-4">
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Mã hóa dữ liệu</h4>
+                                            <p class="text-gray-600 text-sm">SSL 256-bit để bảo vệ thông tin truyền tải</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Truy cập hạn chế</h4>
+                                            <p class="text-gray-600 text-sm">Chỉ nhân viên được ủy quyền mới có quyền truy cập</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Hệ thống an ninh</h4>
+                                            <p class="text-gray-600 text-sm">Firewall và hệ thống phát hiện xâm nhập</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-user-shield text-blue-500 mr-2"></i>
+                                    Cam kết bảo mật
+                                </h3>
+                                <div class="space-y-4">
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check text-blue-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Không chia sẻ thông tin</h4>
+                                            <p class="text-gray-600 text-sm">Không bán hoặc chia sẻ thông tin cho bên thứ ba</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check text-blue-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Tuân thủ pháp luật</h4>
+                                            <p class="text-gray-600 text-sm">Tuân thủ Luật Bảo vệ dữ liệu cá nhân</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check text-blue-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Kiểm tra định kỳ</h4>
+                                            <p class="text-gray-600 text-sm">Đánh giá và cập nhật hệ thống bảo mật thường xuyên</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-red-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">Lưu ý quan trọng</h4>
+                                    <p class="text-gray-600 mb-3">Khách hàng cần bảo mật thông tin đăng nhập và không chia sẻ với người khác. Fox Mobile sẽ không bao giờ yêu cầu bạn cung cấp mật khẩu qua email hoặc điện thoại.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quyền lợi khách hàng -->
+                <div id="quyen-loi" class="privacy-content hidden">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-user-check text-primary mr-3"></i>
+                            Quyền lợi khách hàng
+                        </h2>
+
+                        <div class="space-y-6">
+                            <div class="bg-white border border-gray-200 rounded-xl p-6 hover-lift">
+                                <h3 class="font-bold text-gray-800 text-lg mb-3 flex items-center">
+                                    <i class="fas fa-eye text-purple-500 mr-2"></i>
+                                    Quyền truy cập
+                                </h3>
+                                <p class="text-gray-600">Khách hàng có quyền xem và kiểm tra thông tin cá nhân của mình được lưu trữ trong hệ thống.</p>
+                            </div>
+
+                            <div class="bg-white border border-gray-200 rounded-xl p-6 hover-lift">
+                                <h3 class="font-bold text-gray-800 text-lg mb-3 flex items-center">
+                                    <i class="fas fa-edit text-orange-500 mr-2"></i>
+                                    Quyền chỉnh sửa
+                                </h3>
+                                <p class="text-gray-600">Khách hàng có thể cập nhật, chỉnh sửa thông tin cá nhân khi cần thiết.</p>
+                            </div>
+
+                            <div class="bg-white border border-gray-200 rounded-xl p-6 hover-lift">
+                                <h3 class="font-bold text-gray-800 text-lg mb-3 flex items-center">
+                                    <i class="fas fa-ban text-red-500 mr-2"></i>
+                                    Quyền từ chối
+                                </h3>
+                                <p class="text-gray-600">Khách hàng có quyền từ chối nhận thông tin marketing bất cứ lúc nào.</p>
+                            </div>
+
+                            <div class="bg-white border border-gray-200 rounded-xl p-6 hover-lift">
+                                <h3 class="font-bold text-gray-800 text-lg mb-3 flex items-center">
+                                    <i class="fas fa-trash-alt text-gray-500 mr-2"></i>
+                                    Quyền xóa dữ liệu
+                                </h3>
+                                <p class="text-gray-600">Khách hàng có quyền yêu cầu xóa thông tin cá nhân khỏi hệ thống (trừ những thông tin pháp lý bắt buộc).</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 bg-gray-50 rounded-xl p-6">
+                            <h3 class="font-bold text-gray-800 text-lg mb-4">Thực hiện quyền lợi</h3>
+                            <p class="text-gray-600 mb-4">Để thực hiện các quyền lợi trên, khách hàng có thể:</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-center">
+                                    <i class="fas fa-phone text-primary mr-3"></i>
+                                    <span class="text-gray-700">Gọi hotline: 1800 1234</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-envelope text-primary mr-3"></i>
+                                    <span class="text-gray-700">Email: privacy@foxmobile.com</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-user-circle text-primary mr-3"></i>
+                                    <span class="text-gray-700">Tài khoản trên website</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-store text-primary mr-3"></i>
+                                    <span class="text-gray-700">Trực tiếp tại cửa hàng</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="mb-12" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="bg-gradient-to-r from-primary to-primary-dark rounded-2xl p-8 text-white">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h2 class="text-2xl font-bold mb-4">Câu hỏi về bảo mật?</h2>
+                    <p class="opacity-90 mb-6">Đội ngũ bảo mật của Fox Mobile luôn sẵn sàng giải đáp mọi thắc mắc về chính sách bảo mật thông tin</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-shield-alt w-6 mr-3"></i>
+                            <span class="font-medium">Bộ phận Bảo mật & An toàn thông tin</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-phone w-6 mr-3"></i>
+                            <span class="font-medium">Hotline: 1800 1234</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope w-6 mr-3"></i>
+                            <span class="font-medium">Email: security@foxmobile.com</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="w-32 h-32 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-lock text-white text-4xl"></i>
+                    </div>
+                    <p class="opacity-90 mb-4">Bảo mật thông tin - Bảo vệ quyền lợi khách hàng</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Update Info -->
+<section class="mb-12" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+            <div class="flex items-start">
+                <i class="fas fa-sync-alt text-yellow-500 text-xl mr-3 mt-1"></i>
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-2">Cập nhật chính sách</h4>
+                    <p class="text-gray-600 mb-3">Chính sách bảo mật có thể được cập nhật để phù hợp với quy định pháp luật và cải thiện dịch vụ. Mọi thay đổi sẽ được thông báo trên website ít nhất 15 ngày trước khi có hiệu lực.</p>
+                    <p class="text-sm text-gray-500">Lần cập nhật gần nhất: @DateTime.Now.ToString("dd/MM/yyyy")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Styles {
+    <style>
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+
+            .hover-lift:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            }
+
+        .privacy-content {
+            transition: all 0.3s ease;
+        }
+
+        .privacy-nav-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Privacy navigation
+            const navButtons = document.querySelectorAll('.privacy-nav-btn');
+            const contentSections = document.querySelectorAll('.privacy-content');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const target = this.getAttribute('data-target');
+
+                    // Update active button
+                    navButtons.forEach(btn => {
+                        btn.classList.remove('active', 'bg-primary', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                    this.classList.add('active', 'bg-primary', 'text-white');
+                    this.classList.remove('bg-gray-200', 'text-gray-700');
+
+                    // Show target content
+                    contentSections.forEach(section => {
+                        section.classList.add('hidden');
+                        section.classList.remove('active');
+                    });
+
+                    const targetSection = document.getElementById(target);
+                    if (targetSection) {
+                        targetSection.classList.remove('hidden');
+                        targetSection.classList.add('active');
+                    }
+                });
+            });
+
+            // Initialize AOS
+            if (typeof AOS !== 'undefined') {
+                AOS.init({
+                    duration: 800,
+                    once: true,
+                    offset: 100
+                });
+            }
+        });
+    </script>
+}
