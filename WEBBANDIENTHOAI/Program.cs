@@ -1,5 +1,6 @@
 using FluentAssertions.Common;
 using Microsoft.EntityFrameworkCore;
+using WEBBANDIENTHOAI.Controllers;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Repositories;
 using WEBBANDIENTHOAI.Repository;
@@ -45,7 +46,7 @@ builder.Services.AddScoped<IMailService, MailService>();
 // ===============================================
 
 // 5a) Đăng ký HttpClient để gọi API Gemini
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<ChatController>();
 
 // 5b) Thêm Session (Đã có trong code của bạn, giữ nguyên cấu hình này)
 builder.Services.AddDistributedMemoryCache();
@@ -71,7 +72,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseRouting();
-
+builder.Services.AddSession();
 // Cần phải có UseSession TRƯỚC UseAuthorization
 app.UseSession();
 app.UseAuthorization();
