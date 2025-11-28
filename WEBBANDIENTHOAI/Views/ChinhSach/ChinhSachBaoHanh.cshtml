@@ -1,0 +1,408 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layoutuser.cshtml";
+    ViewData["Title"] = "Chính Sách Bảo Hành - FOXMOBILE";
+}
+
+<!-- Hero Banner -->
+<section class="mb-8" data-aos="fade-up">
+    <div class="bg-gradient-to-r from-primary to-primary-dark rounded-2xl p-8 text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        </div>
+        <div class="relative text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Chính Sách Bảo Hành</h1>
+            <p class="text-lg opacity-90 max-w-2xl mx-auto">Fox Mobile cam kết bảo vệ quyền lợi khách hàng với chính sách bảo hành minh bạch và hỗ trợ tận tâm</p>
+        </div>
+    </div>
+</section>
+
+<!-- Warranty Content -->
+<section class="mb-12" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Warranty Navigation -->
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <div class="flex flex-wrap gap-4">
+                    <button class="warranty-nav-btn active px-4 py-2 bg-primary text-white rounded-lg font-medium transition-all" data-target="doi-moi">
+                        Đổi mới 7 ngày
+                    </button>
+                    <button class="warranty-nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all" data-target="bao-hanh-chuan">
+                        Bảo hành tiêu chuẩn
+                    </button>
+                    <button class="warranty-nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all" data-target="dieu-kien">
+                        Điều kiện áp dụng
+                    </button>
+                </div>
+            </div>
+
+            <!-- Warranty Content -->
+            <div class="p-6 md:p-8">
+                <!-- Đổi mới 7 ngày -->
+                <div id="doi-moi" class="warranty-content active">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-sync-alt text-primary mr-3"></i>
+                            Đổi mới 7 ngày miễn phí
+                        </h2>
+                        
+                        <div class="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="text-center">
+                                    <div class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-mobile-alt text-white text-xl"></i>
+                                    </div>
+                                    <h3 class="font-bold text-gray-800 mb-2">Điện thoại</h3>
+                                    <p class="text-gray-600">7 ngày đổi mới</p>
+                                    <p class="text-sm text-gray-500 mt-1">Lỗi phần cứng từ NSX</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-laptop text-white text-xl"></i>
+                                    </div>
+                                    <h3 class="font-bold text-gray-800 mb-2">Laptop</h3>
+                                    <p class="text-gray-600">7 ngày đổi mới</p>
+                                    <p class="text-sm text-gray-500 mt-1">Lỗi phần cứng từ NSX</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full border-collapse border border-gray-300 rounded-lg overflow-hidden">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Loại sản phẩm</th>
+                                        <th class="border border-gray-300 px-4 py-3 text-center font-semibold text-gray-700">Thời gian đổi mới</th>
+                                        <th class="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-700">Ghi chú</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="border border-gray-300 px-4 py-3 font-medium">Điện thoại</td>
+                                        <td class="border border-gray-300 px-4 py-3 text-center">
+                                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">7 ngày</span>
+                                        </td>
+                                        <td class="border border-gray-300 px-4 py-3 text-gray-600">Lỗi phần cứng từ nhà sản xuất</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="border border-gray-300 px-4 py-3 font-medium">Laptop</td>
+                                        <td class="border border-gray-300 px-4 py-3 text-center">
+                                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">7 ngày</span>
+                                        </td>
+                                        <td class="border border-gray-300 px-4 py-3 text-gray-600">Lỗi phần cứng từ nhà sản xuất</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="border border-gray-300 px-4 py-3 font-medium">Phụ kiện</td>
+                                        <td class="border border-gray-300 px-4 py-3 text-center">
+                                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">15 ngày</span>
+                                        </td>
+                                        <td class="border border-gray-300 px-4 py-3 text-gray-600">Áp dụng cho phụ kiện chính hãng</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảo hành tiêu chuẩn -->
+                <div id="bao-hanh-chuan" class="warranty-content hidden">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-shield-alt text-primary mr-3"></i>
+                            Bảo hành tiêu chuẩn
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="bg-white border border-gray-200 rounded-xl p-6 hover-lift">
+                                <div class="flex items-start mb-4">
+                                    <div class="w-12 h-12 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mr-4">
+                                        <i class="fas fa-mobile-alt text-primary text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-gray-800 text-lg">Điện thoại</h3>
+                                        <p class="text-gray-600">12 tháng bảo hành</p>
+                                    </div>
+                                </div>
+                                <ul class="text-gray-600 space-y-2">
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-2 text-sm"></i>
+                                        Bảo hành chính hãng
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-2 text-sm"></i>
+                                        1 đổi 1 trong 7 ngày
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-2 text-sm"></i>
+                                        Hỗ trợ kỹ thuật 24/7
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-white border border-gray-200 rounded-xl p-6 hover-lift">
+                                <div class="flex items-start mb-4">
+                                    <div class="w-12 h-12 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mr-4">
+                                        <i class="fas fa-laptop text-primary text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-gray-800 text-lg">Laptop</h3>
+                                        <p class="text-gray-600">24 tháng bảo hành</p>
+                                    </div>
+                                </div>
+                                <ul class="text-gray-600 space-y-2">
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-2 text-sm"></i>
+                                        Bảo hành chính hãng
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-2 text-sm"></i>
+                                        Bảo hành phần cứng
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-500 mr-2 text-sm"></i>
+                                        Hỗ trợ tận nơi
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-yellow-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">Lưu ý quan trọng</h4>
+                                    <p class="text-gray-600 mb-3">Khách hàng vui lòng chủ động sao lưu dữ liệu trước khi gửi bảo hành. Fox Mobile không chịu trách nhiệm về việc mất dữ liệu trong mọi trường hợp.</p>
+                                    <div class="flex gap-3">
+                                        <a href="#" class="text-sm text-primary hover:text-primary-dark font-medium">
+                                            <i class="fas fa-download mr-1"></i>Hướng dẫn sao lưu Android
+                                        </a>
+                                        <a href="#" class="text-sm text-primary hover:text-primary-dark font-medium">
+                                            <i class="fas fa-download mr-1"></i>Hướng dẫn sao lưu iOS
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Điều kiện áp dụng -->
+                <div id="dieu-kien" class="warranty-content hidden">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-clipboard-check text-primary mr-3"></i>
+                            Điều kiện áp dụng
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Điều kiện được bảo hành -->
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                    Điều kiện được bảo hành
+                                </h3>
+                                <div class="space-y-4">
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Sản phẩm còn nguyên vẹn</h4>
+                                            <p class="text-gray-600 text-sm">Không trầy xước, biến dạng, vỡ màn hình</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Tem bảo hành còn nguyên</h4>
+                                            <p class="text-gray-600 text-sm">Tem bảo hành không bị rách, mờ, sửa đổi</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Đầy đủ phụ kiện</h4>
+                                            <p class="text-gray-600 text-sm">Còn đầy đủ hộp, sạc, cáp, tai nghe (nếu có)</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Lỗi từ nhà sản xuất</h4>
+                                            <p class="text-gray-600 text-sm">Lỗi phần cứng, linh kiện từ phía NSX</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Trường hợp không được bảo hành -->
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-times-circle text-red-500 mr-2"></i>
+                                    Không được bảo hành
+                                </h3>
+                                <div class="space-y-4">
+                                    <div class="flex items-start">
+                                        <i class="fas fa-times text-red-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Hết hạn bảo hành</h4>
+                                            <p class="text-gray-600 text-sm">Sản phẩm đã quá thời hạn bảo hành</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-times text-red-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Lỗi do người dùng</h4>
+                                            <p class="text-gray-600 text-sm">Rơi vỡ, ngấm nước, vào chất lỏng</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-times text-red-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Sửa chữa bên ngoài</h4>
+                                            <p class="text-gray-600 text-sm">Đã sửa chữa tại nơi không ủy quyền</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <i class="fas fa-times text-red-500 mt-1 mr-3"></i>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-800">Thiếu tem bảo hành</h4>
+                                            <p class="text-gray-600 text-sm">Tem bảo hành bị mất hoặc không rõ ràng</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quy trình bảo hành -->
+                        <div class="mt-8 pt-8 border-t border-gray-200">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">Quy trình bảo hành</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="text-center">
+                                    <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold">1</div>
+                                    <h4 class="font-semibold text-gray-800 mb-2">Tiếp nhận</h4>
+                                    <p class="text-gray-600 text-sm">Kiểm tra tình trạng sản phẩm</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold">2</div>
+                                    <h4 class="font-semibold text-gray-800 mb-2">Đánh giá</h4>
+                                    <p class="text-gray-600 text-sm">Xác định nguyên nhân lỗi</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold">3</div>
+                                    <h4 class="font-semibold text-gray-800 mb-2">Xử lý</h4>
+                                    <p class="text-gray-600 text-sm">Sửa chữa hoặc thay thế</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold">4</div>
+                                    <h4 class="font-semibold text-gray-800 mb-2">Hoàn tất</h4>
+                                    <p class="text-gray-600 text-sm">Bàn giao sản phẩm</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Support Section -->
+<section class="mb-12" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="bg-gradient-to-r from-primary to-primary-dark rounded-2xl p-8 text-white">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h2 class="text-2xl font-bold mb-4">Cần hỗ trợ thêm?</h2>
+                    <p class="opacity-90 mb-6">Đội ngũ chăm sóc khách hàng của Fox Mobile luôn sẵn sàng hỗ trợ bạn 24/7</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-phone-alt w-6 mr-3"></i>
+                            <span class="font-medium">Hotline: 1800 1234</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope w-6 mr-3"></i>
+                            <span class="font-medium">Email: support@foxmobile.com</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-clock w-6 mr-3"></i>
+                            <span class="font-medium">Thời gian: 8:00 - 22:00 (T2 - CN)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="w-32 h-32 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-headset text-white text-4xl"></i>
+                    </div>
+                    <button class="bg-white text-primary px-8 py-3 rounded-xl font-bold hover:bg-gray-100 transition-colors">
+                        Liên hệ ngay
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Styles {
+    <style>
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+
+            .hover-lift:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            }
+
+        .warranty-content {
+            transition: all 0.3s ease;
+        }
+
+        .warranty-nav-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Warranty navigation
+            const navButtons = document.querySelectorAll('.warranty-nav-btn');
+            const contentSections = document.querySelectorAll('.warranty-content');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const target = this.getAttribute('data-target');
+                    
+                    // Update active button
+                    navButtons.forEach(btn => {
+                        btn.classList.remove('active', 'bg-primary', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                    this.classList.add('active', 'bg-primary', 'text-white');
+                    this.classList.remove('bg-gray-200', 'text-gray-700');
+
+                    // Show target content
+                    contentSections.forEach(section => {
+                        section.classList.add('hidden');
+                        section.classList.remove('active');
+                    });
+                    
+                    const targetSection = document.getElementById(target);
+                    if (targetSection) {
+                        targetSection.classList.remove('hidden');
+                        targetSection.classList.add('active');
+                    }
+                });
+            });
+
+            // Initialize AOS
+            if (typeof AOS !== 'undefined') {
+                AOS.init({
+                    duration: 800,
+                    once: true,
+                    offset: 100
+                });
+            }
+        });
+    </script>
+}

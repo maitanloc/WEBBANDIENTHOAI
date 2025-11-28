@@ -1,0 +1,346 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layoutuser.cshtml";
+    ViewData["Title"] = "Chính Sách Thanh Toán - FOXMOBILE";
+}
+
+<section class="mb-8" data-aos="fade-up">
+    <div class="bg-gradient-to-r from-[#FF6600] to-[#E55A00] rounded-2xl p-8 text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\" 60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        </div>
+        <div class="relative text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Chính Sách Thanh Toán</h1>
+            <p class="text-lg opacity-90 max-w-2xl mx-auto">Fox Mobile cung cấp các phương thức thanh toán linh hoạt và an toàn</p>
+        </div>
+    </div>
+</section>
+
+<section class="mb-12" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <div class="flex flex-wrap gap-4">
+                    <button class="payment-nav-btn active px-4 py-2 bg-[#FF6600] text-white rounded-lg font-medium transition-all" data-target="tien-mat">
+                        Tiền mặt
+                    </button>
+                    <button class="payment-nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all" data-target="qr-code">
+                        Quét mã QR
+                    </button>
+                    <button class="payment-nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all" data-target="bao-mat">
+                        Bảo mật
+                    </button>
+                    <button class="payment-nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all" data-target="ho-tro">
+                        Hỗ trợ
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6 md:p-8">
+                <!-- Tiền mặt -->
+                <div id="tien-mat" class="payment-content active">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-money-bill-wave text-[#FF6600] mr-3"></i>
+                            Thanh toán bằng tiền mặt
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-lg mb-4">Ưu điểm</h3>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                                        <span class="text-gray-600">Đơn giản, không cần tài khoản ngân hàng</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                                        <span class="text-gray-600">Không lo lộ thông tin thẻ hay tài khoản</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i>
+                                        <span class="text-gray-600">Kiểm tra hàng trước khi thanh toán</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-lg mb-4">Quy trình</h3>
+                                <ol class="space-y-3 list-decimal list-inside">
+                                    <li class="text-gray-600">Chọn sản phẩm và đặt hàng</li>
+                                    <li class="text-gray-600">Chọn phương thức thanh toán tiền mặt</li>
+                                    <li class="text-gray-600">Nhận hàng và kiểm tra</li>
+                                    <li class="text-gray-600">Thanh toán cho nhân viên giao hàng</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-blue-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">Lưu ý quan trọng</h4>
+                                    <ul class="text-gray-600 list-disc ml-5 space-y-2">
+                                        <li>Chuẩn bị đúng số tiền để thanh toán khi nhận hàng</li>
+                                        <li>Kiểm tra kỹ hàng hóa trước khi thanh toán</li>
+                                        <li>Yêu cầu hóa đơn hoặc biên lai từ nhân viên giao hàng</li>
+                                        <li>Liên hệ hotline 1800 1234 nếu có bất kỳ vấn đề gì</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quét mã QR -->
+                <div id="qr-code" class="payment-content hidden">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-qrcode text-[#FF6600] mr-3"></i>
+                            Thanh toán bằng QR Code
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-lg mb-4">Ứng dụng hỗ trợ</h3>
+                                <ul class="space-y-3">
+                                    <li class="flex items-center">
+                                        <i class="fas fa-mobile-alt text-[#FF6600] mr-3"></i>
+                                        <span class="text-gray-600">ViettelPay</span>
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-mobile-alt text-[#FF6600] mr-3"></i>
+                                        <span class="text-gray-600">Momo</span>
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-mobile-alt text-[#FF6600] mr-3"></i>
+                                        <span class="text-gray-600">ZaloPay</span>
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-mobile-alt text-[#FF6600] mr-3"></i>
+                                        <span class="text-gray-600">VNPT Pay</span>
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-mobile-alt text-[#FF6600] mr-3"></i>
+                                        <span class="text-gray-600">Các app ngân hàng hỗ trợ QR</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-lg mb-4">Cách thanh toán</h3>
+                                <ol class="space-y-3 list-decimal list-inside">
+                                    <li class="text-gray-600">Chọn thanh toán bằng QR Code</li>
+                                    <li class="text-gray-600">Mở ứng dụng ngân hàng/VDT trên điện thoại</li>
+                                    <li class="text-gray-600">Chọn tính năng quét mã QR</li>
+                                    <li class="text-gray-600">Quét mã và xác nhận thanh toán</li>
+                                    <li class="text-gray-600">Giữ lại biên lai điện tử</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="bg-green-50 border border-green-200 rounded-xl p-6 mb-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-bolt text-green-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">Ưu điểm</h4>
+                                    <ul class="text-gray-600 list-disc ml-5 space-y-2">
+                                        <li>Thanh toán nhanh chóng, chỉ với vài thao tác</li>
+                                        <li>Không cần mang theo tiền mặt</li>
+                                        <li>An toàn, không tiết lộ thông tin thẻ</li>
+                                        <li>Nhận ngay ưu đãi từ ứng dụng thanh toán</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-yellow-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">Lưu ý</h4>
+                                    <ul class="text-gray-600 list-disc ml-5 space-y-2">
+                                        <li>Đảm bảo điện thoại có kết nối internet</li>
+                                        <li>Kiểm tra kỹ số tiền và thông tin người nhận</li>
+                                        <li>Chụp lại màn hình xác nhận thanh toán</li>
+                                        <li>Liên hệ ngân hàng nếu giao dịch thất bại</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảo mật -->
+                <div id="bao-mat" class="payment-content hidden">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-shield-alt text-[#FF6600] mr-3"></i>
+                            Bảo mật thanh toán
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-lg mb-4">Cam kết bảo mật</h3>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-lock text-[#FF6600] mr-2 mt-1"></i>
+                                        <span class="text-gray-600">Mã hóa thông tin giao dịch</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-user-shield text-[#FF6600] mr-2 mt-1"></i>
+                                        <span class="text-gray-600">Không lưu trữ thông tin thẻ</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-shield-check text-[#FF6600] mr-2 mt-1"></i>
+                                        <span class="text-gray-600">Tuân thủ tiêu chuẩn PCI DSS</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-lg mb-4">Biện pháp an toàn</h3>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check-double text-[#FF6600] mr-2 mt-1"></i>
+                                        <span class="text-gray-600">Xác thực 2 bước cho giao dịch</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-bell text-[#FF6600] mr-2 mt-1"></i>
+                                        <span class="text-gray-600">Thông báo SMS xác nhận</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-history text-[#FF6600] mr-2 mt-1"></i>
+                                        <span class="text-gray-600">Theo dõi giao dịch 24/7</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-purple-50 border border-purple-200 rounded-xl p-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-headset text-purple-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-2">Khi có nghi ngờ</h4>
+                                    <p class="text-gray-600 mb-3">Nếu bạn nghi ngờ có giao dịch bất thường hoặc lừa đảo, vui lòng:</p>
+                                    <ul class="text-gray-600 list-disc ml-5 space-y-2">
+                                        <li>Liên hệ ngay với ngân hàng của bạn</li>
+                                        <li>Gọi đến hotline 1800 1234 của Fox Mobile</li>
+                                        <li>Cung cấp thông tin giao dịch để được hỗ trợ</li>
+                                        <li>Đổi mật khẩu tài khoản nếu cần thiết</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hỗ trợ -->
+                <div id="ho-tro" class="payment-content hidden">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-headset text-[#FF6600] mr-3"></i>
+                            Hỗ trợ thanh toán
+                        </h2>
+
+                        <div class="space-y-6">
+                            <div class="bg-white border border-gray-200 rounded-xl p-6">
+                                <h3 class="font-bold text-gray-800 text-lg mb-4">Vấn đề thường gặp</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <h4 class="font-medium text-gray-800 mb-2">Giao dịch thất bại</h4>
+                                        <p class="text-gray-600">Kiểm tra kết nối internet, số dư tài khoản và thử lại. Nếu vẫn thất bại, hãy liên hệ ngân hàng để biết thêm chi tiết.</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-800 mb-2">Chưa nhận được xác nhận</h4>
+                                        <p class="text-gray-600">Đôi khi xác nhận thanh toán có thể bị chậm. Vui lòng chờ 5-10 phút và kiểm tra lại. Nếu vẫn chưa nhận được, hãy liên hệ hỗ trợ.</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-800 mb-2">Nhầm lẫn số tiền</h4>
+                                        <p class="text-gray-600">Nếu bạn đã thanh toán nhầm số tiền, vui lòng liên hệ ngay với chúng tôi qua hotline để được xử lý kịp thời.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                                <h3 class="font-bold text-gray-800 text-lg mb-4">Thông tin liên hệ</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-phone w-6 text-[#FF6600]"></i>
+                                        <span class="ml-3 text-gray-600">Hotline: 1800 1234 (Miễn phí)</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-envelope w-6 text-[#FF6600]"></i>
+                                        <span class="ml-3 text-gray-600">Email: payment@foxmobile.com</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-clock w-6 text-[#FF6600]"></i>
+                                        <span class="ml-3 text-gray-600">Thời gian: 24/7</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hover-lift {
+        transition: all 0.3s ease;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+    .payment-content {
+        transition: all 0.3s ease;
+    }
+
+    .payment-nav-btn.active {
+        background: linear-gradient(135deg, #FF6600 0%, #E55A00 100%);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Payment navigation
+        const navButtons = document.querySelectorAll('.payment-nav-btn');
+        const contentSections = document.querySelectorAll('.payment-content');
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const target = this.getAttribute('data-target');
+
+                // Update active button
+                navButtons.forEach(btn => {
+                    btn.classList.remove('active', 'bg-[#FF6600]', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                this.classList.add('active', 'bg-[#FF6600]', 'text-white');
+                this.classList.remove('bg-gray-200', 'text-gray-700');
+
+                // Show target content
+                contentSections.forEach(section => {
+                    section.classList.add('hidden');
+                    section.classList.remove('active');
+                });
+
+                const targetSection = document.getElementById(target);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                    targetSection.classList.add('active');
+                }
+            });
+        });
+
+        // Initialize AOS
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 100
+            });
+        }
+    });
+</script>
