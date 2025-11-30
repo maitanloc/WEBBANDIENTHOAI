@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
-using WEBBANDIENTHOAI.Controllers;
+using WEBBANDIENTHOAI.Controllers.TaiKhoan;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.Services;

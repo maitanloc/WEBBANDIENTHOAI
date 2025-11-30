@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.ViewModels;
-using WEBBANDIENTHOAI.Repository;
 using System.Threading.Tasks;
 using System.Linq;
+using WEBBANDIENTHOAI.Repository.TaiKhoan;
 
-namespace WEBBANDIENTHOAI.Controllers
+namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
 {
     public class RoleController : Controller
     {
@@ -113,9 +113,9 @@ namespace WEBBANDIENTHOAI.Controllers
             // Sửa lại để đảm bảo property names chính xác
             var roleData = new
             {
-                RoleId = role.RoleId,
-                RoleName = role.RoleName,
-                Description = role.Description
+                role.RoleId,
+                role.RoleName,
+                role.Description
             };
 
             return Json(new

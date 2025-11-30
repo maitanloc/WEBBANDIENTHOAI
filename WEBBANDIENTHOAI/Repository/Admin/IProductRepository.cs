@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using WEBBANDIENTHOAI.ViewModels;
 using WEBBANDIENTHOAI.Models;
 
-namespace WEBBANDIENTHOAI.Repository
+namespace WEBBANDIENTHOAI.Repository.Admin
 {
     public interface IProductRepository
     {

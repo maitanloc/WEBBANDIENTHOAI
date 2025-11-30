@@ -9,10 +9,10 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
-using WEBBANDIENTHOAI.Controllers;
+using WEBBANDIENTHOAI.Controllers.NguoiDung;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
-using WEBBANDIENTHOAI.Repositories;
+using WEBBANDIENTHOAI.Repository.TaiKhoan;
 using WEBBANDIENTHOAI.ViewModels;
 
 namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers

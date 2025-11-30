@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WEBBANDIENTHOAI.Models;
-using WEBBANDIENTHOAI.Repository;
 using System.Threading.Tasks;
+using WEBBANDIENTHOAI.Repository.Admin;
 
-namespace WEBBANDIENTHOAI.Controllers
+namespace WEBBANDIENTHOAI.Controllers.Admin
 {
     public class ProductStatusesController : Controller
     {

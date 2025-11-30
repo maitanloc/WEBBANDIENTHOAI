@@ -29,5 +29,11 @@ namespace WEBBANDIENTHOAI.Models
         public Customer Customer { get; set; }
 
         public ICollection<OrderDetail> OrderDetails { get; set; }
+
+        [MaxLength(50)]
+        public string PaymentMethod { get; set; } = "COD";
+
+        [MaxLength(500)]
+        public string Notes { get; set; }
     }
 }

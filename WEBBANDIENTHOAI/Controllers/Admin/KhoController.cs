@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WEBBANDIENTHOAI.Repository;
 using WebBanDienThoai.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using WEBBANDIENTHOAI.Repository.Admin;
 
-namespace WEBBANDIENTHOAI.Controllers
+namespace WEBBANDIENTHOAI.Controllers.Admin
 {
     public class KhoController : Controller
     {
@@ -135,7 +135,7 @@ namespace WEBBANDIENTHOAI.Controllers
 
                 ws.Cells["A:Z"].AutoFitColumns();
 
-                var stream = new System.IO.MemoryStream();
+                var stream = new MemoryStream();
                 package.SaveAs(stream);
                 stream.Position = 0;
 

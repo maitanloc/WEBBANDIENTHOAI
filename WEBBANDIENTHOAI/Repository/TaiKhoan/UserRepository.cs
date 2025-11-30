@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 
-namespace WEBBANDIENTHOAI.Repository
+namespace WEBBANDIENTHOAI.Repository.TaiKhoan
 {
     public interface IUserRepository
     {

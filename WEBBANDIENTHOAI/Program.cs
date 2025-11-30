@@ -1,9 +1,10 @@
 using FluentAssertions.Common;
 using Microsoft.EntityFrameworkCore;
-using WEBBANDIENTHOAI.Controllers;
+using WEBBANDIENTHOAI.Controllers.NguoiDung;
 using WEBBANDIENTHOAI.Data;
-using WEBBANDIENTHOAI.Repositories;
-using WEBBANDIENTHOAI.Repository;
+using WEBBANDIENTHOAI.Repository.Admin;
+using WEBBANDIENTHOAI.Repository.NguoiDung;
+using WEBBANDIENTHOAI.Repository.TaiKhoan;
 using WEBBANDIENTHOAI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,8 +36,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-
-// THÊM DÒNG NÀY - Đăng ký repository cho kho hàng
+builder.Services.AddScoped<IOrderHistoryRepository, OrderHistoryRepository>();
 builder.Services.AddScoped<IKhohangRepository, KhohangRepository>();
 
 // Đăng ký services
@@ -46,20 +46,20 @@ builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IMailService, MailService>();
 
 // ===============================================
-// 5) Cấu hình quan trọng cho Chatbot và Session
+// 5) Cấu hình Session - QUAN TRỌNG
 // ===============================================
-
-// 5a) Đăng ký HttpClient để gọi API Gemini
-builder.Services.AddHttpClient<ChatController>();
-
-// 5b) Thêm Session (Đã có trong code của bạn, giữ nguyên cấu hình này)
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(4);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    options.Cookie.Name = "PhoneShop.Session";
+    options.Cookie.SameSite = SameSiteMode.Lax;
 });
+
+// 5a) Đăng ký HttpClient để gọi API Gemini
+builder.Services.AddHttpClient<ChatController>();
 
 // ========================
 // Build app
@@ -67,25 +67,56 @@ builder.Services.AddSession(options =>
 var app = builder.Build();
 
 // ========================
-// 6) Middleware pipeline
+// 6) Middleware pipeline - SỬA LẠI THỨ TỰ
 // ========================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
+else
+{
+    app.UseDeveloperExceptionPage();
+}
 
 app.UseStaticFiles();
 app.UseRouting();
 
-// SỬA LỖI: Di chuyển UseSession sau UseRouting và trước MapControllerRoute
+// QUAN TRỌNG: UseSession PHẢI được gọi trước khi sử dụng Session
 app.UseSession();
+
+// MIDDLEWARE DEBUG - PHẢI ĐẶT SAU UseSession()
+app.Use(async (context, next) =>
+{
+    // Chỉ debug các request đến OrderHistory để tránh log nhiều
+    if (context.Request.Path.StartsWithSegments("/OrderHistory"))
+    {
+        var userId = context.Session.GetString("UserId");
+        var role = context.Session.GetString("RoleName");
+        var customerId = context.Session.GetString("CustomerId");
+
+        Console.WriteLine($"=== SESSION DEBUG ===");
+        Console.WriteLine($"Path: {context.Request.Path}");
+        Console.WriteLine($"UserId: {userId}");
+        Console.WriteLine($"CustomerId: {customerId}");
+        Console.WriteLine($"Role: {role}");
+        Console.WriteLine($"=== END DEBUG ===");
+    }
+
+    await next();
+});
+
 app.UseAuthorization();
 
 // ========================
-// 7) Default Route
+// 7) Routes
 // ========================
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "orderHistory",
+    pattern: "OrderHistory/{action=Index}/{id?}",
+    defaults: new { controller = "OrderHistory" });
 
 app.Run();

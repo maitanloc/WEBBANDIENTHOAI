@@ -6,7 +6,7 @@ using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.ViewModels;
 
-namespace WEBBANDIENTHOAI.Repository
+namespace WEBBANDIENTHOAI.Repository.Admin
 {
     public class ProductRepository : IProductRepository
     {
@@ -209,7 +209,7 @@ namespace WEBBANDIENTHOAI.Repository
         {
             var product = await _context.Products.FindAsync(productId);
             if (product == null)
-                throw new System.Exception($"Product with ID {productId} not found");
+                throw new Exception($"Product with ID {productId} not found");
 
             // Tạo image mới
             var image = new ProductImage
@@ -217,7 +217,7 @@ namespace WEBBANDIENTHOAI.Repository
                 ProductId = productId,
                 ImagePath = bytes,
                 IsPrimary = true,
-                CreatedAt = System.DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow
             };
 
             await _context.ProductImages.AddAsync(image);

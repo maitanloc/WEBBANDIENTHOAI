@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-namespace WEBBANDIENTHOAI.Controllers
+namespace WEBBANDIENTHOAI.Controllers.ChinhSach
 {
     public class WarrantyController : Controller
     {

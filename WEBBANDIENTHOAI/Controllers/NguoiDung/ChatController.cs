@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.Data;
 
-namespace WEBBANDIENTHOAI.Controllers
+namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 {
     public class ChatController : Controller
     {
@@ -201,7 +201,7 @@ namespace WEBBANDIENTHOAI.Controllers
                 {
                     query = query.Where(p =>
                         keywords.Any(k => p.Name.ToLower().Contains(k) ||
-                                         (p.Brand != null && p.Brand.ToLower().Contains(k))));
+                                         p.Brand != null && p.Brand.ToLower().Contains(k)));
                 }
 
                 // LỌC THEO GIÁ

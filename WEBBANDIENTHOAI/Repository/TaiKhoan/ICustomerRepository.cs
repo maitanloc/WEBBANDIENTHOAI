@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using WEBBANDIENTHOAI.Models;
 
-namespace WEBBANDIENTHOAI.Repositories
+namespace WEBBANDIENTHOAI.Repository.TaiKhoan
 {
     public interface ICustomerRepository
     {

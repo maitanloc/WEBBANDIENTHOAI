@@ -2,7 +2,7 @@
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 
-namespace WEBBANDIENTHOAI.Repository
+namespace WEBBANDIENTHOAI.Repository.NguoiDung
 {
     public interface ICartRepository
     {

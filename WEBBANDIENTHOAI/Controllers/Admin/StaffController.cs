@@ -3,13 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.ViewModels;
-using WEBBANDIENTHOAI.Repository;
 using WEBBANDIENTHOAI.Helpers;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using WEBBANDIENTHOAI.Repository.TaiKhoan;
 
-namespace WEBBANDIENTHOAI.Controllers
+namespace WEBBANDIENTHOAI.Controllers.Admin
 {
     public class StaffController : Controller
     {
@@ -73,7 +73,7 @@ namespace WEBBANDIENTHOAI.Controllers
                     Email = model.Email,
                     RoleId = model.RoleId,
                     IsActive = model.IsActive,
-                    CreatedAt = System.DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 if (await _userRepository.CreateUserAsync(user))

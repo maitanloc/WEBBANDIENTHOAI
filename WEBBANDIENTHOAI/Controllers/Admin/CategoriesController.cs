@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WEBBANDIENTHOAI.Models;
-using WEBBANDIENTHOAI.Repository;
 using System.Threading.Tasks;
+using WEBBANDIENTHOAI.Repository.Admin;
 
-namespace WEBBANDIENTHOAI.Controllers
+namespace WEBBANDIENTHOAI.Controllers.Admin
 {
     public class CategoriesController : Controller
     {
@@ -32,7 +32,7 @@ namespace WEBBANDIENTHOAI.Controllers
                 {
                     CategoryName = dto.CategoryName,
                     Description = dto.Description,
-                    CreatedAt = System.DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 var result = await _categoryRepository.CreateAsync(category);

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WEBBANDIENTHOAI.Repository
+namespace WEBBANDIENTHOAI.Repository.Admin
 {
     // INTERFACE
     public interface IProductStatusRepository

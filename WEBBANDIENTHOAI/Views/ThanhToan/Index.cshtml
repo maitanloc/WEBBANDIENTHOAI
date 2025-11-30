@@ -9,7 +9,8 @@
     <div class="layout-container flex h-full grow flex-col">
 
         <main class="flex-1 w-full max-w-7xl mx-auto px-4 lg:px-10 py-8 lg:py-12">
-            <form asp-action="ProcessOrder" method="post" id="checkout-form">
+            <!-- THAY ĐỔI FORM ACTION THÀNH PREVIEW -->
+            <form asp-action="Preview" method="post" id="checkout-form">
                 @Html.AntiForgeryToken()
 
                 <!-- Hidden fields for selected items -->
@@ -115,7 +116,7 @@
                                         <div class="flex items-center space-x-4">
                                             <div class="relative">
                                                 <img class="w-20 h-20 rounded-lg object-cover border"
-                                                     src="@item.ImageUrl" alt="@item.ProductName" />
+                                                     src="@item.ProductImage" alt="@item.ProductName" />
                                                 <span class="absolute -top-2 -right-2 bg-primary text-white text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full">@item.Quantity</span>
                                             </div>
 
@@ -151,8 +152,9 @@
                                 </div>
                             </div>
 
+                            <!-- THAY ĐỔI NÚT THÀNH "XEM TRƯỚC ĐƠN HÀNG" -->
                             <button type="submit" class="w-full bg-primary text-white text-lg font-semibold rounded-lg h-14 shadow-lg hover:bg-orange-600 transition-colors">
-                                Hoàn tất đơn hàng
+                                Đặt Đơn Hàng
                             </button>
                         </div>
                     </div>

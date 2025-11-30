@@ -4,12 +4,12 @@ using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Helpers;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.ViewModels;
-using WEBBANDIENTHOAI.Repositories;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using WEBBANDIENTHOAI.Repository.TaiKhoan;
 
-namespace WEBBANDIENTHOAI.Controllers
+namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 {
     public class HomeUserController : Controller
     {

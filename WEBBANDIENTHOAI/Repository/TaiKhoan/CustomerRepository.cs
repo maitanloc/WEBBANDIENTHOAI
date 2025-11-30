@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 
-namespace WEBBANDIENTHOAI.Repositories
+namespace WEBBANDIENTHOAI.Repository.TaiKhoan
 {
     public class CustomerRepository : ICustomerRepository
     {

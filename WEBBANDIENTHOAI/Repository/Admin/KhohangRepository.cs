@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WEBBANDIENTHOAI.Repository
+namespace WEBBANDIENTHOAI.Repository.Admin
 {
     public interface IKhohangRepository
     {
@@ -50,14 +50,14 @@ namespace WEBBANDIENTHOAI.Repository
                 .Include(i => i.Product)
                 .Where(i => i.StockCode.Contains(searchTerm) ||
                            i.Location.Contains(searchTerm) ||
-                           (i.Product != null && i.Product.Name.Contains(searchTerm)) ||
-                           (i.Product != null && i.Product.SKU.Contains(searchTerm)))
+                           i.Product != null && i.Product.Name.Contains(searchTerm) ||
+                           i.Product != null && i.Product.SKU.Contains(searchTerm))
                 .ToListAsync();
         }
 
         public async Task UpdateInventoryAsync(Inventory inventory)
         {
-            inventory.LastUpdated = System.DateTime.UtcNow;
+            inventory.LastUpdated = DateTime.UtcNow;
             _context.Inventories.Update(inventory);
             await _context.SaveChangesAsync();
         }

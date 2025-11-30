@@ -13,10 +13,10 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using WebBanDienThoai.Models;
-using WEBBANDIENTHOAI.Controllers;
+using WEBBANDIENTHOAI.Controllers.Admin;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
-using WEBBANDIENTHOAI.Repository;
+using WEBBANDIENTHOAI.Repository.Admin;
 using WEBBANDIENTHOAI.ViewModels;
 
 namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers

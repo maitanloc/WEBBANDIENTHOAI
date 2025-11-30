@@ -2,10 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
-using WEBBANDIENTHOAI.Repository;
+using WEBBANDIENTHOAI.Repository.NguoiDung;
 using WEBBANDIENTHOAI.ViewModels;
 
-namespace WEBBANDIENTHOAI.Controllers
+namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 {
     public class HomeCartsController : Controller
     {
@@ -171,7 +171,7 @@ namespace WEBBANDIENTHOAI.Controllers
                             : "/images/default-product.png";
 
                         // SỬA DÒNG NÀY - THÊM ĐẦY ĐỦ NAMESPACE
-                        viewModel.CartItems.Add(new WEBBANDIENTHOAI.ViewModels.CartItemViewModel
+                        viewModel.CartItems.Add(new ViewModels.CartItemViewModel
                         {
                             CartDetailId = item.CartDetailId,
                             ProductId = item.ProductId,

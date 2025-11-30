@@ -8,11 +8,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
-using WEBBANDIENTHOAI.Repository;
 using WEBBANDIENTHOAI.ViewModels;
 using WEBBANDIENTHOAI.Helpers;
+using WEBBANDIENTHOAI.Repository.Admin;
 
-namespace WEBBANDIENTHOAI.Controllers
+namespace WEBBANDIENTHOAI.Controllers.Admin
 {
     public class ProductsController : Controller
     {

@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Moq;
 using NUnit.Framework;
-using WEBBANDIENTHOAI.Controllers;
+using WEBBANDIENTHOAI.Controllers.Admin;
 using WEBBANDIENTHOAI.Models;
-using WEBBANDIENTHOAI.Repository;
+using WEBBANDIENTHOAI.Repository.Admin;
 
 namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
 {

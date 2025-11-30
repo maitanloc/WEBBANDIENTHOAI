@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WEBBANDIENTHOAI.Data;
 
-namespace WEBBANDIENTHOAI.Controllers
+namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
 {
     public class CustomerController : Controller
     {

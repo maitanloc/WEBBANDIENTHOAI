@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
-using WEBBANDIENTHOAI.Repository;
+using WEBBANDIENTHOAI.Repository.Admin;
 
 namespace WEBBANDIENTHOAI.Tests.UnitTests.Repository
 {
