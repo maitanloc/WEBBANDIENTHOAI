@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Text.Json;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.ViewModels;
-using System.Linq;
-using System.Text.Json;
 
 namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 {
@@ -135,83 +136,90 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 
             if (string.IsNullOrEmpty(customerId))
             {
-                return RedirectToAction("Login", "Account");
+                return Json(new { success = false, message = "Vui lòng đăng nhập lại." });
             }
 
             // Lấy thông tin thanh toán từ session
             var modelJson = HttpContext.Session.GetString(CheckoutSessionKey);
             if (string.IsNullOrEmpty(modelJson))
             {
-                TempData["ErrorMessage"] = "Thông tin thanh toán không tồn tại hoặc đã hết hạn";
-                return RedirectToAction("Index", "HomeCarts");
+                return Json(new { success = false, message = "Thông tin thanh toán không tồn tại hoặc đã hết hạn." });
             }
 
             var model = JsonSerializer.Deserialize<CheckoutViewModel>(modelJson);
 
-            using var transaction = _context.Database.BeginTransaction();
-
             try
             {
-                // 1. Tạo đơn hàng mới
-                var order = new Order
-                {
-                    CustomerId = int.Parse(customerId),
-                    OrderDate = DateTime.UtcNow,
-                    Total = model.TotalAmount,
-                    Status = "Pending",
-                    ShippingAddress = model.Address,
-                    CreatedByUserId = null,
-                    PaymentMethod = model.PaymentMethod,
-                    Notes = model.Notes 
-                };
+                int orderId = 0; // Khai báo orderId ngoài để sử dụng sau
 
-                _context.Orders.Add(order);
-                _context.SaveChanges();
+                var strategy = _context.Database.CreateExecutionStrategy(); // Tạo execution strategy
 
-                // 2. Tạo chi tiết đơn hàng
-                foreach (var item in model.SelectedItems)
+                strategy.Execute(() => // Bọc toàn bộ transaction vào strategy để hỗ trợ retry
                 {
-                    var orderDetail = new OrderDetail
+                    using var transaction = _context.Database.BeginTransaction(); // Bắt đầu transaction
+
+                    // 1. Tạo đơn hàng mới
+                    var order = new Order
                     {
-                        OrderId = order.OrderId,
-                        ProductId = item.ProductId,
-                        Quantity = item.Quantity,
-                        UnitPrice = item.Price
+                        CustomerId = int.Parse(customerId),
+                        OrderDate = DateTime.UtcNow,
+                        Total = model.TotalAmount,
+                        Status = "Pending",
+                        ShippingAddress = model.Address,
+                        CreatedByUserId = null,
+                        PaymentMethod = model.PaymentMethod,
+                        Notes = model.Notes ?? string.Empty // Set to empty string if null to avoid null issues
                     };
-                    _context.OrderDetails.Add(orderDetail);
-                }
 
-                // 3. Xóa các sản phẩm đã thanh toán khỏi giỏ hàng
-                var cart = _context.Carts
-                    .Include(c => c.Details)
-                    .FirstOrDefault(c => c.CustomerId == int.Parse(customerId));
+                    _context.Orders.Add(order);
+                    _context.SaveChanges();
 
-                if (cart != null)
-                {
-                    var selectedCartDetails = cart.Details
-                        .Where(cd => model.SelectedItems.Select(si => si.ProductId).Contains(cd.ProductId))
-                        .ToList();
+                    orderId = order.OrderId; // Gán orderId sau khi SaveChanges()
 
-                    foreach (var cartDetail in selectedCartDetails)
+                    // 2. Tạo chi tiết đơn hàng
+                    foreach (var item in model.SelectedItems)
                     {
-                        _context.CartDetails.Remove(cartDetail);
+                        var orderDetail = new OrderDetail
+                        {
+                            OrderId = order.OrderId,
+                            ProductId = item.ProductId,
+                            Quantity = item.Quantity,
+                            UnitPrice = item.Price
+                        };
+                        _context.OrderDetails.Add(orderDetail);
                     }
-                }
 
-                _context.SaveChanges();
-                transaction.Commit();
+                    // 3. Xóa các sản phẩm đã thanh toán khỏi giỏ hàng
+                    var cart = _context.Carts
+                        .Include(c => c.Details)
+                        .FirstOrDefault(c => c.CustomerId == int.Parse(customerId));
+
+                    if (cart != null)
+                    {
+                        var selectedCartDetails = cart.Details
+                            .Where(cd => model.SelectedItems.Select(si => si.ProductId).Contains(cd.ProductId))
+                            .ToList();
+
+                        foreach (var cartDetail in selectedCartDetails)
+                        {
+                            _context.CartDetails.Remove(cartDetail);
+                        }
+                    }
+
+                    _context.SaveChanges();
+                    transaction.Commit(); // Commit transaction
+                });
 
                 // Xóa session sau khi xử lý thành công
                 HttpContext.Session.Remove(CheckoutSessionKey);
 
-                TempData["SuccessMessage"] = $"Đặt hàng thành công! Mã đơn hàng: #{order.OrderId}";
-                return RedirectToAction("OrderSuccess", new { orderId = order.OrderId });
+                return Json(new { success = true, message = "Đặt hàng thành công!", redirectUrl = Url.Action("OrderSuccess", new { orderId }) });
             }
             catch (Exception ex)
             {
-                transaction.Rollback();
-                TempData["ErrorMessage"] = "Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.";
-                return RedirectToAction("Index", new { selectedProductIds = string.Join(",", model.SelectedItems.Select(i => i.ProductId)) });
+                // Không cần rollback thủ công vì strategy sẽ xử lý
+                Console.WriteLine($"Error in ProcessOrder: {ex.Message} - StackTrace: {ex.StackTrace}");
+                return Json(new { success = false, message = $"Có lỗi xảy ra khi đặt hàng: {ex.Message}. Vui lòng thử lại." });
             }
         }
 
@@ -246,16 +254,16 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
             {
                 OrderId = order.OrderId,
                 OrderDate = order.OrderDate,
-                CustomerName = order.Customer.FullName,
-                CustomerEmail = order.Customer.Email,
-                CustomerPhone = order.Customer.Phone,
-                ShippingAddress = order.ShippingAddress,
+                CustomerName = order.Customer?.FullName ?? string.Empty,
+                CustomerEmail = order.Customer?.Email ?? string.Empty,
+                CustomerPhone = order.Customer?.Phone ?? string.Empty,
+                ShippingAddress = order.ShippingAddress ?? string.Empty,
                 TotalAmount = order.Total,
-                PaymentMethod = order.PaymentMethod,
-                Status = order.Status,
+                PaymentMethod = order.PaymentMethod ?? string.Empty,
+                Status = order.Status ?? string.Empty,
                 OrderItems = order.OrderDetails.Select(od => new OrderItemViewModel
                 {
-                    ProductName = od.Product.Name,
+                    ProductName = od.Product?.Name ?? "Unknown",
                     Quantity = od.Quantity,
                     UnitPrice = od.UnitPrice,
                     TotalPrice = od.Quantity * od.UnitPrice
