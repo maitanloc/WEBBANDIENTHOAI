@@ -42,7 +42,7 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Login(string identifier, string password)
+        public async Task<IActionResult> Login(string identifier, string password)
         {
             try
             {
@@ -55,10 +55,10 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
                 // Chuẩn hóa identifier
                 identifier = identifier.Trim().ToLower();
 
-                // Tìm user (Users table)
-                var user = _context.Users
+                // Tìm user (Users table) - dùng async
+                var user = await _context.Users
                     .Include(u => u.Role)
-                    .FirstOrDefault(u => u.Username == identifier || u.Email == identifier);
+                    .FirstOrDefaultAsync(u => u.Username == identifier || u.Email == identifier);
 
                 if (user != null && user.PasswordHash != null && PasswordHasher.Verify(password, user.PasswordHash))
                 {
@@ -76,12 +76,11 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
                     return RedirectToAction("Index", "Home");
                 }
 
-                // Tìm customer
-                var cust = _context.Customers.FirstOrDefault(c =>
+                // Tìm customer - dùng async
+                var cust = await _context.Customers.FirstOrDefaultAsync(c =>
                     c.Email == identifier ||
-                    !string.IsNullOrEmpty(c.Phone) && c.Phone == identifier);
+                    (!string.IsNullOrEmpty(c.Phone) && c.Phone == identifier));
 
-                // Trong phương thức Login - phần customer
                 if (cust != null && cust.PasswordHash != null && PasswordHasher.Verify(password, cust.PasswordHash))
                 {
                     // XÓA session cũ trước
@@ -117,51 +116,140 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
         // ========== REGISTER ==========
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Register(string fullname, string email, string phone, string password, string address)
+        public async Task<IActionResult> Register(string fullname, string email, string phone, string password, string address)
         {
             try
             {
+                // Kiểm tra dữ liệu đầu vào
                 if (string.IsNullOrWhiteSpace(fullname) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
                 {
                     ViewBag.Error = "Họ tên, email và mật khẩu là bắt buộc.";
                     return View("LoginRegister");
                 }
 
-                // Kiểm tra email đã tồn tại
-                if (_context.Customers.Any(c => c.Email == email))
+                // Kiểm tra định dạng email
+                if (!IsValidEmail(email))
                 {
-                    ViewBag.Error = "Email đã tồn tại!";
+                    ViewBag.Error = "Email không đúng định dạng!";
                     return View("LoginRegister");
                 }
 
-                // Tạo CitizenID ngẫu nhiên
+                // Kiểm tra độ mạnh mật khẩu (ít nhất 6 ký tự)
+                if (password.Length < 6)
+                {
+                    ViewBag.Error = "Mật khẩu phải có ít nhất 6 ký tự!";
+                    return View("LoginRegister");
+                }
+
+                // Kiểm tra email đã tồn tại (trong cả Users và Customers)
+                var emailLower = email.Trim().ToLower();
+
+                // Kiểm tra trong bảng Customers
+                if (await _context.Customers.AnyAsync(c => c.Email == emailLower))
+                {
+                    ViewBag.Error = "Email đã tồn tại trong hệ thống!";
+                    return View("LoginRegister");
+                }
+
+                // Kiểm tra trong bảng Users (admin/staff)
+                if (await _context.Users.AnyAsync(u => u.Email == emailLower))
+                {
+                    ViewBag.Error = "Email đã tồn tại trong hệ thống!";
+                    return View("LoginRegister");
+                }
+
+                // KIỂM TRA TRÙNG SỐ ĐIỆN THOẠI (nếu có)
+                if (!string.IsNullOrWhiteSpace(phone))
+                {
+                    var phoneTrimmed = phone.Trim();
+
+                    // Kiểm tra trong bảng Customers
+                    if (await _context.Customers.AnyAsync(c => c.Phone == phoneTrimmed))
+                    {
+                        ViewBag.Error = "Số điện thoại đã được sử dụng!";
+                        return View("LoginRegister");
+                    }
+
+                    // Kiểm tra định dạng số điện thoại Việt Nam
+                    if (!IsValidVietnamesePhoneNumber(phoneTrimmed))
+                    {
+                        ViewBag.Error = "Số điện thoại không đúng định dạng Việt Nam (10-11 số, bắt đầu bằng 0)!";
+                        return View("LoginRegister");
+                    }
+                }
+
+                // Tạo CitizenID ngẫu nhiên (12 số)
                 string citizenId;
+                int maxRetry = 10; // Tối đa thử 10 lần để tránh CitizenID trùng
+                int currentRetry = 0;
+
                 do
                 {
                     citizenId = GenerateRandomCitizenId();
-                } while (_context.Customers.Any(c => c.CitizenID == citizenId));
+                    currentRetry++;
+
+                    if (currentRetry >= maxRetry)
+                    {
+                        ViewBag.Error = "Lỗi hệ thống khi tạo mã công dân. Vui lòng thử lại.";
+                        return View("LoginRegister");
+                    }
+                } while (await _context.Customers.AnyAsync(c => c.CitizenID == citizenId));
 
                 // Tạo customer mới
                 var customer = new Customer
                 {
                     FullName = fullname?.Trim(),
-                    Email = email?.Trim().ToLower(),
+                    Email = emailLower,
                     Phone = phone?.Trim(),
                     PasswordHash = PasswordHasher.Hash(password),
                     CitizenID = citizenId,
                     Address = address?.Trim(),
-                    IsActive = true
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    
                 };
 
-                _context.Customers.Add(customer);
-                _context.SaveChanges();
+                // Thêm customer vào database (KHÔNG dùng transaction)
+                await _context.Customers.AddAsync(customer);
+                await _context.SaveChangesAsync();
+
+                Console.WriteLine($"=== REGISTER SUCCESS ===");
+                Console.WriteLine($"New customer: {customer.FullName}, Email: {customer.Email}, Phone: {customer.Phone}");
 
                 ViewBag.Message = "Đăng ký thành công! Bạn có thể đăng nhập ngay.";
+                return View("LoginRegister");
+            }
+            catch (DbUpdateException dbEx)
+            {
+                // Xử lý lỗi database đặc biệt
+                Console.WriteLine($"Database error in Register: {dbEx.InnerException?.Message ?? dbEx.Message}");
+
+                // Kiểm tra xem có phải lỗi duplicate không
+                string errorMessage = dbEx.InnerException?.Message ?? "";
+
+                if (errorMessage.Contains("duplicate") || errorMessage.Contains("unique"))
+                {
+                    if (errorMessage.Contains("Email") || errorMessage.Contains("IX_Customers_Email"))
+                        ViewBag.Error = "Email đã tồn tại trong hệ thống!";
+                    else if (errorMessage.Contains("Phone") || errorMessage.Contains("IX_Customers_Phone"))
+                        ViewBag.Error = "Số điện thoại đã được sử dụng!";
+                    else if (errorMessage.Contains("CitizenID") || errorMessage.Contains("IX_Customers_CitizenID"))
+                        ViewBag.Error = "Lỗi hệ thống: ID công dân trùng. Vui lòng thử lại.";
+                    else
+                        ViewBag.Error = "Thông tin đăng ký bị trùng lặp. Vui lòng kiểm tra lại.";
+                }
+                else
+                {
+                    ViewBag.Error = "Lỗi kết nối cơ sở dữ liệu. Vui lòng thử lại sau.";
+                }
+
                 return View("LoginRegister");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Register error: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+
                 ViewBag.Error = $"Lỗi đăng ký: {ex.Message}";
                 return View("LoginRegister");
             }
@@ -234,7 +322,7 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
                 if (emailSent)
                 {
                     Console.WriteLine($"Redirecting to VerifyOTP with email: {email}");
-                    return RedirectToAction("VerifyOTP", new { email });
+                    return RedirectToAction("VerifyOTP", new { email = email });
                 }
                 else
                 {
@@ -337,7 +425,7 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
                     await _context.SaveChangesAsync();
 
                     Console.WriteLine("Redirecting to ResetPassword...");
-                    return RedirectToAction("ResetPassword", new { token });
+                    return RedirectToAction("ResetPassword", new { token = token });
                 }
                 else
                 {
@@ -409,7 +497,7 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
                 if (string.IsNullOrEmpty(email))
                 {
                     TempData["Error"] = "Email không hợp lệ.";
-                    return RedirectToAction("VerifyOTP", new { email });
+                    return RedirectToAction("VerifyOTP", new { email = email });
                 }
 
                 var customer = await _context.Customers
@@ -419,7 +507,7 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
                 {
                     // Bảo mật: không cho biết email có tồn tại không
                     TempData["Success"] = "Nếu email tồn tại trong hệ thống, mã OTP mới đã được gửi.";
-                    return RedirectToAction("VerifyOTP", new { email });
+                    return RedirectToAction("VerifyOTP", new { email = email });
                 }
 
                 // Xóa các OTP cũ
@@ -459,13 +547,13 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
                     TempData["Error"] = "Có lỗi khi gửi email. Vui lòng thử lại.";
                 }
 
-                return RedirectToAction("VerifyOTP", new { email });
+                return RedirectToAction("VerifyOTP", new { email = email });
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"ResendOTP error: {ex.Message}");
                 TempData["Error"] = "Có lỗi khi gửi lại mã OTP. Vui lòng thử lại.";
-                return RedirectToAction("VerifyOTP", new { email });
+                return RedirectToAction("VerifyOTP", new { email = email });
             }
         }
 
@@ -581,7 +669,51 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
 
             return new string(citizenId);
         }
-        // Thêm phương thức này vào OrderHistoryController để test session
+
+        // Kiểm tra định dạng email
+        private bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // Kiểm tra định dạng số điện thoại Việt Nam
+        private bool IsValidVietnamesePhoneNumber(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return false;
+
+            // Loại bỏ khoảng trắng và dấu +
+            phone = phone.Trim().Replace("+", "").Replace(" ", "");
+
+            // Số điện thoại Việt Nam: 10-11 số, bắt đầu bằng 0
+            if (phone.Length < 10 || phone.Length > 11)
+                return false;
+
+            if (!phone.StartsWith("0"))
+                return false;
+
+            // Kiểm tra chỉ chứa số
+            foreach (char c in phone)
+            {
+                if (!char.IsDigit(c))
+                    return false;
+            }
+
+            return true;
+        }
+
+        // Thêm phương thức này để test session
         [HttpGet]
         public IActionResult TestSession()
         {

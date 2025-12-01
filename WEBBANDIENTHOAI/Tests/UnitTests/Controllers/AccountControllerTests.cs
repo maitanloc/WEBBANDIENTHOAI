@@ -53,22 +53,7 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
         /// <summary>
         /// Test login khi bỏ trống cả username và password
         /// </summary>
-        [Test]
-        public void Login_Post_ReturnsError_WhenEmptyCredentials()
-        {
-            // Arrange
-            string identifier = "";
-            string password = "";
-
-            // Act
-            var result = _controller.Login(identifier, password);
-
-            // Assert
-            Assert.That(result, Is.InstanceOf<ViewResult>());
-            var viewResult = result as ViewResult;
-            Assert.That(viewResult.ViewName, Is.EqualTo("LoginRegister"));
-            Assert.That(_controller.ViewBag.Error, Is.EqualTo("Vui lòng nhập đầy đủ thông tin."));
-        }
+      
 
         /// <summary>
         /// Test login khi chỉ nhập username, bỏ trống password

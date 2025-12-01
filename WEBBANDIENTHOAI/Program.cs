@@ -21,10 +21,17 @@ var conn = builder.Configuration.GetConnectionString("DefaultConnection")
 builder.Services.AddControllersWithViews();
 
 // ========================
-// 3) Add DbContext
+// 3) Add DbContext với retry policy
 // ========================
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(conn));
+    options.UseSqlServer(conn, sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,                    // Thử lại tối đa 5 lần
+            maxRetryDelay: TimeSpan.FromSeconds(30), // Mỗi lần cách nhau tối đa 30s
+            errorNumbersToAdd: null);
+        sqlOptions.CommandTimeout(60);          // Timeout 60 giây
+    }));
 
 // ========================
 // 4) Register Repositories
