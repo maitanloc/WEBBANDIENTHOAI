@@ -26,13 +26,13 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(conn, sqlOptions =>
     {
-        sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5,                    // Thử lại tối đa 5 lần
-            maxRetryDelay: TimeSpan.FromSeconds(30), // Mỗi lần cách nhau tối đa 30s
-            errorNumbersToAdd: null);
-        sqlOptions.CommandTimeout(60);          // Timeout 60 giây
+        // TẮT TẠM RETRY STRATEGY ĐỂ DEBUG
+        // sqlOptions.EnableRetryOnFailure(
+        //     maxRetryCount: 5,
+        //     maxRetryDelay: TimeSpan.FromSeconds(30),
+        //     errorNumbersToAdd: null);
+        sqlOptions.CommandTimeout(60);
     }));
-
 // ========================
 // 4) Register Repositories
 // ========================
@@ -66,6 +66,9 @@ builder.Services.AddSession(options =>
 
 // 5a) Đăng ký HttpClient để gọi API Gemini
 builder.Services.AddHttpClient<ChatController>();
+
+// 5b) Đăng ký IHttpContextAccessor để sử dụng trong view
+builder.Services.AddHttpContextAccessor();
 
 // ========================
 // Build app
@@ -119,7 +122,5 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-
 
 app.Run();
