@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\SanPham\**" />
     <Compile Remove="Mappings\**" />
     <Compile Remove="Repositories\**" />
     <Compile Remove="Tests\UnitTests\Common\**" />
@@ -14,6 +15,7 @@
     <Compile Remove="Tests\UnitTests\IntergrationTests\**" />
     <Compile Remove="Tests\UnitTests\Services\**" />
     <Compile Remove="Tests\UnitTests\TestData\**" />
+    <Content Remove="Controllers\SanPham\**" />
     <Content Remove="Mappings\**" />
     <Content Remove="Repositories\**" />
     <Content Remove="Tests\UnitTests\Common\**" />
@@ -21,6 +23,7 @@
     <Content Remove="Tests\UnitTests\IntergrationTests\**" />
     <Content Remove="Tests\UnitTests\Services\**" />
     <Content Remove="Tests\UnitTests\TestData\**" />
+    <EmbeddedResource Remove="Controllers\SanPham\**" />
     <EmbeddedResource Remove="Mappings\**" />
     <EmbeddedResource Remove="Repositories\**" />
     <EmbeddedResource Remove="Tests\UnitTests\Common\**" />
@@ -28,6 +31,7 @@
     <EmbeddedResource Remove="Tests\UnitTests\IntergrationTests\**" />
     <EmbeddedResource Remove="Tests\UnitTests\Services\**" />
     <EmbeddedResource Remove="Tests\UnitTests\TestData\**" />
+    <None Remove="Controllers\SanPham\**" />
     <None Remove="Mappings\**" />
     <None Remove="Repositories\**" />
     <None Remove="Tests\UnitTests\Common\**" />
@@ -52,10 +56,6 @@
     <PackageReference Include="MySql.Data" Version="9.5.0" />
     <PackageReference Include="NUnit" Version="4.4.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\SanPham\" />
   </ItemGroup>
 
 </Project>

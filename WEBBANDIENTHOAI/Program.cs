@@ -36,7 +36,6 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddScoped<IOrderHistoryRepository, OrderHistoryRepository>();
 builder.Services.AddScoped<IKhohangRepository, KhohangRepository>();
 
 // Đăng ký services
@@ -114,9 +113,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapControllerRoute(
-    name: "orderHistory",
-    pattern: "OrderHistory/{action=Index}/{id?}",
-    defaults: new { controller = "OrderHistory" });
+
 
 app.Run();
