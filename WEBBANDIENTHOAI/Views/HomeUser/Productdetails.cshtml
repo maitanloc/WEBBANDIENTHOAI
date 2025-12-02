@@ -163,24 +163,33 @@
                             <button type="button" id="decreaseQty" class="px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors rounded-l-lg">
                                 <i class="fas fa-minus text-xs"></i>
                             </button>
-                            <input type="number" id="quantity" value="1" min="1" max="10" 
+                            <input type="number" id="quantity" value="1" min="1" max="@Model.InventoryQuantity"
                                    class="w-16 text-center border-0 focus:ring-0 focus:outline-none bg-transparent" />
                             <button type="button" id="increaseQty" class="px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors rounded-r-lg">
                                 <i class="fas fa-plus text-xs"></i>
                             </button>
                         </div>
-                        <span class="text-sm text-gray-500">Còn <span class="font-semibold">10</span> sản phẩm</span>
+                        @if (Model.InventoryQuantity > 0)
+                        {
+                            <span class="text-sm text-gray-500">Còn <span class="font-semibold">@Model.InventoryQuantity</span> sản phẩm</span>
+                        }
+                        else
+                        {
+                            <span class="text-sm text-red-500 font-semibold">Hết hàng</span>
+                        }
                     </div>
 
                     <div class="flex space-x-4">
-                        <button id="addToCartBtn" 
+                        <button id="addToCartBtn"
                                 data-product-id="@Model.ProductId"
-                                class="flex-1 bg-gradient-to-r from-primary to-primary-dark text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2">
+                                class="flex-1 bg-gradient-to-r from-primary to-primary-dark text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                @(Model.InventoryQuantity == 0 ? "disabled" : "")>
                             <i class="fas fa-shopping-cart"></i>
                             <span>Thêm vào giỏ hàng</span>
                         </button>
                         <button id="buyNowBtn"
-                                class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2">
+                                class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                @(Model.InventoryQuantity == 0 ? "disabled" : "")>
                             <i class="fas fa-bolt"></i>
                             <span>Đặt hàng</span>
                         </button>
@@ -414,6 +423,16 @@
             const quantityInput = document.getElementById('quantity');
             const decreaseBtn = document.getElementById('decreaseQty');
             const increaseBtn = document.getElementById('increaseQty');
+
+            quantityInput.addEventListener('input', function () {
+                const current = parseInt(this.value);
+                const max = parseInt(this.max);
+
+                if (current > max) {
+                    showCustomAlert('Số lượng sản phẩm không đủ. Tối đa: ' + max);
+                    this.value = max;
+                }
+            });
 
             decreaseBtn.addEventListener('click', () => {
                 const current = parseInt(quantityInput.value);

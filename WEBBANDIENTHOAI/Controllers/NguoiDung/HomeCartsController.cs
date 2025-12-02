@@ -158,19 +158,22 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
             {
                 foreach (var item in cart.Details)
                 {
-                    // Lấy thông tin sản phẩm
+                    // Lấy thông tin sản phẩm và tồn kho
                     var product = await _context.Products
                         .Include(p => p.PrimaryImage)
+                        .Include(p => p.Inventory) // Thêm dòng này
                         .FirstOrDefaultAsync(p => p.ProductId == item.ProductId);
 
                     if (product != null)
                     {
-                        // Lấy ảnh chính của sản phẩm
+                        // Lấy ảnh chính
                         string imageUrl = product.PrimaryImage != null
                             ? Url.Action("GetProductImage", "HomeUser", new { imageId = product.PrimaryImage.ImageId })
                             : "/images/default-product.png";
 
-                        // SỬA DÒNG NÀY - THÊM ĐẦY ĐỦ NAMESPACE
+                        // Tính tổng tồn kho
+                        var inventoryQuantity = product.Inventory?.Sum(i => i.CurrentQuantity) ?? 0;
+
                         viewModel.CartItems.Add(new ViewModels.CartItemViewModel
                         {
                             CartDetailId = item.CartDetailId,
@@ -178,7 +181,8 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                             ProductName = product.Name,
                             ProductImage = imageUrl,
                             Price = item.UnitPrice,
-                            Quantity = item.Quantity
+                            Quantity = item.Quantity,
+                            InventoryQuantity = inventoryQuantity // Thêm dòng này
                         });
                     }
                 }

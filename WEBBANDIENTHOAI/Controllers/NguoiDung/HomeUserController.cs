@@ -103,6 +103,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 .Include(p => p.Images)
                 .Include(p => p.PhoneConfiguration)
                 .Include(p => p.LaptopConfiguration)
+                .Include(p => p.Inventory) // <<< Tải dữ liệu tồn kho
                 .FirstOrDefaultAsync(p => p.ProductId == id);
 
             if (product == null)
@@ -138,6 +139,9 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 orderedImages.AddRange(product.Images.Where(img => img.ImageId != product.ImageId));
             }
 
+            // Tính toán tổng số lượng tồn kho
+            var inventoryQuantity = product.Inventory?.Sum(i => i.CurrentQuantity) ?? 0;
+
             var viewModel = new ProductDetailsVm
             {
                 ProductId = product.ProductId,
@@ -156,6 +160,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 CategoryName = product.Category?.CategoryName,
                 CreatedAt = product.CreatedAt,
                 PrimaryImageId = product.ImageId,
+                InventoryQuantity = inventoryQuantity, // <<< Gán số lượng tồn kho
                 Images = orderedImages.Select(img => new ProductImageVm { ImageId = img.ImageId }).ToList(),
 
                 PhoneConfiguration = product.PhoneConfiguration != null ? new PhoneConfigurationVm

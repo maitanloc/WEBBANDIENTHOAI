@@ -13,6 +13,7 @@ namespace WEBBANDIENTHOAI.ViewModels
         public string ProductImage { get; set; } // Đảm bảo dùng ProductImage thay vì ImageUrl
         public decimal Price { get; set; }
         public int Quantity { get; set; }
+        public int InventoryQuantity { get; set; }
         public decimal TotalPrice => Price * Quantity;
     }
 

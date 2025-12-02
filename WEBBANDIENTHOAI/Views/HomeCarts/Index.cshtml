@@ -57,7 +57,7 @@
                             @foreach (var item in Model.CartItems)
                             {
                                 <div class="flex items-center gap-4 p-6 cart-item bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm"
-                                     data-price="@item.Price" data-quantity="@item.Quantity" data-product-id="@item.ProductId">
+                                     data-price="@item.Price" data-quantity="@item.Quantity" data-product-id="@item.ProductId" data-inventory-quantity="@item.InventoryQuantity">
 
                                     <input type="checkbox" class="item-checkbox h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" checked />
 
@@ -72,15 +72,14 @@
                                     </div>
 
                                     <div class="flex items-center gap-2">
-                                        <button type="button" onclick="updateQuantity(@item.ProductId, @(item.Quantity - 1))" class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <button type="button" onclick="updateQuantity(@item.ProductId, 'decrease')" class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-minus text-xs"></i>
                                         </button>
 
-                                        <span class="w-12 text-center border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 py-1">
-                                            @item.Quantity
-                                        </span>
+                                        <input type="number" value="@item.Quantity" class="w-16 px-1 text-center border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 py-2 quantity-input" data-product-id="@item.ProductId" min="1" max="@item.InventoryQuantity" />
 
-                                        <button type="button" onclick="updateQuantity(@item.ProductId, @(item.Quantity + 1))" class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+
+                                        <button type="button" onclick="updateQuantity(@item.ProductId, 'increase')" class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-plus text-xs"></i>
                                         </button>
 
@@ -156,9 +155,57 @@
 
 @section Scripts {
     <script>
-        function updateQuantity(productId, newQuantity) {
-            if (newQuantity < 1) return;
+        function updateQuantity(productId, direction) {
+            const itemElement = document.querySelector(`.cart-item[data-product-id='${productId}']`);
+            if (!itemElement) return;
 
+            const quantityInput = itemElement.querySelector('.quantity-input');
+            const currentQuantity = parseInt(quantityInput.value);
+            const inventoryQuantity = parseInt(itemElement.dataset.inventoryQuantity);
+
+            let newQuantity = currentQuantity;
+            if (direction === 'increase') {
+                newQuantity++;
+            } else if (direction === 'decrease') {
+                newQuantity--;
+            }
+
+            if (newQuantity < 1) {
+                return; // Không cho giảm xuống dưới 1
+            }
+
+            if (newQuantity > inventoryQuantity) {
+                showCustomAlert('Số lượng sản phẩm không đủ. Tối đa: ' + inventoryQuantity);
+                quantityInput.value = inventoryQuantity; // Đặt lại giá trị input
+                return;
+            }
+
+            sendUpdateRequest(productId, newQuantity);
+        }
+
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('change', function () {
+                const productId = this.dataset.productId;
+                const newQuantity = parseInt(this.value);
+                const maxQuantity = parseInt(this.max);
+
+                if (newQuantity < 1) {
+                    showCustomAlert('Số lượng phải lớn hơn 0');
+                    this.value = 1; // Hoặc giá trị cũ
+                    return;
+                }
+
+                if (newQuantity > maxQuantity) {
+                    showCustomAlert('Số lượng sản phẩm không đủ. Tối đa: ' + maxQuantity);
+                    this.value = maxQuantity;
+                    return;
+                }
+                sendUpdateRequest(productId, newQuantity);
+            });
+        });
+
+
+        function sendUpdateRequest(productId, newQuantity) {
             fetch('/HomeCarts/UpdateQuantity', {
                 method: 'POST',
                 headers: {
@@ -170,16 +217,18 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    location.reload();
+                    location.reload(); // Tải lại trang để cập nhật giỏ hàng
                 } else {
-                    alert(data.message);
+                    showCustomAlert(data.message);
+                    location.reload(); // Tải lại trang để reset về giá trị đúng
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Có lỗi xảy ra khi cập nhật số lượng');
+                showCustomAlert('Có lỗi xảy ra khi cập nhật số lượng');
             });
         }
+
 
         const selectAllCheckbox = document.getElementById("select-all");
         const checkoutForm = document.getElementById("checkout-form");
@@ -199,15 +248,15 @@
                 const cb = item.querySelector(".item-checkbox");
                 if (cb.checked) {
                     const price = parseFloat(item.dataset.price);
-                    const quantity = parseInt(item.dataset.quantity);
+                    const quantity = parseInt(item.querySelector('.quantity-input').value); // Lấy quantity từ input
                     subtotal += price * quantity;
                 }
             });
 
-            // Nếu 0 sản phẩm được check → tổng = 0
             document.getElementById("subtotal-price").textContent = formatMoney(subtotal);
             document.getElementById("total-price").textContent = formatMoney(subtotal);
         }
+
 
         // Lấy danh sách sản phẩm được chọn
         function getSelectedProductIds() {
@@ -225,12 +274,12 @@
             const itemCheckboxes = document.querySelectorAll(".item-checkbox");
 
             if (itemCheckboxes.length > 0) {
-                // Luôn check sản phẩm đầu tiên
-                itemCheckboxes.forEach(cb => cb.checked = false);
-                itemCheckboxes[0].checked = true;
+                itemCheckboxes.forEach(cb => cb.checked = true);
             }
-
-            updateTotal();
+             updateTotal(); // Cập nhật tổng tiền khi tải trang
+             if (selectAllCheckbox) {
+                selectAllCheckbox.checked = true;
+            }
         });
 
         // Event cho các checkbox item
@@ -241,20 +290,20 @@
                 const allChecked = Array.from(itemCheckboxes).every(x => x.checked);
                 const noneChecked = Array.from(itemCheckboxes).every(x => !x.checked);
 
-                // Cập nhật trạng thái ô "chọn tất cả"
-                if (allChecked) {
-                    selectAllCheckbox.checked = true;
-                    selectAllCheckbox.indeterminate = false;
+                if (selectAllCheckbox){
+                    if (allChecked) {
+                        selectAllCheckbox.checked = true;
+                        selectAllCheckbox.indeterminate = false;
+                    }
+                    else if (noneChecked) {
+                        selectAllCheckbox.checked = false;
+                        selectAllCheckbox.indeterminate = false;
+                    }
+                    else {
+                        selectAllCheckbox.checked = false;
+                        selectAllCheckbox.indeterminate = true;
+                    }
                 }
-                else if (noneChecked) {
-                    selectAllCheckbox.checked = false;
-                    selectAllCheckbox.indeterminate = false;
-                }
-                else {
-                    selectAllCheckbox.checked = false;
-                    selectAllCheckbox.indeterminate = true;
-                }
-
                 updateTotal();
             }
         });
@@ -272,7 +321,7 @@
 
             if (selectedProductIds.length === 0) {
                 e.preventDefault();
-                alert('Vui lòng chọn ít nhất một sản phẩm để thanh toán');
+                showCustomAlert('Vui lòng chọn ít nhất một sản phẩm để thanh toán');
                 return;
             }
 

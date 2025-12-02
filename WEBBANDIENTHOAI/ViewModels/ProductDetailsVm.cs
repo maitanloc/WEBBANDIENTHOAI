@@ -20,6 +20,7 @@ namespace WEBBANDIENTHOAI.ViewModels
         public string? CategoryName { get; set; }
         public DateTime CreatedAt { get; set; }
         public int? PrimaryImageId { get; set; }
+        public int InventoryQuantity { get; set; }
         public List<ProductImageVm> Images { get; set; } = new();
         public LaptopConfigurationVm? LaptopConfiguration { get; set; }
         public PhoneConfigurationVm? PhoneConfiguration { get; set; }
