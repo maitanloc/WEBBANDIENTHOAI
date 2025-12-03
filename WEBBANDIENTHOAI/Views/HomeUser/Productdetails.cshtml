@@ -54,22 +54,6 @@
                     }
                 </div>
 
-                <!-- Thumbnail Gallery -->
-                @if (Model.Images.Any())
-                {
-                    <div class="grid grid-cols-4 gap-3">
-                        @foreach (var img in Model.Images.Take(4))
-                        {
-                            <div class="thumbnail bg-gray-50 rounded-lg p-2 cursor-pointer border-2 border-transparent hover:border-primary transition-all duration-200"
-                                 data-imageid="@img.ImageId">
-                                <img src="@Url.Action("GetProductImage", "HomeUser", new { imageId = img.ImageId })" 
-                                     class="w-full h-20 object-contain" 
-                                     alt="@Model.Name" />
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
 
             <!-- Product Info -->
             <div class="space-y-6">
