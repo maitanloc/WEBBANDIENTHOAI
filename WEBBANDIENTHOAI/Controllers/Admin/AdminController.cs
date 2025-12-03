@@ -33,10 +33,9 @@ public class AdminController : Controller
             .Where(o => o.OrderDate >= today && o.OrderDate < today.AddDays(1))
             .SumAsync(o => (decimal?)o.Total) ?? 0m;
 
-        // Đơn mới -> số đơn Pending
+        // ĐÃ SỬA – dùng StatusId thay vì Status string
         model.NewOrdersCount = await _context.Orders
-            .Where(o => o.Status == "Pending")
-            .CountAsync();
+            .CountAsync(o => o.StatusId == 1);   // 1 = Pending (theo dữ liệu bạn đã insert)
 
         // Low stock: inventory current <= minimum
         // LƯU Ý: nếu DbSet tên khác (Inventories) -> đổi _context.Inventory thành _context.Inventories
@@ -45,75 +44,52 @@ public class AdminController : Controller
             .Where(i => i.CurrentQuantity <= i.MinimumQuantity)
             .CountAsync();
 
-        // Recent orders (top 6)
-        var recent = await _context.Orders
+        // Recent orders (top 6) – ĐÃ SỬA HOÀN CHỈNH CHO StatusId + OrderStatus
+        var recentOrders = await _context.Orders
+            .Include(o => o.Customer)           // Lấy tên khách hàng
+            .Include(o => o.OrderStatus)        // Lấy tên trạng thái (Pending, Shipped,...)
             .OrderByDescending(o => o.OrderDate)
             .Take(6)
             .Select(o => new
             {
                 o.OrderId,
                 o.OrderDate,
-                o.Status,
                 o.Total,
-                CustomerId = (int?)o.CustomerId,
-                CreatedByUserId = o.CreatedByUserId
+                StatusName = o.OrderStatus != null ? o.OrderStatus.StatusName : "Không xác định",
+                CustomerName = o.Customer != null ? o.Customer.FullName : null,
+                o.CreatedByUserId
             })
             .ToListAsync();
 
-        // Resolve customer & user names
-        var customerIds = recent.Where(r => r.CustomerId.HasValue).Select(r => r.CustomerId.Value).Distinct().ToList();
-        var userIds = recent.Where(r => r.CreatedByUserId.HasValue).Select(r => r.CreatedByUserId.Value).Distinct().ToList();
+        // Lấy tên nhân viên nếu đơn do nhân viên tạo (CreatedByUserId)
+        var staffIds = recentOrders
+            .Where(x => x.CreatedByUserId.HasValue)
+            .Select(x => x.CreatedByUserId.Value)
+            .Distinct()
+            .ToList();
 
-        var customers = new List<(int CustomerId, string FullName)>();
-        if (customerIds.Any())
+        var staffDict = new Dictionary<int, string>();
+        if (staffIds.Any())
         {
-            customers = await _context.Customers
-                .Where(c => customerIds.Contains(c.CustomerId))
-                .Select(c => new { c.CustomerId, c.FullName })
-                .AsNoTracking()
-                .ToListAsync()
-                .ContinueWith(t => t.Result.Select(x => (x.CustomerId, x.FullName)).ToList());
+            staffDict = await _context.Users
+                .Where(u => staffIds.Contains(u.UserId))
+                .ToDictionaryAsync(u => u.UserId, u => u.FullName ?? u.Username ?? "Nhân viên");
         }
 
-        var users = new List<(int UserId, string FullName, string Username)>();
-        if (userIds.Any())
-        {
-            users = await _context.Users
-                .Where(u => userIds.Contains(u.UserId))
-                .Select(u => new { u.UserId, u.FullName, u.Username })
-                .AsNoTracking()
-                .ToListAsync()
-                .ContinueWith(t => t.Result.Select(x => (x.UserId, x.FullName, x.Username)).ToList());
-        }
-
-        foreach (var r in recent)
+        // Đổ dữ liệu vào DTO
+        foreach (var r in recentOrders)
         {
             var dto = new RecentOrderDto
             {
                 OrderCode = $"#ORD-{r.OrderId:00000}",
                 OrderDate = r.OrderDate,
-                Status = r.Status,
-                Total = r.Total
+                Status = r.StatusName,                                           // ĐÃ SỬA: hiển thị tên trạng thái
+                Total = r.Total,   // XÓA HẾT ?? 0m đi, chỉ để thế này là xong! // XÓA HẾT ?? 0m đi, chỉ để thế này là xong!
+                StaffOrCustomer = r.CustomerName
+                    ?? (r.CreatedByUserId.HasValue && staffDict.ContainsKey(r.CreatedByUserId.Value)
+                        ? staffDict[r.CreatedByUserId.Value]
+                        : "Khách lẻ")
             };
-
-            if (r.CustomerId.HasValue)
-            {
-                var cust = customers.FirstOrDefault(c => c.CustomerId == r.CustomerId.Value);
-                if (!string.IsNullOrEmpty(cust.FullName))
-                    dto.StaffOrCustomer = cust.FullName;
-            }
-
-            if (string.IsNullOrEmpty(dto.StaffOrCustomer) && r.CreatedByUserId.HasValue)
-            {
-                var usr = users.FirstOrDefault(u => u.UserId == r.CreatedByUserId.Value);
-                if (!string.IsNullOrEmpty(usr.FullName))
-                    dto.StaffOrCustomer = usr.FullName;
-                else if (!string.IsNullOrEmpty(usr.Username))
-                    dto.StaffOrCustomer = usr.Username;
-            }
-
-            if (string.IsNullOrEmpty(dto.StaffOrCustomer))
-                dto.StaffOrCustomer = "Khách lẻ";
 
             model.RecentOrders.Add(dto);
         }

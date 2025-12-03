@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿// WEBBANDIENTHOAI/ViewModels/OrderBillViewModel.cs
 namespace WEBBANDIENTHOAI.ViewModels
 {
     public class OrderBillViewModel
@@ -13,7 +11,10 @@ namespace WEBBANDIENTHOAI.ViewModels
         public string ShippingAddress { get; set; }
         public decimal TotalAmount { get; set; }
         public string PaymentMethod { get; set; }
-        public string Status { get; set; }
+
+        // ĐÃ SỬA: hiển thị tên thay vì số
+        public string Status { get; set; }  // ví dụ: "Pending", "Delivered"...
+
         public List<OrderItemViewModel> OrderItems { get; set; }
     }
 

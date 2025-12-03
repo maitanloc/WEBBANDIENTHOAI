@@ -164,7 +164,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                         CustomerId = int.Parse(customerId),
                         OrderDate = DateTime.UtcNow,
                         Total = model.TotalAmount,
-                        Status = "Pending",
+                        StatusId = 1,
                         ShippingAddress = model.Address,
                         CreatedByUserId = null,
                         PaymentMethod = model.PaymentMethod,
@@ -260,7 +260,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 ShippingAddress = order.ShippingAddress ?? string.Empty,
                 TotalAmount = order.Total,
                 PaymentMethod = order.PaymentMethod ?? string.Empty,
-                Status = order.Status ?? string.Empty,
+                Status = order.OrderStatus?.StatusName ?? "Pending",
                 OrderItems = order.OrderDetails.Select(od => new OrderItemViewModel
                 {
                     ProductName = od.Product?.Name ?? "Unknown",
