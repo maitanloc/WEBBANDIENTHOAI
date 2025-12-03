@@ -49,43 +49,7 @@
 
         @foreach (var sp in Model)
         {
-            <a href="@Url.Action("ProductDetails", "HomeUser", new { id = sp.ProductId })"
-               class="group bg-white rounded-2xl border shadow-sm hover:shadow-xl transition-all duration-300 p-4 flex flex-col">
-
-                <div class="relative">
-                    <img src="@Url.Action("GetProductImage", "HomeUser", new { imageId = sp.PrimaryImage?.ImageId })"
-                         class="w-full h-40 object-contain group-hover:scale-105 transition-transform duration-300" />
-
-                    @if (sp.Price < 20000000)
-                    {
-                        <span class="absolute top-2 left-2 bg-green-500 text-white text-xs px-3 py-1 rounded-full shadow">
-                            GIÁ TỐT
-                        </span>
-                    }
-                </div>
-
-                <h3 class="mt-3 font-semibold text-gray-800 line-clamp-2 text-sm min-h-[40px]">
-                    @sp.Name
-                </h3>
-
-                <div class="mt-2">
-                    <span class="text-primary font-bold text-lg">
-                        @String.Format("{0:N0}₫", sp.Price)
-                    </span>
-
-                    @if (sp.OldPrice > sp.Price)
-                    {
-                        <span class="text-gray-400 text-sm line-through ml-2">
-                            @String.Format("{0:N0}₫", sp.OldPrice)
-                        </span>
-                    }
-                </div>
-
-                <button class="mt-4 w-full bg-primary text-white py-2 rounded-xl font-medium hover:bg-primary-dark transition">
-                    Xem chi tiết
-                </button>
-
-            </a>
+            await Html.RenderPartialAsync("_ProductCard", sp);
         }
     </div>
 
@@ -106,12 +70,135 @@
 
 @section Scripts {
     <script>
-        document.getElementById('brand-select').addEventListener('change', function () {
-            document.getElementById('filterSortForm').submit();
-        });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter functionality
+            const brandSelect = document.getElementById('brand-select');
+            if(brandSelect) {
+                brandSelect.addEventListener('change', function () {
+                    document.getElementById('filterSortForm').submit();
+                });
+            }
 
-        document.getElementById('sort-select').addEventListener('change', function () {
-            document.getElementById('filterSortForm').submit();
+            const sortSelect = document.getElementById('sort-select');
+            if(sortSelect) {
+                sortSelect.addEventListener('change', function () {
+                    document.getElementById('filterSortForm').submit();
+                });
+            }
+
+            // Add to cart functionality
+            const addToCartForms = document.querySelectorAll('.add-to-cart-form');
+            addToCartForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const productId = this.dataset.product;
+                    const button = this.querySelector('button');
+
+                    // Show loading state
+                    const originalHTML = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    button.disabled = true;
+
+                    // Gửi request đến server thực tế
+                    fetch('/HomeCarts/AddToCart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: `productId=${productId}&quantity=1`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success state
+                            button.innerHTML = '<i class="fas fa-check"></i>';
+                            button.classList.remove('from-primary', 'to-primary-dark');
+                            button.classList.add('bg-green-500');
+
+                            // Update cart count
+                            const cartCount = document.querySelector('.cart-count');
+                            if (cartCount) {
+                                const currentCount = parseInt(cartCount.textContent) || 0;
+                                cartCount.textContent = currentCount + 1;
+                                cartCount.classList.add('animate-bounce');
+                                setTimeout(() => cartCount.classList.remove('animate-bounce'), 1000);
+                            }
+
+                            // Show success message
+                            showNotification('Đã thêm sản phẩm vào giỏ hàng!', 'success');
+
+                            // Reset button after 2 seconds
+                            setTimeout(() => {
+                                button.innerHTML = originalHTML;
+                                button.classList.remove('bg-green-500');
+                                button.classList.add('from-primary', 'to-primary-dark');
+                                button.disabled = false;
+                            }, 2000);
+                        } else {
+                            if (data.requireLogin) {
+                                if (confirm('Bạn cần đăng nhập để mua hàng. Đến trang đăng nhập?')) {
+                                    window.location.href = '/Account/Login';
+                                } else {
+                                    // Reset button nếu user không muốn login
+                                    button.innerHTML = originalHTML;
+                                    button.disabled = false;
+                                }
+                            } else {
+                                showNotification(data.message, 'error');
+                                button.innerHTML = originalHTML;
+                                button.disabled = false;
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        showNotification('Có lỗi xảy ra khi thêm vào giỏ hàng', 'error');
+                        button.innerHTML = originalHTML;
+                        button.disabled = false;
+                    });
+                });
+            });
+
+            // Wishlist button functionality
+            const wishlistBtns = document.querySelectorAll('.wishlist-btn');
+            wishlistBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation(); // Prevent link navigation
+                    // Add wishlist functionality here
+                    showNotification('Đã thêm vào danh sách yêu thích!', 'success');
+                });
+            });
+
+            // Notification function
+            function showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 ${
+                    type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                }`;
+                notification.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+
+                // Add to page
+                document.body.appendChild(notification);
+
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(calc(100% + 1rem))';
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }
         });
     </script>
 }

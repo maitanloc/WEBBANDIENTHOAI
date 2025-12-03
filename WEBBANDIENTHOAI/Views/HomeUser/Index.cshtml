@@ -120,135 +120,46 @@
 
 
 <!-- Featured Products Section -->
-<section class="mb-12" data-aos="fade-up">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Sản Phẩm Nổi Bật</h2>
-        <a href="/HomeUser/AllProducts" class="text-primary font-medium hover:text-primary-dark flex items-center text-sm">
-            Xem tất cả
-            <i class="fas fa-arrow-right ml-2"></i>
-        </a>
-    </div>
+<section class="mb-12 px-4" data-aos="fade-up">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Sản Phẩm Nổi Bật</h2>
+            <a href="/HomeUser/AllProducts" class="text-primary font-medium hover:text-primary-dark flex items-center text-sm">
+                Xem tất cả
+                <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
-        @if ((topPhones != null && topPhones.Any()) || (topLaptops != null && topLaptops.Any()))
-        {
-            <!-- Gộp 2 danh sách -->
-            var products = new List<WEBBANDIENTHOAI.Models.Product>();
-            if (topPhones != null) { products.AddRange(topPhones); }
-            if (topLaptops != null) { products.AddRange(topLaptops); }
-
-            foreach (var sp in products)
+            @if ((topPhones != null && topPhones.Any()) || (topLaptops != null && topLaptops.Any()))
             {
-                <a href="@Url.Action("ProductDetails", "HomeUser", new { id = sp.ProductId })"
-                   class="block product-card">
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden group hover:shadow-xl transition-all duration-500 hover-lift cursor-pointer h-full flex flex-col">
-                        <div class="relative overflow-hidden flex-1">
-                            @if (sp.PrimaryImage != null)
-                            {
-                                <img src="@Url.Action("GetProductImage", "HomeUser", new { imageId = sp.PrimaryImage.ImageId })"
-                                     class="w-full h-40 object-contain p-2 transition-transform duration-500 group-hover:scale-105 bg-white"
-                                     alt="@sp.Name" />
-                            }
-                            else
-                            {
-                                <img src="/images/default-product.png"
-                                     class="w-full h-40 object-contain p-2 transition-transform duration-500 group-hover:scale-105 bg-white"
-                                     alt="@sp.Name" />
-                            }
+                <!-- Gộp 2 danh sách -->
+                var products = new List<WEBBANDIENTHOAI.Models.Product>();
+                if (topPhones != null) { products.AddRange(topPhones); }
+                if (topLaptops != null) { products.AddRange(topLaptops); }
 
-                            @if (sp.Price < 5000000)
-                            {
-                                <div class="absolute top-3 left-3">
-                                    <span class="bg-gradient-to-r from-primary to-primary-dark text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                                        GIÁ TỐT
-                                    </span>
-                                </div>
-                            }
-
-                            <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <button type="button"
-                                        class="wishlist-btn w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors"
-                                        onclick="event.preventDefault(); event.stopPropagation();">
-                                    <i class="fas fa-heart text-gray-600 text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="p-4 flex-1 flex flex-col">
-                            <h3 class="font-semibold text-gray-800 text-sm line-clamp-2 mb-2 leading-tight">@sp.Name</h3>
-
-                            @if (!string.IsNullOrEmpty(sp.ShortDescription))
-                            {
-                                <p class="text-gray-500 text-xs line-clamp-2 mb-3 leading-relaxed flex-1">
-                                    @sp.ShortDescription
-                                </p>
-                            }
-
-                            <div class="mt-auto">
-                                <div class="flex items-center justify-between mt-4">
-                                    <div class="flex flex-col">
-                                        <span class="text-primary font-bold text-lg">
-                                            @String.Format("{0:N0}₫", sp.Price)
-                                        </span>
-                                        @if (sp.OldPrice > sp.Price)
-                                        {
-                                            <span class="text-gray-400 text-sm line-through">
-                                                @String.Format("{0:N0}₫", sp.OldPrice)
-                                            </span>
-                                        }
-                                    </div>
-
-                                    <form asp-controller="HomeCarts" asp-action="AddToCart" method="post"
-                                          class="add-to-cart-form"
-                                          data-product="@sp.ProductId"
-                                          onclick="event.stopPropagation();">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="productId" value="@sp.ProductId" />
-                                        <button type="submit"
-                                                class="w-10 h-10 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl flex items-center justify-center hover:shadow-lg transition-all duration-300 transform hover:scale-105 group/btn">
-                                            <i class="fas fa-shopping-cart text-sm group-hover/btn:scale-110 transition-transform"></i>
-                                        </button>
-                                    </form>
-                                </div>
-
-                                <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                                    <div class="flex items-center space-x-1">
-                                        <div class="flex text-yellow-400">
-                                            <i class="fas fa-star text-xs"></i>
-                                            <i class="fas fa-star text-xs"></i>
-                                            <i class="fas fa-star text-xs"></i>
-                                            <i class="fas fa-star text-xs"></i>
-                                            <i class="fas fa-star-half-alt text-xs"></i>
-                                        </div>
-                                        <span class="text-gray-500 text-xs ml-1">(128)</span>
-                                    </div>
-                                    <span class="text-green-600 text-xs font-medium bg-green-50 px-2 py-1 rounded-full">
-                                        Còn hàng
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </a>
+                foreach (var sp in products)
+                {
+                    await Html.RenderPartialAsync("_ProductCard", sp);
+                }
             }
-        }
-        else
-        {
-            <div class="col-span-full text-center py-16">
-                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-box-open text-3xl text-gray-400"></i>
+            else
+            {
+                <div class="col-span-full text-center py-16">
+                    <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-box-open text-3xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">Không có sản phẩm</h3>
+                    <p class="text-gray-500 mb-6">Hiện tại không có sản phẩm nào để hiển thị.</p>
+                    <a href="/HomeUser/AllProducts" class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl hover:bg-primary-dark transition-colors font-medium">
+                        <i class="fas fa-store"></i>
+                        Khám phá sản phẩm
+                    </a>
                 </div>
-                <h3 class="text-xl font-semibold text-gray-600 mb-2">Không có sản phẩm</h3>
-                <p class="text-gray-500 mb-6">Hiện tại không có sản phẩm nào để hiển thị.</p>
-                <a href="/HomeUser/AllProducts" class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl hover:bg-primary-dark transition-colors font-medium">
-                    <i class="fas fa-store"></i>
-                    Khám phá sản phẩm
-                </a>
-            </div>
-        }
+            }
+        </div>
     </div>
-</section>
 </section>
 
 <!-- Promotional Banner -->

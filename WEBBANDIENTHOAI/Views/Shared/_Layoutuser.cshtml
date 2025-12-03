@@ -1,25 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
-@inject IHttpContextAccessor HttpContextAccessor
-
-@{
-    // Lấy thông tin từ Session
-    var session = HttpContextAccessor.HttpContext?.Session;
-    var isLoggedIn = !string.IsNullOrEmpty(session?.GetString("CustomerId")) ||
-                     !string.IsNullOrEmpty(session?.GetString("UserId"));
-
-    var customerName = session?.GetString("Username") ?? "Khách";
-    var customerEmail = session?.GetString("Email");
-    var customerId = session?.GetString("CustomerId");
-    var userId = session?.GetString("UserId");
-    var roleName = session?.GetString("RoleName");
-
-    // Gán vào ViewBag để dùng trong welcome notification và các thành phần khác
-    ViewBag.IsLoggedIn = isLoggedIn;
-    ViewBag.CustomerName = customerName;
-    ViewBag.CustomerEmail = customerEmail;
-}
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="light" lang="vi">
 <head>
     <meta charset="utf-8" />
@@ -230,22 +209,6 @@
 </head>
 
 <body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200 antialiased">
-    <!-- Custom Alert Popup -->
-    <div id="custom-alert-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-[10001] hidden items-center justify-center p-4">
-        <div id="custom-alert-box" class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-md text-center transform scale-95 transition-all duration-300">
-            <div class="flex justify-center items-center mb-4">
-                <div class="w-20 h-20 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center border-4 border-white dark:border-gray-700">
-                    <i class="fas fa-exclamation-triangle text-4xl text-primary"></i>
-                </div>
-            </div>
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Thông báo</h3>
-            <p id="custom-alert-message" class="text-gray-600 dark:text-gray-300 mb-6 px-4"></p>
-            <button id="custom-alert-close" class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-dark transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-800">
-                Đã hiểu
-            </button>
-        </div>
-    </div>
-
     <!-- POPUP XÁC NHẬN ĐĂNG XUẤT -->
     <div id="logout-popup" class="logout-overlay">
         <div class="logout-popup">
@@ -258,20 +221,19 @@
             </div>
         </div>
     </div>
-
     <!-- Welcome Notification -->
-    @if (isLoggedIn)
+    @if (ViewBag.IsLoggedIn == true && !string.IsNullOrEmpty(ViewBag.CustomerName?.ToString()))
     {
         <div id="welcome-notification" class="fixed top-20 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-50 border border-primary/20 animate-bounce-slow">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center">
                     <span class="text-white font-bold text-sm">
-                        @customerName?.Substring(0, 1).ToUpper()
+                        @ViewBag.CustomerName?.ToString().Substring(0, 1).ToUpper()
                     </span>
                 </div>
                 <div>
                     <h4 class="font-semibold text-gray-800 dark:text-white">Xin chào!</h4>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm">Chào mừng @customerName quay trở lại</p>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">Chào mừng @ViewBag.CustomerName quay trở lại</p>
                 </div>
                 <button onclick="closeWelcome()" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times"></i>
@@ -303,16 +265,13 @@
             <header class="sticky top-0 z-40 flex items-center justify-between border-b border-solid border-primary/20 bg-background-light/95 dark:bg-background-dark/95 px-4 sm:px-6 lg:px-8 py-3 backdrop-blur-md transition-all duration-300 shadow-sm" id="mainHeader">
                 <!-- Logo Section -->
                 <div class="flex items-center gap-6">
-                    <a href="@Url.Action("Index", "HomeUser")" class="flex items-center gap-3 text-gray-800 dark:text-white group" onclick="window.location.reload(true);">
+                    <a href="/HomeUser" class="flex items-center gap-3 text-gray-800 dark:text-white group">
                         <div class="relative">
-                            <div class="size-12 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden bg-white">
-                                <img src="~/Images/logo.png"
-                                     alt="Logo"
-                                     class="w-full h-full object-contain p-1" />
+                            <div class="size-12 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
+                                <span class="text-white font-bold text-lg">F</span>
                             </div>
                             <div class="absolute -inset-1 bg-primary/20 rounded-xl blur-sm group-hover:blur-md transition-all duration-300"></div>
                         </div>
-
                         <div>
                             <h2 class="text-xl font-black tracking-tight gradient-text">FOXMOBILE</h2>
                             <p class="text-xs text-gray-500 dark:text-gray-400 -mt-1">Premium Technology</p>
@@ -320,23 +279,31 @@
                     </a>
                 </div>
 
-
-                <!-- Search Form -->
+                <!-- Enhanced Search -->
                 <div class="hidden lg:flex flex-1 justify-center px-8 max-w-2xl">
-                    <form asp-controller="HomeUser" asp-action="Search" method="get" class="relative w-full group">
+                    <div class="relative w-full group">
                         <div class="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-dark/20 rounded-xl blur-sm group-hover:blur transition-all duration-300"></div>
                         <div class="relative flex items-stretch rounded-xl h-12 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 group-hover:shadow-md transition-all duration-300">
                             <div class="text-gray-500 dark:text-gray-400 flex items-center justify-center pl-4">
                                 <i class="fas fa-search"></i>
                             </div>
-                            <input type="text" name="keyword" class="flex-1 rounded-l-xl text-gray-800 dark:text-white bg-transparent border-none h-full px-4 text-sm focus:outline-none focus:ring-0"
-                                   placeholder="Tìm kiếm sản phẩm..."
-                                   value="@ViewData["Keyword"]" />
-                            <button type="submit" class="px-5 bg-primary text-white rounded-r-xl hover:bg-primary-dark transition-colors flex items-center justify-center">
-                                Tìm
+                            <input class="flex-1 rounded-r-xl text-gray-800 dark:text-white bg-transparent border-none h-full px-4 text-sm focus:outline-none focus:ring-0"
+                                   placeholder="Tìm kiếm sản phẩm, thương hiệu..."
+                                   id="globalSearch" />
+                            <button class="px-4 text-gray-500 hover:text-primary transition-colors">
+                                <i class="fas fa-sliders-h"></i>
                             </button>
                         </div>
-                    </form>
+                        <!-- Search Suggestions -->
+                        <div class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden z-50 overflow-hidden" id="searchSuggestions">
+                            <div class="p-3 border-b border-gray-100 dark:border-gray-700">
+                                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Đề xuất tìm kiếm</p>
+                            </div>
+                            <div class="max-h-60 overflow-y-auto">
+                                <!-- Suggestions will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Enhanced Navigation & Actions -->
@@ -372,9 +339,9 @@
                         <!-- Cart with Enhanced Badge -->
                         <a href="/HomeCarts/Index" class="flex items-center justify-center rounded-xl w-10 h-10 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 relative group">
                             <i class="fas fa-shopping-cart text-gray-600 dark:text-gray-400 group-hover:text-primary"></i>
-                            <span class="absolute -top-1 -right-1 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center shadow-lg cart-count transform group-hover:scale-110 transition-transform">
-                                2
-                            </span>
+                            @* <span class="absolute -top-1 -right-1 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center shadow-lg cart-count transform group-hover:scale-110 transition-transform">
+                                !
+                            </span> *@
                         </a>
 
                         <!-- Notifications -->
@@ -400,10 +367,10 @@
                         <!-- User Profile với Click Dropdown -->
                         <div class="relative" id="user-profile-container">
                             <button id="user-profile-button" class="flex items-center gap-2 rounded-xl px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200">
-                                @if (isLoggedIn)
+                                @if (ViewBag.IsLoggedIn == true)
                                 {
                                     <div class="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                                        @customerName?.Substring(0, 1).ToUpper()
+                                        @ViewBag.CustomerName?.ToString().Substring(0, 1).ToUpper()
                                     </div>
                                     <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="user-profile-chevron"></i>
                                 }
@@ -418,24 +385,28 @@
 
                             <!-- Enhanced User Dropdown -->
                             <div id="user-profile-dropdown" class="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden z-50 overflow-hidden">
-                                @if (isLoggedIn)
+                                @if (ViewBag.IsLoggedIn == true)
                                 {
                                     <div class="p-4 border-b border-gray-100 dark:border-gray-700">
                                         <div class="flex items-center gap-3">
                                             <div class="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white font-semibold">
-                                                @customerName?.Substring(0, 1).ToUpper()
+                                                @ViewBag.CustomerName?.ToString().Substring(0, 1).ToUpper()
                                             </div>
                                             <div>
-                                                <p class="font-semibold text-gray-800 dark:text-white">@customerName</p>
-                                                @if (!string.IsNullOrEmpty(customerEmail))
+                                                <p class="font-semibold text-gray-800 dark:text-white">@ViewBag.CustomerName</p>
+                                                @if (!string.IsNullOrEmpty(ViewBag.CustomerEmail?.ToString()))
                                                 {
-                                                    <p class="text-sm text-gray-500 dark:text-gray-400">@customerEmail</p>
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400">@ViewBag.CustomerEmail</p>
+                                                }
+                                                @if (!string.IsNullOrEmpty(ViewBag.CustomerPhone?.ToString()))
+                                                {
+                                                    <p class="text-xs text-gray-400">@ViewBag.CustomerPhone</p>
                                                 }
                                             </div>
                                         </div>
                                     </div>
                                     <div class="p-2">
-                                        <a href="/account" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <a href="/Info/ThongTinKH" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-user text-gray-500 w-5"></i>
                                             <span>Tài khoản của tôi</span>
                                         </a>
@@ -664,7 +635,17 @@
                             </div>
 
                             <!-- Newsletter Subscription -->
-
+                            <div class="mt-6 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+                                <p class="text-sm font-semibold mb-2">Đăng ký nhận tin</p>
+                                <p class="text-xs text-gray-400 mb-3">Nhận ưu đãi độc quyền & tin tức mới nhất</p>
+                                <div class="flex gap-2">
+                                    <input type="email" placeholder="Email của bạn"
+                                           class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <button class="bg-primary hover:bg-primary-dark text-white rounded-lg px-4 transition-colors">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -757,52 +738,6 @@
             once: true,
             offset: 100
         });
-
-        // Custom Alert Functionality
-        function showCustomAlert(message) {
-            const overlay = document.getElementById('custom-alert-overlay');
-            const messageEl = document.getElementById('custom-alert-message');
-            const alertBox = document.getElementById('custom-alert-box');
-
-            if (overlay && messageEl && alertBox) {
-                messageEl.textContent = message;
-                overlay.classList.remove('hidden');
-                overlay.classList.add('flex');
-                setTimeout(() => {
-                    alertBox.classList.remove('scale-95');
-                }, 10);
-            }
-        }
-
-        function hideCustomAlert() {
-            const overlay = document.getElementById('custom-alert-overlay');
-            const alertBox = document.getElementById('custom-alert-box');
-
-            if (overlay && alertBox) {
-                alertBox.classList.add('scale-95');
-                setTimeout(() => {
-                    overlay.classList.add('hidden');
-                    overlay.classList.remove('flex');
-                }, 300);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const closeButton = document.getElementById('custom-alert-close');
-            const overlay = document.getElementById('custom-alert-overlay');
-
-            if (closeButton) {
-                closeButton.addEventListener('click', hideCustomAlert);
-            }
-            if (overlay) {
-                overlay.addEventListener('click', function(e) {
-                    if (e.target === overlay) {
-                        hideCustomAlert();
-                    }
-                });
-            }
-        });
-
 
         // Loading Screen
         window.addEventListener('load', function() {
@@ -978,20 +913,21 @@
             document.documentElement.classList.add('dark');
         }
 
+
         // =======================================================
-        // 🤖 CHAT WIDGET FUNCTIONALITY
+        // 🤖 CHAT WIDGET FUNCTIONALITY (ĐÃ SỬA CHO CẤU TRÚC HTML MỚI)
         // =======================================================
         document.addEventListener('DOMContentLoaded', function() {
             // Lấy các phần tử DOM
             const chatToggle = document.getElementById('chat-toggle');
-            const chatContainer = document.getElementById('chat-container');
+            const chatContainer = document.getElementById('chat-container'); // Khối chat chính
             const chatClose = document.getElementById('chat-close');
             const chatInput = document.getElementById('chat-input');
             const chatSend = document.getElementById('chat-send');
-            const chatMessagesContainer = document.getElementById('chat-messages');
-            const chatClear = document.getElementById('chat-clear');
+            const chatMessagesContainer = document.getElementById('chat-messages'); // Khu vực chứa tin nhắn
+            const chatClear = document.getElementById('chat-clear'); // Bạn cần thêm nút này vào HTML Header
 
-            // Đường dẫn Avatar
+            // Đường dẫn Avatar (Sử dụng đường dẫn của bạn)
             const aiAvatarUrl = '/images/nhân viên tư vấn.png';
 
             // Class Tailwind cho màu sắc
@@ -1022,6 +958,7 @@
                     innerContent.className = 'flex-none';
                 }
 
+
                 // Nội dung tin nhắn chính
                 const messageBubble = document.createElement('div');
                 messageBubble.className = `rounded-lg p-3 shadow-sm ${sender === 'user' ? userBg : aiBg}`;
@@ -1040,17 +977,18 @@
                 messageWrapper.appendChild(innerContent);
 
                 chatMessagesContainer.appendChild(messageWrapper);
-                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight; // Cuộn xuống dưới
                 return messageWrapper;
             }
 
             // Hàm tải lịch sử chat
             async function loadHistory() {
                 try {
+                    // Gọi action GetChatHistory trong ChatController
                     const response = await fetch('/Chat/GetChatHistory');
                     const history = await response.json();
 
-                    chatMessagesContainer.innerHTML = '';
+                    chatMessagesContainer.innerHTML = ''; // Xóa nội dung cũ
 
                     if (history.length === 0) {
                         createMessageElement("Chào bạn! Tôi là Fox AI, chuyên gia tư vấn công nghệ của FOXMOBILE. Tôi có thể giúp bạn tìm kiếm Điện thoại hoặc Laptop phù hợp!", 'ai');
@@ -1064,6 +1002,7 @@
                     console.error('Lỗi khi tải lịch sử chat:', error);
                 }
             }
+
 
             // Hàm gửi tin nhắn
             async function sendMessage() {
@@ -1128,7 +1067,7 @@
                 chatToggle.addEventListener('click', function() {
                     chatContainer.classList.toggle('hidden');
                     if (!chatContainer.classList.contains('hidden')) {
-                         loadHistory();
+                         loadHistory(); // Tải lịch sử khi mở
                          chatInput.focus();
                     }
                 });
@@ -1156,7 +1095,7 @@
                 });
             }
 
-            // Xử lý nút xóa lịch sử
+            // Xử lý nút xóa lịch sử (Nếu bạn thêm ID chat-clear vào HTML)
             if (chatClear) {
                 chatClear.addEventListener('click', clearHistory);
             }
