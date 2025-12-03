@@ -388,6 +388,16 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
             return View(products);
         }
 
+        public async Task<IActionResult> Search(string keyword)
+        {
+            ViewData["Keyword"] = keyword;
+            var products = await _context.Products
+                                         .Include(p => p.PrimaryImage)
+                                         .Where(p => p.Name.Contains(keyword) && p.StatusId == 1)
+                                         .ToListAsync();
+            return View(products);
+        }
+
 
 
     }

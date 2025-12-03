@@ -321,31 +321,22 @@
                 </div>
 
 
-                <!-- Enhanced Search -->
+                <!-- Search Form -->
                 <div class="hidden lg:flex flex-1 justify-center px-8 max-w-2xl">
-                    <div class="relative w-full group">
+                    <form asp-controller="HomeUser" asp-action="Search" method="get" class="relative w-full group">
                         <div class="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-dark/20 rounded-xl blur-sm group-hover:blur transition-all duration-300"></div>
                         <div class="relative flex items-stretch rounded-xl h-12 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 group-hover:shadow-md transition-all duration-300">
                             <div class="text-gray-500 dark:text-gray-400 flex items-center justify-center pl-4">
                                 <i class="fas fa-search"></i>
                             </div>
-                            <input class="flex-1 rounded-r-xl text-gray-800 dark:text-white bg-transparent border-none h-full px-4 text-sm focus:outline-none focus:ring-0"
-                                   placeholder="Tìm kiếm sản phẩm, thương hiệu..."
-                                   id="globalSearch" />
-                            <button class="px-4 text-gray-500 hover:text-primary transition-colors">
-                                <i class="fas fa-sliders-h"></i>
+                            <input type="text" name="keyword" class="flex-1 rounded-l-xl text-gray-800 dark:text-white bg-transparent border-none h-full px-4 text-sm focus:outline-none focus:ring-0"
+                                   placeholder="Tìm kiếm sản phẩm..."
+                                   value="@ViewData["Keyword"]" />
+                            <button type="submit" class="px-5 bg-primary text-white rounded-r-xl hover:bg-primary-dark transition-colors flex items-center justify-center">
+                                Tìm
                             </button>
                         </div>
-                        <!-- Search Suggestions -->
-                        <div class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden z-50 overflow-hidden" id="searchSuggestions">
-                            <div class="p-3 border-b border-gray-100 dark:border-gray-700">
-                                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Đề xuất tìm kiếm</p>
-                            </div>
-                            <div class="max-h-60 overflow-y-auto">
-                                <!-- Suggestions will be populated by JavaScript -->
-                            </div>
-                        </div>
-                    </div>
+                    </form>
                 </div>
 
                 <!-- Enhanced Navigation & Actions -->
