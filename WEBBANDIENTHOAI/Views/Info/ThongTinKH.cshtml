@@ -1,0 +1,339 @@
+@model WEBBANDIENTHOAI.Models.Customer
+
+@{
+    ViewData["Title"] = "Hồ Sơ Người Dùng";
+    Layout = "~/Views/Shared/_Layoutuser.cshtml";
+}
+
+<div class="font-display bg-background-light dark:bg-background-dark min-h-screen">
+
+    <main class="layout-container flex h-full grow flex-col">
+        <div class="px-4 sm:px-6 lg:px-10 flex flex-1 justify-center py-5 md:py-10">
+            <div class="flex w-full max-w-6xl flex-col gap-8 md:flex-row">
+
+                <!-- SIDEBAR -->
+                <aside class="flex-shrink-0 md:w-64 lg:w-72">
+                    <div class="sticky top-28 flex flex-col justify-between rounded-xl bg-card-light dark:bg-card-dark p-4 shadow-sm border border-border-light dark:border-border-dark">
+
+                        <div class="flex flex-col gap-6">
+
+                            <!-- USER INFO -->
+                            <div class="flex items-center gap-4">
+                                <div id="sidebar-avatar" class="size-12 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-xl font-semibold">
+                                    @if (!string.IsNullOrEmpty(Model.FullName))
+                                    {
+                                        @Model.FullName.Substring(0, 1).ToUpper()
+                                    }
+                                </div>
+
+                                <div class="flex flex-col">
+                                    <h1 id="sidebar-fullname" class="text-text-light dark:text-text-dark text-base font-semibold leading-normal">
+                                        @Model.FullName
+                                    </h1>
+                                    <p class="text-subtext-light dark:text-subtext-dark text-sm font-normal leading-normal">
+                                        @Model.Email
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- TOTAL SPENT -->
+                            <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-4 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark">
+                                <p class="text-subtext-light dark:text-subtext-dark text-sm font-medium leading-normal">Tổng chi tiêu</p>
+                                <p class="text-text-light dark:text-text-dark tracking-light text-2xl font-bold leading-tight text-primary">
+                                    @(((decimal?)ViewBag.TotalSpending ?? 0m).ToString("N0"))₫
+                                </p>
+                            </div>
+
+                            <!-- MENU -->
+                            <div class="flex flex-col gap-1">
+                                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 dark:bg-primary/20 text-primary" href="#">
+                                    <span class="material-symbols-outlined fill text-xl">person</span>
+                                    <p class="text-sm font-semibold leading-normal">Thông tin tài khoản</p>
+                                </a>
+                                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-light dark:text-text-dark hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors" href="#">
+                                    <span class="material-symbols-outlined text-xl">package_2</span>
+                                    <p class="text-sm font-medium leading-normal">Lịch sử đơn hàng</p>
+                                </a>
+                                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-light dark:text-text-dark hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors" href="#">
+                                    <span class="material-symbols-outlined text-xl">map</span>
+                                    <p class="text-sm font-medium leading-normal">Địa chỉ đã lưu</p>
+                                </a>
+                            </div>
+
+                        </div>
+
+                        <!-- LOGOUT -->
+                        <div class="flex flex-col gap-1 mt-8 pt-4 border-t border-border-light dark:border-border-dark">
+                            <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-light dark:text-text-dark hover:bg-red-500/10 dark:hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-400 transition-colors" href="/Account/Logout">
+                                <span class="material-symbols-outlined text-xl">logout</span>
+                                <p class="text-sm font-medium leading-normal">Đăng xuất</p>
+                            </a>
+                        </div>
+
+                    </div>
+                </aside>
+
+                <!-- MAIN CONTENT -->
+                <div class="flex-1 flex flex-col gap-8">
+
+                    <div class="flex flex-wrap justify-between gap-3">
+                        <div class="flex flex-col gap-1">
+                            <p class="text-text-light dark:text-text-dark text-3xl font-bold">Thông tin tài khoản</p>
+                            <p class="text-subtext-light dark:text-subtext-dark text-base">Quản lý và cập nhật thông tin cá nhân của bạn tại đây.</p>
+                        </div>
+                    </div>
+                     <div id="notification" class="hidden rounded-lg p-4 text-sm" role="alert"></div>
+
+                    <!-- PERSONAL INFO -->
+                    <form method="post" id="profileForm">
+                         @Html.AntiForgeryToken()
+                        <div class="rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark p-6 shadow-sm">
+                            <div class="flex justify-between items-center pb-5 border-b border-border-light dark:border-border-dark">
+                                <h2 class="text-text-light dark:text-text-dark text-lg font-semibold leading-tight">Thông tin cá nhân</h2>
+
+                                <button type="button" id="editProfileButton" class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 bg-primary/10 dark:bg-primary/20 text-primary gap-2 text-sm font-semibold px-4 hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors">
+                                    <span class="material-symbols-outlined text-base">edit</span>
+                                    <span id="editProfileButtonText">Chỉnh sửa</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 pt-6">
+                                <input type="hidden" name="CustomerId" value="@Model.CustomerId" />
+                                <input type="hidden" name="Email" value="@Model.Email" />
+                                <div>
+                                    <label for="fullName" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Họ và Tên</label>
+                                    <input id="fullName" name="FullName" value="@Model.FullName" readonly
+                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                </div>
+
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Email</label>
+                                    <input id="email" value="@Model.Email" readonly
+                                           type="email"
+                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-gray-200 dark:bg-gray-700 cursor-not-allowed" />
+                                </div>
+
+                                <div>
+                                    <label for="phone" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Số điện thoại</label>
+                                    <input id="phone" name="Phone" value="@Model.Phone" readonly
+                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                </div>
+
+                                <div>
+                                    <label for="cccd" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Số CCCD/CMND</label>
+                                    <input id="cccd" name="CitizenID" value="@Model.CitizenID" readonly
+                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label for="address" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Địa chỉ</label>
+                                    <input id="address" name="Address" value="@Model.Address" readonly
+                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- SECURITY -->
+                     <form method="post" id="passwordForm">
+                        @Html.AntiForgeryToken()
+                        <div class="rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark p-6 shadow-sm">
+
+                            <div class="flex justify-between items-center pb-5 border-b border-border-light dark:border-border-dark">
+                                <div>
+                                    <h2 class="text-text-light dark:text-text-dark text-lg font-semibold leading-tight">Bảo mật</h2>
+                                    <p class="text-subtext-light dark:text-subtext-dark text-sm mt-1">Thay đổi mật khẩu của bạn.</p>
+                                </div>
+                                <button type="button" id="changePasswordButton" class="flex max-w-[480px] items-center justify-center rounded-lg h-10 bg-primary text-white gap-2 text-sm font-semibold px-6 hover:opacity-90 transition-opacity">
+                                    Thay đổi
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 pt-6">
+
+                                <div>
+                                    <label class="block mb-1.5 text-sm font-medium" for="currentPassword">Mật khẩu hiện tại</label>
+                                    <input type="password" id="currentPassword" name="CurrentPassword" placeholder="Nhập mật khẩu hiện tại ..." disabled
+                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                </div>
+                                 <div></div>
+                                <div>
+                                    <label class="block mb-1.5 text-sm font-medium" for="newPassword">Mật khẩu mới</label>
+                                    <input type="password" id="newPassword" name="NewPassword" placeholder="Nhập mật khẩu mới ..." disabled
+                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                </div>
+
+                                <div>
+                                    <label class="block mb-1.5 text-sm font-medium" for="confirmNewPassword">Xác nhận mật khẩu mới</label>
+                                    <input type="password" id="confirmNewPassword" name="ConfirmNewPassword" placeholder="Xac nhận mật khẩu ..." disabled
+                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+</div>
+
+@section Styles {
+    <style>
+        .read-only-styles, input:disabled {
+             background-color: #f3f4f6; /* bg-gray-100 */
+             cursor: default;
+        }
+       .dark .read-only-styles, .dark input:disabled {
+            background-color: #374151; /* dark:bg-gray-700 */
+       }
+       .notification {
+            transition: opacity 0.5s ease-in-out;
+       }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // === PROFILE INFO FORM ===
+            const editProfileButton = document.getElementById('editProfileButton');
+            const editProfileButtonText = document.getElementById('editProfileButtonText');
+            const profileForm = document.getElementById('profileForm');
+            const profileInputs = Array.from(profileForm.querySelectorAll('.read-only-styles'));
+            const notification = document.getElementById('notification');
+
+            let isProfileEditMode = false;
+            
+            function showNotification(message, isSuccess) {
+                notification.textContent = message;
+                notification.className = 'notification rounded-lg p-4 text-sm mb-4'; // Reset classes
+                if (isSuccess) {
+                    notification.classList.add('bg-green-100', 'text-green-800');
+                } else {
+                    notification.classList.add('bg-red-100', 'text-red-800');
+                }
+                notification.classList.remove('hidden');
+                setTimeout(() => {
+                    notification.classList.add('hidden');
+                }, 3000);
+            }
+
+            function setProfileEditMode(isEditing) {
+                 isProfileEditMode = isEditing;
+                 if (isEditing) {
+                    editProfileButtonText.textContent = 'Xác nhận';
+                    editProfileButton.classList.remove('bg-primary/10', 'dark:bg-primary/20', 'text-primary');
+                    editProfileButton.classList.add('bg-green-500/10', 'dark:bg-green-500/20', 'text-green-500');
+                    editProfileButton.querySelector('.material-symbols-outlined').textContent = 'save';
+
+                    profileInputs.forEach(input => {
+                        input.readOnly = false;
+                        input.classList.remove('read-only-styles');
+                    });
+                } else {
+                    editProfileButtonText.textContent = 'Chỉnh sửa';
+                    editProfileButton.classList.add('bg-primary/10', 'dark:bg-primary/20', 'text-primary');
+                    editProfileButton.classList.remove('bg-green-500/10', 'dark:bg-green-500/20', 'text-green-500');
+                    editProfileButton.querySelector('.material-symbols-outlined').textContent = 'edit';
+
+                    profileInputs.forEach(input => {
+                        input.readOnly = true;
+                        input.classList.add('read-only-styles');
+                    });
+                }
+            }
+
+
+            editProfileButton.addEventListener('click', async function (e) {
+                e.preventDefault();
+
+                if (!isProfileEditMode) {
+                    setProfileEditMode(true);
+                    return;
+                }
+
+                const formData = new FormData(profileForm);
+                const token = formData.get('__RequestVerificationToken');
+
+                try {
+                    const response = await fetch('/Info/UpdateProfile', {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'RequestVerificationToken': token }
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        showNotification('Cập nhật thông tin thành công!', true);
+                        setProfileEditMode(false);
+                        
+                        document.getElementById('sidebar-fullname').textContent = result.newName;
+                        document.getElementById('sidebar-avatar').textContent = result.newName.substring(0, 1).toUpperCase();
+                    } else {
+                         showNotification(result.message || 'Có lỗi xảy ra.', false);
+                    }
+                } catch (error) {
+                    showNotification('Lỗi kết nối. Vui lòng thử lại.', false);
+                }
+            });
+
+            // === PASSWORD CHANGE FORM ===
+            const changePasswordButton = document.getElementById('changePasswordButton');
+            const passwordForm = document.getElementById('passwordForm');
+            const passwordInputs = Array.from(passwordForm.querySelectorAll('input[type="password"]'));
+            let isPasswordEditMode = false;
+
+            function setPasswordEditMode(isEditing) {
+                isPasswordEditMode = isEditing;
+                if (isEditing) {
+                    changePasswordButton.textContent = 'Xác nhận';
+                    passwordInputs.forEach(input => input.disabled = false);
+                } else {
+                    changePasswordButton.textContent = 'Thay đổi';
+                    passwordInputs.forEach(input => {
+                        input.disabled = true;
+                        input.value = ''; // Clear fields on reset
+                    });
+                }
+            }
+
+            changePasswordButton.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                if (!isPasswordEditMode) {
+                    setPasswordEditMode(true);
+                    return;
+                }
+
+                const formData = new FormData(passwordForm);
+                const token = formData.get('__RequestVerificationToken');
+
+                 try {
+                    const response = await fetch('/Info/ChangePassword', {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'RequestVerificationToken': token }
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        showNotification(result.message || 'Đổi mật khẩu thành công!', true);
+                        setPasswordEditMode(false);
+                    } else {
+                         showNotification(result.message || 'Có lỗi xảy ra.', false);
+                    }
+                } catch (error) {
+                    showNotification('Lỗi kết nối. Vui lòng thử lại.', false);
+                }
+            });
+
+        });
+    </script>
+}
