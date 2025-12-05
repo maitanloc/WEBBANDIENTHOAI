@@ -1,0 +1,127 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WEBBANDIENTHOAI.Data;
+using WEBBANDIENTHOAI.Models;
+using WEBBANDIENTHOAI.Repository.TaiKhoan; // Add this using statement
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+
+namespace WEBBANDIENTHOAI.Controllers
+{
+    public class OrdersController : Controller
+    {
+        private readonly AppDbContext _context;
+        private readonly ICustomerRepository _customerRepository; // Inject ICustomerRepository
+
+        public OrdersController(AppDbContext context, ICustomerRepository customerRepository) // Update constructor
+        {
+            _context = context;
+            _customerRepository = customerRepository;
+        }
+
+        private int? GetCurrentCustomerId()
+        {
+            var userIdString = HttpContext.Session.GetString("UserId");
+            var role = HttpContext.Session.GetString("RoleName");
+
+            if (!string.IsNullOrEmpty(userIdString) && role == "Customer")
+            {
+                if (int.TryParse(userIdString, out int customerId))
+                {
+                    return customerId;
+                }
+            }
+            return null;
+        }
+
+        public async Task<IActionResult> HomeOrders(string searchQuery = null, string statusFilter = null)
+        {
+            var customerId = GetCurrentCustomerId();
+            if (customerId == null)
+            {
+                return RedirectToAction("LoginRegister", "Account");
+            }
+
+            var customer = await _customerRepository.GetCustomerByIdAsync(customerId.Value);
+            if (customer != null)
+            {
+                ViewBag.CustomerName = customer.FullName;
+                ViewBag.CustomerEmail = customer.Email;
+                ViewBag.CustomerPhone = customer.Phone;
+                ViewBag.IsLoggedIn = true;
+            }
+            else
+            {
+                ViewBag.IsLoggedIn = false;
+            }
+
+            ViewBag.CurrentSearch = searchQuery;
+            ViewBag.CurrentStatus = statusFilter;
+            ViewBag.Statuses = await _context.OrderStatuses.ToListAsync();
+
+
+            var ordersQuery = _context.Orders
+                .Where(o => o.CustomerId == customerId.Value)
+                .Include(o => o.OrderStatus)
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Product)
+                        .ThenInclude(p => p.PrimaryImage)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                var normalizedQuery = searchQuery.ToLower().Trim();
+                ordersQuery = ordersQuery.Where(o =>
+                    o.OrderId.ToString().Contains(normalizedQuery) ||
+                    o.OrderDetails.Any(d => d.Product.Name.ToLower().Contains(normalizedQuery))
+                );
+            }
+
+            if (!string.IsNullOrEmpty(statusFilter) && statusFilter != "Tất cả")
+            {
+                ordersQuery = ordersQuery.Where(o => o.OrderStatus.StatusName == statusFilter);
+            }
+
+            var orders = await ordersQuery.OrderByDescending(o => o.OrderDate).ToListAsync();
+
+            return View(orders);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelOrder(int id)
+        {
+            var customerId = GetCurrentCustomerId();
+            if (customerId == null)
+            {
+                return Unauthorized(new { success = false, message = "Bạn cần đăng nhập để thực hiện việc này." });
+            }
+
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == id && o.CustomerId == customerId.Value);
+
+            if (order == null)
+            {
+                return NotFound(new { success = false, message = "Không tìm thấy đơn hàng." });
+            }
+
+            // Only allow cancellation if the status is Pending or Processing
+            if (order.StatusId != 1 && order.StatusId != 2) // Assuming 1=Pending, 2=Processing
+            {
+                return BadRequest(new { success = false, message = "Không thể hủy đơn hàng ở trạng thái này." });
+            }
+
+            var cancelledStatus = await _context.OrderStatuses.FirstOrDefaultAsync(s => s.StatusName == "Cancelled");
+            if (cancelledStatus == null)
+            {
+                // This would be an internal server error
+                return StatusCode(500, new { success = false, message = "Trạng thái 'Cancelled' không được cấu hình trong hệ thống." });
+            }
+
+            order.StatusId = cancelledStatus.StatusId;
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Đơn hàng đã được hủy." });
+        }
+    }
+}

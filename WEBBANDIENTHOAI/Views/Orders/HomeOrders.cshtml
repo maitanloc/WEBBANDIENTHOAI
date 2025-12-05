@@ -1,0 +1,220 @@
+@model IEnumerable<WEBBANDIENTHOAI.Models.Order>
+
+@{
+    ViewData["Title"] = "Lịch Sử Mua Hàng";
+    Layout = "~/Views/Shared/_Layoutuser.cshtml";
+
+    string GetVietnameseStatusName(string englishStatus)
+    {
+        return englishStatus switch
+        {
+            "Pending" => "Đơn hàng đang chờ xử lý",
+            "Processing" => "Đơn hàng đang được chuẩn bị",
+            "Shipped" => "Đơn hàng đã được giao",
+            "Delivered" => "Đơn hàng đã giao thành công",
+            "Cancelled" => "Đơn hàng đã bị hủy",
+            _ => englishStatus, // Fallback to English if no translation
+        };
+    }
+
+    string GetStatusClass(string englishStatus)
+    {
+        return englishStatus switch
+        {
+            "Delivered" => "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300",
+            "Shipped" => "bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300",
+            "Pending" => "bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300",
+            "Processing" => "bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300", // New color for Processing
+            "Cancelled" => "bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300",
+            _ => "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300",
+        };
+    }
+
+    string GetStatusIcon(string englishStatus)
+    {
+        return englishStatus switch
+        {
+            "Delivered" => "check_circle",
+            "Shipped" => "local_shipping",
+            "Pending" => "hourglass_top",
+            "Processing" => "inventory", // New icon for Processing
+            "Cancelled" => "cancel",
+            _ => "help",
+        };
+    }
+}
+
+
+<div class="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <div class="flex flex-col gap-6">
+        <div>
+            <div class="mb-2 flex flex-wrap items-center gap-2">
+                <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary" asp-controller="Info" asp-action="ThongTinKH">Tài khoản của tôi</a>
+                <span class="material-symbols-outlined text-base text-slate-400 dark:text-slate-500">chevron_right</span>
+                <span class="text-sm font-medium text-slate-800 dark:text-slate-200">Lịch sử mua hàng</span>
+            </div>
+            <h1 class="text-3xl font-black leading-tight tracking-tight text-slate-900 dark:text-slate-50">Lịch sử mua hàng</h1>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm">
+            <form id="filterForm" method="get" action="@Url.Action("HomeOrders", "Orders")" class="flex flex-col md:flex-row gap-4 items-center">
+                @Html.AntiForgeryToken()
+                <div class="relative flex-grow w-full">
+                    <label class="relative">
+                        <span class="material-symbols-outlined pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" style="font-size: 20px;">search</span>
+                        <input name="searchQuery" value="@ViewBag.CurrentSearch" class="h-11 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-background-light dark:bg-slate-800 py-2 pl-11 pr-4 text-sm placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Tìm kiếm mã đơn hoặc tên sản phẩm..." type="search" />
+                    </label>
+                </div>
+                <div class="relative flex-shrink-0 w-full md:w-64">
+                    <select name="statusFilter" class="h-11 w-full appearance-none rounded-lg border border-slate-200 dark:border-slate-700 bg-background-light dark:bg-slate-800 px-4 pr-10 text-sm focus:outline-none focus:ring-1 focus:ring-primary">
+                        <option value="Tất cả">Tất cả trạng thái</option>
+                        @foreach (var status in ViewBag.Statuses as List<OrderStatus>)
+                        {
+                            <option value="@status.StatusName" selected="@(status.StatusName == ViewBag.CurrentStatus)">
+                                @GetVietnameseStatusName(status.StatusName)
+                            </option>
+                        }
+                    </select>
+                    <span class="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400">expand_more</span>
+                </div>
+                <div class="flex-shrink-0">
+                    <button type="submit" class="flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-6 text-sm font-semibold text-white shadow-sm hover:bg-primary/90">
+                        <i class="fas fa-filter"></i>
+                        <span>Lọc</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="order-list-container" class="flex flex-col gap-6">
+            @if (!Model.Any())
+            {
+                 <div class="text-center p-8 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <p class="text-slate-500 dark:text-slate-400">Không tìm thấy đơn hàng nào khớp với tìm kiếm của bạn.</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var order in Model)
+                {
+                    <div id="order-card-@order.OrderId" class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-shadow duration-300 hover:shadow-md">
+                        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 px-6 py-4">
+                            <div>
+                                <p class="font-bold text-slate-900 dark:text-slate-50">Mã đơn hàng: <span class="text-primary font-mono">#@order.OrderId</span></p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">Ngày đặt: @order.OrderDate.ToString("dd/MM/yyyy")</p>
+                            </div>
+                            <div class="status-badge flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium @GetStatusClass(order.OrderStatus.StatusName)">
+                                <span class="material-symbols-outlined text-base">@GetStatusIcon(order.OrderStatus.StatusName)</span>
+                                <span>@GetVietnameseStatusName(order.OrderStatus.StatusName)</span>
+                            </div>
+                        </div>
+
+                        <div class="divide-y divide-slate-200 dark:divide-slate-800 p-4 md:p-6">
+                            @foreach (var detail in order.OrderDetails)
+                            {
+                                <div class="flex gap-4 py-4 first:pt-0 last:pb-0">
+                                     <img class="h-20 w-20 rounded-lg object-cover" src="@(detail.Product?.PrimaryImage != null ? Url.Action("GetProductImage", "HomeUser", new { imageId = detail.Product.PrimaryImage.ImageId }) : "/images/default-product.png")" alt="@detail.Product.Name">
+                                    <div class="flex flex-1 flex-col justify-center">
+                                        <p class="font-semibold text-slate-800 dark:text-slate-100">@detail.Product.Name</p>
+                                        <p class="text-sm text-slate-500 dark:text-slate-400">Số lượng: @detail.Quantity</p>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <p class="font-semibold text-slate-900 dark:text-slate-50">@detail.UnitPrice.ToString("N0")₫</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="button-container flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 px-6 py-4">
+                            <div class="text-lg font-bold text-slate-900 dark:text-slate-50">
+                                <span>Tổng cộng:</span>
+                                <span>@order.Total.ToString("N0")₫</span>
+                            </div>
+                            <div class="flex gap-3">
+                                @if (order.OrderStatus.StatusName == "Cancelled" || order.OrderStatus.StatusName == "Delivered")
+                                {
+                                    <button class="flex h-10 items-center justify-center gap-2 rounded-lg bg-primary/20 px-4 text-sm font-semibold text-primary hover:bg-primary/30 dark:bg-primary/30 dark:hover:bg-primary/40">Mua Lại</button>
+                                }
+                                 @if (order.OrderStatus.StatusName == "Pending")
+                                {
+                                    <button data-order-id="@order.OrderId" class="cancel-order-btn flex h-10 items-center justify-center gap-2 rounded-lg bg-red-500/20 px-4 text-sm font-semibold text-red-500 hover:bg-red-500/30">Hủy Đơn</button>
+                                }
+                                <button class="flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-sm hover:bg-primary/90">Xem Chi Tiết</button>
+                                @if (order.OrderStatus.StatusName == "Shipped")
+                                {
+                                     <button class="flex h-10 items-center justify-center gap-2 rounded-lg bg-green-500 px-4 text-sm font-semibold text-white shadow-sm hover:bg-green-500/90">Xác Nhận Đã Nhận Hàng</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            document.querySelectorAll('.cancel-order-btn').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const orderId = this.dataset.orderId;
+
+                    if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) {
+                        fetch(`/Orders/CancelOrder/${orderId}`, {
+                            method: 'POST',
+                            headers: {
+                                'RequestVerificationToken': token,
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Find the order card
+                                const orderCard = document.getElementById(`order-card-${orderId}`);
+                                if (orderCard) {
+                                    // Update status badge
+                                    const statusBadge = orderCard.querySelector('.status-badge');
+                                    if(statusBadge) {
+                                        statusBadge.className = 'status-badge flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300';
+                                        statusBadge.innerHTML = `<span class="material-symbols-outlined text-base">cancel</span><span>Đơn hàng đã bị hủy</span>`;
+                                    }
+
+                                    // Update buttons
+                                    const buttonContainer = orderCard.querySelector('.button-container .flex.gap-3');
+                                    if(buttonContainer) {
+                                        // Remove old buttons, add new ones
+                                        const oldCancelButton = buttonContainer.querySelector('.cancel-order-btn');
+                                        if (oldCancelButton) oldCancelButton.remove();
+                                        
+                                        // Check if "Mua Lại" button already exists before adding
+                                        if (!buttonContainer.querySelector('.buy-again-btn')) {
+                                             const buyAgainButton = document.createElement('button');
+                                             buyAgainButton.className = 'buy-again-btn flex h-10 items-center justify-center gap-2 rounded-lg bg-primary/20 px-4 text-sm font-semibold text-primary hover:bg-primary/30 dark:bg-primary/30 dark:hover:bg-primary/40';
+                                             buyAgainButton.textContent = 'Mua Lại';
+                                             // Prepend it before "Xem chi tiet"
+                                             buttonContainer.insertBefore(buyAgainButton, buttonContainer.querySelector('a, button'));
+                                        }
+                                    }
+                                }
+                                alert(data.message || 'Đơn hàng đã được hủy thành công.');
+                            } else {
+                                alert('Lỗi: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
+
