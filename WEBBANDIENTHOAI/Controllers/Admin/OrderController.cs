@@ -39,7 +39,6 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
         {
             try
             {
-                // Truyền dữ liệu filter vào ViewBag
                 ViewBag.Search = search;
                 ViewBag.CustomerId = customerId;
                 ViewBag.PaymentMethod = paymentMethod;
@@ -49,25 +48,18 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                 ViewBag.SortBy = sortBy;
                 ViewBag.CurrentPage = page;
 
-                // Lấy danh sách trạng thái cho dropdown
                 var statuses = await _orderStatusRepository.GetAllAsync();
                 ViewBag.Statuses = statuses;
 
-                // Lấy danh sách khách hàng cho dropdown (nếu cần)
-                // Nếu bạn có GetAllCustomersAsync trong CustomerRepository
-                // ViewBag.Customers = await _customerRepository.GetAllAsync();
-                // Nếu không có, tạm thời để danh sách rỗng
                 ViewBag.Customers = new List<Customer>();
 
-                // Lấy danh sách đơn hàng
                 var orders = await _orderRepository.GetOrdersAsync(
                     search, paymentMethod, statusId, startDate, endDate, sortBy, page, pageSize);
 
-                // Tính tổng doanh thu của trang hiện tại
                 ViewBag.TotalRevenue = orders.Items.Sum(o => o.Total);
 
-                // Tính thống kê (nếu cần hiển thị)
-                var statistics = await CalculateStatisticsAsync();
+                // Tính thống kê - GỌI TRỰC TIẾP TỪ REPOSITORY
+                var statistics = await _orderRepository.GetStatisticsAsync();
                 ViewBag.Statistics = statistics;
 
                 return View(orders);
@@ -97,7 +89,6 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Lấy danh sách trạng thái
                 var statuses = await _orderStatusRepository.GetAllAsync();
                 ViewBag.StatusList = statuses;
 
@@ -123,7 +114,6 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Chỉ cập nhật trạng thái
                 var result = await _orderRepository.UpdateStatusAsync(order.OrderId, order.StatusId);
                 if (result)
                 {
@@ -141,24 +131,6 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                 TempData["Error"] = $"Lỗi khi cập nhật: {ex.Message}";
                 return RedirectToAction(nameof(Edit), new { id });
             }
-        }
-
-        // Helper method để tính thống kê
-        private async Task<OrderStatisticsDto> CalculateStatisticsAsync()
-        {
-            // Bạn cần implement phương thức này trong OrderRepository
-            // Hoặc tính toán trực tiếp ở đây
-            var allOrders = await _orderRepository.GetOrdersAsync("", "", null, "", "", "newest", 1, int.MaxValue);
-
-            return new OrderStatisticsDto
-            {
-                TotalOrders = allOrders.TotalCount,
-                TotalRevenue = allOrders.Items.Sum(o => o.Total),
-                PendingOrders = allOrders.Items.Count(o => o.StatusId == 1),
-                ProcessingOrders = allOrders.Items.Count(o => o.StatusId == 2),
-                CompletedOrders = allOrders.Items.Count(o => o.StatusId == 3),
-                CancelledOrders = allOrders.Items.Count(o => o.StatusId == 4)
-            };
         }
     }
 }

@@ -19,6 +19,7 @@ namespace WEBBANDIENTHOAI.Repository.Admin
 
         Task<Order> GetByIdAsync(int id);
         Task<bool> UpdateStatusAsync(int orderId, int statusId);
+        Task<OrderStatisticsDto> GetStatisticsAsync();
     }
 
     public class OrderRepository : IOrderRepository
@@ -154,6 +155,34 @@ namespace WEBBANDIENTHOAI.Repository.Admin
             catch (Exception ex)
             {
                 throw new Exception($"Lỗi khi cập nhật trạng thái đơn hàng: {ex.Message}");
+            }
+        }
+
+        public async Task<OrderStatisticsDto> GetStatisticsAsync()
+        {
+            try
+            {
+                var orders = await _context.Orders.AsNoTracking().ToListAsync();
+                var statuses = await _context.OrderStatuses.AsNoTracking().ToListAsync();
+
+                var pendingId = statuses.FirstOrDefault(s => s.StatusName.Contains("Pending") || s.StatusName.Contains("Chờ"))?.StatusId ?? 1;
+                var processingId = statuses.FirstOrDefault(s => s.StatusName.Contains("Processing") || s.StatusName.Contains("Đang"))?.StatusId ?? 2;
+                var completedId = statuses.FirstOrDefault(s => s.StatusName.Contains("Completed") || s.StatusName.Contains("Hoàn thành"))?.StatusId ?? 3;
+                var cancelledId = statuses.FirstOrDefault(s => s.StatusName.Contains("Cancel") || s.StatusName.Contains("Hủy"))?.StatusId ?? 4;
+
+                return new OrderStatisticsDto
+                {
+                    TotalOrders = orders.Count,
+                    TotalRevenue = orders.Sum(o => o.Total),
+                    PendingOrders = orders.Count(o => o.StatusId == pendingId),
+                    ProcessingOrders = orders.Count(o => o.StatusId == processingId),
+                    CompletedOrders = orders.Count(o => o.StatusId == completedId),
+                    CancelledOrders = orders.Count(o => o.StatusId == cancelledId)
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Lỗi khi tính thống kê đơn hàng: {ex.Message}");
             }
         }
     }
