@@ -30,7 +30,7 @@ namespace WEBBANDIENTHOAI.Models
         public string PaymentMethod { get; set; } = "COD";
 
         [MaxLength(500)]
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
 
         // Navigation properties
         [ForeignKey("CustomerId")]
