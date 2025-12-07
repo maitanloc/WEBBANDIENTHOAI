@@ -14,7 +14,7 @@ namespace WEBBANDIENTHOAI.Models
 
         [Required]
         [MaxLength(50)]
-        public string ReceiptNumber { get; set; }
+        public string? ReceiptNumber { get; set; }
 
         public DateTime ExportDate { get; set; } = DateTime.UtcNow;
 
@@ -30,7 +30,7 @@ namespace WEBBANDIENTHOAI.Models
         public int CreatedByUserId { get; set; }
 
         [MaxLength(500)]
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -39,10 +39,10 @@ namespace WEBBANDIENTHOAI.Models
         public Customer Customer { get; set; }
 
         [ForeignKey("OrderId")]
-        public Order Order { get; set; }
+        public Order? Order { get; set; }
 
         [ForeignKey("CreatedByUserId")]
-        public User CreatedByUser { get; set; }
+        public User? CreatedByUser { get; set; }
 
         public ICollection<ExportReceiptDetail> ExportReceiptDetails { get; set; }
     }
@@ -50,11 +50,11 @@ namespace WEBBANDIENTHOAI.Models
     // DTO để gửi data vào stored procedure
     public class ExportReceiptCreateDto
     {
-        public string ReceiptNumber { get; set; }
+        public string? ReceiptNumber { get; set; }
         public int? CustomerId { get; set; }
         public int? OrderId { get; set; }
         public int CreatedByUserId { get; set; }
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         public List<ExportItemDto> Items { get; set; } = new List<ExportItemDto>();
     }
 
@@ -62,10 +62,10 @@ namespace WEBBANDIENTHOAI.Models
     public class ExportItemDto
     {
         public int? ProductId { get; set; }
-        public string StockCode { get; set; }
-        public string SKU { get; set; }
-        public string Name { get; set; }
-        public string Brand { get; set; }
+        public string? StockCode { get; set; }
+        public string?   SKU { get; set; }
+        public string? Name { get; set; }
+        public string? Brand { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
     }
