@@ -58,7 +58,6 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
 
                 ViewBag.TotalRevenue = orders.Items.Sum(o => o.Total);
 
-                // Tính thống kê - GỌI TRỰC TIẾP TỪ REPOSITORY
                 var statistics = await _orderRepository.GetStatisticsAsync();
                 ViewBag.Statistics = statistics;
 
@@ -69,6 +68,39 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                 TempData["Error"] = $"Lỗi: {ex.Message}";
                 return View(new WEBBANDIENTHOAI.Repository.Admin.PagedResult<Order>());
             }
+        }
+
+        // POST: Order/UpdateStatus - AJAX endpoint cho modal popup
+        // POST: Order/UpdateStatus
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateStatus(int OrderId, int StatusId)
+        {
+            try
+            {
+                if (OrderId <= 0 || StatusId <= 0)
+                {
+                    TempData["Error"] = "Thông tin không hợp lệ";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var result = await _orderRepository.UpdateStatusAsync(OrderId, StatusId);
+
+                if (result)
+                {
+                    TempData["Success"] = "✅ Cập nhật trạng thái đơn hàng thành công!";
+                }
+                else
+                {
+                    TempData["Error"] = "❌ Không tìm thấy đơn hàng để cập nhật";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"❌ Lỗi: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Order/Edit/5

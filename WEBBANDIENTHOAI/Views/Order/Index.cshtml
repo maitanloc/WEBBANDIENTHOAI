@@ -1,7 +1,9 @@
 ﻿@model WEBBANDIENTHOAI.Repository.Admin.PagedResult<WEBBANDIENTHOAI.Models.Order>
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     ViewData["Title"] = "Quản Lý Đơn Hàng";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var tokenSet = Antiforgery.GetAndStoreTokens(Context);
 }
 
 @section Styles {
@@ -41,6 +43,21 @@
 
         body {
             font-family: 'Inter', sans-serif !important;
+        }
+
+        /* Modal Animation */
+        #editStatusModal {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
     </style>
 }
@@ -131,6 +148,7 @@
             <!-- Filter Section -->
             <div class="mt-8 p-4 bg-white rounded-xl shadow-sm border border-surface-light">
                 <form method="get" class="flex flex-wrap items-center gap-4">
+                    <input type="hidden" name="__RequestVerificationToken" value="@tokenSet.RequestToken" />
                     <div class="flex items-center gap-2">
                         <label class="text-sm font-medium text-text-light-primary" for="startDate">Từ</label>
                         <input class="form-input rounded-lg border-surface-light bg-background-light text-text-light-primary text-sm focus:ring-primary focus:border-primary"
@@ -178,6 +196,7 @@
                 <div class="p-4 flex flex-col md:flex-row gap-4 justify-between items-center border-b border-surface-light">
                     <div class="w-full md:max-w-md">
                         <form method="get">
+                            <input type="hidden" name="__RequestVerificationToken" value="@tokenSet.RequestToken" />
                             <label class="flex flex-col w-full">
                                 <div class="flex w-full flex-1 items-stretch rounded-lg h-11">
                                     <div class="text-text-light-secondary flex bg-surface-light items-center justify-center pl-4 rounded-l-lg">
@@ -275,10 +294,10 @@
                                                    class="p-2 rounded-md hover:bg-surface-light" title="Chi tiết">
                                                     <span class="material-symbols-outlined text-base text-text-light-primary">visibility</span>
                                                 </a>
-                                                <a asp-action="Edit" asp-route-id="@order.OrderId"
-                                                   class="p-2 rounded-md hover:bg-surface-light" title="Cập nhật">
+                                                <button onclick="openEditModal(@order.OrderId, @order.StatusId)"
+                                                        class="p-2 rounded-md hover:bg-surface-light" title="Cập nhật trạng thái">
                                                     <span class="material-symbols-outlined text-base text-text-light-primary">edit</span>
-                                                </a>
+                                                </button>
                                             </td>
                                         </tr>
                                     }
@@ -326,79 +345,187 @@
     </main>
 </div>
 
-<!-- Toast Messages -->
-@if (TempData["Success"] != null)
-{
-    <div id="successToast" class="fixed top-4 right-4 z-50 max-w-sm">
-        <div class="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-start gap-3">
-            <span class="material-symbols-outlined">check_circle</span>
-            <div class="flex-1">
-                <p class="font-semibold">Thành công</p>
-                <p class="text-sm">@TempData["Success"]</p>
+<!-- Modal Popup FORM THÔNG THƯỜNG - VẪN ĐẸP Y NGUYÊN -->
+<div id="editStatusModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
+            <!-- Header màu CAM đẹp -->
+            <div class="bg-gradient-to-r from-primary to-orange-600 rounded-t-xl p-5">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-white text-3xl">edit_note</span>
+                        <h3 class="text-xl font-bold text-white">Cập nhật trạng thái</h3>
+                    </div>
+                    <button type="button" onclick="closeEditModal()" class="text-white hover:bg-white/20 rounded-full p-2 transition-all">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
             </div>
-            <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200">
-                <span class="material-symbols-outlined text-lg">close</span>
-            </button>
+
+            <!-- Form sửa trạng thái -->
+            <form method="post" asp-controller="Order" asp-action="UpdateStatus">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="editOrderId" name="OrderId" />
+
+                <!-- Thông tin đơn hàng -->
+                <div class="bg-orange-50 border-l-4 border-primary rounded-lg p-4 mb-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-primary">info</span>
+                        <p class="font-semibold text-text-light-primary">Thông tin đơn hàng</p>
+                    </div>
+                    <p class="text-sm text-text-light-secondary ml-8">
+                        Mã đơn: <span class="font-bold text-primary" id="displayOrderId">#---</span>
+                    </p>
+                </div>
+
+                <!-- Select trạng thái -->
+                <div class="mb-6">
+                    <label class="flex items-center gap-2 text-sm font-semibold text-text-light-primary mb-3">
+                        <span class="material-symbols-outlined text-primary">task_alt</span>
+                        Chọn trạng thái mới
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <select id="editStatusId" name="StatusId" required
+                            class="w-full rounded-xl border-2 border-surface-light bg-white px-4 py-3.5 text-text-light-primary font-medium focus:ring-2 focus:ring-primary focus:border-primary transition-all hover:border-primary/50">
+                        @if (ViewBag.Statuses != null)
+                        {
+                            @foreach (var status in ViewBag.Statuses)
+                            {
+                                <option value="@status.StatusId">
+                                    @status.StatusName
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Ghi chú -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
+                    <div class="flex gap-2">
+                        <span class="material-symbols-outlined text-blue-600 text-sm">lightbulb</span>
+                        <p class="text-xs text-blue-800">
+                            Trạng thái sẽ được cập nhật ngay lập tức và khách hàng có thể nhận được thông báo.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Buttons với hiệu ứng đẹp -->
+                <div class="flex gap-3 pt-4 border-t border-surface-light">
+                    <button type="button" onclick="closeEditModal()"
+                            class="flex-1 py-3.5 rounded-xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-50 hover:border-gray-400 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">cancel</span>
+                        Hủy bỏ
+                    </button>
+                    <button type="submit"
+                            class="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-primary to-orange-600 text-white font-bold hover:from-orange-600 hover:to-primary transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">save</span>
+                        Lưu thay đổi
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-    <script>
+</div>
+
+<style>
+    /* Animation cho modal */
+    @@keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    #editStatusModal:not(.hidden) #modalContent {
+        animation: modalFadeIn 0.3s ease-out forwards;
+    }
+
+    /* Custom scrollbar cho select */
+    select::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    select::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    select::-webkit-scrollbar-thumb {
+        background: #f96b06;
+        border-radius: 10px;
+    }
+
+        select::-webkit-scrollbar-thumb:hover {
+            background: #d85a05;
+        }
+</style>
+
+<script>
+    // Mở modal với animation đẹp
+    function openEditModal(orderId, currentStatusId) {
+        document.getElementById('editOrderId').value = orderId;
+        document.getElementById('editStatusId').value = currentStatusId;
+        document.getElementById('displayOrderId').textContent = '#' + orderId;
+
+        const modal = document.getElementById('editStatusModal');
+        const content = document.getElementById('modalContent');
+
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+
+        // Trigger animation
         setTimeout(() => {
-            const toast = document.getElementById('successToast');
-            if (toast) toast.remove();
-        }, 3000);
-    </script>
-}
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
 
-@if (TempData["Error"] != null)
-{
-    <div id="errorToast" class="fixed top-4 right-4 z-50 max-w-sm">
-        <div class="bg-red-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-start gap-3">
-            <span class="material-symbols-outlined">error</span>
-            <div class="flex-1">
-                <p class="font-semibold">Lỗi</p>
-                <p class="text-sm">@TempData["Error"]</p>
-            </div>
-            <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200">
-                <span class="material-symbols-outlined text-lg">close</span>
-            </button>
-        </div>
-    </div>
-    <script>
+    // Đóng modal với animation
+    function closeEditModal() {
+        const modal = document.getElementById('editStatusModal');
+        const content = document.getElementById('modalContent');
+
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+
         setTimeout(() => {
-            const toast = document.getElementById('errorToast');
-            if (toast) toast.remove();
-        }, 5000);
-    </script>
-}
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
+    }
 
-@section Scripts {
-    <script>
-        // Set selected values for dropdowns
-        document.addEventListener('DOMContentLoaded', function() {
-            // Payment Method
-            const paymentMethod = '@ViewBag.PaymentMethod';
-            if (paymentMethod) {
-                document.querySelector('select[name="paymentMethod"]').value = paymentMethod;
-            }
+    // Click outside để đóng
+    document.getElementById('editStatusModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
 
-            // Status
-            const statusId = '@ViewBag.StatusId';
-            if (statusId) {
-                document.querySelector('select[name="statusId"]').value = statusId;
+    // Nhấn ESC để đóng
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('editStatusModal');
+            if (!modal.classList.contains('hidden')) {
+                closeEditModal();
             }
+        }
+    });
 
-            // Sort By
-            const sortBy = '@ViewBag.SortBy';
-            if (sortBy) {
-                document.querySelector('select[name="sortBy"]').value = sortBy;
-            }
-        });
-
-        // Auto-submit search on Enter
-        document.querySelector('input[name="search"]')?.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                this.form.submit();
-            }
-        });
-    </script>
-}
+    // Loading state khi submit
+    document.getElementById('editStatusForm').addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+            <svg class="animate-spin h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="ml-2">Đang lưu...</span>
+        `;
+    });
+</script>
