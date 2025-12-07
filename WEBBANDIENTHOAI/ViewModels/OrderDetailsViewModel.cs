@@ -12,6 +12,7 @@ namespace WEBBANDIENTHOAI.ViewModels
         public string CustomerEmail { get; set; }
         public string ShippingAddress { get; set; }
         public string PaymentMethod { get; set; }
+        public int StatusId { get; set; }  // ← THÊM DÒNG NÀY
         public string StatusName { get; set; }
         public string Notes { get; set; }
         public decimal Total { get; set; }
