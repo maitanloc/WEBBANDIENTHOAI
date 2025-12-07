@@ -14,15 +14,18 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderStatusRepository _orderStatusRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IOrderDetailsRepository _orderDetailsRepository;
 
         public OrderController(
             IOrderRepository orderRepository,
             IOrderStatusRepository orderStatusRepository,
-            ICustomerRepository customerRepository)
+            ICustomerRepository customerRepository,
+            IOrderDetailsRepository orderDetailsRepository)
         {
             _orderRepository = orderRepository;
             _orderStatusRepository = orderStatusRepository;
             _customerRepository = customerRepository;
+            _orderDetailsRepository = orderDetailsRepository;
         }
 
         // GET: Order
@@ -70,7 +73,6 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
             }
         }
 
-        // POST: Order/UpdateStatus - AJAX endpoint cho modal popup
         // POST: Order/UpdateStatus
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -101,6 +103,53 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Order/GetOrderDetails - AJAX endpoint cho popup chi tiết
+        [HttpGet]
+        public async Task<IActionResult> GetOrderDetails(int orderId)
+        {
+            try
+            {
+                var order = await _orderRepository.GetByIdAsync(orderId);
+                if (order == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
+                }
+
+                var orderDetails = await _orderDetailsRepository.GetByOrderIdAsync(orderId);
+
+                var viewModel = new WEBBANDIENTHOAI.ViewModels.OrderDetailsViewModel
+                {
+                    OrderId = order.OrderId,
+                    OrderDate = order.OrderDate,
+                    CustomerName = order.Customer?.FullName ?? "N/A",
+                    CustomerPhone = order.Customer?.Phone ?? "N/A",
+                    CustomerEmail = order.Customer?.Email ?? "N/A",
+                    ShippingAddress = order.ShippingAddress ?? "N/A",
+                    PaymentMethod = order.PaymentMethod,
+                    StatusName = order.OrderStatus?.StatusName ?? "N/A",
+                    Notes = order.Notes ?? "",
+                    Total = order.Total,
+                    OrderDetails = orderDetails.Select(od => new WEBBANDIENTHOAI.ViewModels.OrderDetailItem
+                    {
+                        OrderDetailId = od.OrderDetailId,
+                        ProductId = od.ProductId,
+                        ProductName = od.Product?.Name ?? "N/A",
+                        ProductImage = od.Product?.PrimaryImage != null
+                            ? Url.Action("GetProductImage", "HomeUser", new { imageId = od.Product.PrimaryImage.ImageId })
+                            : "/images/default-product.png",
+                        Quantity = od.Quantity,
+                        UnitPrice = od.UnitPrice
+                    }).ToList()
+                };
+
+                return Json(new { success = true, data = viewModel });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
         }
 
         // GET: Order/Edit/5
