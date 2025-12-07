@@ -14,18 +14,23 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderStatusRepository _orderStatusRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IOrderDetailsRepository _orderDetailsRepository;
 
         public OrderController(
             IOrderRepository orderRepository,
             IOrderStatusRepository orderStatusRepository,
-            ICustomerRepository customerRepository)
+            ICustomerRepository customerRepository,
+            IOrderDetailsRepository orderDetailsRepository)
         {
             _orderRepository = orderRepository;
             _orderStatusRepository = orderStatusRepository;
             _customerRepository = customerRepository;
+            _orderDetailsRepository = orderDetailsRepository;
         }
 
-        // GET: Order
+        // GET: Admin/Order
+        [Route("Admin/Order")]
+        [Route("Admin/Order/Index")]
         public async Task<IActionResult> Index(
             string search = "",
             int? customerId = null,
@@ -70,9 +75,9 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
             }
         }
 
-        // POST: Order/UpdateStatus - AJAX endpoint cho modal popup
-        // POST: Order/UpdateStatus
+        // POST: Admin/Order/UpdateStatus
         [HttpPost]
+        [Route("Admin/Order/UpdateStatus")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int OrderId, int StatusId)
         {
@@ -103,7 +108,83 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Order/Edit/5
+        // GET: Admin/Order/GetOrderDetails - AJAX endpoint
+        [HttpGet]
+        [Route("Admin/Order/GetOrderDetails")]
+        public async Task<IActionResult> GetOrderDetails(int orderId)
+        {
+            try
+            {
+                // Log để debug
+                System.Diagnostics.Debug.WriteLine($"=== GetOrderDetails called with orderId={orderId} ===");
+
+                if (orderId <= 0)
+                {
+                    return Json(new { success = false, message = "OrderId không hợp lệ" });
+                }
+
+                var order = await _orderRepository.GetByIdAsync(orderId);
+
+                System.Diagnostics.Debug.WriteLine($"Order found: {order != null}");
+
+                if (order == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
+                }
+
+                System.Diagnostics.Debug.WriteLine($"Customer: {order.Customer?.FullName ?? "NULL"}");
+                System.Diagnostics.Debug.WriteLine($"OrderStatus: {order.OrderStatus?.StatusName ?? "NULL"}");
+
+                var orderDetails = await _orderDetailsRepository.GetByOrderIdAsync(orderId);
+
+                System.Diagnostics.Debug.WriteLine($"OrderDetails count: {orderDetails?.Count ?? 0}");
+
+                var viewModel = new WEBBANDIENTHOAI.ViewModels.OrderDetailsViewModel
+                {
+                    OrderId = order.OrderId,
+                    OrderDate = order.OrderDate,
+                    CustomerName = order.Customer?.FullName ?? "N/A",
+                    CustomerPhone = order.Customer?.Phone ?? "N/A",
+                    CustomerEmail = order.Customer?.Email ?? "N/A",
+                    ShippingAddress = order.ShippingAddress ?? "N/A",
+                    PaymentMethod = order.PaymentMethod ?? "COD",
+                    StatusId = order.StatusId,
+                    StatusName = order.OrderStatus?.StatusName ?? "Không xác định",
+                    Notes = order.Notes ?? "",
+                    Total = order.Total,
+                    OrderDetails = orderDetails?.Select(od => new WEBBANDIENTHOAI.ViewModels.OrderDetailItem
+                    {
+                        OrderDetailId = od.OrderDetailId,
+                        ProductId = od.ProductId,
+                        ProductName = od.Product?.Name ?? "N/A",
+                        ProductImage = od.Product?.PrimaryImage != null
+                            ? Url.Action("GetProductImage", "HomeUser", new { imageId = od.Product.PrimaryImage.ImageId })
+                            : "/images/default-product.png",
+                        Quantity = od.Quantity,
+                        UnitPrice = od.UnitPrice
+                    }).ToList() ?? new List<WEBBANDIENTHOAI.ViewModels.OrderDetailItem>()
+                };
+
+                System.Diagnostics.Debug.WriteLine("=== Returning success ===");
+
+                return Json(new { success = true, data = viewModel });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"=== ERROR: {ex.Message} ===");
+                System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+
+                return Json(new
+                {
+                    success = false,
+                    message = $"Lỗi: {ex.Message}",
+                    details = ex.InnerException?.Message ?? ""
+                });
+            }
+        }
+
+        // GET: Admin/Order/Edit/5
+        [Route("Admin/Order/Edit/{id?}")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -133,8 +214,9 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
             }
         }
 
-        // POST: Order/Edit/5
+        // POST: Admin/Order/Edit/5
         [HttpPost]
+        [Route("Admin/Order/Edit/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("OrderId,StatusId")] Order order)
         {

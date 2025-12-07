@@ -18,7 +18,7 @@ namespace WEBBANDIENTHOAI.Models
         public decimal UnitPrice { get; set; }
 
         [ForeignKey("OrderId")]
-        public Order Order { get; set; }
+        public Order? Order { get; set; }
 
         [ForeignKey("ProductId")]
         public Product Product { get; set; }
