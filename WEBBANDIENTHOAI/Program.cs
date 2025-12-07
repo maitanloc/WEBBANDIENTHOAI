@@ -18,7 +18,16 @@ var conn = builder.Configuration.GetConnectionString("DefaultConnection")
 // ========================
 // 2) Add MVC services
 // ========================
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddRazorOptions(options =>
+{
+    // Cho controller thường (không phải Area) tìm view bên ngoài
+    options.ViewLocationFormats.Add("/Views/{1}/{0}.cshtml");
+    options.ViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+    
+    // Cho Area controller
+    options.AreaViewLocationFormats.Add("/Views/{2}/{1}/{0}.cshtml");
+    options.AreaViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+});
 
 // ========================
 // 3) Add DbContext với retry policy
@@ -44,6 +53,9 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IKhohangRepository, KhohangRepository>();
+builder.Services.AddScoped<IOrderStatusRepository, OrderStatusRepository>();
+// Thêm vào phần 4) Register Repositories
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 // Đăng ký services
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -119,6 +131,9 @@ app.UseAuthorization();
 // ========================
 // 7) Routes
 // ========================
+app.MapControllerRoute(
+    name: "Admin",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

@@ -437,9 +437,11 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                         <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
                     </summary>
                     <div class="pl-8 pt-2 flex flex-col gap-2">
-                        <a href="@Url.Action("Orders", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
+                        <a href="@Url.Action("Index", "Order", new { area = "Admin" })"
+                           class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                           data-loader="true">
                             <span class="material-symbols-outlined text-sm">shopping_cart</span>
-                            Đặt Hàng
+                            Đơn Hàng
                         </a>
                         <a href="@Url.Action("Shipping", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
                             <span class="material-symbols-outlined text-sm">local_shipping</span>

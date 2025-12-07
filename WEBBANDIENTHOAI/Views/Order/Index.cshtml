@@ -1,0 +1,404 @@
+﻿@model WEBBANDIENTHOAI.Repository.Admin.PagedResult<WEBBANDIENTHOAI.Models.Order>
+@{
+    ViewData["Title"] = "Quản Lý Đơn Hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f96b06",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#23170f",
+                        "text-light-primary": "#1c130d",
+                        "text-light-secondary": "#9e6b47",
+                        "surface-light": "#f4ece6"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 24px;
+        }
+
+            .material-symbols-outlined.fill {
+                font-variation-settings: 'FILL' 1;
+            }
+
+        body {
+            font-family: 'Inter', sans-serif !important;
+        }
+    </style>
+}
+
+<div class="relative min-h-screen w-full bg-background-light">
+    <main class="w-full p-6 lg:p-8">
+        <div class="w-full max-w-full mx-auto">
+            <!-- Page Header -->
+            <div class="flex flex-wrap justify-between gap-4 mb-8">
+                <div class="flex flex-col gap-2">
+                    <p class="text-text-light-primary text-4xl font-black leading-tight tracking-[-0.033em]">
+                        Dashboard Quản Lý Đơn Hàng
+                    </p>
+                    <p class="text-text-light-secondary text-base font-normal leading-normal">
+                        Xem và quản lý tất cả đơn hàng tại đây. Tổng cộng: <strong>@Model.TotalCount</strong> đơn hàng
+                    </p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="window.print()" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-surface-light text-text-light-primary gap-2 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-surface-light/80 transition-colors">
+                        <span class="material-symbols-outlined text-base">download</span>
+                        <span class="truncate">Xuất Excel</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            @if (ViewBag.Statistics != null)
+            {
+                var stats = ViewBag.Statistics as WEBBANDIENTHOAI.Models.OrderStatisticsDto;
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-surface-light p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-primary uppercase mb-1">Tổng Đơn</p>
+                                <p class="text-2xl font-black text-text-light-primary">@stats.TotalOrders</p>
+                            </div>
+                            <span class="material-symbols-outlined text-4xl text-gray-300">shopping_cart</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-surface-light p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-green-600 uppercase mb-1">Doanh Thu</p>
+                                <p class="text-xl font-black text-text-light-primary">@stats.TotalRevenue.ToString("N0")đ</p>
+                            </div>
+                            <span class="material-symbols-outlined text-4xl text-gray-300">payments</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-surface-light p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-yellow-600 uppercase mb-1">Chờ Xử Lý</p>
+                                <p class="text-2xl font-black text-text-light-primary">@stats.PendingOrders</p>
+                            </div>
+                            <span class="material-symbols-outlined text-4xl text-gray-300">schedule</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-surface-light p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-blue-600 uppercase mb-1">Đang Xử Lý</p>
+                                <p class="text-2xl font-black text-text-light-primary">@stats.ProcessingOrders</p>
+                            </div>
+                            <span class="material-symbols-outlined text-4xl text-gray-300">sync</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-surface-light p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-green-600 uppercase mb-1">Hoàn Thành</p>
+                                <p class="text-2xl font-black text-text-light-primary">@stats.CompletedOrders</p>
+                            </div>
+                            <span class="material-symbols-outlined text-4xl text-gray-300">check_circle</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-surface-light p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-red-600 uppercase mb-1">Đã Hủy</p>
+                                <p class="text-2xl font-black text-text-light-primary">@stats.CancelledOrders</p>
+                            </div>
+                            <span class="material-symbols-outlined text-4xl text-gray-300">cancel</span>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Filter Section -->
+            <div class="mt-8 p-4 bg-white rounded-xl shadow-sm border border-surface-light">
+                <form method="get" class="flex flex-wrap items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium text-text-light-primary" for="startDate">Từ</label>
+                        <input class="form-input rounded-lg border-surface-light bg-background-light text-text-light-primary text-sm focus:ring-primary focus:border-primary"
+                               id="startDate" name="startDate" type="date" value="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium text-text-light-primary" for="endDate">Đến</label>
+                        <input class="form-input rounded-lg border-surface-light bg-background-light text-text-light-primary text-sm focus:ring-primary focus:border-primary"
+                               id="endDate" name="endDate" type="date" value="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="flex-grow md:flex-grow-0">
+                        <select name="paymentMethod" class="form-select w-full md:w-auto rounded-lg border-surface-light bg-background-light text-text-light-primary text-sm focus:ring-primary focus:border-primary">
+                            <option value="">Phương thức thanh toán</option>
+                            <option value="COD">COD</option>
+                            <option value="BANKING">Chuyển khoản</option>
+                        </select>
+                    </div>
+                    <div class="flex-grow md:flex-grow-0">
+                        <select name="statusId" class="form-select w-full md:w-auto rounded-lg border-surface-light bg-background-light text-text-light-primary text-sm focus:ring-primary focus:border-primary">
+                            <option value="">Tất cả trạng thái</option>
+                            @if (ViewBag.Statuses != null)
+                            {
+                                @foreach (var status in ViewBag.Statuses)
+                                {
+                                    <option value="@status.StatusId">@status.StatusName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="flex-grow md:flex-grow-0">
+                        <select name="sortBy" class="form-select w-full md:w-auto rounded-lg border-surface-light bg-background-light text-text-light-primary text-sm focus:ring-primary focus:border-primary">
+                            <option value="newest">Mới nhất</option>
+                            <option value="oldest">Cũ nhất</option>
+                            <option value="highest">Giá trị cao nhất</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+                        <span class="truncate">Áp dụng</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="mt-6 bg-white rounded-xl shadow-sm border border-surface-light overflow-hidden">
+                <div class="p-4 flex flex-col md:flex-row gap-4 justify-between items-center border-b border-surface-light">
+                    <div class="w-full md:max-w-md">
+                        <form method="get">
+                            <label class="flex flex-col w-full">
+                                <div class="flex w-full flex-1 items-stretch rounded-lg h-11">
+                                    <div class="text-text-light-secondary flex bg-surface-light items-center justify-center pl-4 rounded-l-lg">
+                                        <span class="material-symbols-outlined">search</span>
+                                    </div>
+                                    <input name="search" value="@ViewBag.Search"
+                                           class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg text-text-light-primary focus:outline-0 focus:ring-1 focus:ring-primary border-none bg-surface-light h-full placeholder:text-text-light-secondary px-4 text-sm font-normal leading-normal"
+                                           placeholder="Tìm theo mã đơn, tên khách hàng, SĐT..." />
+                                </div>
+                            </label>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="overflow-y-auto max-h-[50vh]">
+                    <div class="overflow-x-auto">
+                        @if (!Model.Items.Any())
+                        {
+                            <div class="text-center py-12">
+                                <span class="material-symbols-outlined text-6xl text-gray-300 mb-3">inbox</span>
+                                <h5 class="text-xl font-semibold text-gray-500 mb-2">Không có đơn hàng nào</h5>
+                                <p class="text-text-light-secondary">Chưa có đơn hàng nào được tạo trong hệ thống</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <table class="w-full text-sm text-left text-text-light-secondary">
+                                <thead class="text-xs text-text-light-secondary uppercase bg-background-light sticky top-0">
+                                    <tr>
+                                        <th class="px-6 py-3" scope="col">Mã Đơn</th>
+                                        <th class="px-6 py-3" scope="col">Khách Hàng</th>
+                                        <th class="px-6 py-3" scope="col">Địa Chỉ</th>
+                                        <th class="px-6 py-3" scope="col">Ngày Đặt</th>
+                                        <th class="px-6 py-3" scope="col">Tổng Tiền</th>
+                                        <th class="px-6 py-3" scope="col">Thanh Toán</th>
+                                        <th class="px-6 py-3" scope="col">Trạng Thái</th>
+                                        <th class="px-6 py-3 text-right" scope="col">Hành Động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model.Items)
+                                    {
+                                        <tr class="bg-white border-b hover:bg-surface-light/50">
+                                            <th class="px-6 py-4 font-bold text-primary whitespace-nowrap" scope="row">
+                                                #@order.OrderId
+                                            </th>
+                                            <td class="px-6 py-4 font-medium text-text-light-primary">
+                                                @order.Customer?.FullName
+                                                <br />
+                                                <small class="text-text-light-secondary">@order.Customer?.Phone</small>
+                                            </td>
+                                            <td class="px-6 py-4">@(order.ShippingAddress ?? "N/A")</td>
+                                            <td class="px-6 py-4">
+                                                @order.OrderDate.ToString("dd/MM/yyyy")
+                                                <br />
+                                                <small class="text-text-light-secondary">@order.OrderDate.ToString("HH:mm")</small>
+                                            </td>
+                                            <td class="px-6 py-4 font-bold text-green-600">
+                                                @order.Total.ToString("N0")đ
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                @if (order.PaymentMethod == "COD")
+                                                {
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">COD</span>
+                                                }
+                                                else if (order.PaymentMethod == "BANKING")
+                                                {
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Chuyển khoản</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">@order.PaymentMethod</span>
+                                                }
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                @{
+                                                    string statusClass = "";
+                                                    string statusText = order.OrderStatus?.StatusName ?? "Không xác định";
+                                                    switch (order.StatusId)
+                                                    {
+                                                        case 1: statusClass = "bg-yellow-100 text-yellow-800"; break;
+                                                        case 2: statusClass = "bg-blue-100 text-blue-800"; break;
+                                                        case 3: statusClass = "bg-green-100 text-green-800"; break;
+                                                        case 4: statusClass = "bg-red-100 text-red-800"; break;
+                                                        case 5: statusClass = "bg-indigo-100 text-indigo-800"; break;
+                                                        default: statusClass = "bg-gray-100 text-gray-800"; break;
+                                                    }
+                                                }
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @statusClass">
+                                                    @statusText
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 text-right flex justify-end gap-2">
+                                                <a asp-action="Details" asp-route-id="@order.OrderId"
+                                                   class="p-2 rounded-md hover:bg-surface-light" title="Chi tiết">
+                                                    <span class="material-symbols-outlined text-base text-text-light-primary">visibility</span>
+                                                </a>
+                                                <a asp-action="Edit" asp-route-id="@order.OrderId"
+                                                   class="p-2 rounded-md hover:bg-surface-light" title="Cập nhật">
+                                                    <span class="material-symbols-outlined text-base text-text-light-primary">edit</span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <div class="mt-6 flex justify-center items-center gap-2">
+                    @if (ViewBag.CurrentPage > 1)
+                    {
+                        <a asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-statusId="@ViewBag.StatusId"
+                           asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")"
+                           asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")"
+                           class="px-4 py-2 rounded-lg bg-white border border-surface-light text-text-light-primary hover:bg-surface-light">
+                            Trước
+                        </a>
+                    }
+
+                    <span class="px-4 py-2 text-text-light-primary font-medium">
+                        Trang @ViewBag.CurrentPage / @Model.TotalPages
+                    </span>
+
+                    @if (ViewBag.CurrentPage < Model.TotalPages)
+                    {
+                        <a asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-statusId="@ViewBag.StatusId"
+                           asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")"
+                           asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")"
+                           class="px-4 py-2 rounded-lg bg-white border border-surface-light text-text-light-primary hover:bg-surface-light">
+                            Sau
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+    </main>
+</div>
+
+<!-- Toast Messages -->
+@if (TempData["Success"] != null)
+{
+    <div id="successToast" class="fixed top-4 right-4 z-50 max-w-sm">
+        <div class="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-start gap-3">
+            <span class="material-symbols-outlined">check_circle</span>
+            <div class="flex-1">
+                <p class="font-semibold">Thành công</p>
+                <p class="text-sm">@TempData["Success"]</p>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+        </div>
+    </div>
+    <script>
+        setTimeout(() => {
+            const toast = document.getElementById('successToast');
+            if (toast) toast.remove();
+        }, 3000);
+    </script>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div id="errorToast" class="fixed top-4 right-4 z-50 max-w-sm">
+        <div class="bg-red-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-start gap-3">
+            <span class="material-symbols-outlined">error</span>
+            <div class="flex-1">
+                <p class="font-semibold">Lỗi</p>
+                <p class="text-sm">@TempData["Error"]</p>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+        </div>
+    </div>
+    <script>
+        setTimeout(() => {
+            const toast = document.getElementById('errorToast');
+            if (toast) toast.remove();
+        }, 5000);
+    </script>
+}
+
+@section Scripts {
+    <script>
+        // Set selected values for dropdowns
+        document.addEventListener('DOMContentLoaded', function() {
+            // Payment Method
+            const paymentMethod = '@ViewBag.PaymentMethod';
+            if (paymentMethod) {
+                document.querySelector('select[name="paymentMethod"]').value = paymentMethod;
+            }
+
+            // Status
+            const statusId = '@ViewBag.StatusId';
+            if (statusId) {
+                document.querySelector('select[name="statusId"]').value = statusId;
+            }
+
+            // Sort By
+            const sortBy = '@ViewBag.SortBy';
+            if (sortBy) {
+                document.querySelector('select[name="sortBy"]').value = sortBy;
+            }
+        });
+
+        // Auto-submit search on Enter
+        document.querySelector('input[name="search"]')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.form.submit();
+            }
+        });
+    </script>
+}

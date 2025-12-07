@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using System.Collections.Generic;
 using WEBBANDIENTHOAI.Models;
 
 namespace WEBBANDIENTHOAI.Repository.TaiKhoan
@@ -9,5 +10,6 @@ namespace WEBBANDIENTHOAI.Repository.TaiKhoan
         Task<Customer> CreateCustomerAsync(Customer customer);
         Task<Customer> GetCustomerByIdAsync(int customerId);
         Task<Customer> GetCustomerByEmailAsync(string email);
+        Task<IEnumerable<Customer>> GetAllAsync(); // Thêm method này
     }
 }

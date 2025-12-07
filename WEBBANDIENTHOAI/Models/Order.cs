@@ -25,7 +25,7 @@ namespace WEBBANDIENTHOAI.Models
         public string ShippingAddress { get; set; }
 
         public int? CreatedByUserId { get; set; }
-
+        
         [MaxLength(50)]
         public string PaymentMethod { get; set; } = "COD";
 
@@ -40,5 +40,22 @@ namespace WEBBANDIENTHOAI.Models
         public OrderStatus OrderStatus { get; set; }  // Mới thêm
 
         public ICollection<OrderDetail> OrderDetails { get; set; }
+    }
+    // DTO cho thống kê đơn hàng
+    public class OrderStatisticsDto
+    {
+        public int TotalOrders { get; set; }
+        public decimal TotalRevenue { get; set; }
+        public int PendingOrders { get; set; }
+        public int ProcessingOrders { get; set; }
+        public int CompletedOrders { get; set; }
+        public int CancelledOrders { get; set; }
+    }
+
+    // DTO cho cập nhật trạng thái đơn hàng
+    public class OrderStatusUpdateDto
+    {
+        [Required(ErrorMessage = "Vui lòng chọn trạng thái")]
+        public int StatusId { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 
@@ -25,6 +26,7 @@ namespace WEBBANDIENTHOAI.Repository.TaiKhoan
             await _context.SaveChangesAsync();
             return customer;
         }
+
         public async Task<Customer> GetCustomerByIdAsync(int customerId)
         {
             return await _context.Customers
@@ -35,6 +37,14 @@ namespace WEBBANDIENTHOAI.Repository.TaiKhoan
         {
             return await _context.Customers
                 .FirstOrDefaultAsync(c => c.Email == email);
+        }
+
+        public async Task<IEnumerable<Customer>> GetAllAsync()
+        {
+            return await _context.Customers
+                .OrderBy(c => c.FullName)
+                .AsNoTracking()
+                .ToListAsync();
         }
     }
 }
