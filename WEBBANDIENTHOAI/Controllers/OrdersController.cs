@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
+using WEBBANDIENTHOAI.Repository.NguoiDung;
 using WEBBANDIENTHOAI.Repository.TaiKhoan; // Add this using statement
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,11 +14,13 @@ namespace WEBBANDIENTHOAI.Controllers
     {
         private readonly AppDbContext _context;
         private readonly ICustomerRepository _customerRepository; // Inject ICustomerRepository
+        private readonly ICartRepository _cartRepository;
 
-        public OrdersController(AppDbContext context, ICustomerRepository customerRepository) // Update constructor
+        public OrdersController(AppDbContext context, ICustomerRepository customerRepository, ICartRepository cartRepository) // Update constructor
         {
             _context = context;
             _customerRepository = customerRepository;
+            _cartRepository = cartRepository;
         }
 
         private int? GetCurrentCustomerId()
@@ -122,6 +125,57 @@ namespace WEBBANDIENTHOAI.Controllers
             await _context.SaveChangesAsync();
 
             return Json(new { success = true, message = "Đơn hàng đã được hủy." });
+        }
+        [HttpPost]
+        public async Task<IActionResult> ConfirmDelivery(int id)
+        {
+            var customerId = GetCurrentCustomerId();
+            if (customerId == null)
+            {
+                return Unauthorized(new { success = false, message = "Bạn cần đăng nhập để thực hiện việc này." });
+            }
+
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == id && o.CustomerId == customerId.Value);
+
+            if (order == null)
+            {
+                return NotFound(new { success = false, message = "Không tìm thấy đơn hàng." });
+            }
+
+            // Assuming StatusId 3 is "Shipping"
+            if (order.StatusId == 3)
+            {
+                order.StatusId = 4; // StatusId 4 for "Delivered"
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Xác nhận đã nhận hàng thành công." });
+            }
+
+            return BadRequest(new { success = false, message = "Không thể xác nhận đơn hàng ở trạng thái này." });
+        }
+        [HttpPost]
+        public async Task<IActionResult> Repurchase(int id)
+        {
+            var customerId = GetCurrentCustomerId();
+            if (customerId == null)
+            {
+                return Json(new { success = false, message = "Vui lòng đăng nhập để mua hàng!", requireLogin = true });
+            }
+
+            var order = await _context.Orders
+                                      .Include(o => o.OrderDetails)
+                                      .FirstOrDefaultAsync(o => o.OrderId == id && o.CustomerId == customerId.Value);
+
+            if (order == null)
+            {
+                return NotFound(new { success = false, message = "Không tìm thấy đơn hàng." });
+            }
+
+            foreach (var item in order.OrderDetails)
+            {
+                await _cartRepository.AddToCartAsync(customerId.Value, item.ProductId, item.Quantity);
+            }
+
+            return Json(new { success = true, redirectToUrl = Url.Action("Index", "HomeCarts") });
         }
     }
 }

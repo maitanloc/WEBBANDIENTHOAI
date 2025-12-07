@@ -10,7 +10,7 @@
         {
             "Pending" => "Đơn hàng đang chờ xử lý",
             "Processing" => "Đơn hàng đang được chuẩn bị",
-            "Shipped" => "Đơn hàng đã được giao",
+            "Shipped" => "Đơn hàng đang được giao",
             "Delivered" => "Đơn hàng đã giao thành công",
             "Cancelled" => "Đơn hàng đã bị hủy",
             _ => englishStatus, // Fallback to English if no translation
@@ -133,7 +133,7 @@
                             <div class="flex gap-3">
                                 @if (order.OrderStatus.StatusName == "Cancelled" || order.OrderStatus.StatusName == "Delivered")
                                 {
-                                    <button class="flex h-10 items-center justify-center gap-2 rounded-lg bg-primary/20 px-4 text-sm font-semibold text-primary hover:bg-primary/30 dark:bg-primary/30 dark:hover:bg-primary/40">Mua Lại</button>
+                                    <button data-order-id="@order.OrderId" class="repurchase-btn flex h-10 items-center justify-center gap-2 rounded-lg bg-primary/20 px-4 text-sm font-semibold text-primary hover:bg-primary/30 dark:bg-primary/30 dark:hover:bg-primary/40">Mua Lại</button>
                                 }
                                  @if (order.OrderStatus.StatusName == "Pending")
                                 {
@@ -142,7 +142,7 @@
                                 <a asp-controller="OrderDetail" asp-action="HomeOrderDetail" asp-route-id="@order.OrderId" class="flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-sm hover:bg-primary/90">Xem Chi Tiết</a>
                                 @if (order.OrderStatus.StatusName == "Shipped")
                                 {
-                                     <button class="flex h-10 items-center justify-center gap-2 rounded-lg bg-green-500 px-4 text-sm font-semibold text-white shadow-sm hover:bg-green-500/90">Xác Nhận Đã Nhận Hàng</button>
+                                     <button data-order-id="@order.OrderId" class="confirm-delivery-btn flex h-10 items-center justify-center gap-2 rounded-lg bg-green-500 px-4 text-sm font-semibold text-white shadow-sm hover:bg-green-500/90">Xác Nhận Đã Nhận Hàng</button>
                                 }
                             </div>
                         </div>
@@ -158,62 +158,138 @@
         document.addEventListener('DOMContentLoaded', function () {
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-            document.querySelectorAll('.cancel-order-btn').forEach(button => {
-                button.addEventListener('click', function (e) {
-                    e.preventDefault();
+            // Function to handle the cancel order action
+            function handleCancelOrder(button) {
+                const orderId = button.dataset.orderId;
+                if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) {
+                    fetch(`/Orders/CancelOrder/${orderId}`, {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': token,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            updateOrderStatusUI(orderId, 'Cancelled', 'Đơn hàng đã bị hủy');
+                            alert(data.message || 'Đơn hàng đã được hủy thành công.');
+                        } else {
+                            alert('Lỗi: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.');
+                    });
+                }
+            }
 
-                    const orderId = this.dataset.orderId;
+            // Function to handle the confirm delivery action
+            function handleConfirmDelivery(button) {
+                const orderId = button.dataset.orderId;
+                if (confirm('Xác nhận bạn đã nhận được đơn hàng này?')) {
+                    fetch(`/Orders/ConfirmDelivery/${orderId}`, {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': token,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            updateOrderStatusUI(orderId, 'Delivered', 'Đơn hàng đã giao thành công');
+                            alert(data.message || 'Xác nhận thành công.');
+                        } else {
+                            alert('Lỗi: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.');
+                    });
+                }
+            }
 
-                    if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) {
-                        fetch(`/Orders/CancelOrder/${orderId}`, {
-                            method: 'POST',
-                            headers: {
-                                'RequestVerificationToken': token,
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Find the order card
-                                const orderCard = document.getElementById(`order-card-${orderId}`);
-                                if (orderCard) {
-                                    // Update status badge
-                                    const statusBadge = orderCard.querySelector('.status-badge');
-                                    if(statusBadge) {
-                                        statusBadge.className = 'status-badge flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300';
-                                        statusBadge.innerHTML = `<span class="material-symbols-outlined text-base">cancel</span><span>Đơn hàng đã bị hủy</span>`;
-                                    }
-
-                                    // Update buttons
-                                    const buttonContainer = orderCard.querySelector('.button-container .flex.gap-3');
-                                    if(buttonContainer) {
-                                        // Remove old buttons, add new ones
-                                        const oldCancelButton = buttonContainer.querySelector('.cancel-order-btn');
-                                        if (oldCancelButton) oldCancelButton.remove();
-                                        
-                                        // Check if "Mua Lại" button already exists before adding
-                                        if (!buttonContainer.querySelector('.buy-again-btn')) {
-                                             const buyAgainButton = document.createElement('button');
-                                             buyAgainButton.className = 'buy-again-btn flex h-10 items-center justify-center gap-2 rounded-lg bg-primary/20 px-4 text-sm font-semibold text-primary hover:bg-primary/30 dark:bg-primary/30 dark:hover:bg-primary/40';
-                                             buyAgainButton.textContent = 'Mua Lại';
-                                             // Prepend it before "Xem chi tiet"
-                                             buttonContainer.insertBefore(buyAgainButton, buttonContainer.querySelector('a, button'));
-                                        }
-                                    }
-                                }
-                                alert(data.message || 'Đơn hàng đã được hủy thành công.');
-                            } else {
-                                alert('Lỗi: ' + data.message);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.');
-                        });
+            // Function to handle the repurchase action
+            function handleRepurchase(button) {
+                const orderId = button.dataset.orderId;
+                fetch(`/Orders/Repurchase/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token,
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.redirectToUrl) {
+                        window.location.href = data.redirectToUrl;
+                    } else if (data.requireLogin) {
+                        // Redirect to login page if needed
+                        window.location.href = '/Account/LoginRegister';
+                    } else {
+                        alert('Lỗi: ' + (data.message || 'Không thể thực hiện thao tác này.'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.');
                 });
+            }
+            
+            // Delegate event listeners to the container
+            document.getElementById('order-list-container').addEventListener('click', function(e) {
+                if (e.target.matches('.cancel-order-btn')) {
+                    handleCancelOrder(e.target);
+                } else if (e.target.matches('.confirm-delivery-btn')) {
+                    handleConfirmDelivery(e.target);
+                } else if (e.target.matches('.repurchase-btn')) {
+                    handleRepurchase(e.target);
+                }
             });
+
+
+            // Function to dynamically update the UI after a status change
+            function updateOrderStatusUI(orderId, newStatus, newStatusText) {
+                const orderCard = document.getElementById(`order-card-${orderId}`);
+                if (!orderCard) return;
+
+                // Update status badge
+                const statusBadge = orderCard.querySelector('.status-badge');
+                const statusClasses = {
+                    'Delivered': 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300',
+                    'Cancelled': 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'
+                };
+                const statusIcons = {
+                    'Delivered': 'check_circle',
+                    'Cancelled': 'cancel'
+                };
+
+                if (statusBadge && statusClasses[newStatus]) {
+                    statusBadge.className = `status-badge flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${statusClasses[newStatus]}`;
+                    statusBadge.innerHTML = `<span class="material-symbols-outlined text-base">${statusIcons[newStatus]}</span><span>${newStatusText}</span>`;
+                }
+
+                // Update buttons
+                const buttonContainer = orderCard.querySelector('.button-container .flex.gap-3');
+                if (buttonContainer) {
+                    // Remove old action buttons
+                    buttonContainer.querySelector('.cancel-order-btn')?.remove();
+                    buttonContainer.querySelector('.confirm-delivery-btn')?.remove();
+
+                    // Add "Mua Lại" button if it doesn't exist
+                    if (!buttonContainer.querySelector('.repurchase-btn')) {
+                        const repurchaseButton = document.createElement('button');
+                        repurchaseButton.dataset.orderId = orderId;
+                        repurchaseButton.className = 'repurchase-btn flex h-10 items-center justify-center gap-2 rounded-lg bg-primary/20 px-4 text-sm font-semibold text-primary hover:bg-primary/30 dark:bg-primary/30 dark:hover:bg-primary/40';
+                        repurchaseButton.textContent = 'Mua Lại';
+                        // Prepend it so it appears first
+                        buttonContainer.insertBefore(repurchaseButton, buttonContainer.firstChild);
+                    }
+                }
+            }
         });
     </script>
 }
