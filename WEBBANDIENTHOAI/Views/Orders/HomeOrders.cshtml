@@ -139,7 +139,7 @@
                                 {
                                     <button data-order-id="@order.OrderId" class="cancel-order-btn flex h-10 items-center justify-center gap-2 rounded-lg bg-red-500/20 px-4 text-sm font-semibold text-red-500 hover:bg-red-500/30">Hủy Đơn</button>
                                 }
-                                <button class="flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-sm hover:bg-primary/90">Xem Chi Tiết</button>
+                                <a asp-controller="OrderDetail" asp-action="HomeOrderDetail" asp-route-id="@order.OrderId" class="flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-sm hover:bg-primary/90">Xem Chi Tiết</a>
                                 @if (order.OrderStatus.StatusName == "Shipped")
                                 {
                                      <button class="flex h-10 items-center justify-center gap-2 rounded-lg bg-green-500 px-4 text-sm font-semibold text-white shadow-sm hover:bg-green-500/90">Xác Nhận Đã Nhận Hàng</button>

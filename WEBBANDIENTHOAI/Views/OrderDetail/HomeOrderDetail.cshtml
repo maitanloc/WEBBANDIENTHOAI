@@ -1,0 +1,111 @@
+@model WEBBANDIENTHOAI.Models.Order
+
+@{
+    ViewData["Title"] = "Chi Tiết Đơn Hàng";
+    Layout = "~/Views/Shared/_Layoutuser.cshtml";
+
+    string GetVietnameseStatusName(string englishStatus)
+    {
+        return englishStatus switch
+        {
+            "Pending" => "Đơn hàng đang chờ xử lý",
+            "Processing" => "Đơn hàng đang được chuẩn bị",
+            "Shipped" => "Đơn hàng đã được giao",
+            "Delivered" => "Đơn hàng đã giao thành công",
+            "Cancelled" => "Đơn hàng đã bị hủy",
+            _ => englishStatus, // Fallback to English if no translation
+        };
+    }
+
+    string GetStatusClass(string englishStatus)
+    {
+        return englishStatus switch
+        {
+            "Delivered" => "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300",
+            "Shipped" => "bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300",
+            "Pending" => "bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300",
+            "Processing" => "bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300",
+            "Cancelled" => "bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300",
+            _ => "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300",
+        };
+    }
+
+    string GetStatusIcon(string englishStatus)
+    {
+        return englishStatus switch
+        {
+            "Delivered" => "check_circle",
+            "Shipped" => "local_shipping",
+            "Pending" => "hourglass_top",
+            "Processing" => "inventory",
+            "Cancelled" => "cancel",
+            _ => "help",
+        };
+    }
+}
+
+<div class="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <div class="flex flex-col gap-6">
+        <div>
+            <div class="mb-2 flex flex-wrap items-center gap-2">
+                <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary" asp-controller="Info" asp-action="ThongTinKH">Tài khoản của tôi</a>
+                <span class="material-symbols-outlined text-base text-slate-400 dark:text-slate-500">chevron_right</span>
+                <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary" asp-controller="Orders" asp-action="HomeOrders">Lịch sử mua hàng</a>
+                <span class="material-symbols-outlined text-base text-slate-400 dark:text-slate-500">chevron_right</span>
+                <span class="text-sm font-medium text-slate-800 dark:text-slate-200">Chi tiết đơn hàng</span>
+            </div>
+            <h1 class="text-3xl font-black leading-tight tracking-tight text-slate-900 dark:text-slate-50">Chi tiết đơn hàng #@Model.OrderId</h1>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-slate-50 mb-4">Thông tin đơn hàng</h2>
+                    <p class="text-slate-700 dark:text-slate-300 mb-2"><strong>Mã đơn hàng:</strong> #@Model.OrderId</p>
+                    <p class="text-slate-700 dark:text-slate-300 mb-2"><strong>Ngày đặt:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    <div class="flex items-center gap-2 mb-2">
+                        <strong class="text-slate-700 dark:text-slate-300">Trạng thái:</strong>
+                        <span class="status-badge flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium @GetStatusClass(Model.OrderStatus.StatusName)">
+                            <span class="material-symbols-outlined text-base">@GetStatusIcon(Model.OrderStatus.StatusName)</span>
+                            <span>@GetVietnameseStatusName(Model.OrderStatus.StatusName)</span>
+                        </span>
+                    </div>
+                    <p class="text-slate-700 dark:text-slate-300 mb-2"><strong>Tổng tiền:</strong> @Model.Total.ToString("N0")₫</p>
+                    <p class="text-slate-700 dark:text-slate-300"><strong>Ghi chú:</strong> @(string.IsNullOrEmpty(Model.Notes) ? "Không có" : Model.Notes)</p>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-slate-50 mb-4">Thông tin giao hàng</h2>
+                    <p class="text-slate-700 dark:text-slate-300 mb-2"><strong>Người nhận:</strong> @Model.Customer.FullName</p>
+                    <p class="text-slate-700 dark:text-slate-300 mb-2"><strong>Số điện thoại:</strong> @Model.Customer.Phone</p>
+                    <p class="text-slate-700 dark:text-slate-300 mb-2"><strong>Địa chỉ:</strong> @Model.ShippingAddress</p>
+                    <p class="text-slate-700 dark:text-slate-300"><strong>Email:</strong> @Model.Customer.Email</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+            <h2 class="text-xl font-bold text-slate-900 dark:text-slate-50 mb-4">Sản phẩm</h2>
+            <div class="divide-y divide-slate-200 dark:divide-slate-800">
+                @foreach (var detail in Model.OrderDetails)
+                {
+                    <div class="flex gap-4 py-4">
+                         <img class="h-20 w-20 rounded-lg object-cover" src="@(detail.Product?.PrimaryImage != null ? Url.Action("GetProductImage", "HomeUser", new { imageId = detail.Product.PrimaryImage.ImageId }) : "/images/default-product.png")" alt="@detail.Product.Name">
+                        <div class="flex flex-1 flex-col justify-center">
+                            <p class="font-semibold text-slate-800 dark:text-slate-100">@detail.Product.Name</p>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Số lượng: @detail.Quantity</p>
+                        </div>
+                        <div class="flex items-center">
+                            <p class="font-semibold text-slate-900 dark:text-slate-50">@detail.UnitPrice.ToString("N0")₫</p>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="flex justify-end pt-4">
+                <a asp-controller="Orders" asp-action="HomeOrders" class="flex h-10 items-center justify-center gap-2 rounded-lg bg-slate-200 dark:bg-slate-700 px-4 text-sm font-semibold text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-300 dark:hover:bg-slate-600">
+                    <span class="material-symbols-outlined text-base">arrow_back</span>
+                    <span>Quay lại lịch sử mua hàng</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
