@@ -422,8 +422,8 @@
         content.classList.add('hidden');
 
         try {
-            // Gọi API lấy dữ liệu
-            const response = await fetch(`/Admin/ExportReceipt/Details/${exportReceiptId}?handler=json`, {
+            // ✅ GỌI ĐÚNG API ENDPOINT
+            const response = await fetch(`/Admin/ExportReceipt/GetDetails/${exportReceiptId}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -437,23 +437,31 @@
 
             const receipt = await response.json();
 
-            // Cập nhật thông tin
+            // Kiểm tra nếu có lỗi từ server
+            if (receipt.success === false) {
+                throw new Error(receipt.message || 'Không thể tải dữ liệu');
+            }
+
+            // Cập nhật thông tin header
             document.getElementById('exportReceiptNumber').textContent = `Mã phiếu: ${receipt.receiptNumber}`;
+
+            // Thông tin khách hàng
             document.getElementById('exportCustomerName').textContent = receipt.customer?.fullName || 'N/A';
             document.getElementById('exportCustomerPhone').textContent = receipt.customer?.phone || 'N/A';
             document.getElementById('exportCustomerEmail').textContent = receipt.customer?.email || 'N/A';
 
-            // Đơn hàng
+            // Thông tin đơn hàng
             if (receipt.orderId) {
                 document.getElementById('exportOrderLink').innerHTML = `<a href="/Admin/Order?search=${receipt.orderId}" class="text-blue-600 hover:underline">#${receipt.orderId}</a>`;
             } else {
                 document.getElementById('exportOrderLink').textContent = 'N/A';
             }
 
+            // Ngày xuất và người tạo
             document.getElementById('exportDate').textContent = new Date(receipt.exportDate).toLocaleString('vi-VN');
             document.getElementById('exportCreatedBy').textContent = receipt.createdByUser?.fullName || 'N/A';
 
-            // Ghi chú
+            // Ghi chú (nếu có)
             const notesSection = document.getElementById('exportNotesSection');
             if (receipt.notes && receipt.notes.trim() !== '') {
                 notesSection.classList.remove('hidden');
@@ -470,11 +478,11 @@
                     <tr class="hover:bg-green-50">
                         <td class="px-4 py-3 font-semibold">${stt++}</td>
                         <td class="px-4 py-3">
-                            <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">${item.stockCode}</span>
+                            <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">${item.stockCode || 'N/A'}</span>
                         </td>
                         <td class="px-4 py-3">
-                            <p class="font-semibold text-gray-800">${item.snapshotName}</p>
-                            <p class="text-xs text-gray-500">SKU: ${item.snapshotSKU}</p>
+                            <p class="font-semibold text-gray-800">${item.snapshotName || 'N/A'}</p>
+                            <p class="text-xs text-gray-500">SKU: ${item.snapshotSKU || 'N/A'}</p>
                         </td>
                         <td class="px-4 py-3 text-center">
                             <span class="inline-flex items-center justify-center w-10 h-10 bg-green-500 text-white font-bold rounded-full">
@@ -493,13 +501,14 @@
             document.getElementById('exportTotalQty').textContent = `${receipt.totalQuantity} sản phẩm`;
             document.getElementById('exportTotalValue').textContent = receipt.totalValue.toLocaleString('vi-VN') + 'đ';
 
-            // Hiện content
+            // Hiện content, ẩn loading
             loading.classList.add('hidden');
             content.classList.remove('hidden');
 
         } catch (error) {
             console.error('Error loading export details:', error);
 
+            // Hiện thông báo lỗi
             loading.innerHTML = `
                 <div class="text-center py-8">
                     <span class="material-symbols-outlined text-6xl text-red-500 mb-3">error</span>
@@ -514,26 +523,28 @@
         }
     }
 
+    // Đóng modal
     function closeExportDetailsModal() {
         const modal = document.getElementById('exportDetailsModal');
         modal.classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
     }
 
+    // In phiếu xuất
     function printExportReceipt() {
         window.print();
     }
 
-    // Click outside để đóng
+    // Click outside để đóng modal
     document.getElementById('exportDetailsModal')?.addEventListener('click', function(e) {
         if (e.target === this) {
             closeExportDetailsModal();
         }
     });
 
-    // ESC để đóng
+    // Nhấn ESC để đóng modal
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
+        if (e.key === 'Escape') {   
             const modal = document.getElementById('exportDetailsModal');
             if (modal && !modal.classList.contains('hidden')) {
                 closeExportDetailsModal();

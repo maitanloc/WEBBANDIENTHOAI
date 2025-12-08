@@ -8,15 +8,19 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
     public class ExportReceiptController : Controller
     {
         private readonly IExportReceiptRepository _exportReceiptRepository;
+        private readonly IExportReceiptDetailsRepository _exportReceiptDetailsRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IOrderDetailsRepository _orderDetailsRepository;
+        
 
         public ExportReceiptController(
             IExportReceiptRepository exportReceiptRepository,
+            IExportReceiptDetailsRepository exportReceiptDetailsRepository,
             IOrderRepository orderRepository,
             IOrderDetailsRepository orderDetailsRepository)
         {
             _exportReceiptRepository = exportReceiptRepository;
+            _exportReceiptDetailsRepository = exportReceiptDetailsRepository;
             _orderRepository = orderRepository;
             _orderDetailsRepository = orderDetailsRepository;
         }
@@ -52,7 +56,7 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
             }
         }
 
-        // GET: Admin/ExportReceipt/Details/5
+        // GET: Admin/ExportReceipt/Details/5 - View HTML
         [Route("Admin/ExportReceipt/Details/{id}")]
         public async Task<IActionResult> Details(int id)
         {
@@ -71,6 +75,88 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
             {
                 TempData["Error"] = $"Lỗi: {ex.Message}";
                 return RedirectToAction(nameof(Index));
+            }
+        }
+
+        // GET: Admin/ExportReceipt/GetDetails/5 - AJAX endpoint trả về JSON
+        [HttpGet]
+        [Route("Admin/ExportReceipt/GetDetails/{id}")]
+        public async Task<IActionResult> GetDetails(int id)
+        {
+            try
+            {
+                var exportReceipt = await _exportReceiptRepository.GetByIdAsync(id);
+                if (exportReceipt == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Không tìm thấy phiếu xuất"
+                    });
+                }
+
+                // Tạo DTO để trả về
+                var dto = new
+                {
+                    exportReceiptId = exportReceipt.ExportReceiptId,
+                    receiptNumber = exportReceipt.ReceiptNumber,
+                    exportDate = exportReceipt.ExportDate,
+                    customerId = exportReceipt.CustomerId,
+                    orderId = exportReceipt.OrderId,
+                    totalQuantity = exportReceipt.TotalQuantity,
+                    totalValue = exportReceipt.TotalValue,
+                    notes = exportReceipt.Notes,
+                    createdAt = exportReceipt.CreatedAt,
+                    customer = exportReceipt.Customer != null ? new
+                    {
+                        customerId = exportReceipt.Customer.CustomerId,
+                        fullName = exportReceipt.Customer.FullName,
+                        email = exportReceipt.Customer.Email,
+                        phone = exportReceipt.Customer.Phone,
+                        address = exportReceipt.Customer.Address
+                    } : null,
+                    order = exportReceipt.Order != null ? new
+                    {
+                        orderId = exportReceipt.Order.OrderId,
+                        orderDate = exportReceipt.Order.OrderDate,
+                        total = exportReceipt.Order.Total
+                    } : null,
+                    createdByUser = exportReceipt.CreatedByUser != null ? new
+                    {
+                        userId = exportReceipt.CreatedByUser.UserId,
+                        fullName = exportReceipt.CreatedByUser.FullName,
+                        username = exportReceipt.CreatedByUser.Username
+                    } : null,
+                    exportReceiptDetails = exportReceipt.ExportReceiptDetails?.Select(d => new
+                    {
+                        exportDetailId = d.ExportDetailId,
+                        productId = d.ProductId,
+                        stockCode = d.StockCode,
+                        snapshotSKU = d.SnapshotSKU,
+                        snapshotName = d.SnapshotName,
+                        snapshotBrand = d.SnapshotBrand,
+                        quantity = d.Quantity,
+                        unitPrice = d.UnitPrice,
+                        totalPrice = d.TotalPrice,
+                        product = d.Product != null ? new
+                        {
+                            productId = d.Product.ProductId,
+                            name = d.Product.Name,
+                            sku = d.Product.SKU,
+                            brand = d.Product.Brand
+                        } : null
+                    }).ToList()
+                };
+
+                return Json(dto);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = $"Lỗi: {ex.Message}"
+                });
             }
         }
 

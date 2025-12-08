@@ -58,7 +58,9 @@ builder.Services.AddScoped<IOrderStatusRepository, OrderStatusRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderDetailsRepository, OrderDetailsRepository>();
 // Đăng ký ExportReceiptRepository
-builder.Services.AddScoped<IExportReceiptRepository, ExportReceiptRepository>();    
+builder.Services.AddScoped<IExportReceiptRepository, ExportReceiptRepository>();
+// Thêm vào phần ConfigureServices hoặc builder.Services
+builder.Services.AddScoped<IExportReceiptDetailsRepository, ExportReceiptDetailsRepository>();
 
 // Đăng ký services
 builder.Services.AddScoped<IEmailService, EmailService>();

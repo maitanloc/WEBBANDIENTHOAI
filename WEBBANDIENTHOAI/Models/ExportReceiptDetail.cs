@@ -16,17 +16,17 @@ namespace WEBBANDIENTHOAI.Models
 
         [Required]
         [MaxLength(50)]
-        public string StockCode { get; set; }
+        public string? StockCode { get; set; }
 
         [Required]
         [MaxLength(60)]
-        public string SnapshotSKU { get; set; }
+        public string? SnapshotSKU { get; set; }
 
         [MaxLength(250)]
-        public string SnapshotName { get; set; }
+        public string? SnapshotName { get; set; }
 
         [MaxLength(100)]
-        public string SnapshotBrand { get; set; }
+        public string? SnapshotBrand { get; set; }
 
         public int Quantity { get; set; }
 
