@@ -108,7 +108,7 @@
                         }
 
                         <!-- LOGIN PANEL -->
-                        <section id="loginPanel" class="panel visible bg-white/60 backdrop-blur-sm rounded-xl">
+                        <section id="loginPanel" class="panel visible bg-white/60 backdrop-blur-sm rounded-xl overflow-y-auto">
                             <form asp-controller="Account" asp-action="Login" method="post" class="h-full flex flex-col justify-between" autocomplete="on">
                                 @Html.AntiForgeryToken()
                                 <div>
@@ -152,7 +152,7 @@
                         </section>
 
                         <!-- REGISTER PANEL -->
-                        <section id="registerPanel" class="panel hidden-right bg-white/60 backdrop-blur-sm rounded-xl">
+                        <section id="registerPanel" class="panel hidden-right bg-white/60 backdrop-blur-sm rounded-xl overflow-y-auto">
                             <form asp-controller="Account" asp-action="Register" method="post" class="h-full flex flex-col justify-between">
                                 @Html.AntiForgeryToken()
                                 <div>
