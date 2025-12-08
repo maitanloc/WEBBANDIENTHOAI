@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.Repository.NguoiDung;
+using WEBBANDIENTHOAI.Repository.TaiKhoan;
 using WEBBANDIENTHOAI.ViewModels;
 
 namespace WEBBANDIENTHOAI.Controllers.NguoiDung
@@ -11,11 +12,13 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
     {
         private readonly ICartRepository _cartRepository;
         private readonly AppDbContext _context;
+        private readonly ICustomerRepository _customerRepository;
 
-        public HomeCartsController(ICartRepository cartRepository, AppDbContext context)
+        public HomeCartsController(ICartRepository cartRepository, AppDbContext context, ICustomerRepository customerRepository)
         {
             _cartRepository = cartRepository;
             _context = context;
+            _customerRepository = customerRepository;
         }
 
         private int? GetCurrentCustomerId()
@@ -39,6 +42,19 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
             if (customerId == null)
             {
                 return RedirectToAction("Login", "Account");
+            }
+
+            var customer = await _customerRepository.GetCustomerByIdAsync(customerId.Value);
+            if (customer != null)
+            {
+                ViewBag.CustomerName = customer.FullName;
+                ViewBag.CustomerEmail = customer.Email;
+                ViewBag.CustomerPhone = customer.Phone;
+                ViewBag.IsLoggedIn = true;
+            }
+            else
+            {
+                ViewBag.IsLoggedIn = false;
             }
 
             var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId.Value);

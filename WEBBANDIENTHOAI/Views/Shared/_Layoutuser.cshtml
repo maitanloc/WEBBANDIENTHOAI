@@ -281,7 +281,7 @@
 
                 <!-- Enhanced Search -->
                 <div class="hidden lg:flex flex-1 justify-center px-8 max-w-2xl">
-                    <div class="relative w-full group">
+                    <form action="/HomeUser/Search" method="get" class="relative w-full group">
                         <div class="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-dark/20 rounded-xl blur-sm group-hover:blur transition-all duration-300"></div>
                         <div class="relative flex items-stretch rounded-xl h-12 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 group-hover:shadow-md transition-all duration-300">
                             <div class="text-gray-500 dark:text-gray-400 flex items-center justify-center pl-4">
@@ -289,9 +289,11 @@
                             </div>
                             <input class="flex-1 rounded-r-xl text-gray-800 dark:text-white bg-transparent border-none h-full px-4 text-sm focus:outline-none focus:ring-0"
                                    placeholder="Tìm kiếm sản phẩm, thương hiệu..."
-                                   id="globalSearch" />
-                            <button class="px-4 text-gray-500 hover:text-primary transition-colors">
-                                <i class="fas fa-sliders-h"></i>
+                                   id="globalSearch"
+                                   name="query"
+                                   autocomplete="off" />
+                            <button type="submit" class="px-4 text-gray-500 hover:text-primary transition-colors">
+                                <i class="fas fa-search"></i>
                             </button>
                         </div>
                         <!-- Search Suggestions -->
@@ -303,7 +305,7 @@
                                 <!-- Suggestions will be populated by JavaScript -->
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
 
                 <!-- Enhanced Navigation & Actions -->
@@ -318,23 +320,11 @@
                             <i class="fas fa-laptop text-base"></i>
                             <span>Laptop</span>
                         </a>
-                        <a href="/promotions" class="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 flex items-center gap-2 group">
-                            <i class="fas fa-percentage text-base"></i>
-                            <span>Khuyến mãi</span>
-                        </a>
-                        <a href="/news" class="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 flex items-center gap-2 group">
-                            <i class="fas fa-newspaper text-base"></i>
-                            <span>Tin công nghệ</span>
-                        </a>
                     </nav>
 
                     <!-- Action Buttons -->
                     <div class="flex items-center gap-3">
-                        <!-- Wishlist -->
-                        <button class="hidden sm:flex items-center justify-center rounded-xl w-10 h-10 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 relative group">
-                            <i class="fas fa-heart text-gray-600 dark:text-gray-400 group-hover:text-red-500"></i>
-                            <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform">3</span>
-                        </button>
+
 
                         <!-- Cart with Enhanced Badge -->
                         <a href="/HomeCarts/Index" class="flex items-center justify-center rounded-xl w-10 h-10 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 relative group">
@@ -344,25 +334,7 @@
                             </span> *@
                         </a>
 
-                        <!-- Notifications -->
-                        <div class="relative group">
-                            <button class="flex items-center justify-center rounded-xl w-10 h-10 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200">
-                                <i class="fas fa-bell text-gray-600 dark:text-gray-400 group-hover:text-primary"></i>
-                                <span class="absolute -top-1 -right-1 bg-yellow-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center animate-pulse">5</span>
-                            </button>
-                            <!-- Notification Dropdown -->
-                            <div class="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden group-hover:block z-50 overflow-hidden">
-                                <div class="p-4 border-b border-gray-100 dark:border-gray-700">
-                                    <div class="flex justify-between items-center">
-                                        <p class="font-semibold text-gray-800 dark:text-white">Thông báo</p>
-                                        <span class="text-xs bg-primary text-white px-2 py-1 rounded-full">5 mới</span>
-                                    </div>
-                                </div>
-                                <div class="max-h-60 overflow-y-auto">
-                                    <!-- Notifications list -->
-                                </div>
-                            </div>
-                        </div>
+
 
                         <!-- User Profile với Click Dropdown -->
                         <div class="relative" id="user-profile-container">
@@ -413,16 +385,6 @@
                                         <a asp-controller="Orders" asp-action="HomeOrders" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-clipboard-list text-gray-500 w-5"></i>
                                             <span>Đơn hàng</span>
-                                        </a>
-                                        <a href="/wishlist" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                            <i class="fas fa-heart text-gray-500 w-5"></i>
-                                            <span>Yêu thích</span>
-                                            <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span>
-                                        </a>
-                                        <div class="border-t border-gray-100 dark:border-gray-700 my-2"></div>
-                                        <a href="/settings" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                            <i class="fas fa-cog text-gray-500 w-5"></i>
-                                            <span>Cài đặt</span>
                                         </a>
                                         <button class="logout-trigger w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors text-left">
                                             <i class="fas fa-sign-out-alt w-5"></i>
@@ -780,7 +742,9 @@
 
         if (globalSearch && searchSuggestions) {
             globalSearch.addEventListener('focus', () => {
-                searchSuggestions.classList.remove('hidden');
+                if (globalSearch.value.length > 0) {
+                    searchSuggestions.classList.remove('hidden');
+                }
             });
 
             globalSearch.addEventListener('blur', () => {
@@ -789,32 +753,42 @@
                 }, 200);
             });
 
-            // Sample search suggestions
-            const suggestions = [
-                'iPhone 15 Pro Max',
-                'Samsung Galaxy S24',
-                'MacBook Pro M3',
-                'iPad Air 5',
-                'Apple Watch Series 9',
-                'AirPods Pro 2'
-            ];
+            globalSearch.addEventListener('input', async (e) => {
+                const query = e.target.value;
 
-            globalSearch.addEventListener('input', (e) => {
-                const value = e.target.value.toLowerCase();
-                const filtered = suggestions.filter(item =>
-                    item.toLowerCase().includes(value)
-                );
+                if (query.length < 1) {
+                    searchSuggestions.classList.add('hidden');
+                    return;
+                }
+
+                const response = await fetch(`/HomeUser/Search?query=${encodeURIComponent(query)}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const data = await response.json();
+
+                if (data.redirectToUrl) {
+                    window.location.href = data.redirectToUrl;
+                    return;
+                }
 
                 const suggestionsContainer = searchSuggestions.querySelector('.max-h-60');
                 if (suggestionsContainer) {
-                    suggestionsContainer.innerHTML = filtered.map(item => `
-                        <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0">
-                            <div class="flex items-center gap-3">
-                                <i class="fas fa-search text-gray-400"></i>
-                                <span class="text-gray-700 dark:text-gray-300">${item}</span>
-                            </div>
-                        </div>
-                    `).join('');
+                    if (data.suggestions && data.suggestions.length > 0) {
+                        suggestionsContainer.innerHTML = data.suggestions.map(item => `
+                            <a href="/HomeUser/Productdetails/${item.productId}" class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-search text-gray-400"></i>
+                                    <span class="text-gray-700 dark:text-gray-300">${item.name}</span>
+                                </div>
+                            </a>
+                        `).join('');
+                        searchSuggestions.classList.remove('hidden');
+                    } else {
+                        suggestionsContainer.innerHTML = '<p class="p-4 text-sm text-gray-500">Không tìm thấy sản phẩm nào.</p>';
+                        searchSuggestions.classList.remove('hidden');
+                    }
                 }
             });
         }

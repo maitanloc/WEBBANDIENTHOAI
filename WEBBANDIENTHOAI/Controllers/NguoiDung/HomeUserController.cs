@@ -388,14 +388,38 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
             return View(products);
         }
 
-        public async Task<IActionResult> Search(string keyword)
+        public async Task<IActionResult> Search(string query)
         {
-            ViewData["Keyword"] = keyword;
-            var products = await _context.Products
+            // Check if it's an AJAX request
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                if (string.IsNullOrWhiteSpace(query))
+                {
+                    return new JsonResult(new { suggestions = new List<object>() });
+                }
+
+                var products = await _context.Products
+                    .Where(p => p.Name.Contains(query))
+                    .Select(p => new { p.ProductId, p.Name })
+                    .ToListAsync();
+
+                var exactMatch = products.FirstOrDefault(p => p.Name.Equals(query, StringComparison.OrdinalIgnoreCase));
+
+                if (exactMatch != null)
+                {
+                    var redirectToUrl = Url.Action("Productdetails", "HomeUser", new { id = exactMatch.ProductId });
+                    return new JsonResult(new { redirectToUrl });
+                }
+
+                return new JsonResult(new { suggestions = products });
+            }
+
+            ViewData["Keyword"] = query;
+            var productResults = await _context.Products
                                          .Include(p => p.PrimaryImage)
-                                         .Where(p => p.Name.Contains(keyword) && p.StatusId == 1)
+                                         .Where(p => p.Name.Contains(query) && p.StatusId == 1)
                                          .ToListAsync();
-            return View(products);
+            return View(productResults);
         }
 
 

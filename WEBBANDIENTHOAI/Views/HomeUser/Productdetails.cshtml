@@ -12,19 +12,24 @@
         <nav class="flex mb-6" aria-label="Breadcrumb">
             <ol class="flex items-center space-x-2 text-sm">
                 <li>
-                    <a href="/" class="text-gray-500 hover:text-primary transition-colors">
+                    <a href="/HomeUser/Index" class="text-gray-500 hover:text-primary transition-colors">
                         <i class="fas fa-home"></i>
                     </a>
                 </li>
                 <li class="flex items-center">
                     <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
-                    <a href="/products" class="text-gray-500 hover:text-primary transition-colors">Sản phẩm</a>
-                </li>
-                <li class="flex items-center">
-                    <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
-                    <a href="/products?categoryId=@Model.CategoryId" class="text-gray-500 hover:text-primary transition-colors">
-                        @Model.CategoryName
-                    </a>
+                    @if (Model.CategoryId == 1) // Smartphone
+                    {
+                        <a href="/HomeUser/Smartphones" class="text-gray-500 hover:text-primary transition-colors">Điện thoại</a>
+                    }
+                    else if (Model.CategoryId == 2) // Laptop
+                    {
+                        <a href="/HomeUser/Laptops" class="text-gray-500 hover:text-primary transition-colors">Laptop</a>
+                    }
+                    else
+                    {
+                        <a href="/products" class="text-gray-500 hover:text-primary transition-colors">Sản phẩm</a>
+                    }
                 </li>
                 <li class="flex items-center">
                     <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
