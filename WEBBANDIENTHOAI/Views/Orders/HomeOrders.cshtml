@@ -161,55 +161,101 @@
             // Function to handle the cancel order action
             function handleCancelOrder(button) {
                 const orderId = button.dataset.orderId;
-                if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) {
-                    fetch(`/Orders/CancelOrder/${orderId}`, {
-                        method: 'POST',
-                        headers: {
-                            'RequestVerificationToken': token,
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            updateOrderStatusUI(orderId, 'Cancelled', 'Đơn hàng đã bị hủy');
-                            alert(data.message || 'Đơn hàng đã được hủy thành công.');
-                        } else {
-                            alert('Lỗi: ' + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.');
-                    });
-                }
+                Swal.fire({
+                    title: 'Bạn có chắc chắn?',
+                    text: "Bạn có chắc chắn muốn hủy đơn hàng này không?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Có, hủy đơn!',
+                    cancelButtonText: 'Không'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/Orders/CancelOrder/${orderId}`, {
+                            method: 'POST',
+                            headers: {
+                                'RequestVerificationToken': token,
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                updateOrderStatusUI(orderId, 'Cancelled', 'Đơn hàng đã bị hủy');
+                                Swal.fire(
+                                    'Đã hủy!',
+                                    data.message || 'Đơn hàng của bạn đã được hủy thành công.',
+                                    'success'
+                                );
+                            } else {
+                                Swal.fire(
+                                    'Lỗi!',
+                                    data.message,
+                                    'error'
+                                );
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire(
+                                'Lỗi!',
+                                'Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.',
+                                'error'
+                            );
+                        });
+                    }
+                });
             }
 
             // Function to handle the confirm delivery action
             function handleConfirmDelivery(button) {
                 const orderId = button.dataset.orderId;
-                if (confirm('Xác nhận bạn đã nhận được đơn hàng này?')) {
-                    fetch(`/Orders/ConfirmDelivery/${orderId}`, {
-                        method: 'POST',
-                        headers: {
-                            'RequestVerificationToken': token,
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            updateOrderStatusUI(orderId, 'Delivered', 'Đơn hàng đã giao thành công');
-                            alert(data.message || 'Xác nhận thành công.');
-                        } else {
-                            alert('Lỗi: ' + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.');
-                    });
-                }
+                Swal.fire({
+                    title: 'Xác nhận đã nhận hàng?',
+                    text: "Bạn có chắc chắn đã nhận được đơn hàng này?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Vâng, tôi đã nhận được!',
+                    cancelButtonText: 'Chưa'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/Orders/ConfirmDelivery/${orderId}`, {
+                            method: 'POST',
+                            headers: {
+                                'RequestVerificationToken': token,
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                updateOrderStatusUI(orderId, 'Delivered', 'Đơn hàng đã giao thành công');
+                                Swal.fire(
+                                    'Thành công!',
+                                    data.message || 'Xác nhận đã nhận hàng thành công.',
+                                    'success'
+                                );
+                            } else {
+                                Swal.fire(
+                                    'Lỗi!',
+                                    data.message,
+                                    'error'
+                                );
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire(
+                                'Lỗi!',
+                                'Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.',
+                                'error'
+                            );
+                        });
+                    }
+                });
             }
 
             // Function to handle the repurchase action
