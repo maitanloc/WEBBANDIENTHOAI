@@ -11,123 +11,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/ProductStatuses.css" asp-append-version="true" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
 </head>
 
-<body class="status-management bg-background-light dark:bg-background-dark font-display text-[#181411] dark:text-gray-200">
-    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-        <div class="layout-container flex h-full grow flex-col">
-            <main class="flex-1 px-4 sm:px-6 md:px-8 lg:px-12 py-8">
-                <div class="mx-auto max-w-7xl">
-                    <!-- Top Nav Bar -->
-                    <header class="status-header flex flex-col sm:flex-row items-start sm:items-center sm:justify-between whitespace-nowrap pb-6">
-                        <div class="flex items-center gap-4 text-[#181411] dark:text-gray-100">
-                            <div class="size-8 text-primary">
-                                <svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                                    <path clip-rule="evenodd" d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z" fill="currentColor" fill-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <h1 class="text-2xl font-bold tracking-tight">Quản lý Trạng thái Sản phẩm</h1>
+<body class="status-management bg-gray-50 dark:bg-gray-900">
+    <div class="flex h-screen">
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            <div class="status-header sticky top-0 z-10">
+                <header class="h-16 flex items-center justify-between px-8 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-xl font-bold text-orange-500 dark:text-orange-400">
+                        Quản lý Trạng thái Sản phẩm
+                    </h2>
+
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <span class="material-icons-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">search</span>
+                            <input class="search-input pl-10 pr-4 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/80 transition dark:placeholder-gray-500"
+                                   placeholder="Tìm kiếm trạng thái..." type="text" id="searchInput" />
                         </div>
                         <button type="button"
-                                class="btn-primary-custom mt-4 sm:mt-0"
+                                class="btn-primary-custom flex items-center justify-center px-4 py-2 font-semibold rounded-lg text-sm transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 dark:focus:ring-offset-gray-900"
                                 data-bs-toggle="modal" data-bs-target="#createModal">
-                            <span class="material-symbols-outlined text-base">add_circle</span>
-                            <span class="truncate">Thêm Trạng thái</span>
+                            <span class="material-icons-outlined text-base mr-2">add</span>
+                            Thêm Trạng thái
                         </button>
-                    </header>
+                    </div>
+                </header>
+            </div>
 
-                    <!-- Thông báo -->
-                    @if (TempData["Success"] != null)
-                    {
-                        <div class="alert alert-success mb-4">@TempData["Success"]</div>
-                    }
-                    @if (TempData["Error"] != null)
-                    {
-                        <div class="alert alert-danger mb-4">@TempData["Error"]</div>
-                    }
+            <div class="p-8">
+                <!-- Hiển thị thông báo -->
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success mb-4">
+                        @TempData["Success"]
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger mb-4">
+                        @TempData["Error"]
+                    </div>
+                }
 
-                    <!-- Main Content - Table -->
-                    <div class="w-full">
-                        @if (Model.Any())
-                        {
-                            <div class="status-table overflow-hidden shadow-sm">
-                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-left" scope="col">Tên trạng thái</th>
-                                            <th class="text-left" scope="col">Mô tả</th>
-                                            <th class="text-left" scope="col">Số sản phẩm</th>
-                                            <th class="text-right" scope="col">Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in Model)
-                                        {
-                                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40">
-                                                <td class="whitespace-nowrap font-medium text-gray-900 dark:text-gray-100">
-                                                    @item.StatusName
-                                                </td>
-                                                <td class="whitespace-nowrap text-gray-600 dark:text-gray-300">
-                                                    @(item.Description ?? "Không có mô tả")
-                                                </td>
-                                                <td class="whitespace-nowrap text-gray-600 dark:text-gray-300">
-                                                    <span class="status-badge @GetStatusBadgeClass(item.StatusName)">
-                                                        @item.Products?.Count ?? 0 sản phẩm
-                                                    </span>
-                                                </td>
-                                                <td class="whitespace-nowrap text-right font-medium">
-                                                    <div class="flex items-center justify-end gap-2">
-                                                        <button class="action-btn edit-btn"
-                                                                data-bs-toggle="modal" data-bs-target="#editModal"
-                                                                data-id="@item.StatusId"
-                                                                data-name="@item.StatusName"
-                                                                data-desc="@item.Description">
-                                                            <span class="material-symbols-outlined text-xl">edit</span>
-                                                        </button>
-                                                        <button class="action-btn delete-btn"
-                                                                data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                                                data-id="@item.StatusId"
-                                                                data-name="@item.StatusName">
-                                                            <span class="material-symbols-outlined text-xl">delete</span>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                        else
-                        {
-                            <!-- Empty State -->
-                            <div class="empty-state">
-                                <div class="flex flex-col items-center gap-6">
-                                    <div class="empty-state-icon">
-                                        <span class="material-symbols-outlined text-4xl">inventory</span>
-                                    </div>
-                                    <div class="flex max-w-sm flex-col items-center gap-2">
-                                        <p class="text-lg font-bold text-[#181411] dark:text-gray-100">Chưa có trạng thái nào</p>
-                                        <p class="text-sm font-normal text-gray-600 dark:text-gray-400">Bắt đầu bằng cách thêm trạng thái đầu tiên của bạn.</p>
-                                    </div>
-                                    <button type="button"
-                                            class="btn-primary-custom"
-                                            data-bs-toggle="modal" data-bs-target="#createModal">
-                                        <span class="material-symbols-outlined text-base">add_circle</span>
-                                        <span class="truncate">Thêm Trạng thái Đầu tiên</span>
-                                    </button>
-                                </div>
-                            </div>
-                        }
+                <div class="status-table overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left" id="statusesTable">
+                            <thead>
+                                <tr>
+                                    <th class="w-12 text-center font-medium" scope="col">
+                                        <input class="checkbox-custom" type="checkbox" id="selectAll" />
+                                    </th>
+                                    <th class="font-medium" scope="col">Tên trạng thái</th>
+                                    <th class="font-medium" scope="col">Mô tả</th>
+                                    <th class="font-medium text-center" scope="col">Số sản phẩm</th>
+                                    <th class="font-medium" scope="col">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr class="border-b dark:border-gray-700 status-row">
+                                        <td class="w-12 text-center">
+                                            <input class="checkbox-custom status-checkbox" type="checkbox" value="@item.StatusId" />
+                                        </td>
+                                        <td class="font-semibold text-gray-800 dark:text-gray-100">@item.StatusName</td>
+                                        <td class="text-gray-600 dark:text-gray-300">@(item.Description ?? "Không có mô tả")</td>
+                                        <td class="text-gray-600 dark:text-gray-300 text-center">@(item.Products?.Count ?? 0)</td>
+                                        <td>
+                                            <div class="flex items-center space-x-2">
+                                                <button class="action-btn edit-btn"
+                                                        data-bs-toggle="modal" data-bs-target="#editModal"
+                                                        data-id="@item.StatusId"
+                                                        data-name="@item.StatusName"
+                                                        data-desc="@item.Description">
+                                                    <span class="material-icons-outlined text-lg">edit</span>
+                                                </button>
+                                                <button class="action-btn delete-btn"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                        data-id="@item.StatusId"
+                                                        data-name="@item.StatusName">
+                                                    <span class="material-icons-outlined text-lg">delete</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
 
     <!-- Modal Thêm -->
@@ -246,6 +225,19 @@
             modal.find('#deleteStatusName').text(name);
         });
 
+        // Tìm kiếm trạng thái
+        $('#searchInput').on('keyup', function() {
+            var value = $(this).val().toLowerCase();
+            $('.status-row').filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+        // Chọn tất cả
+        $('#selectAll').click(function() {
+            $('.status-checkbox').prop('checked', this.checked);
+        });
+
         // Reset form khi đóng modal thêm
         $('#createModal').on('hidden.bs.modal', function () {
             $(this).find('form')[0].reset();
@@ -258,16 +250,3 @@
     </script>
 </body>
 </html>
-
-@functions {
-    public string GetStatusBadgeClass(string statusName)
-    {
-        return statusName?.ToLower() switch
-        {
-            "còn hàng" or "active" or "đang hoạt động" => "active",
-            "hết hàng" or "inactive" or "ngừng kinh doanh" => "inactive",
-            "đặt trước" or "done" or "hoàn thành" => "done",
-            _ => "active"
-        };
-    }
-}
