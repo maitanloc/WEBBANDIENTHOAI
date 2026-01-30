@@ -72,6 +72,7 @@ namespace WEBBANDIENTHOAI.Data
 
             modelBuilder.Entity<Order>().ToTable("Orders");
             modelBuilder.Entity<OrderDetail>().ToTable("OrderDetails");
+            modelBuilder.Entity<OrderStatus>().ToTable("OrderStatuses"); // Thêm dòng này nếu chưa có
 
             modelBuilder.Entity<Cart>().ToTable("Carts");
             modelBuilder.Entity<CartDetail>().ToTable("CartDetails");
@@ -81,16 +82,16 @@ namespace WEBBANDIENTHOAI.Data
 
             modelBuilder.Entity<AuditLog>().ToTable("AuditLogs");
 
-            // 🔥 THÊM CẤU HÌNH CHO CÁC TABLE MỚI
+            // CẤU HÌNH CHO CÁC TABLE MỚI
             modelBuilder.Entity<PasswordResetToken>().ToTable("PasswordResetTokens");
             modelBuilder.Entity<OTPCode>().ToTable("OTPCodes");
 
-            // 🔥 CẤU HÌNH QUAN HỆ Product ↔ ProductImage
+            // CẤU HÌNH QUAN HỆ Product ↔ ProductImage
             modelBuilder.Entity<Product>()
                 .HasMany(p => p.Images)
                 .WithOne(pi => pi.Product)
                 .HasForeignKey(pi => pi.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.ClientCascade); // Đổi từ Cascade để tránh lỗi multiple cascade paths
 
             // Quan hệ optional cho PrimaryImage
             modelBuilder.Entity<Product>()
@@ -100,7 +101,7 @@ namespace WEBBANDIENTHOAI.Data
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // 🔥 CẤU HÌNH CHO PASSWORD RESET TOKENS
+            // CẤU HÌNH CHO PASSWORD RESET TOKENS
             modelBuilder.Entity<PasswordResetToken>(entity =>
             {
                 entity.HasKey(prt => prt.TokenId);
@@ -111,7 +112,7 @@ namespace WEBBANDIENTHOAI.Data
                 entity.HasIndex(prt => prt.Email);
             });
 
-            // 🔥 CẤU HÌNH CHO OTP CODES
+            // CẤU HÌNH CHO OTP CODES
             modelBuilder.Entity<OTPCode>(entity =>
             {
                 entity.HasKey(otp => otp.OTPId);
@@ -126,9 +127,36 @@ namespace WEBBANDIENTHOAI.Data
             modelBuilder.Entity<Product>().HasIndex(p => p.SKU).IsUnique(false);
             modelBuilder.Entity<Inventory>().HasIndex(i => i.StockCode);
             modelBuilder.Entity<Order>().HasIndex(o => o.OrderDate);
-
-            // 🔥 THÊM INDEX CHO CUSTOMER EMAIL (quan trọng cho forgot password)
             modelBuilder.Entity<Customer>().HasIndex(c => c.Email).IsUnique();
+
+            // =============== DATA SEEDING ===============
+            // Gieo dữ liệu cho Bảng Role
+            modelBuilder.Entity<Role>().HasData(
+                new Role { RoleId = 1, RoleName = "Admin", Description = "Quản trị viên cấp cao nhất" },
+                new Role { RoleId = 2, RoleName = "Staff", Description = "Nhân viên quản lý" },
+                new Role { RoleId = 3, RoleName = "Customer", Description = "Khách hàng" }
+            );
+
+            // Gieo dữ liệu cho Bảng OrderStatus
+            modelBuilder.Entity<OrderStatus>().HasData(
+                new OrderStatus { StatusId = 1, StatusName = "Pending", Description = "Đơn hàng đang chờ xử lý" },
+                new OrderStatus { StatusId = 2, StatusName = "Processing", Description = "Đơn hàng đang được chuẩn bị" },
+                new OrderStatus { StatusId = 3, StatusName = "Shipped", Description = "Đơn hàng đã được giao cho đơn vị vận chuyển" },
+                new OrderStatus { StatusId = 4, StatusName = "Delivered", Description = "Đơn hàng đã giao thành công" },
+                new OrderStatus { StatusId = 5, StatusName = "Cancelled", Description = "Đơn hàng đã bị hủy" }
+            );
+
+            // Gieo dữ liệu cho Bảng ProductStatus
+            modelBuilder.Entity<ProductStatus>().HasData(
+                new ProductStatus { StatusId = 1, StatusName = "Available", Description = "Sản phẩm có sẵn, đang kinh doanh" },
+                new ProductStatus { StatusId = 2, StatusName = "Out of Stock", Description = "Sản phẩm đã hết hàng" }
+            );
+
+            // Gieo dữ liệu cho Bảng Category
+            modelBuilder.Entity<Category>().HasData(
+                new Category { CategoryId = 1, CategoryName = "Smartphones", Description = "Các loại điện thoại thông minh", CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                new Category { CategoryId = 2, CategoryName = "Laptops", Description = "Các loại máy tính xách tay", CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
+            );
         }
     }
 }
