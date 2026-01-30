@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WEBBANDIENTHOAI.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDatabaseWithSeedData : Migration
+    public partial class FinalInitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -545,6 +545,11 @@ namespace WEBBANDIENTHOAI.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Customers",
+                columns: new[] { "CustomerId", "Address", "CitizenID", "CreatedAt", "Email", "FullName", "IsActive", "PasswordHash", "Phone" },
+                values: new object[] { 1, "123 Đường ABC, Quận 1, TP. HCM", "0123456789", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "customer@example.com", "Nguyễn Văn A", true, new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 }, "0987654321" });
+
+            migrationBuilder.InsertData(
                 table: "OrderStatuses",
                 columns: new[] { "StatusId", "Description", "StatusName" },
                 values: new object[,]
@@ -573,6 +578,53 @@ namespace WEBBANDIENTHOAI.Migrations
                     { 1, "Quản trị viên cấp cao nhất", "Admin" },
                     { 2, "Nhân viên quản lý", "Staff" },
                     { 3, "Khách hàng", "Customer" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Products",
+                columns: new[] { "ProductId", "Brand", "CategoryId", "Color", "CreatedAt", "ImageId", "Name", "OldPrice", "Price", "SKU", "ShortDescription", "Size", "StatusId", "StockCode" },
+                values: new object[,]
+                {
+                    { 1, "Apple", 1, "Titan tự nhiên", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "iPhone 15 Pro 256GB", 30990000m, 28990000m, "IP15P256", "Chip A17 Pro, Màn hình Super Retina XDR, Camera Pro 48MP.", null, (byte)1, "SC-IP15P256" },
+                    { 2, "Apple", 2, "Space Gray", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "MacBook Pro 14 inch M3", 52990000m, 49990000m, "MBP14M3", "Chip M3 Pro, 18GB RAM, 512GB SSD, Màn hình Liquid Retina XDR.", null, (byte)1, "SC-MBP14M3" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "UserId", "CreatedAt", "Email", "FullName", "IsActive", "PasswordHash", "RoleId", "Username" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@example.com", "Administrator", true, new byte[] { 36, 11, 229, 24, 250, 189, 39, 36, 221, 182, 240, 78, 235, 29, 165, 150, 116, 72, 215, 232, 49, 192, 140, 143, 168, 34, 128, 159, 116, 199, 32, 169 }, 1, "admin" },
+                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "customer@example.com", "Nguyễn Văn A", true, new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 }, 3, "customer" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Inventory",
+                columns: new[] { "InventoryId", "CurrentQuantity", "LastUpdated", "Location", "MaximumQuantity", "MinimumQuantity", "ProductId", "StockCode" },
+                values: new object[,]
+                {
+                    { 1, 50, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Kho A1", 1000, 10, 1, "SC-IP15P256" },
+                    { 2, 30, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Kho B2", 1000, 5, 2, "SC-MBP14M3" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "LaptopConfigurations",
+                columns: new[] { "ConfigurationId", "Battery", "CPU", "Color", "CreatedAt", "GraphicsCard", "OperatingSystem", "Ports", "ProductId", "RAM", "Resolution", "ScreenSize", "ScreenTechnology", "Storage", "Weight" },
+                values: new object[] { 1, null, "Apple M3 Pro 11-core", "Space Gray", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "14-core GPU", "macOS Sonoma", null, 2, "18 GB", null, "14.2 inch", "Liquid Retina XDR display", "512 GB SSD", "1.55 kg" });
+
+            migrationBuilder.InsertData(
+                table: "PhoneConfigurations",
+                columns: new[] { "ConfigurationId", "Battery", "CPU", "Camera", "Color", "Cores", "CreatedAt", "InternalStorage", "OperatingSystem", "Ports", "ProductId", "RAM", "Resolution", "Screen", "ScreenTechnology", "Threads" },
+                values: new object[] { 1, "Li-Ion, sạc nhanh", "Apple A17 Pro", "Chính 48 MP & Phụ 12 MP, 12 MP", "Titan tự nhiên", null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "256 GB", "iOS 17", null, 1, "8 GB", null, "6.1-inch Super Retina XDR", null, null });
+
+            migrationBuilder.InsertData(
+                table: "ProductImages",
+                columns: new[] { "ImageId", "CreatedAt", "ImagePath", "IsPrimary", "ProductId" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new byte[0], true, 1 },
+                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new byte[0], false, 1 },
+                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new byte[0], true, 2 }
                 });
 
             migrationBuilder.CreateIndex(

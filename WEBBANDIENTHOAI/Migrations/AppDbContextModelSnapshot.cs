@@ -196,6 +196,20 @@ namespace WEBBANDIENTHOAI.Migrations
                         .IsUnique();
 
                     b.ToTable("Customers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            CustomerId = 1,
+                            Address = "123 Đường ABC, Quận 1, TP. HCM",
+                            CitizenID = "0123456789",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "customer@example.com",
+                            FullName = "Nguyễn Văn A",
+                            IsActive = true,
+                            PasswordHash = new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 },
+                            Phone = "0987654321"
+                        });
                 });
 
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.ExportReceipt", b =>
@@ -368,6 +382,23 @@ namespace WEBBANDIENTHOAI.Migrations
                         .IsUnique();
 
                     b.ToTable("LaptopConfigurations", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ConfigurationId = 1,
+                            CPU = "Apple M3 Pro 11-core",
+                            Color = "Space Gray",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            GraphicsCard = "14-core GPU",
+                            OperatingSystem = "macOS Sonoma",
+                            ProductId = 2,
+                            RAM = "18 GB",
+                            ScreenSize = "14.2 inch",
+                            ScreenTechnology = "Liquid Retina XDR display",
+                            Storage = "512 GB SSD",
+                            Weight = "1.55 kg"
+                        });
                 });
 
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.OTPCode", b =>
@@ -654,6 +685,22 @@ namespace WEBBANDIENTHOAI.Migrations
                         .IsUnique();
 
                     b.ToTable("PhoneConfigurations", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ConfigurationId = 1,
+                            Battery = "Li-Ion, sạc nhanh",
+                            CPU = "Apple A17 Pro",
+                            Camera = "Chính 48 MP & Phụ 12 MP, 12 MP",
+                            Color = "Titan tự nhiên",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            InternalStorage = "256 GB",
+                            OperatingSystem = "iOS 17",
+                            ProductId = 1,
+                            RAM = "8 GB",
+                            Screen = "6.1-inch Super Retina XDR"
+                        });
                 });
 
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.Product", b =>
@@ -726,6 +773,38 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.HasIndex("StatusId");
 
                     b.ToTable("Products", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ProductId = 1,
+                            Brand = "Apple",
+                            CategoryId = 1,
+                            Color = "Titan tự nhiên",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "iPhone 15 Pro 256GB",
+                            OldPrice = 30990000m,
+                            Price = 28990000m,
+                            SKU = "IP15P256",
+                            ShortDescription = "Chip A17 Pro, Màn hình Super Retina XDR, Camera Pro 48MP.",
+                            StatusId = (byte)1,
+                            StockCode = "SC-IP15P256"
+                        },
+                        new
+                        {
+                            ProductId = 2,
+                            Brand = "Apple",
+                            CategoryId = 2,
+                            Color = "Space Gray",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "MacBook Pro 14 inch M3",
+                            OldPrice = 52990000m,
+                            Price = 49990000m,
+                            SKU = "MBP14M3",
+                            ShortDescription = "Chip M3 Pro, 18GB RAM, 512GB SSD, Màn hình Liquid Retina XDR.",
+                            StatusId = (byte)1,
+                            StockCode = "SC-MBP14M3"
+                        });
                 });
 
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.ProductImage", b =>
@@ -754,6 +833,32 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductImages", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ImageId = 1,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ImagePath = new byte[0],
+                            IsPrimary = true,
+                            ProductId = 1
+                        },
+                        new
+                        {
+                            ImageId = 2,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ImagePath = new byte[0],
+                            IsPrimary = false,
+                            ProductId = 1
+                        },
+                        new
+                        {
+                            ImageId = 3,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ImagePath = new byte[0],
+                            IsPrimary = true,
+                            ProductId = 2
+                        });
                 });
 
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.ProductStatus", b =>
@@ -877,6 +982,20 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin@example.com",
+                            FullName = "Administrator",
+                            IsActive = true,
+                            PasswordHash = new byte[] { 36, 11, 229, 24, 250, 189, 39, 36, 221, 182, 240, 78, 235, 29, 165, 150, 116, 72, 215, 232, 49, 192, 140, 143, 168, 34, 128, 159, 116, 199, 32, 169 },
+                            RoleId = 1,
+                            Username = "admin"
+                       
+                        });
                 });
 
             modelBuilder.Entity("WebBanDienThoai.Models.ImportReceipt", b =>
@@ -1028,6 +1147,30 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.HasIndex("StockCode");
 
                     b.ToTable("Inventory", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            InventoryId = 1,
+                            CurrentQuantity = 50,
+                            LastUpdated = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Location = "Kho A1",
+                            MaximumQuantity = 1000,
+                            MinimumQuantity = 10,
+                            ProductId = 1,
+                            StockCode = "SC-IP15P256"
+                        },
+                        new
+                        {
+                            InventoryId = 2,
+                            CurrentQuantity = 30,
+                            LastUpdated = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Location = "Kho B2",
+                            MaximumQuantity = 1000,
+                            MinimumQuantity = 5,
+                            ProductId = 2,
+                            StockCode = "SC-MBP14M3"
+                        });
                 });
 
             modelBuilder.Entity("WebBanDienThoai.Models.InventoryHistory", b =>
