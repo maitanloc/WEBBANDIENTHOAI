@@ -236,7 +236,7 @@
             <!-- Pagination -->
             @if (Model.TotalPages > 1)
             {
-                <div class="mt-6 flex justify-center items-center gap-2">
+                <div class="mt-8 flex justify-center items-center gap-4 py-4 border-t border-gray-200">
                     @if (ViewBag.CurrentPage > 1)
                     {
                         <a asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)"
@@ -244,14 +244,17 @@
                            asp-route-fromDate="@ViewBag.FromDate"
                            asp-route-toDate="@ViewBag.ToDate"
                            asp-route-sortBy="@ViewBag.SortBy"
-                           class="px-4 py-2 rounded-lg bg-white border border-surface-light text-text-light-primary hover:bg-surface-light">
+                           class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-black text-xs font-bold uppercase tracking-widest hover:bg-gray-900 hover:text-white transition-all duration-300">
+                            <span class="material-symbols-outlined text-sm">chevron_left</span>
                             Trước
                         </a>
                     }
 
-                    <span class="px-4 py-2 text-text-light-primary font-medium">
-                        Trang @ViewBag.CurrentPage / @Model.TotalPages
-                    </span>
+                    <div class="flex items-center gap-1">
+                        <span class="text-lg font-black text-gray-900">@ViewBag.CurrentPage</span>
+                        <span class="text-sm font-bold text-gray-400">/</span>
+                        <span class="text-sm font-bold text-gray-400">@Model.TotalPages</span>
+                    </div>
 
                     @if (ViewBag.CurrentPage < Model.TotalPages)
                     {
@@ -260,8 +263,9 @@
                            asp-route-fromDate="@ViewBag.FromDate"
                            asp-route-toDate="@ViewBag.ToDate"
                            asp-route-sortBy="@ViewBag.SortBy"
-                           class="px-4 py-2 rounded-lg bg-white border border-surface-light text-text-light-primary hover:bg-surface-light">
+                           class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-black text-xs font-bold uppercase tracking-widest hover:bg-gray-900 hover:text-white transition-all duration-300">
                             Sau
+                            <span class="material-symbols-outlined text-sm">chevron_right</span>
                         </a>
                     }
                 </div>

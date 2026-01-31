@@ -4,290 +4,31 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-.status-table {
-    background: white;
-    border-radius: 0.75rem;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+/* Custom transitions and hover effects not easily done in Tailwind */
+.status-row:hover .group-hover\:opacity-100 {
+    opacity: 1;
 }
 
-.dark .status-table {
-    background: #1a1a1a;
-    border-color: #374151;
+/* Modal refinements if needed */
+.modal-content {
+    transition: transform 0.3s ease-out;
 }
 
-.status-table thead {
-    background: #f8fafc;
+/* Custom scrollbar for table if needed */
+.overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
 }
 
-.dark .status-table thead {
-    background: rgba(55, 65, 81, 0.5);
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
 }
 
-.status-table th {
-    color: #374151;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-bottom: 1px solid #e2e8f0;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
 }
 
-.dark .status-table th {
-    color: #d1d5db;
-    border-color: #374151;
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
 }
 
-.status-table td {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e2e8f0;
-    color: #374151;
-    font-size: 0.875rem;
-}
-
-.dark .status-table td {
-    color: #e5e7eb;
-    border-color: #374151;
-}
-
-.status-table tr:hover {
-    background: #f8fafc;
-}
-
-.dark .status-table tr:hover {
-    background: rgba(55, 65, 81, 0.3);
-}
-
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    border-radius: 9999px;
-    padding: 0.25rem 0.625rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
-
-    .status-badge.active {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-.dark .status-badge.active {
-    background: rgba(21, 128, 61, 0.3);
-    color: #4ade80;
-}
-
-.status-badge.inactive {
-    background: #fecaca;
-    color: #991b1b;
-}
-
-.dark .status-badge.inactive {
-    background: rgba(185, 28, 28, 0.3);
-    color: #f87171;
-}
-
-.status-badge.done {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.dark .status-badge.done {
-    background: rgba(37, 99, 235, 0.3);
-    color: #60a5fa;
-}
-
-.color-indicator {
-    width: 1rem;
-    height: 1rem;
-    border-radius: 9999px;
-    display: inline-block;
-}
-
-.btn-primary-custom {
-    background: #f48c25;
-    color: white;
-    font-weight: 600;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    border: none;
-    border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-    .btn-primary-custom:hover {
-        background: #e07c1a;
-        transform: translateY(-1px);
-    }
-
-.action-btn {
-    padding: 0.375rem;
-    border-radius: 0.375rem;
-    color: #6b7280;
-    border: none;
-    background: none;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-    .action-btn:hover {
-        background: #e5e7eb;
-        color: #374151;
-    }
-
-.dark .action-btn {
-    color: #9ca3af;
-}
-
-    .dark .action-btn:hover {
-        background: #4b5563;
-        color: #e5e7eb;
-    }
-
-.delete-btn:hover {
-    color: #dc2626;
-}
-
-.dark .delete-btn:hover {
-    color: #f87171;
-}
-
-/* Modal Styles */
-.modal-content-custom {
-    border-radius: 0.75rem;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-    background: white;
-}
-
-.dark .modal-content-custom {
-    background: #1a1a1a;
-    border-color: #374151;
-}
-
-.modal-input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    background: white;
-    color: #1f2937;
-    font-size: 0.875rem;
-    transition: all 0.2s;
-}
-
-.dark .modal-input {
-    background: #262626;
-    border-color: #4b5563;
-    color: #f9fafb;
-}
-
-.modal-input:focus {
-    outline: none;
-    border-color: #f48c25;
-    box-shadow: 0 0 0 3px rgba(244, 140, 37, 0.1);
-}
-
-.modal-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: #374151;
-    font-size: 0.875rem;
-}
-
-.dark .modal-label {
-    color: #d1d5db;
-}
-
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.modal-textarea {
-    min-height: 80px;
-    resize: vertical;
-}
-
-/* Button styles trong modal */
-.modal-btn-primary {
-    background: #f48c25;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    border: none;
-    transition: opacity 0.2s;
-}
-
-    .modal-btn-primary:hover {
-        opacity: 0.9;
-    }
-
-.modal-btn-secondary {
-    background: #6b7280;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    border: none;
-    transition: opacity 0.2s;
-}
-
-    .modal-btn-secondary:hover {
-        opacity: 0.9;
-    }
-
-.modal-btn-danger {
-    background: #dc2626;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    border: none;
-    transition: opacity 0.2s;
-}
-
-    .modal-btn-danger:hover {
-        opacity: 0.9;
-    }
-
-/* Header styles */
-.status-header {
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.dark .status-header {
-    border-color: #374151;
-}
-
-/* Empty state */
-.empty-state {
-    border: 2px dashed #d1d5db;
-    border-radius: 0.75rem;
-    padding: 3rem;
-    text-align: center;
-}
-
-.dark .empty-state {
-    border-color: #4b5563;
-}
-
-.empty-state-icon {
-    background: rgba(244, 140, 37, 0.1);
-    color: #f48c25;
-    width: 4rem;
-    height: 4rem;
-    border-radius: 9999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.5rem;
-}

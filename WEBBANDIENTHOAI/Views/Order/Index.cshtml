@@ -9,295 +9,161 @@
 @section Styles {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#f96b06",
-                        "background-light": "#f8f7f5",
-                        "background-dark": "#23170f",
-                        "text-light-primary": "#1c130d",
-                        "text-light-secondary": "#9e6b47",
-                        "surface-light": "#f4ece6"
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-                },
-            },
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             font-size: 24px;
         }
 
-            .material-symbols-outlined.fill {
-                font-variation-settings: 'FILL' 1;
-            }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
 
         body {
             font-family: 'Inter', sans-serif !important;
         }
 
-        /* Modal Animation */
-        #editStatusModal {
-            animation: fadeIn 0.3s ease-out;
+        /* Borderless input styles */
+        .borderless-input {
+            background-color: transparent !important;
+            border: none !important;
+            border-bottom: 1px solid #d1d5db !important;
+            border-radius: 0 !important;
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
         }
-
-        @@keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+        .borderless-input:focus {
+            outline: none !important;
+            border-bottom-color: #10b981 !important;
+            box-shadow: none !important;
         }
     </style>
 }
 
-<div class="relative min-h-screen w-full bg-background-light">
-    <main class="w-full p-6 lg:p-8">
-        <div class="w-full max-w-full mx-auto">
             <!-- Page Header -->
-            <div class="flex flex-wrap justify-between gap-4 mb-8">
-                <div class="flex flex-col gap-2">
-                    <p class="text-text-light-primary text-4xl font-black leading-tight tracking-[-0.033em]">
-                        Dashboard Quản Lý Đơn Hàng
-                    </p>
-                    <p class="text-text-light-secondary text-base font-normal leading-normal">
-                        Xem và quản lý tất cả đơn hàng tại đây. Tổng cộng: <strong>@Model.TotalCount</strong> đơn hàng
-                    </p>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="window.print()" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-surface-light text-text-light-primary gap-2 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-surface-light/80 transition-colors">
-                        <span class="material-symbols-outlined text-base">download</span>
-                        <span class="truncate">Xuất Excel</span>
-                    </button>
+            <div class="mb-8 mt-2">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Quản lý Đơn hàng</h1>
+                        <p class="text-sm text-gray-500 mt-1">Xem và xử lý các giao dịch từ khách hàng. Tổng cộng: <strong>@Model.TotalCount</strong> đơn hàng.</p>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <button onclick="window.print()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded font-semibold text-sm transition-all">
+                            <span class="material-symbols-outlined text-sm">download</span>
+                            Xuất Excel
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Statistics Cards -->
-            @if (ViewBag.Statistics != null)
-            {
-                var stats = ViewBag.Statistics as WEBBANDIENTHOAI.Models.OrderStatisticsDto;
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-                    <div class="bg-white rounded-xl shadow-sm border border-surface-light p-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-semibold text-primary uppercase mb-1">Tổng Đơn</p>
-                                <p class="text-2xl font-black text-text-light-primary">@stats.TotalOrders</p>
-                            </div>
-                            <span class="material-symbols-outlined text-4xl text-gray-300">shopping_cart</span>
+                        <!-- Filter Section -->
+            <div class="bg-transparent mb-6">
+                <form method="get" class="flex flex-wrap items-center gap-6">
+                    @Html.AntiForgeryToken()
+                    <div class="relative flex-1 min-w-[300px]">
+                        <span class="material-symbols-outlined absolute left-0 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                        <input name="search" value="@ViewBag.Search"
+                               class="w-full pl-8 pr-4 py-2 bg-transparent border-b border-gray-300 focus:outline-none focus:border-emerald-500 text-black text-sm"
+                               placeholder="Mã đơn, tên khách hàng, SĐT..." />
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="startDate">Từ</label>
+                            <input class="bg-transparent border-b border-gray-300 py-1 text-sm text-black focus:outline-none focus:border-emerald-500"
+                                   id="startDate" name="startDate" type="date" value="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="endDate">Đến</label>
+                            <input class="bg-transparent border-b border-gray-300 py-1 text-sm text-black focus:outline-none focus:border-emerald-500"
+                                   id="endDate" name="endDate" type="date" value="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" />
                         </div>
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-surface-light p-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-semibold text-green-600 uppercase mb-1">Doanh Thu</p>
-                                <p class="text-xl font-black text-text-light-primary">@stats.TotalRevenue.ToString("N0")đ</p>
-                            </div>
-                            <span class="material-symbols-outlined text-4xl text-gray-300">payments</span>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-surface-light p-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-semibold text-yellow-600 uppercase mb-1">Chờ Xử Lý</p>
-                                <p class="text-2xl font-black text-text-light-primary">@stats.PendingOrders</p>
-                            </div>
-                            <span class="material-symbols-outlined text-4xl text-gray-300">schedule</span>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-surface-light p-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-semibold text-blue-600 uppercase mb-1">Đang Xử Lý</p>
-                                <p class="text-2xl font-black text-text-light-primary">@stats.ProcessingOrders</p>
-                            </div>
-                            <span class="material-symbols-outlined text-4xl text-gray-300">sync</span>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-surface-light p-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-semibold text-green-600 uppercase mb-1">Hoàn Thành</p>
-                                <p class="text-2xl font-black text-text-light-primary">@stats.CompletedOrders</p>
-                            </div>
-                            <span class="material-symbols-outlined text-4xl text-gray-300">check_circle</span>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-surface-light p-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-semibold text-red-600 uppercase mb-1">Đã Hủy</p>
-                                <p class="text-2xl font-black text-text-light-primary">@stats.CancelledOrders</p>
-                            </div>
-                            <span class="material-symbols-outlined text-4xl text-gray-300">cancel</span>
-                        </div>
-                    </div>
-                </div>
-            }
 
-            <!-- Filter Section -->
-            <div class="mt-8 p-4 bg-white rounded-xl shadow-sm border border-surface-light">
-                <form method="get" class="flex flex-wrap items-center gap-4">
-                    <input type="hidden" name="__RequestVerificationToken" value="@tokenSet.RequestToken" />
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-text-light-primary" for="startDate">Từ</label>
-                        <input class="form-input rounded-lg border-surface-light bg-background-light text-text-light-primary text-sm focus:ring-primary focus:border-primary"
-                               id="startDate" name="startDate" type="date" value="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" />
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-text-light-primary" for="endDate">Đến</label>
-                        <input class="form-input rounded-lg border-surface-light bg-background-light text-text-light-primary text-sm focus:ring-primary focus:border-primary"
-                               id="endDate" name="endDate" type="date" value="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" />
-                    </div>
-                    <div class="flex-grow md:flex-grow-0">
-                        <select name="paymentMethod" class="form-select w-full md:w-auto rounded-lg border-surface-light bg-background-light text-text-light-primary text-sm focus:ring-primary focus:border-primary">
-                            <option value="">Phương thức thanh toán</option>
-                            <option value="COD">COD</option>
-                            <option value="BANKING">Chuyển khoản</option>
-                        </select>
-                    </div>
-                    <div class="flex-grow md:flex-grow-0">
-                        <select name="statusId" class="form-select w-full md:w-auto rounded-lg border-surface-light bg-background-light text-text-light-primary text-sm focus:ring-primary focus:border-primary">
-                            <option value="">Tất cả trạng thái</option>
-                            @if (ViewBag.Statuses != null)
+                    <select name="statusId" class="bg-transparent border-b border-gray-300 py-2 text-sm text-black focus:outline-none focus:border-emerald-500 min-w-[150px]">
+                        <option value="">Trạng thái</option>
+                        @if (ViewBag.Statuses != null)
+                        {
+                            @foreach (var status in ViewBag.Statuses)
                             {
-                                @foreach (var status in ViewBag.Statuses)
-                                {
-                                    <option value="@status.StatusId">@status.StatusName</option>
-                                }
+                                <option value="@status.StatusId" selected="@(ViewBag.StatusId == status.StatusId)">@status.StatusName</option>
                             }
-                        </select>
-                    </div>
-                    <div class="flex-grow md:flex-grow-0">
-                        <select name="sortBy" class="form-select w-full md:w-auto rounded-lg border-surface-light bg-background-light text-text-light-primary text-sm focus:ring-primary focus:border-primary">
-                            <option value="newest">Mới nhất</option>
-                            <option value="oldest">Cũ nhất</option>
-                            <option value="highest">Giá trị cao nhất</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
-                        <span class="truncate">Áp dụng</span>
+                        }
+                    </select>
+
+                    <button type="submit" class="px-6 py-2 bg-gray-800 text-white rounded text-xs font-bold hover:bg-black transition-colors tracking-widest">
+                        ÁP DỤNG LỌC
                     </button>
                 </form>
             </div>
 
-            <!-- Orders Table -->
-            <div class="mt-6 bg-white rounded-xl shadow-sm border border-surface-light overflow-hidden">
-                <div class="p-4 flex flex-col md:flex-row gap-4 justify-between items-center border-b border-surface-light">
-                    <div class="w-full md:max-w-md">
-                        <form method="get">
-                            <input type="hidden" name="__RequestVerificationToken" value="@tokenSet.RequestToken" />
-                            <label class="flex flex-col w-full">
-                                <div class="flex w-full flex-1 items-stretch rounded-lg h-11">
-                                    <div class="text-text-light-secondary flex bg-surface-light items-center justify-center pl-4 rounded-l-lg">
-                                        <span class="material-symbols-outlined">search</span>
-                                    </div>
-                                    <input name="search" value="@ViewBag.Search"
-                                           class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg text-text-light-primary focus:outline-0 focus:ring-1 focus:ring-primary border-none bg-surface-light h-full placeholder:text-text-light-secondary px-4 text-sm font-normal leading-normal"
-                                           placeholder="Tìm theo mã đơn, tên khách hàng, SĐT..." />
-                                </div>
-                            </label>
-                        </form>
-                    </div>
-                </div>
+                        <!-- Orders Table -->
+            <div class="bg-white border border-gray-300">
+                <div class="overflow-x-auto">
 
-                <div class="overflow-y-auto max-h-[50vh]">
-                    <div class="overflow-x-auto">
                         @if (!Model.Items.Any())
                         {
-                            <div class="text-center py-12">
-                                <span class="material-symbols-outlined text-6xl text-gray-300 mb-3">inbox</span>
-                                <h5 class="text-xl font-semibold text-gray-500 mb-2">Không có đơn hàng nào</h5>
-                                <p class="text-text-light-secondary">Chưa có đơn hàng nào được tạo trong hệ thống</p>
+                            <div class="text-center py-12 text-gray-500">
+                                <span class="material-symbols-outlined text-4xl mb-2 text-gray-300">inbox</span>
+                                <p>Không tìm thấy đơn hàng nào.</p>
                             </div>
                         }
                         else
                         {
-                            <table class="w-full text-sm text-left text-text-light-secondary">
-                                <thead class="text-xs text-text-light-secondary uppercase bg-background-light sticky top-0">
-                                    <tr>
-                                        <th class="px-6 py-3" scope="col">Mã Đơn</th>
-                                        <th class="px-6 py-3" scope="col">Khách Hàng</th>
-                                        <th class="px-6 py-3" scope="col">Địa Chỉ</th>
-                                        <th class="px-6 py-3" scope="col">Ngày Đặt</th>
-                                        <th class="px-6 py-3" scope="col">Tổng Tiền</th>
-                                        <th class="px-6 py-3" scope="col">Thanh Toán</th>
-                                        <th class="px-6 py-3" scope="col">Trạng Thái</th>
-                                        <th class="px-6 py-3 text-right" scope="col">Hành Động</th>
+                            <table class="w-full text-left border-collapse border border-gray-300" id="ordersTable">
+                                <thead>
+                                    <tr class="bg-gray-100 border-b border-gray-300">
+                                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Mã Đơn</th>
+                                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Khách Hàng</th>
+                                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Ngày Đặt</th>
+                                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Tổng Tiền</th>
+                                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300 w-24">P. Thức</th>
+                                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Trạng Thái</th>
+                                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-right">Thao tác</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="divide-y divide-gray-300">
                                     @foreach (var order in Model.Items)
                                     {
-                                        <tr class="bg-white border-b hover:bg-surface-light/50">
-                                            <th class="px-6 py-4 font-bold text-primary whitespace-nowrap" scope="row">
+                                        <tr class="order-row border-b border-gray-300 hover:bg-gray-50 transition-colors text-black">
+                                            <td class="px-4 py-3 font-bold border-r border-gray-300">
                                                 #@order.OrderId
-                                            </th>
-                                            <td class="px-6 py-4 font-medium text-text-light-primary">
-                                                @order.Customer?.FullName
-                                                <br />
-                                                <small class="text-text-light-secondary">@order.Customer?.Phone</small>
                                             </td>
-                                            <td class="px-6 py-4">@(order.ShippingAddress ?? "N/A")</td>
-                                            <td class="px-6 py-4">
-                                                @order.OrderDate.ToString("dd/MM/yyyy")
-                                                <br />
-                                                <small class="text-text-light-secondary">@order.OrderDate.ToString("HH:mm")</small>
+                                            <td class="px-4 py-3 border-r border-gray-300">
+                                                <p class="font-bold">@order.Customer?.FullName</p>
+                                                <p class="text-xs text-gray-500">@order.Customer?.Phone</p>
                                             </td>
-                                            <td class="px-6 py-4 font-bold text-green-600">
+                                            <td class="px-4 py-3 border-r border-gray-300">
+                                                <p class="text-sm">@order.OrderDate.ToString("dd/MM/yyyy")</p>
+                                                <p class="text-xs text-gray-500">@order.OrderDate.ToString("HH:mm")</p>
+                                            </td>
+                                            <td class="px-4 py-3 font-bold text-emerald-700 border-r border-gray-300">
                                                 @order.Total.ToString("N0")đ
                                             </td>
-                                            <td class="px-6 py-4">
-                                                @if (order.PaymentMethod == "COD")
-                                                {
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">COD</span>
-                                                }
-                                                else if (order.PaymentMethod == "BANKING")
-                                                {
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Chuyển khoản</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">@order.PaymentMethod</span>
-                                                }
+                                            <td class="px-4 py-3 border-r border-gray-300 text-xs">
+                                                @order.PaymentMethod
                                             </td>
-                                            <td class="px-6 py-4">
-                                                @{
-                                                    string statusClass = "";
-                                                    string statusText = order.OrderStatus?.StatusName ?? "Không xác định";
-                                                    switch (order.StatusId)
-                                                    {
-                                                        case 1: statusClass = "bg-yellow-100 text-yellow-800"; break;
-                                                        case 2: statusClass = "bg-blue-100 text-blue-800"; break;
-                                                        case 3: statusClass = "bg-green-100 text-green-800"; break;
-                                                        case 4: statusClass = "bg-red-100 text-red-800"; break;
-                                                        case 5: statusClass = "bg-indigo-100 text-indigo-800"; break;
-                                                        default: statusClass = "bg-gray-100 text-gray-800"; break;
-                                                    }
-                                                }
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @statusClass">
-                                                    @statusText
+                                            <td class="px-4 py-3 border-r border-gray-300">
+                                                <span class="text-xs font-bold uppercase">
+                                                    @(order.OrderStatus?.StatusName ?? "N/A")
                                                 </span>
                                             </td>
-                                            <td class="px-6 py-4 text-right flex justify-end gap-2">
-                                                <button onclick="openDetailsModal(@order.OrderId)"
-                                                        class="p-2 rounded-md hover:bg-surface-light" title="Chi tiết">
-                                                    <span class="material-symbols-outlined text-base text-text-light-primary">visibility</span>
-                                                </button>
-                                                <button onclick="openEditModal(@order.OrderId, @order.StatusId)"
-                                                        class="p-2 rounded-md hover:bg-surface-light" title="Cập nhật trạng thái">
-                                                    <span class="material-symbols-outlined text-base text-text-light-primary">edit</span>
-                                                </button>
+                                            <td class="px-4 py-3 text-right">
+                                                <div class="flex items-center justify-end gap-2">
+                                                    <button onclick="openDetailsModal(@order.OrderId)"
+                                                            class="p-1 px-2 text-gray-700 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-xs font-bold uppercase transition-colors"
+                                                            title="Chi tiết">
+                                                        Xem
+                                                    </button>
+                                                    <button onclick="openEditModal(@order.OrderId, @order.StatusId)"
+                                                            class="p-1 px-2 text-amber-700 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded text-xs font-bold uppercase transition-colors"
+                                                            title="Cập nhật">
+                                                        Sửa
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     }
@@ -308,10 +174,9 @@
                 </div>
             </div>
 
-            <!-- Pagination -->
             @if (Model.TotalPages > 1)
             {
-                <div class="mt-6 flex justify-center items-center gap-2">
+                <div class="mt-8 flex justify-center items-center gap-4">
                     @if (ViewBag.CurrentPage > 1)
                     {
                         <a asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)"
@@ -319,14 +184,17 @@
                            asp-route-statusId="@ViewBag.StatusId"
                            asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")"
                            asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")"
-                           class="px-4 py-2 rounded-lg bg-white border border-surface-light text-text-light-primary hover:bg-surface-light">
+                           class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-black text-xs font-bold uppercase tracking-widest hover:bg-gray-900 hover:text-white transition-all duration-300">
+                            <span class="material-symbols-outlined text-sm">chevron_left</span>
                             Trước
                         </a>
                     }
 
-                    <span class="px-4 py-2 text-text-light-primary font-medium">
-                        Trang @ViewBag.CurrentPage / @Model.TotalPages
-                    </span>
+                    <div class="flex items-center gap-1">
+                        <span class="text-lg font-black text-gray-900">@ViewBag.CurrentPage</span>
+                        <span class="text-sm font-bold text-gray-400">/</span>
+                        <span class="text-sm font-bold text-gray-400">@Model.TotalPages</span>
+                    </div>
 
                     @if (ViewBag.CurrentPage < Model.TotalPages)
                     {
@@ -335,8 +203,9 @@
                            asp-route-statusId="@ViewBag.StatusId"
                            asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")"
                            asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")"
-                           class="px-4 py-2 rounded-lg bg-white border border-surface-light text-text-light-primary hover:bg-surface-light">
+                           class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-black text-xs font-bold uppercase tracking-widest hover:bg-gray-900 hover:text-white transition-all duration-300">
                             Sau
+                            <span class="material-symbols-outlined text-sm">chevron_right</span>
                         </a>
                     }
                 </div>
@@ -345,80 +214,75 @@
     </main>
 </div>
 
-<!-- Modal Popup FORM THÔNG THƯỜNG - VẪN ĐẸP Y NGUYÊN -->
-<div id="editStatusModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
+<!-- Modal Popup CẬP NHẬT TRẠNG THÁI - CLEAN & PREMIUM -->
+<div id="editStatusModal" class="hidden fixed inset-0 z-[60] overflow-y-auto bg-black bg-opacity-60 backdrop-blur-sm transition-all duration-300">
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
-            <!-- Header màu CAM đẹp -->
-            <div class="bg-gradient-to-r from-primary to-orange-600 rounded-t-xl p-5">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-white text-3xl">edit_note</span>
-                        <h3 class="text-xl font-bold text-white">Cập nhật trạng thái</h3>
+        <div class="bg-white shadow-2xl w-full max-w-lg mx-auto transform transition-all duration-300 scale-95 opacity-0 border border-gray-200" id="modalContent">
+            <!-- Header -->
+            <div class="border-b border-gray-200 p-6 flex justify-between items-center bg-gray-50/50">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-gray-900 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white">edit_calendar</span>
                     </div>
-                    <button type="button" onclick="closeEditModal()" class="text-white hover:bg-white/20 rounded-full p-2 transition-all">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
+                    <div>
+                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Cập nhật trạng thái</h3>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Quản lý tiến trình đơn hàng</p>
+                    </div>
                 </div>
+                <button type="button" onclick="closeEditModal()" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-black hover:bg-gray-100 transition-all">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
             </div>
 
-            <!-- Form sửa trạng thái -->
-            <form method="post" asp-controller="Order" asp-action="UpdateStatus">
+            <!-- Body Area -->
+            <form method="post" asp-controller="Order" asp-action="UpdateStatus" id="editStatusForm" class="p-8">
                 @Html.AntiForgeryToken()
                 <input type="hidden" id="editOrderId" name="OrderId" />
 
-                <!-- Thông tin đơn hàng -->
-                <div class="bg-orange-50 border-l-4 border-primary rounded-lg p-4 mb-6">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="material-symbols-outlined text-primary">info</span>
-                        <p class="font-semibold text-text-light-primary">Thông tin đơn hàng</p>
+                <div class="space-y-8">
+                    <!-- Order ID Display -->
+                    <div class="pb-6 border-b border-gray-100">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.15em] mb-2 block">Mã đơn hàng</label>
+                        <span class="text-3xl font-black text-gray-900 tracking-tighter" id="displayOrderId">#---</span>
                     </div>
-                    <p class="text-sm text-text-light-secondary ml-8">
-                        Mã đơn: <span class="font-bold text-primary" id="displayOrderId">#---</span>
-                    </p>
-                </div>
 
-                <!-- Select trạng thái -->
-                <div class="mb-6">
-                    <label class="flex items-center gap-2 text-sm font-semibold text-text-light-primary mb-3">
-                        <span class="material-symbols-outlined text-primary">task_alt</span>
-                        Chọn trạng thái mới
-                        <span class="text-red-500">*</span>
-                    </label>
-                    <select id="editStatusId" name="StatusId" required
-                            class="w-full rounded-xl border-2 border-surface-light bg-white px-4 py-3.5 text-text-light-primary font-medium focus:ring-2 focus:ring-primary focus:border-primary transition-all hover:border-primary/50">
-                        @if (ViewBag.Statuses != null)
-                        {
-                            @foreach (var status in ViewBag.Statuses)
-                            {
-                                <option value="@status.StatusId">
-                                    @status.StatusName
-                                </option>
-                            }
-                        }
-                    </select>
-                </div>
+                    <!-- Status Selection -->
+                    <div>
+                        <label class="text-[10px] font-black text-gray-900 uppercase tracking-[0.15em] mb-4 block">Chọn trạng thái mới <span class="text-red-500">*</span></label>
+                        <div class="relative group">
+                            <select id="editStatusId" name="StatusId" required
+                                    class="w-full bg-transparent border-b-2 border-gray-200 py-3 text-lg font-bold text-gray-900 focus:outline-none focus:border-gray-900 transition-all appearance-none cursor-pointer">
+                                @if (ViewBag.Statuses != null)
+                                {
+                                    @foreach (var status in ViewBag.Statuses)
+                                    {
+                                        <option value="@status.StatusId" class="py-2">@status.StatusName</option>
+                                    }
+                                }
+                            </select>
+                            <span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-black transition-colors">
+                                expand_more
+                            </span>
+                        </div>
+                    </div>
 
-                <!-- Ghi chú -->
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
-                    <div class="flex gap-2">
-                        <span class="material-symbols-outlined text-blue-600 text-sm">lightbulb</span>
-                        <p class="text-xs text-blue-800">
-                            Trạng thái sẽ được cập nhật ngay lập tức và khách hàng có thể nhận được thông báo.
+                    <!-- Info Note -->
+                    <div class="flex gap-4 p-4 bg-gray-50 border border-gray-200">
+                        <span class="material-symbols-outlined text-gray-400 text-xl flex-shrink-0">info</span>
+                        <p class="text-xs text-gray-500 leading-relaxed font-medium">
+                            <strong class="text-gray-900">Lưu ý:</strong> Trạng thái đơn hàng sẽ được cập nhật ngay lập tức. Khách hàng sẽ nhận được thông báo về sự thay đổi này qua email hoặc tài khoản.
                         </p>
                     </div>
                 </div>
 
-                <!-- Buttons với hiệu ứng đẹp -->
-                <div class="flex gap-3 pt-4 border-t border-surface-light">
+                <!-- Footer / Actions -->
+                <div class="flex gap-4 mt-10">
                     <button type="button" onclick="closeEditModal()"
-                            class="flex-1 py-3.5 rounded-xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-50 hover:border-gray-400 transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-lg">cancel</span>
+                            class="flex-1 px-6 py-4 border border-gray-300 text-black text-[10px] font-black uppercase tracking-[0.2em] hover:bg-gray-50 transition-all">
                         Hủy bỏ
                     </button>
                     <button type="submit"
-                            class="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-primary to-orange-600 text-white font-bold hover:from-orange-600 hover:to-primary transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-lg">save</span>
+                            class="flex-1 px-6 py-4 bg-gray-900 text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-lg shadow-gray-200">
                         Lưu thay đổi
                     </button>
                 </div>
@@ -530,154 +394,136 @@
     });
 </script>
 <!-- ================== THÊM MODAL NÀY VÀO CUỐI FILE INDEX.CSHTML ================== -->
-<!-- Modal Popup CHI TIẾT ĐƠN HÀNG -->
-<div id="orderDetailsModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
+<!-- Modal Popup CHI TIẾT ĐƠN HÀNG - CLEAN & PREMIUM -->
+<div id="orderDetailsModal" class="hidden fixed inset-0 z-[60] overflow-y-auto bg-black bg-opacity-60 backdrop-blur-sm transition-all duration-300">
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto transform transition-all duration-300" id="detailsModalContent">
-            <!-- Header màu CAM -->
-            <div class="bg-gradient-to-r from-primary to-orange-600 rounded-t-2xl p-6">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-white text-4xl">receipt_long</span>
-                        <div>
-                            <h3 class="text-2xl font-bold text-white">Chi Tiết Đơn Hàng</h3>
-                            <p class="text-orange-100 text-sm" id="modalOrderId">Mã đơn: #---</p>
-                        </div>
+        <div class="bg-white shadow-2xl w-full max-w-5xl mx-auto transform transition-all duration-300 scale-95 opacity-0 border border-gray-200" id="detailsModalContent">
+            <!-- Header -->
+            <div class="border-b border-gray-200 p-6 flex justify-between items-center bg-gray-50/50">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-gray-900 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white">receipt_long</span>
                     </div>
-                    <button type="button" onclick="closeDetailsModal()" class="text-white hover:bg-white/20 rounded-full p-2 transition-all">
-                        <span class="material-symbols-outlined text-3xl">close</span>
-                    </button>
+                    <div>
+                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Chi Tiết Đơn Hàng</h3>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5" id="modalOrderId">Mã đơn: #---</p>
+                    </div>
                 </div>
+                <button type="button" onclick="closeDetailsModal()" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-black hover:bg-gray-100 transition-all">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
             </div>
 
             <!-- Content -->
-            <div class="p-6 max-h-[70vh] overflow-y-auto">
+            <div class="p-8 max-h-[75vh] overflow-y-auto">
                 <!-- Loading State -->
-                <div id="detailsLoading" class="text-center py-12">
-                    <svg class="animate-spin h-12 w-12 text-primary mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="text-text-light-secondary">Đang tải dữ liệu...</p>
+                <div id="detailsLoading" class="text-center py-24">
+                    <div class="inline-block w-12 h-12 border-4 border-gray-200 border-t-black rounded-full animate-spin mb-4"></div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Đang tải dữ liệu...</p>
                 </div>
 
                 <!-- Content Container -->
-                <div id="detailsContent" class="hidden">
-                    <!-- Thông tin khách hàng -->
-                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-5 mb-6 border-l-4 border-primary">
-                        <h4 class="font-bold text-lg text-text-light-primary mb-4 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary">person</span>
-                            Thông Tin Khách Hàng
-                        </h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="flex items-start gap-3">
-                                <span class="material-symbols-outlined text-orange-600">badge</span>
+                <div id="detailsContent" class="hidden space-y-12">
+                    <!-- 1. Thông tin khách hàng -->
+                    <div>
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 block border-b border-gray-100 pb-2">1. Thông tin khách hàng</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                            <div class="flex items-start gap-4">
+                                <span class="material-symbols-outlined text-gray-400">person</span>
                                 <div>
-                                    <p class="text-xs text-text-light-secondary">Họ tên</p>
-                                    <p class="font-semibold text-text-light-primary" id="customerName">---</p>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Họ tên</p>
+                                    <p class="font-bold text-gray-900" id="customerName">---</p>
                                 </div>
                             </div>
-                            <div class="flex items-start gap-3">
-                                <span class="material-symbols-outlined text-orange-600">call</span>
+                            <div class="flex items-start gap-4">
+                                <span class="material-symbols-outlined text-gray-400">call</span>
                                 <div>
-                                    <p class="text-xs text-text-light-secondary">Số điện thoại</p>
-                                    <p class="font-semibold text-text-light-primary" id="customerPhone">---</p>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Điện thoại</p>
+                                    <p class="font-bold text-gray-900" id="customerPhone">---</p>
                                 </div>
                             </div>
-                            <div class="flex items-start gap-3">
-                                <span class="material-symbols-outlined text-orange-600">mail</span>
+                            <div class="flex items-start gap-4">
+                                <span class="material-symbols-outlined text-gray-400">mail</span>
                                 <div>
-                                    <p class="text-xs text-text-light-secondary">Email</p>
-                                    <p class="font-semibold text-text-light-primary" id="customerEmail">---</p>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Email</p>
+                                    <p class="font-bold text-gray-900 break-all" id="customerEmail">---</p>
                                 </div>
                             </div>
-                            <div class="flex items-start gap-3">
-                                <span class="material-symbols-outlined text-orange-600">local_shipping</span>
+                            <div class="flex items-start gap-4">
+                                <span class="material-symbols-outlined text-gray-400">local_shipping</span>
                                 <div>
-                                    <p class="text-xs text-text-light-secondary">Địa chỉ giao hàng</p>
-                                    <p class="font-semibold text-text-light-primary" id="shippingAddress">---</p>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Địa chỉ giao hàng</p>
+                                    <p class="font-bold text-gray-900 leading-relaxed" id="shippingAddress">---</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Thông tin đơn hàng -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="material-symbols-outlined text-blue-600">calendar_today</span>
-                                <p class="text-xs font-semibold text-blue-900">Ngày đặt</p>
+                    <!-- 2. Thông tin đơn hàng -->
+                    <div>
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 block border-b border-gray-100 pb-2">2. Thông tin đơn hàng</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="p-4 border border-gray-100 bg-gray-50/30">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Ngày đặt</p>
+                                <p class="font-bold text-gray-900" id="orderDate">---</p>
                             </div>
-                            <p class="font-bold text-blue-800" id="orderDate">---</p>
-                        </div>
-                        <div class="bg-green-50 rounded-xl p-4 border border-green-200">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="material-symbols-outlined text-green-600">credit_card</span>
-                                <p class="text-xs font-semibold text-green-900">Thanh toán</p>
+                            <div class="p-4 border border-gray-100 bg-gray-50/30">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Thanh toán</p>
+                                <p class="font-bold text-gray-900" id="paymentMethod">---</p>
                             </div>
-                            <p class="font-bold text-green-800" id="paymentMethod">---</p>
-                        </div>
-                        <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="material-symbols-outlined text-purple-600">info</span>
-                                <p class="text-xs font-semibold text-purple-900">Trạng thái</p>
-                            </div>
-                            <p class="font-bold text-purple-800" id="orderStatus">---</p>
-                        </div>
-                    </div>
-
-                    <!-- Ghi chú -->
-                    <div id="notesSection" class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 hidden">
-                        <div class="flex gap-2">
-                            <span class="material-symbols-outlined text-yellow-700">note</span>
-                            <div class="flex-1">
-                                <p class="text-xs font-semibold text-yellow-900 mb-1">Ghi chú</p>
-                                <p class="text-sm text-yellow-800" id="orderNotes">---</p>
+                            <div class="p-4 border border-gray-100 bg-gray-50/30">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Trạng thái</p>
+                                <p class="font-bold text-gray-900" id="orderStatus">---</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Danh sách sản phẩm -->
-                    <div class="bg-white rounded-xl border-2 border-surface-light">
-                        <div class="bg-gradient-to-r from-primary to-orange-600 text-white px-5 py-3 rounded-t-xl">
-                            <h4 class="font-bold text-lg flex items-center gap-2">
-                                <span class="material-symbols-outlined">shopping_bag</span>
-                                Sản Phẩm Đã Đặt
-                            </h4>
-                        </div>
-                        <div class="divide-y divide-surface-light" id="productList">
-                            <!-- Products will be loaded here -->
+                    <!-- 3. Danh sách sản phẩm -->
+                    <div>
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 block border-b border-gray-100 pb-2">3. Danh sách sản phẩm</label>
+                        <div class="border border-gray-200 overflow-hidden">
+                            <div class="divide-y divide-gray-100 bg-white" id="productList">
+                                <!-- Products will be loaded here via JS -->
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Tổng tiền -->
-                    <div class="mt-6 bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl p-6 border-2 border-green-300">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-3">
-                                <span class="material-symbols-outlined text-4xl text-green-700">paid</span>
-                                <span class="text-xl font-bold text-green-900">Tổng Cộng</span>
+                    <!-- 4. Ghi chú & Tổng cộng -->
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 pt-4">
+                        <!-- Notes Section -->
+                        <div id="notesSection" class="hidden flex-1 w-full lg:max-w-xl">
+                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">Ghi chú từ khách hàng</label>
+                            <div class="p-4 bg-gray-50 border border-gray-200">
+                                <p class="text-sm italic text-gray-600 leading-relaxed" id="orderNotes">---</p>
                             </div>
-                            <span class="text-3xl font-black text-green-700" id="orderTotal">0đ</span>
+                        </div>
+
+                        <!-- Total & Final Actions -->
+                        <div class="flex flex-col items-end gap-6 w-full lg:w-auto ml-auto">
+                            <div class="text-right">
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Tổng giá trị đơn hàng</p>
+                                <span class="text-5xl font-black text-gray-900 tracking-tighter" id="orderTotal">0đ</span>
+                            </div>
+                            <div class="flex gap-4 no-print">
+                                <button type="button" onclick="printOrder()" class="flex items-center gap-2 px-8 py-4 border border-gray-300 text-black text-[10px] font-black uppercase tracking-[0.2em] hover:bg-gray-50 transition-all">
+                                    <span class="material-symbols-outlined text-sm">print</span>
+                                    IN ĐƠN HÀNG
+                                </button>
+                                <button type="button" id="exportOrderBtn" onclick="exportOrder()" 
+                                        class="hidden flex items-center gap-2 px-8 py-4 bg-gray-900 text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-lg shadow-gray-200">
+                                    <span class="material-symbols-outlined text-sm">inventory_2</span>
+                                    XUẤT HÀNG NGAY
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Footer -->
-            <div class="bg-surface-light px-6 py-4 rounded-b-2xl flex justify-end gap-3">
-                <!-- Nút Xuất hàng - chỉ hiện khi StatusId = 3 -->
-                <button type="button" id="exportOrderBtn" onclick="exportOrder()" class="hidden px-6 py-3 rounded-xl bg-green-500 text-white font-semibold hover:bg-green-600 transition-all flex items-center gap-2">
-                    <span class="material-symbols-outlined">local_shipping</span>
-                    Xuất hàng
-                </button>
-
-                <button type="button" onclick="printOrder()" class="px-6 py-3 rounded-xl bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-all flex items-center gap-2">
-                    <span class="material-symbols-outlined">print</span>
-                    In đơn hàng
-                </button>
-                <button type="button" onclick="closeDetailsModal()" class="px-6 py-3 rounded-xl bg-gray-500 text-white font-semibold hover:bg-gray-600 transition-all flex items-center gap-2">
-                    <span class="material-symbols-outlined">close</span>
-                    Đóng
+            <!-- Simple Closing Footer -->
+            <div class="p-6 border-t border-gray-100 bg-gray-50/30 flex justify-center">
+                <button type="button" onclick="closeDetailsModal()" class="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] hover:text-black transition-all">
+                    ĐÓNG CHI TIẾT
                 </button>
             </div>
         </div>
@@ -692,6 +538,7 @@
     // =====================================================
     async function openDetailsModal(orderId) {
         const modal = document.getElementById('orderDetailsModal');
+        const modalContent = document.getElementById('detailsModalContent');
         const loading = document.getElementById('detailsLoading');
         const content = document.getElementById('detailsContent');
         const exportBtn = document.getElementById('exportOrderBtn');
@@ -699,6 +546,12 @@
         // Hiện modal
         modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
+
+        // Trigger animation
+        setTimeout(() => {
+            modalContent.classList.remove('scale-95', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+        }, 10);
 
         // Reset state
         loading.classList.remove('hidden');
@@ -764,26 +617,26 @@
                 const productList = document.getElementById('productList');
                 if (data.orderDetails && data.orderDetails.length > 0) {
                     productList.innerHTML = data.orderDetails.map(item => `
-                        <div class="flex items-center gap-4 p-4 hover:bg-orange-50 transition-colors">
+                        <div class="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors border-b border-gray-200 last:border-0 text-black">
                             <img src="${item.productImage || '/images/no-image.png'}"
                                  alt="${item.productName || 'Product'}"
-                                 class="w-20 h-20 object-cover rounded-lg border-2 border-surface-light"
+                                 class="w-16 h-16 object-cover border border-gray-300"
                                  onerror="this.src='/images/no-image.png'">
                             <div class="flex-1">
-                                <h5 class="font-bold text-text-light-primary mb-1">${item.productName || 'N/A'}</h5>
-                                <p class="text-sm text-text-light-secondary">
-                                    Đơn giá: <span class="font-semibold text-primary">${(item.unitPrice || 0).toLocaleString('vi-VN')}đ</span>
+                                <h5 class="font-bold mb-1">${item.productName || 'N/A'}</h5>
+                                <p class="text-xs text-gray-500 lowercase tracking-wider">
+                                    Đơn giá: <span class="font-bold text-black">${(item.unitPrice || 0).toLocaleString('vi-VN')}đ</span>
                                 </p>
                             </div>
                             <div class="text-center">
-                                <p class="text-xs text-text-light-secondary mb-1">Số lượng</p>
-                                <span class="inline-flex items-center justify-center w-12 h-12 bg-primary text-white font-bold rounded-full text-lg">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">Số lượng</p>
+                                <span class="font-bold">
                                     ${item.quantity || 0}
                                 </span>
                             </div>
                             <div class="text-right">
-                                <p class="text-xs text-text-light-secondary mb-1">Thành tiền</p>
-                                <p class="text-xl font-black text-green-600">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">Thành tiền</p>
+                                <p class="font-bold text-emerald-700">
                                     ${(item.subtotal || 0).toLocaleString('vi-VN')}đ
                                 </p>
                             </div>
@@ -822,8 +675,15 @@
 
     function closeDetailsModal() {
         const modal = document.getElementById('orderDetailsModal');
-        modal.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
+        const modalContent = document.getElementById('detailsModalContent');
+
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }, 300);
     }
 
     function printOrder() {
@@ -849,6 +709,7 @@
 
     async function openExportModal(orderId) {
         const modal = document.getElementById('exportModal');
+        const modalContent = document.getElementById('exportModalContent');
         const loading = document.getElementById('exportLoading');
         const content = document.getElementById('exportContent');
 
@@ -857,6 +718,12 @@
         // Hiện modal
         modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
+
+        // Trigger animation
+        setTimeout(() => {
+            modalContent.classList.remove('scale-95', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+        }, 10);
 
         // Reset state
         loading.classList.remove('hidden');
@@ -1071,136 +938,121 @@
     });
 </script>
 <!-- THÊM VÀO CUỐI FILE Index.cshtml (sau modal orderDetailsModal) -->
-<!-- ================== MODAL XUẤT KHO ================== -->
-<div id="exportModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
+<!-- Modal Popup XUẤT KHO - CLEAN & PREMIUM -->
+<div id="exportModal" class="hidden fixed inset-0 z-[60] overflow-y-auto bg-black bg-opacity-60 backdrop-blur-sm transition-all duration-300">
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl mx-auto transform transition-all duration-300" id="exportModalContent">
-            <!-- Header màu XANH LÁ -->
-            <div class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-t-2xl p-6">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-white text-4xl">local_shipping</span>
-                        <div>
-                            <h3 class="text-2xl font-bold text-white">Xuất Kho Hàng</h3>
-                            <p class="text-green-100 text-sm" id="exportOrderInfo">Đơn hàng: #---</p>
-                        </div>
+        <div class="bg-white shadow-2xl w-full max-w-5xl mx-auto transform transition-all duration-300 scale-95 opacity-0 border border-gray-200" id="exportModalContent">
+            <!-- Header -->
+            <div class="border-b border-gray-200 p-6 flex justify-between items-center bg-gray-50/50">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-gray-900 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white">inventory_2</span>
                     </div>
-                    <button type="button" onclick="closeExportModal()" class="text-white hover:bg-white/20 rounded-full p-2 transition-all">
-                        <span class="material-symbols-outlined text-3xl">close</span>
-                    </button>
+                    <div>
+                        <h3 class="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Xuất Kho Hàng</h3>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5" id="exportOrderInfo">Đơn hàng: #---</p>
+                    </div>
                 </div>
+                <button type="button" onclick="closeExportModal()" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-black hover:bg-gray-100 transition-all">
+                    <span class="material-symbols-outlined text-xl">close</span>
+                </button>
             </div>
 
-            <!-- Content -->
-            <div class="p-6 max-h-[65vh] overflow-y-auto">
+            <!-- Content Area -->
+            <div class="p-8 max-h-[75vh] overflow-y-auto">
                 <!-- Loading State -->
-                <div id="exportLoading" class="text-center py-12">
-                    <svg class="animate-spin h-12 w-12 text-green-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="text-text-light-secondary">Đang tải dữ liệu...</p>
+                <div id="exportLoading" class="text-center py-24">
+                    <div class="inline-block w-12 h-12 border-4 border-gray-200 border-t-black rounded-full animate-spin mb-4"></div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Đang tải dữ liệu...</p>
                 </div>
 
                 <!-- Content Container -->
-                <div id="exportContent" class="hidden">
-                    <!-- Thông tin đơn hàng -->
-                    <div class="bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl p-5 mb-6 border-l-4 border-green-500">
-                        <h4 class="font-bold text-lg text-text-light-primary mb-4 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-green-600">info</span>
-                            Thông Tin Đơn Hàng
-                        </h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div id="exportContent" class="hidden space-y-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                        <!-- Summary Section -->
+                        <div class="lg:col-span-1 space-y-8">
                             <div>
-                                <p class="text-xs text-text-light-secondary">Khách hàng</p>
-                                <p class="font-semibold text-text-light-primary" id="exportCustomerName">---</p>
+                                <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 block border-b border-gray-100 pb-2">Thông tin xuất kho</label>
+                                <div class="space-y-4">
+                                    <div class="p-4 border border-gray-200">
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Khách hàng</p>
+                                        <p class="font-bold text-gray-900" id="exportCustomerName">---</p>
+                                    </div>
+                                    <div class="p-4 border border-gray-200">
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Ngày đặt hàng</p>
+                                        <p class="font-bold text-gray-900" id="exportOrderDate">---</p>
+                                    </div>
+                                    <div class="p-4 border border-gray-200 bg-gray-50/50">
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tổng giá trị</p>
+                                        <p class="text-2xl font-black text-gray-900" id="exportOrderTotal">0đ</p>
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- Notes Field -->
                             <div>
-                                <p class="text-xs text-text-light-secondary">Ngày đặt</p>
-                                <p class="font-semibold text-text-light-primary" id="exportOrderDate">---</p>
+                                <label class="text-[10px] font-black text-gray-900 uppercase tracking-[0.2em] mb-4 block">Ghi chú xuất kho</label>
+                                <textarea id="exportNotes" rows="4"
+                                          class="w-full bg-white border border-gray-200 p-4 text-sm text-gray-900 focus:outline-none focus:border-black transition-all placeholder:text-gray-300 resize-none"
+                                          placeholder="Nhập ghi chú vận hành (nếu có)..."></textarea>
                             </div>
+                        </div>
+
+                        <!-- Table Section -->
+                        <div class="lg:col-span-2 space-y-8">
                             <div>
-                                <p class="text-xs text-text-light-secondary">Tổng tiền</p>
-                                <p class="font-semibold text-green-600" id="exportOrderTotal">---</p>
+                                <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 block border-b border-gray-100 pb-2">Sản phẩm cần xuất</label>
+                                <div class="border border-gray-200 overflow-hidden">
+                                    <table class="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr class="bg-gray-50 border-b border-gray-200">
+                                                <th class="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest w-24">Mã Kho</th>
+                                                <th class="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Sản Phẩm</th>
+                                                <th class="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center w-20">SL</th>
+                                                <th class="px-4 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Đơn Giá</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="exportProductList" class="divide-y divide-gray-100">
+                                            <!-- Products loaded via JS -->
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="bg-gray-50 border-t border-gray-200">
+                                                <td colspan="3" class="px-4 py-4 text-[10px] font-black text-gray-900 uppercase tracking-[0.2em] text-right">Thành tiền</td>
+                                                <td class="px-4 py-4 text-lg font-black text-gray-900 text-right" id="exportGrandTotal">0đ</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Ghi chú xuất kho -->
-                    <div class="mb-6">
-                        <label class="flex items-center gap-2 text-sm font-semibold text-text-light-primary mb-3">
-                            <span class="material-symbols-outlined text-green-600">note</span>
-                            Ghi chú xuất kho
-                        </label>
-                        <textarea id="exportNotes" rows="3"
-                                  class="w-full rounded-xl border-2 border-surface-light bg-white px-4 py-3 text-text-light-primary focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
-                                  placeholder="Nhập ghi chú (nếu có)..."></textarea>
-                    </div>
-
-                    <!-- Danh sách sản phẩm xuất kho -->
-                    <div class="bg-white rounded-xl border-2 border-surface-light">
-                        <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-t-xl">
-                            <h4 class="font-bold text-lg flex items-center gap-2">
-                                <span class="material-symbols-outlined">inventory_2</span>
-                                Sản Phẩm Xuất Kho
-                            </h4>
-                        </div>
-
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead class="bg-green-50 text-green-800">
-                                    <tr>
-                                        <th class="px-4 py-3 text-left">Mã kho</th>
-                                        <th class="px-4 py-3 text-left">Sản phẩm</th>
-                                        <th class="px-4 py-3 text-center">Số lượng</th>
-                                        <th class="px-4 py-3 text-right">Đơn giá</th>
-                                        <th class="px-4 py-3 text-right">Thành tiền</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="exportProductList" class="divide-y divide-surface-light">
-                                    <!-- Products will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Tổng cộng -->
-                        <div class="bg-green-50 px-5 py-4 border-t-2 border-green-200">
-                            <div class="flex justify-between items-center">
-                                <span class="text-lg font-bold text-green-900">Tổng cộng</span>
-                                <span class="text-2xl font-black text-green-600" id="exportGrandTotal">0đ</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Cảnh báo -->
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mt-6">
-                        <div class="flex gap-3">
-                            <span class="material-symbols-outlined text-yellow-600 text-2xl">warning</span>
-                            <div class="flex-1">
-                                <p class="text-sm font-semibold text-yellow-900 mb-1">⚠️ Lưu ý quan trọng</p>
-                                <ul class="text-xs text-yellow-800 space-y-1 list-disc list-inside">
-                                    <li>Hệ thống sẽ tự động kiểm tra tồn kho trước khi xuất</li>
-                                    <li>Số lượng tồn kho sẽ được trừ tự động sau khi xuất thành công</li>
-                                    <li>Thao tác này không thể hoàn tác</li>
-                                </ul>
+                            <!-- Warnings -->
+                            <div class="p-6 border border-amber-200 bg-amber-50 flex gap-4">
+                                <span class="material-symbols-outlined text-amber-600">warning</span>
+                                <div>
+                                    <p class="text-[10px] font-black text-amber-900 uppercase tracking-widest mb-2">Quy trình vận hành</p>
+                                    <ul class="text-xs text-amber-800 space-y-1 font-medium list-disc list-inside">
+                                        <li>Hệ thống sẽ trừ tồn kho tự động sau khi xác nhận</li>
+                                        <li>Vui lòng kiểm tra thực tế hàng hóa trước khi nhấn xác nhận</li>
+                                        <li>Thao tác này sẽ ghi lại lịch sử xuất kho vĩnh viễn</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Footer -->
-            <div class="bg-surface-light px-6 py-4 rounded-b-2xl flex justify-end gap-3">
-                <button type="button" onclick="closeExportModal()"
-                        class="px-6 py-3 rounded-xl border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-all flex items-center gap-2">
-                    <span class="material-symbols-outlined">close</span>
-                    Hủy bỏ
-                </button>
-                <button type="button" id="confirmExportBtn" onclick="confirmExport()"
-                        class="px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold hover:from-green-600 hover:to-emerald-700 transition-all flex items-center gap-2 shadow-lg">
-                    <span class="material-symbols-outlined">check_circle</span>
-                    Xác nhận xuất kho
-                </button>
+                <!-- Actions Footer -->
+                <div class="flex gap-4 mt-12 pt-8 border-t border-gray-100">
+                    <button type="button" onclick="closeExportModal()"
+                            class="flex-1 px-8 py-4 border border-gray-300 text-black text-[10px] font-black uppercase tracking-[0.3em] hover:bg-gray-50 transition-all">
+                        Hủy bỏ
+                    </button>
+                    <button type="button" id="confirmExportBtn" onclick="confirmExport()"
+                            class="flex-1 px-8 py-4 bg-gray-900 text-white text-[10px] font-black uppercase tracking-[0.3em] hover:bg-black transition-all shadow-lg shadow-gray-200 flex items-center justify-center gap-3">
+                        <span class="material-symbols-outlined text-sm">check_circle</span>
+                        XÁC NHẬN XUẤT KHO
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1390,13 +1242,20 @@
     // Đóng modal xuất kho
     function closeExportModal() {
         const modal = document.getElementById('exportModal');
-        modal.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
+        const modalContent = document.getElementById('exportModalContent');
 
-        // Reset data
-        currentExportOrderId = null;
-        currentExportData = null;
-        document.getElementById('exportNotes').value = '';
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+
+            // Reset data
+            currentExportOrderId = null;
+            currentExportData = null;
+            document.getElementById('exportNotes').value = '';
+        }, 300);
     }
 
     // Hàm exportOrder() đã được định nghĩa ở trên, không cần thêm nữa

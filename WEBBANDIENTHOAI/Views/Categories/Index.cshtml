@@ -1,141 +1,140 @@
 ﻿@model IEnumerable<WEBBANDIENTHOAI.Models.Category>
 
 @{
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Quản lý Danh mục";
 }
 
-<!DOCTYPE html>
-<html class="light" lang="vi">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+@section Styles {
     <link rel="stylesheet" href="~/css/categories.css" asp-append-version="true" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+}
 
-<body class="category-management bg-gray-50 dark:bg-gray-900">
-    <div class="flex h-screen">
-        <!-- Main Content Area -->
-        <main class="flex-1 flex flex-col overflow-y-auto">
-            <div class="category-header sticky top-0 z-10">
-                <header class="h-16 flex items-center justify-between px-8 border-b border-gray-200 dark:border-gray-700">
-                    <h2 class="text-xl font-bold text-orange-500 dark:text-orange-400">
-                        Quản lý Danh mục
-                    </h2>
-
-                    <div class="flex items-center space-x-4">
-                        <div class="relative">
-                            <span class="material-icons-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">search</span>
-                            <input class="search-input pl-10 pr-4 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/80 transition dark:placeholder-gray-500"
-                                   placeholder="Tìm kiếm danh mục..." type="text" id="searchInput" />
-                        </div>
-                        <button type="button"
-                                class="btn-primary-custom flex items-center justify-center px-4 py-2 font-semibold rounded-lg text-sm transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 dark:focus:ring-offset-gray-900"
-                                data-bs-toggle="modal" data-bs-target="#createModal">
-                            <span class="material-icons-outlined text-base mr-2">add</span>
-                            Thêm Danh mục
-                        </button>
-                    </div>
-                </header>
+<div class="category-management">
+    <!-- Header Section -->
+    <div class="mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Quản lý Danh mục</h1>
+                <p class="text-sm text-gray-500 mt-1">Quản lý và phân loại các danh mục sản phẩm của bạn.</p>
             </div>
-
-            <div class="p-8">
-                <!-- Hiển thị thông báo -->
-                @if (TempData["Success"] != null)
-                {
-                    <div class="alert alert-success mb-4">
-                        @TempData["Success"]
-                    </div>
-                }
-                @if (TempData["Error"] != null)
-                {
-                    <div class="alert alert-danger mb-4">
-                        @TempData["Error"]
-                    </div>
-                }
-
-                <div class="category-table overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left" id="categoriesTable">
-                            <thead>
-                                <tr>
-                                    <th class="w-12 text-center font-medium" scope="col">
-                                        <input class="checkbox-custom" type="checkbox" id="selectAll" />
-                                    </th>
-                                    <th class="font-medium" scope="col">Tên danh mục</th>
-                                    <th class="font-medium" scope="col">Mô tả</th>
-                                    <th class="font-medium text-center" scope="col">Số sản phẩm</th>
-                                    <th class="font-medium" scope="col">Ngày tạo</th>
-                                    <th class="font-medium" scope="col">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
-                                    <tr class="border-b dark:border-gray-700 category-row">
-                                        <td class="w-12 text-center">
-                                            <input class="checkbox-custom category-checkbox" type="checkbox" value="@item.CategoryId" />
-                                        </td>
-                                        <td class="font-semibold text-gray-800 dark:text-gray-100">@item.CategoryName</td>
-                                        <td class="text-gray-600 dark:text-gray-300">@(item.Description ?? "Không có mô tả")</td>
-                                        <td class="text-gray-600 dark:text-gray-300 text-center">@item.Products?.Count ?? 0</td>
-                                        <td class="text-gray-600 dark:text-gray-300">@item.CreatedAt.ToString("dd/MM/yyyy")</td>
-                                        <td>
-                                            <div class="flex items-center space-x-2">
-                                                <button class="action-btn edit-btn"
-                                                        data-bs-toggle="modal" data-bs-target="#editModal"
-                                                        data-id="@item.CategoryId"
-                                                        data-name="@item.CategoryName"
-                                                        data-desc="@item.Description">
-                                                    <span class="material-icons-outlined text-lg">edit</span>
-                                                </button>
-                                                <button class="action-btn delete-btn"
-                                                        data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                                        data-id="@item.CategoryId"
-                                                        data-name="@item.CategoryName">
-                                                    <span class="material-icons-outlined text-lg">delete</span>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="relative group">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors">search</span>
+                    <input type="text" id="searchInput" 
+                           class="w-full md:w-64 pl-10 pr-4 py-2 bg-transparent border-b border-gray-300 focus:outline-none focus:border-emerald-500 transition-all text-black"
+                           placeholder="Tìm kiếm danh mục..." />
                 </div>
+                
+                <button type="button"
+                        class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded font-semibold text-sm transition-all"
+                        data-bs-toggle="modal" data-bs-target="#createModal">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                    Thêm mới
+                </button>
             </div>
-        </main>
+        </div>
     </div>
 
+    <!-- Main Content -->
+    <div class="bg-white border border-gray-300">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse border border-gray-300" id="categoriesTable">
+                <thead>
+                    <tr class="bg-gray-100 border-b border-gray-300">
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider w-12 text-center border-r border-gray-300">
+                            <input class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-gray-400 cursor-pointer" type="checkbox" id="selectAll" />
+                        </th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Tên danh mục</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Mô tả</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-center border-r border-gray-300">Số sản phẩm</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Ngày tạo</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-right">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-300">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="category-row border-b border-gray-300 hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3 text-center border-r border-gray-300">
+                                <input class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-gray-400 cursor-pointer category-checkbox" type="checkbox" value="@item.CategoryId" />
+                            </td>
+                            <td class="px-4 py-3 border-r border-gray-300">
+                                <span class="font-bold text-black">@item.CategoryName</span>
+                            </td>
+                            <td class="px-4 py-3 text-black text-sm max-w-xs truncate border-r border-gray-300">
+                                @(item.Description ?? "Không có mô tả")
+                            </td>
+                            <td class="px-4 py-3 text-center border-r border-gray-300 text-black font-medium">
+                                @(item.Products?.Count ?? 0)
+                            </td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-black text-sm">
+                                @item.CreatedAt.ToString("dd/MM/yyyy")
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button class="p-1 px-2 text-amber-700 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded text-xs font-bold uppercase transition-colors"
+                                            data-bs-toggle="modal" data-bs-target="#editModal"
+                                            data-id="@item.CategoryId"
+                                            data-name="@item.CategoryName"
+                                            data-desc="@item.Description"
+                                            title="Sửa">
+                                        Sửa
+                                    </button>
+                                    <button class="p-1 px-2 text-red-700 bg-red-100 hover:bg-red-200 border border-red-300 rounded text-xs font-bold uppercase transition-colors"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-id="@item.CategoryId"
+                                            data-name="@item.CategoryName"
+                                            title="Xóa">
+                                        Xóa
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="px-4 py-12 text-center text-gray-500">
+                                <span class="material-symbols-outlined text-4xl mb-2 text-gray-300">category</span>
+                                <p>Chưa có danh mục nào được tạo.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modals -->
     <!-- Modal Thêm -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content modal-content-custom">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createModalLabel">Thêm Danh mục Mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-2xl shadow-xl">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h5 class="text-lg font-bold text-gray-900">Thêm Danh mục</h5>
+                    <button type="button" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" data-bs-dismiss="modal">
+                        <span class="material-symbols-outlined text-gray-400">close</span>
+                    </button>
                 </div>
                 <form asp-action="Create" method="post">
                     @Html.AntiForgeryToken()
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label class="modal-label" for="createCategoryName">Tên danh mục <span class="text-red-500">*</span></label>
-                            <input type="text" id="createCategoryName" name="CategoryName" class="modal-input"
-                                   placeholder="Nhập tên danh mục" required maxlength="120" />
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tên danh mục <span class="text-red-500">*</span></label>
+                            <input type="text" name="CategoryName" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all placeholder-gray-300"
+                                   placeholder="Tên danh mục..." required maxlength="120" />
                         </div>
-                        <div class="form-group">
-                            <label class="modal-label" for="createDescription">Mô tả</label>
-                            <textarea id="createDescription" name="Description" class="modal-input modal-textarea"
-                                      placeholder="Nhập mô tả cho danh mục" maxlength="500"></textarea>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Mô tả</label>
+                            <textarea name="Description" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all placeholder-gray-300 min-h-[100px]"
+                                      placeholder="Mô tả danh mục..." maxlength="500"></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="modal-btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button type="submit" class="modal-btn-primary">Thêm Danh mục</button>
+                    <div class="px-6 py-4 bg-gray-50 rounded-b-2xl flex justify-end gap-3">
+                        <button type="button" class="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-200 rounded-xl transition-colors" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="px-4 py-2 text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-xl shadow-sm transition-colors">Lưu lại</button>
                     </div>
                 </form>
             </div>
@@ -143,31 +142,33 @@
     </div>
 
     <!-- Modal Sửa -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content modal-content-custom">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Sửa Danh mục</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-2xl shadow-xl">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h5 class="text-lg font-bold text-gray-900">Sửa Danh mục</h5>
+                    <button type="button" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" data-bs-dismiss="modal">
+                        <span class="material-symbols-outlined text-gray-400">close</span>
+                    </button>
                 </div>
                 <form asp-action="Edit" method="post">
                     @Html.AntiForgeryToken()
-                    <div class="modal-body">
-                        <input type="hidden" name="CategoryId" id="editCategoryId" />
-                        <div class="form-group">
-                            <label class="modal-label" for="editCategoryName">Tên danh mục <span class="text-red-500">*</span></label>
-                            <input type="text" id="editCategoryName" name="CategoryName" class="modal-input"
-                                   placeholder="Nhập tên danh mục" required maxlength="120" />
+                    <input type="hidden" name="CategoryId" id="editCategoryId" />
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tên danh mục <span class="text-red-500">*</span></label>
+                            <input type="text" id="editCategoryName" name="CategoryName" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-bold text-black"
+                                   placeholder="Tên danh mục" required maxlength="120" />
                         </div>
-                        <div class="form-group">
-                            <label class="modal-label" for="editDescription">Mô tả</label>
-                            <textarea id="editDescription" name="Description" class="modal-input modal-textarea"
-                                      placeholder="Nhập mô tả cho danh mục" maxlength="500"></textarea>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Mô tả</label>
+                            <textarea id="editDescription" name="Description" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all min-h-[100px] text-black"
+                                      placeholder="Mô tả..." maxlength="500"></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="modal-btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button type="submit" class="modal-btn-primary">Cập nhật Danh mục</button>
+                    <div class="px-6 py-4 bg-gray-50 rounded-b-2xl flex justify-end gap-3">
+                        <button type="button" class="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-200 rounded-xl transition-colors" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition-colors">Cập nhật</button>
                     </div>
                 </form>
             </div>
@@ -175,35 +176,35 @@
     </div>
 
     <!-- Modal Xóa -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content modal-content-custom">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Xóa Danh mục</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 rounded-2xl shadow-xl">
                 <form asp-action="Delete" method="post">
                     @Html.AntiForgeryToken()
-                    <div class="modal-body">
-                        <input type="hidden" name="id" id="deleteCategoryId" />
-                        <p class="text-gray-700 dark:text-gray-300 mb-3">Bạn có chắc chắn muốn xóa danh mục "<span id="deleteCategoryName" class="font-semibold"></span>"?</p>
-                        <p class="text-red-500 text-sm">Lưu ý: Không thể xóa nếu danh mục đang có sản phẩm.</p>
+                    <input type="hidden" name="id" id="deleteCategoryId" />
+                    <div class="p-8 text-center">
+                        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="material-symbols-outlined text-3xl">delete_forever</span>
+                        </div>
+                        <h5 class="text-xl font-bold text-gray-900 mb-2">Xóa danh mục?</h5>
+                        <p class="text-sm text-gray-500">Bạn có chắc chắn muốn xóa "<span id="deleteCategoryName" class="font-bold text-gray-900"></span>"?</p>
+                        <p class="text-xs text-red-500 mt-3 p-2 bg-red-50 rounded-lg">Không thể xóa nếu danh mục đang có sản phẩm.</p>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="modal-btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="modal-btn-danger">Xóa Danh mục</button>
+                    <div class="px-6 py-4 bg-gray-50 rounded-b-2xl flex justify-center gap-3">
+                        <button type="button" class="flex-1 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-200 rounded-xl transition-colors" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="flex-1 px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-sm transition-colors">Xóa ngay</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Bootstrap & jQuery -->
+@section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
-        // Xử lý modal sửa - tự động điền thông tin khi nhấn nút sửa
+        // Xử lý modal sửa
         $('#editModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var id = button.data('id');
@@ -250,5 +251,4 @@
             $('.alert').fadeOut('slow');
         }, 5000);
     </script>
-</body>
-</html>
+}

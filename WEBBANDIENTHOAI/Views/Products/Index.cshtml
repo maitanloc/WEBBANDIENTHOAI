@@ -9,9 +9,8 @@
     <link rel="stylesheet" href="~/css/products.css" asp-append-version="true" />
 }
 
-<div class="page-products">
-    <div class="container mx-auto px-4 py-6">
-        @* Nếu bạn có partial _ProductsIndexPartial, render nó *@
+<div class="product-management">
+    <div class="w-full">
         @await Html.PartialAsync("_ProductsIndexPartial", Model)
     </div>
 </div>

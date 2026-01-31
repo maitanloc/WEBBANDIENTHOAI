@@ -12,8 +12,8 @@ using WEBBANDIENTHOAI.Data;
 namespace WEBBANDIENTHOAI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260130062015_FinalInitialCreate")]
-    partial class FinalInitialCreate
+    [Migration("20260131024939_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -994,7 +994,7 @@ namespace WEBBANDIENTHOAI.Migrations
                             Email = "admin@example.com",
                             FullName = "Administrator",
                             IsActive = true,
-                            PasswordHash = new byte[] { 36, 11, 229, 24, 250, 189, 39, 36, 221, 182, 240, 78, 235, 29, 165, 150, 116, 72, 215, 232, 49, 192, 140, 143, 168, 34, 128, 159, 116, 199, 32, 169 },
+                            PasswordHash = new byte[] { 147, 186, 166, 224, 128, 110, 18, 16, 209, 138, 14, 3, 140, 101, 193, 223, 134, 242, 179, 21, 25, 20, 208, 182, 112, 183, 17, 199, 15, 222, 119, 93 },
                             RoleId = 1,
                             Username = "admin"
                         },

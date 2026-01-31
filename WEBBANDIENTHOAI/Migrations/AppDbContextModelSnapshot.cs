@@ -991,10 +991,20 @@ namespace WEBBANDIENTHOAI.Migrations
                             Email = "admin@example.com",
                             FullName = "Administrator",
                             IsActive = true,
-                            PasswordHash = new byte[] { 36, 11, 229, 24, 250, 189, 39, 36, 221, 182, 240, 78, 235, 29, 165, 150, 116, 72, 215, 232, 49, 192, 140, 143, 168, 34, 128, 159, 116, 199, 32, 169 },
+                            PasswordHash = new byte[] { 147, 186, 166, 224, 128, 110, 18, 16, 209, 138, 14, 3, 140, 101, 193, 223, 134, 242, 179, 21, 25, 20, 208, 182, 112, 183, 17, 199, 15, 222, 119, 93 },
                             RoleId = 1,
                             Username = "admin"
-                       
+                        },
+                        new
+                        {
+                            UserId = 2,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "customer@example.com",
+                            FullName = "Nguyễn Văn A",
+                            IsActive = true,
+                            PasswordHash = new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 },
+                            RoleId = 3,
+                            Username = "customer"
                         });
                 });
 
