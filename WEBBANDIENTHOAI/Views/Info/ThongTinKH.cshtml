@@ -1,4 +1,4 @@
-@model WEBBANDIENTHOAI.Models.Customer
+@model WEBBANDIENTHOAI.ViewModels.ProfileViewModel
 
 @{
     ViewData["Title"] = "Hồ Sơ Người Dùng";
@@ -78,11 +78,12 @@
                             <p class="text-subtext-light dark:text-subtext-dark text-base">Quản lý và cập nhật thông tin cá nhân của bạn tại đây.</p>
                         </div>
                     </div>
-                     <div id="notification" class="hidden rounded-lg p-4 text-sm" role="alert"></div>
+                     <div id="notification-container"></div>
+
 
                     <!-- PERSONAL INFO -->
-                    <form method="post" id="profileForm">
-                         @Html.AntiForgeryToken()
+                    <form asp-action="UpdateProfile" method="post" id="profileForm" novalidate>
+                        @Html.AntiForgeryToken()
                         <div class="rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark p-6 shadow-sm">
                             <div class="flex justify-between items-center pb-5 border-b border-border-light dark:border-border-dark">
                                 <h2 class="text-text-light dark:text-text-dark text-lg font-semibold leading-tight">Thông tin cá nhân</h2>
@@ -94,46 +95,44 @@
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 pt-6">
-                                <input type="hidden" name="CustomerId" value="@Model.CustomerId" />
-                                <input type="hidden" name="Email" value="@Model.Email" />
+                                <input type="hidden" asp-for="CustomerId" />
+                                <input type="hidden" asp-for="Email" />
                                 <div>
-                                    <label for="fullName" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Họ và Tên</label>
-                                    <input id="fullName" name="FullName" value="@Model.FullName" readonly
-                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <label asp-for="FullName" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Họ và Tên</label>
+                                    <input asp-for="FullName" readonly class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <span asp-validation-for="FullName" class="text-red-500 text-sm"></span>
                                 </div>
 
                                 <div>
-                                    <label for="email" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Email</label>
-                                    <input id="email" value="@Model.Email" readonly
-                                           type="email"
-                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-gray-200 dark:bg-gray-700 cursor-not-allowed" />
+                                    <label asp-for="Email" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Email</label>
+                                    <input asp-for="Email" readonly type="email" class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-gray-200 dark:bg-gray-700 cursor-not-allowed" />
                                 </div>
 
                                 <div>
-                                    <label for="phone" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Số điện thoại</label>
-                                    <input id="phone" name="Phone" value="@Model.Phone" readonly
-                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <label asp-for="Phone" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Số điện thoại</label>
+                                    <input asp-for="Phone" readonly class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <span asp-validation-for="Phone" class="text-red-500 text-sm"></span>
                                 </div>
 
                                 <div>
-                                    <label for="cccd" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Số CCCD/CMND</label>
-                                    <input id="cccd" name="CitizenID" value="@Model.CitizenID" readonly
-                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <label asp-for="CitizenID" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Số CCCD/CMND</label>
+                                    <input asp-for="CitizenID" readonly class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <span asp-validation-for="CitizenID" class="text-red-500 text-sm"></span>
                                 </div>
 
                                 <div class="md:col-span-2">
-                                    <label for="address" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Địa chỉ</label>
-                                    <input id="address" name="Address" value="@Model.Address" readonly
-                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <label asp-for="Address" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Địa chỉ</label>
+                                    <input asp-for="Address" readonly class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <span asp-validation-for="Address" class="text-red-500 text-sm"></span>
                                 </div>
-
                             </div>
                         </div>
                     </form>
 
                     <!-- SECURITY -->
-                     <form method="post" id="passwordForm">
+                     <form asp-action="ChangePassword" method="post" id="passwordForm" novalidate>
                         @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="CustomerId" />
                         <div class="rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark p-6 shadow-sm">
 
                             <div class="flex justify-between items-center pb-5 border-b border-border-light dark:border-border-dark">
@@ -149,46 +148,45 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 pt-6">
 
                                 <div>
-                                    <label class="block mb-1.5 text-sm font-medium" for="currentPassword">Mật khẩu hiện tại</label>
-                                    <input type="password" id="currentPassword" name="CurrentPassword" placeholder="Nhập mật khẩu hiện tại ..." disabled
-                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <label asp-for="CurrentPassword" class="block mb-1.5 text-sm font-medium">Mật khẩu hiện tại</label>
+                                    <input asp-for="CurrentPassword" placeholder="Nhập mật khẩu hiện tại ..." disabled class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <span asp-validation-for="CurrentPassword" class="text-red-500 text-sm"></span>
                                 </div>
                                  <div></div>
                                 <div>
-                                    <label class="block mb-1.5 text-sm font-medium" for="newPassword">Mật khẩu mới</label>
-                                    <input type="password" id="newPassword" name="NewPassword" placeholder="Nhập mật khẩu mới ..." disabled
-                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <label asp-for="NewPassword" class="block mb-1.5 text-sm font-medium">Mật khẩu mới</label>
+                                    <input asp-for="NewPassword" placeholder="Nhập mật khẩu mới ..." disabled class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <span asp-validation-for="NewPassword" class="text-red-500 text-sm"></span>
                                 </div>
 
                                 <div>
-                                    <label class="block mb-1.5 text-sm font-medium" for="confirmNewPassword">Xác nhận mật khẩu mới</label>
-                                    <input type="password" id="confirmNewPassword" name="ConfirmNewPassword" placeholder="Xac nhận mật khẩu ..." disabled
-                                           class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <label asp-for="ConfirmNewPassword" class="block mb-1.5 text-sm font-medium">Xác nhận mật khẩu mới</label>
+                                    <input asp-for="ConfirmNewPassword" placeholder="Xac nhận mật khẩu ..." disabled class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <span asp-validation-for="ConfirmNewPassword" class="text-red-500 text-sm"></span>
                                 </div>
-
                             </div>
                         </div>
                     </form>
-
                 </div>
-
             </div>
         </div>
     </main>
-
 </div>
 
 @section Styles {
     <style>
         .read-only-styles, input:disabled {
-             background-color: #f3f4f6; /* bg-gray-100 */
+             background-color: #f3f4f6;
              cursor: default;
         }
        .dark .read-only-styles, .dark input:disabled {
-            background-color: #374151; /* dark:bg-gray-700 */
+            background-color: #374151;
        }
        .notification {
             transition: opacity 0.5s ease-in-out;
+       }
+       .input-validation-error {
+            border-color: #ef4444 !important;
        }
     </style>
 }
@@ -196,46 +194,75 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // === PROFILE INFO FORM ===
-            const editProfileButton = document.getElementById('editProfileButton');
-            const editProfileButtonText = document.getElementById('editProfileButtonText');
-            const profileForm = document.getElementById('profileForm');
-            const profileInputs = Array.from(profileForm.querySelectorAll('.read-only-styles'));
-            const notification = document.getElementById('notification');
-
-            let isProfileEditMode = false;
             
+            const notificationContainer = document.getElementById('notification-container');
+
             function showNotification(message, isSuccess) {
-                notification.textContent = message;
-                notification.className = 'notification rounded-lg p-4 text-sm mb-4'; // Reset classes
-                if (isSuccess) {
-                    notification.classList.add('bg-green-100', 'text-green-800');
-                } else {
-                    notification.classList.add('bg-red-100', 'text-red-800');
-                }
-                notification.classList.remove('hidden');
+                const notifId = 'notif-' + Date.now();
+                const notifDiv = document.createElement('div');
+                notifDiv.id = notifId;
+                notifDiv.className = 'notification rounded-lg p-4 text-sm mb-4 ' + (isSuccess ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800');
+                notifDiv.setAttribute('role', 'alert');
+                notifDiv.textContent = message;
+                
+                notificationContainer.appendChild(notifDiv);
+
                 setTimeout(() => {
-                    notification.classList.add('hidden');
+                    const el = document.getElementById(notifId);
+                    if(el) {
+                       el.style.opacity = '0';
+                       setTimeout(() => el.remove(), 500);
+                    }
                 }, 3000);
             }
 
+            function clearValidationErrors(form) {
+                form.querySelectorAll('[data-valmsg-for]').forEach(span => {
+                    span.textContent = '';
+                });
+                form.querySelectorAll('.input-validation-error').forEach(input => {
+                    input.classList.remove('input-validation-error');
+                });
+            }
+
+            function processValidationErrors(form, errors) {
+                clearValidationErrors(form);
+                for (const key in errors) {
+                    if (errors.hasOwnProperty(key)) {
+                        const span = form.querySelector(`[data-valmsg-for="${key}"]`);
+                        if (span) {
+                            span.textContent = errors[key];
+                        }
+                        const input = form.querySelector(`[name="${key}"]`);
+                        if(input) {
+                            input.classList.add('input-validation-error');
+                        }
+                    }
+                }
+            }
+
+
+            // === PROFILE INFO FORM ===
+            const editProfileButton = document.getElementById('editProfileButton');
+            const profileForm = document.getElementById('profileForm');
+            const profileInputs = Array.from(profileForm.querySelectorAll('.read-only-styles'));
+            let isProfileEditMode = false;
+
             function setProfileEditMode(isEditing) {
-                 isProfileEditMode = isEditing;
-                 if (isEditing) {
-                    editProfileButtonText.textContent = 'Xác nhận';
+                isProfileEditMode = isEditing;
+                if (isEditing) {
+                    editProfileButton.innerHTML = '<span class="material-symbols-outlined text-base">save</span><span>Xác nhận</span>';
                     editProfileButton.classList.remove('bg-primary/10', 'dark:bg-primary/20', 'text-primary');
                     editProfileButton.classList.add('bg-green-500/10', 'dark:bg-green-500/20', 'text-green-500');
-                    editProfileButton.querySelector('.material-symbols-outlined').textContent = 'save';
 
                     profileInputs.forEach(input => {
                         input.readOnly = false;
                         input.classList.remove('read-only-styles');
                     });
                 } else {
-                    editProfileButtonText.textContent = 'Chỉnh sửa';
+                    editProfileButton.innerHTML = '<span class="material-symbols-outlined text-base">edit</span><span>Chỉnh sửa</span>';
                     editProfileButton.classList.add('bg-primary/10', 'dark:bg-primary/20', 'text-primary');
                     editProfileButton.classList.remove('bg-green-500/10', 'dark:bg-green-500/20', 'text-green-500');
-                    editProfileButton.querySelector('.material-symbols-outlined').textContent = 'edit';
 
                     profileInputs.forEach(input => {
                         input.readOnly = true;
@@ -243,41 +270,42 @@
                     });
                 }
             }
-
-
-            editProfileButton.addEventListener('click', async function (e) {
-                e.preventDefault();
-
+            
+            editProfileButton.addEventListener('click', async function () {
                 if (!isProfileEditMode) {
                     setProfileEditMode(true);
                     return;
                 }
 
+                clearValidationErrors(profileForm);
                 const formData = new FormData(profileForm);
-                const token = formData.get('__RequestVerificationToken');
 
                 try {
-                    const response = await fetch('/Info/UpdateProfile', {
+                    const response = await fetch(profileForm.action, {
                         method: 'POST',
                         body: formData,
-                        headers: { 'RequestVerificationToken': token }
+                        headers: { 'RequestVerificationToken': formData.get('__RequestVerificationToken') }
                     });
 
                     const result = await response.json();
 
-                    if (response.ok && result.success) {
-                        showNotification('Cập nhật thông tin thành công!', true);
+                    if (result.success) {
+                        showNotification(result.message, true);
                         setProfileEditMode(false);
-                        
-                        document.getElementById('sidebar-fullname').textContent = result.newName;
-                        document.getElementById('sidebar-avatar').textContent = result.newName.substring(0, 1).toUpperCase();
+                        if (result.newName) {
+                            document.getElementById('sidebar-fullname').textContent = result.newName;
+                            document.getElementById('sidebar-avatar').textContent = result.newName.substring(0, 1).toUpperCase();
+                        }
+                    } else if (result.errors) {
+                        processValidationErrors(profileForm, result.errors);
                     } else {
-                         showNotification(result.message || 'Có lỗi xảy ra.', false);
+                        showNotification(result.message || 'Có lỗi xảy ra khi cập nhật.', false);
                     }
                 } catch (error) {
                     showNotification('Lỗi kết nối. Vui lòng thử lại.', false);
                 }
             });
+
 
             // === PASSWORD CHANGE FORM ===
             const changePasswordButton = document.getElementById('changePasswordButton');
@@ -287,42 +315,44 @@
 
             function setPasswordEditMode(isEditing) {
                 isPasswordEditMode = isEditing;
+                passwordInputs.forEach(input => {
+                    input.disabled = !isEditing;
+                    if(!isEditing) input.value = '';
+                });
+
                 if (isEditing) {
                     changePasswordButton.textContent = 'Xác nhận';
-                    passwordInputs.forEach(input => input.disabled = false);
                 } else {
                     changePasswordButton.textContent = 'Thay đổi';
-                    passwordInputs.forEach(input => {
-                        input.disabled = true;
-                        input.value = ''; // Clear fields on reset
-                    });
                 }
             }
 
-            changePasswordButton.addEventListener('click', async function(e) {
-                e.preventDefault();
-
+            changePasswordButton.addEventListener('click', async function() {
                 if (!isPasswordEditMode) {
                     setPasswordEditMode(true);
                     return;
                 }
-
+                
+                clearValidationErrors(passwordForm);
                 const formData = new FormData(passwordForm);
-                const token = formData.get('__RequestVerificationToken');
 
                  try {
-                    const response = await fetch('/Info/ChangePassword', {
+                    const response = await fetch(passwordForm.action, {
                         method: 'POST',
                         body: formData,
-                        headers: { 'RequestVerificationToken': token }
+                        headers: { 'RequestVerificationToken': formData.get('__RequestVerificationToken') }
                     });
 
                     const result = await response.json();
 
-                    if (response.ok && result.success) {
-                        showNotification(result.message || 'Đổi mật khẩu thành công!', true);
+                    if (result.success) {
+                        showNotification(result.message, true);
+
                         setPasswordEditMode(false);
-                    } else {
+                    } else if(result.errors) {
+                        processValidationErrors(passwordForm, result.errors);
+                    }
+                     else {
                          showNotification(result.message || 'Có lỗi xảy ra.', false);
                     }
                 } catch (error) {

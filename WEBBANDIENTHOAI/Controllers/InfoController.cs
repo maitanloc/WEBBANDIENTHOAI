@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WEBBANDIENTHOAI.ViewModels;
 using WEBBANDIENTHOAI.Services;
+using System.Collections.Generic;
 
 namespace WEBBANDIENTHOAI.Controllers
 {
-    // Adding explicit routing
     [Route("Info")]
     public class InfoController : Controller
     {
@@ -22,63 +22,54 @@ namespace WEBBANDIENTHOAI.Controllers
         }
 
         [HttpGet("ThongTinKH")]
-        public IActionResult ThongTinKH()
+        public async Task<IActionResult> ThongTinKH()
         {
             var userId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int customerId))
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("LoginRegister", "Account");
             }
 
-            var role = HttpContext.Session.GetString("RoleName");
-            if (role != "Customer")
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            if (!int.TryParse(userId, out int customerId))
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
-            var customer = _context.Customers.AsNoTracking().FirstOrDefault(c => c.CustomerId == customerId);
-
+            var customer = await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.CustomerId == customerId);
             if (customer == null)
             {
                 return NotFound();
             }
 
-            // Calculate total spending for orders with StatusId = 4
-            var totalSpending = _context.Orders
-                                        .Where(o => o.CustomerId == customerId && o.StatusId == 4)
-                                        .Sum(o => (decimal?)o.Total) ?? 0m;
+            var viewModel = new ProfileViewModel
+            {
+                CustomerId = customer.CustomerId,
+                FullName = customer.FullName,
+                Email = customer.Email,
+                Phone = customer.Phone,
+                CitizenID = customer.CitizenID,
+                Address = customer.Address,
+                CreatedAt = customer.CreatedAt,
+                IsActive = customer.IsActive
+            };
 
-            ViewBag.TotalSpending = totalSpending;
-
-            // Populate ViewBag for the layout
-            ViewBag.CustomerName = customer.FullName;
-            ViewBag.CustomerEmail = customer.Email;
-            ViewBag.CustomerPhone = customer.Phone;
-            ViewBag.IsLoggedIn = true;
-
-            return View(customer);
+            await PopulateViewBagForCustomer(customerId);
+            return View(viewModel);
         }
 
         [HttpPost("UpdateProfile")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProfile(Customer model)
+        public async Task<IActionResult> UpdateProfile(ProfileViewModel model)
         {
             var userId = HttpContext.Session.GetString("UserId");
-            var role = HttpContext.Session.GetString("RoleName");
-
-            if (string.IsNullOrEmpty(userId) || role != "Customer" || model.CustomerId.ToString() != userId)
+            if (string.IsNullOrEmpty(userId) || model.CustomerId.ToString() != userId)
             {
-                return StatusCode(401, new { success = false, message = "Unauthorized access." });
+                return Unauthorized(new { success = false, message = "Unauthorized access." });
             }
-            
-            if (string.IsNullOrWhiteSpace(model.FullName))
+
+            ModelState.Remove(nameof(model.PasswordHash)); // Ignore password hash validation
+            ModelState.Remove(nameof(model.CurrentPassword));
+            ModelState.Remove(nameof(model.NewPassword));
+            ModelState.Remove(nameof(model.ConfirmNewPassword));
+
+            if (!ModelState.IsValid)
             {
-                 return BadRequest(new { success = false, message = "Họ và Tên là bắt buộc." });
+                return Json(new { success = false, errors = GetModelStateErrors() });
             }
 
             var customerToUpdate = await _context.Customers.FindAsync(model.CustomerId);
@@ -91,41 +82,35 @@ namespace WEBBANDIENTHOAI.Controllers
             customerToUpdate.Phone = model.Phone;
             customerToUpdate.Address = model.Address;
             customerToUpdate.CitizenID = model.CitizenID;
-            
-            try
-            {
-                await _context.SaveChangesAsync();
-                var currentUsername = HttpContext.Session.GetString("Username");
-                if (currentUsername != customerToUpdate.FullName)
-                {
-                    HttpContext.Session.SetString("Username", customerToUpdate.FullName);
-                }
-                
-                return Ok(new { success = true, newName = customerToUpdate.FullName });
-            }
-            catch (DbUpdateException ex)
-            {
-                // In a real app, you would log this exception.
-                return StatusCode(500, new { success = false, message = "Lỗi khi lưu vào cơ sở dữ liệu." });
-            }
+
+            await _context.SaveChangesAsync();
+
+            HttpContext.Session.SetString("Username", customerToUpdate.FullName);
+            return Ok(new { success = true, newName = customerToUpdate.FullName, message = "Cập nhật thông tin thành công!" });
         }
 
         [HttpPost("ChangePassword")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordViewModel model)
+        public async Task<IActionResult> ChangePassword(ProfileViewModel model)
         {
-            if (!ModelState.IsValid)
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out var customerId) || model.CustomerId != customerId)
             {
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                return BadRequest(new { success = false, message = string.Join(" ", errors) });
+                return Unauthorized(new { success = false, message = "Unauthorized access." });
             }
 
-            var userId = HttpContext.Session.GetString("UserId");
-            var role = HttpContext.Session.GetString("RoleName");
-
-            if (string.IsNullOrEmpty(userId) || role != "Customer" || !int.TryParse(userId, out int customerId))
+            // For this action, only validate password-related fields.
+            // Remove other required fields from the base Customer model from validation.
+            ModelState.Remove(nameof(model.FullName));
+            ModelState.Remove(nameof(model.Email));
+            ModelState.Remove(nameof(model.Phone));
+            ModelState.Remove(nameof(model.CitizenID));
+            ModelState.Remove(nameof(model.Address));
+            ModelState.Remove(nameof(model.PasswordHash));
+            
+            if (!ModelState.IsValid)
             {
-                return StatusCode(401, new { success = false, message = "Unauthorized access." });
+                return Json(new { success = false, errors = GetModelStateErrors() });
             }
 
             var customer = await _context.Customers.FindAsync(customerId);
@@ -134,23 +119,40 @@ namespace WEBBANDIENTHOAI.Controllers
                 return NotFound(new { success = false, message = "Không tìm thấy khách hàng." });
             }
 
-            // Verify current password
             if (!PasswordHasher.Verify(model.CurrentPassword, customer.PasswordHash))
             {
-                return BadRequest(new { success = false, message = "Mật khẩu hiện tại không đúng." });
+                ModelState.AddModelError(nameof(model.CurrentPassword), "Mật khẩu hiện tại không đúng.");
+                return Json(new { success = false, errors = GetModelStateErrors() });
             }
 
-            // Hash and update new password
             customer.PasswordHash = PasswordHasher.Hash(model.NewPassword);
+            await _context.SaveChangesAsync();
 
-            try
+            return Ok(new { success = true, message = "Đổi mật khẩu thành công." });
+        }
+
+        private Dictionary<string, string> GetModelStateErrors()
+        {
+            return ModelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).FirstOrDefault()
+            );
+        }
+
+        private async Task PopulateViewBagForCustomer(int customerId)
+        {
+            var customer = await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.CustomerId == customerId);
+            if (customer != null)
             {
-                await _context.SaveChangesAsync();
-                return Ok(new { success = true, message = "Đổi mật khẩu thành công." });
-            }
-            catch (DbUpdateException)
-            {
-                return StatusCode(500, new { success = false, message = "Lỗi khi cập nhật mật khẩu." });
+                var totalSpending = await _context.Orders
+                                            .Where(o => o.CustomerId == customerId && o.StatusId == 4)
+                                            .SumAsync(o => (decimal?)o.Total) ?? 0m;
+
+                ViewBag.TotalSpending = totalSpending;
+                ViewBag.CustomerName = customer.FullName;
+                ViewBag.CustomerEmail = customer.Email;
+                ViewBag.CustomerPhone = customer.Phone;
+                ViewBag.IsLoggedIn = true;
             }
         }
     }
