@@ -2,233 +2,144 @@
 
 @{
     ViewData["Title"] = "Quản lý kho hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
     var totalItems = ViewBag.TotalItems ?? 0;
     var lowStockItems = ViewBag.LowStockItems ?? 0;
     var searchTerm = ViewBag.SearchTerm as string;
     var isLowStockView = ViewBag.IsLowStockView as bool? ?? false;
 }
 
-<!-- FONT + TONE MÀU CHUẨN FILE HTML -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+@section Styles {
+    <link rel="stylesheet" href="~/css/categories.css" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+}
 
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-        background: #f8f7f5;
-    }
-
-    :root {
-        --primary: #f48c25;
-        --primary-20: rgba(244, 140, 37, 0.2);
-        --primary-10: rgba(244, 140, 37, 0.1);
-        --primary-5: rgba(244, 140, 37, 0.05);
-        --text-main: #1c140d;
-        --text-sub: #9c7349;
-        --bg-light: #f8f7f5;
-        --bg-card: #f4ede7;
-        --border-light: #e8dbce;
-    }
-
-    .text-primary {
-        color: var(--primary);
-    }
-
-    .bg-primary {
-        background-color: var(--primary);
-    }
-
-    .bg-primary\/20 {
-        background-color: var(--primary-20);
-    }
-
-    .bg-primary\/10 {
-        background-color: var(--primary-10);
-    }
-
-    .bg-primary\/5 {
-        background-color: var(--primary-5);
-    }
-</style>
-
-<div class="max-w-7xl mx-auto">
-
-    <!-- HEADER -->
-    <header class="mb-6">
-        <h1 class="text-[var(--text-main)] text-4xl font-black tracking-[-0.03em]">
-            Bảng điều khiển quản lý kho hàng
-        </h1>
-
-        <!-- STAT CARDS -->
-        <div class="flex flex-wrap gap-4 mt-4">
-            <div class="rounded-lg p-4 border border-[var(--border-light)] bg-[var(--bg-card)]">
-                <div class="text-2xl font-bold text-[var(--text-main)]">@totalItems</div>
-                <div class="text-sm text-[var(--text-sub)]">Tổng sản phẩm</div>
+<div class="category-management">
+    <!-- Header Section -->
+    <div class="mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Quản lý Kho hàng</h1>
+                <p class="text-sm text-gray-500 mt-1">Quản lý tồn kho và theo dõi sản phẩm trong kho.</p>
             </div>
+        </div>
+    </div>
 
-            <div class="rounded-lg p-4 border border-[var(--border-light)] bg-[var(--bg-card)]">
-                <div class="text-2xl font-bold text-[#dc2626]">@lowStockItems</div>
-                <div class="text-sm text-[var(--text-sub)]">Sắp hết hàng</div>
-            </div>
-
+    <!-- Stats Cards -->
+    @if (!string.IsNullOrEmpty(searchTerm) || isLowStockView)
+    {
+        <div class="flex flex-wrap gap-4 mb-6">
             @if (!string.IsNullOrEmpty(searchTerm))
             {
-                <div class="rounded-lg p-4 border border-[var(--border-light)] bg-[var(--bg-card)]">
-                    <div class="text-sm text-[var(--text-sub)]">
-                        Kết quả tìm kiếm:
-                        <span class="font-semibold text-[var(--text-main)]">"@searchTerm"</span>
-                        <a href="@Url.Action("Index")" class="ml-2 text-primary hover:underline">✕</a>
-                    </div>
+                <div class="px-4 py-3 bg-white border border-gray-300 rounded text-sm text-gray-700">
+                    Kết quả tìm kiếm: <span class="font-semibold">@searchTerm</span>
+                    <a href="@Url.Action("Index")" class="ml-2 text-emerald-600 hover:underline">✕</a>
                 </div>
             }
-
             @if (isLowStockView)
             {
-                <div class="rounded-lg p-4 border border-[var(--border-light)] bg-[var(--bg-card)]">
-                    <div class="text-sm text-[var(--text-sub)]">
-                        Đang xem sản phẩm sắp hết hàng
-                        <a href="@Url.Action("Index")" class="ml-2 text-primary hover:underline">✕</a>
-                    </div>
+                <div class="px-4 py-3 bg-white border border-gray-300 rounded text-sm text-gray-700">
+                    Đang xem sản phẩm sắp hết hàng
+                    <a href="@Url.Action("Index")" class="ml-2 text-emerald-600 hover:underline">✕</a>
                 </div>
-            }
-        </div>
-    </header>
-
-    <!-- SEARCH + ACTIONS -->
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-
-        <!-- SEARCH -->
-        <form method="post" asp-action="Search" class="w-full md:max-w-md">
-            <label class="flex flex-col h-12 w-full">
-                <div class="flex w-full items-center rounded-lg h-full bg-[var(--bg-card)]">
-                    <span class="material-symbols-outlined text-[var(--text-sub)] pl-4">search</span>
-                    <input name="searchTerm"
-                           value="@searchTerm"
-                           class="flex-1 rounded-r-lg bg-transparent px-4 text-[var(--text-main)]
-                                  placeholder:text-[var(--text-sub)] focus:outline-none"
-                           placeholder="Tìm kiếm sản phẩm, vị trí..." />
-                </div>
-            </label>
-        </form>
-
-        <!-- ACTION BUTTONS -->
-        <div class="flex items-center gap-2">
-
-            <a href="@Url.Action("LowStock")"
-               class="flex items-center rounded-lg h-12 bg-[#fef2f2] text-[#dc2626] px-5 gap-2 hover:bg-[#fee2e2] transition">
-                <span class="material-symbols-outlined !text-xl">warning</span>
-                Sắp hết hàng
-            </a>
-
-            <button class="p-2 rounded-lg text-[var(--text-main)] hover:bg-primary/10">
-                <span class="material-symbols-outlined">filter_list</span>
-            </button>
-
-            <button class="flex items-center rounded-lg h-12 px-5 bg-primary/20 text-primary gap-2 hover:bg-primary/30 transition">
-                <span class="material-symbols-outlined !text-xl" style="font-variation-settings:'FILL'1;">login</span>
-                Nhập hàng
-            </button>
-
-            <button class="flex items-center rounded-lg h-12 px-5 bg-primary/20 text-primary gap-2 hover:bg-primary/30 transition">
-                <span class="material-symbols-outlined !text-xl" style="font-variation-settings:'FILL'1;">logout</span>
-                Xuất hàng
-            </button>
-
-            <button class="flex items-center rounded-lg h-12 px-5 bg-primary text-white gap-2 hover:bg-opacity-90 transition"
-                    onclick="window.location.href = '@Url.Action("ExportExcel", "Kho")';">
-                <span class="material-symbols-outlined !text-xl" style="font-variation-settings:'FILL'1;">print</span>
-                Xuất Excel
-            </button>
-        </div>
-    </div>
-
-    <!-- TABLE -->
-    <div class="w-full">
-        <div class="overflow-hidden rounded-lg border border-[var(--border-light)] bg-[var(--bg-light)]">
-            <div class="overflow-x-auto">
-                <table class="w-full min-w-[1024px]">
-
-                    <!-- HEADER -->
-                    <thead class="bg-[var(--bg-card)]">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Mã kho</th>
-                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Mã tồn kho</th>
-                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Tên sản phẩm</th>
-                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Hiện tại</th>
-                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Tối thiểu</th>
-                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Tối đa</th>
-                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Vị trí</th>
-                            <th class="px-4 py-3 text-left text-[var(--text-main)] text-sm font-medium">Cập nhật</th>
-                        </tr>
-                    </thead>
-
-                    <!-- ROWS -->
-                    <tbody class="divide-y divide-[var(--border-light)]">
-                        @foreach (var item in Model)
-                        {
-                            <tr class="hover:bg-primary/5 @(item.CurrentQuantity <= item.MinimumQuantity ? "bg-red-50" : "")">
-
-                                <td class="px-4 py-2 text-[var(--text-sub)]">@item.InventoryId</td>
-                                <td class="px-4 py-2 text-[var(--text-sub)]">@item.StockCode</td>
-
-                                <td class="px-4 py-2 text-[var(--text-main)]">
-                                    @if (item.Product != null)
-                                    {
-                                        <div>
-                                            <div class="font-medium">@item.Product.Name</div>
-                                            <div class="text-xs text-[var(--text-sub)]">@item.Product.SKU</div>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-[var(--text-sub)]">Chưa có thông tin</span>
-                                    }
-
-                                    @if (item.CurrentQuantity <= item.MinimumQuantity)
-                                    {
-                                        <span class="ml-2 px-2 py-1 text-xs bg-[#dc2626] text-white rounded-full">
-                                            CẢNH BÁO
-                                        </span>
-                                    }
-                                </td>
-
-                                <td class="px-4 py-2 text-[var(--text-sub)]">@item.CurrentQuantity</td>
-                                <td class="px-4 py-2 text-[var(--text-sub)]">@item.MinimumQuantity</td>
-                                <td class="px-4 py-2 text-[var(--text-sub)]">@item.MaximumQuantity</td>
-
-                                <td class="px-4 py-2">
-                                    <button class="h-8 px-4 rounded-lg bg-[var(--bg-card)] text-[var(--text-main)] w-full">
-                                        @item.Location
-                                    </button>
-                                </td>
-
-                                <td class="px-4 py-2 text-[var(--text-sub)]">
-                                    @item.LastUpdated.ToString("dd/MM/yyyy HH:mm")
-                                </td>
-
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- EMPTY STATE -->
-    @if (!Model.Any())
-    {
-        <div class="text-center py-12">
-            <span class="material-symbols-outlined text-6xl text-[var(--text-sub)]">inventory_2</span>
-            <p class="mt-4 text-[var(--text-sub)]">Không có dữ liệu tồn kho</p>
-
-            @if (!string.IsNullOrEmpty(searchTerm))
-            {
-                <a href="@Url.Action("Index")" class="mt-2 inline-flex items-center text-primary hover:underline">
-                    <span class="material-symbols-outlined text-lg">arrow_back</span>
-                    Quay lại danh sách đầy đủ
-                </a>
             }
         </div>
     }
+
+    <!-- Filter Section -->
+    <div class="bg-transparent p-0 mb-6">
+        <form id="inventory-filter-form" class="flex flex-wrap gap-4 items-center">
+            <div class="relative flex-1 min-w-[250px]">
+                <span class="material-symbols-outlined absolute left-0 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                <input name="searchTerm" value="@searchTerm" placeholder="Tìm tên sản phẩm, mã kho..." 
+                       class="w-full pl-8 pr-4 py-2 bg-transparent border-b border-gray-300 focus:outline-none focus:border-emerald-500 text-black" />
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <a href="@Url.Action("LowStock")"
+                   class="flex items-center gap-2 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded border border-red-300 text-xs font-bold uppercase transition-colors">
+                    <span class="material-symbols-outlined text-sm">warning</span>
+                    Sắp hết hàng
+                </a>
+
+                <button type="button" class="flex items-center gap-2 px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded border border-amber-300 text-xs font-bold uppercase transition-colors" 
+                        title="Nhập hàng">
+                    <span class="material-symbols-outlined text-sm">login</span>
+                    Nhập
+                </button>
+
+                <button type="button" class="flex items-center gap-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded border border-blue-300 text-xs font-bold uppercase transition-colors"
+                        title="Xuất hàng">
+                    <span class="material-symbols-outlined text-sm">logout</span>
+                    Xuất
+                </button>
+
+                <button type="button" onclick="window.location.href = '@Url.Action("ExportExcel", "Kho")';"
+                        class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold uppercase transition-colors">
+                    <span class="material-symbols-outlined text-sm">download</span>
+                    Excel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-white border border-gray-300">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse border border-gray-300" id="inventoryTable">
+                <thead>
+                    <tr class="bg-gray-100 border-b border-gray-300">
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Mã kho</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Mã SKU</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Tên sản phẩm</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-center border-r border-gray-300">Hiện tại</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-center border-r border-gray-300">Tối thiểu</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-center border-r border-gray-300">Tối đa</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Vị trí</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Cập nhật lần cuối</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-300">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="inventory-row border-b border-gray-300 hover:bg-gray-50 transition-colors @(item.CurrentQuantity <= item.MinimumQuantity ? "bg-red-50" : "")">
+                            <td class="px-4 py-3 border-r border-gray-300">
+                                <span class="font-bold text-black">#@item.InventoryId</span>
+                            </td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-black text-sm">@item.StockCode</td>
+                            <td class="px-4 py-3 border-r border-gray-300">
+                                @if (item.Product != null)
+                                {
+                                    <div class="font-bold text-black">@item.Product.Name</div>
+                                    <div class="text-xs text-gray-500">@item.Product.SKU</div>
+                                }
+                                else
+                                {
+                                    <span class="text-gray-500 text-sm">Chưa có thông tin</span>
+                                }
+                                @if (item.CurrentQuantity <= item.MinimumQuantity)
+                                {
+                                    <span class="inline-block ml-2 px-2 py-1 text-xs font-bold bg-red-600 text-white rounded">CẢNH BÁO</span>
+                                }
+                            </td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-black text-sm text-center font-semibold">@item.CurrentQuantity</td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-black text-sm text-center">@item.MinimumQuantity</td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-black text-sm text-center">@item.MaximumQuantity</td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-black text-sm">@item.Location</td>
+                            <td class="px-4 py-3 text-black text-sm">@item.LastUpdated.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="px-4 py-12 text-center text-gray-500">
+                                <span class="material-symbols-outlined text-4xl mb-2 text-gray-300">inventory_2</span>
+                                <p>Không tìm thấy dữ liệu kho hàng nào.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

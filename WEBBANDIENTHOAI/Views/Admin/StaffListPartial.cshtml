@@ -1,146 +1,120 @@
-﻿@model IEnumerable<WEBBANDIENTHOAI.Models.User>
+﻿  @model IEnumerable<WEBBANDIENTHOAI.Models.User>
 
 @{
-    ViewData["Title"] = "Quản lý Nhân viên";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Quản lý Nhân viên";
 }
 
-<div class="relative flex min-h-screen w-full flex-col bg-white">
-    <div class="flex h-full w-full">
-        <main class="w-full flex-1 overflow-y-auto">
-            <div class="container mx-auto px-6 py-8">
-                <div class="flex flex-wrap items-center justify-between gap-4">
-                    <div class="flex flex-col gap-1">
-                        <h1 class="text-gray-900 text-3xl font-bold leading-tight tracking-tight">
-                            Quản lý Nhân viên
-                        </h1>
-                        <p class="text-gray-600 text-base font-normal leading-normal">
-                            Xem, thêm, sửa và xóa thông tin nhân viên.
-                        </p>
-                    </div>
-                    <button id="addUserBtn"
-                            class="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-[#f27f0d] text-white shadow-sm transition-all hover:bg-[#d66e00] focus:outline-none focus:ring-2 focus:ring-[#f27f0d]/50 focus:ring-offset-2 text-sm font-bold leading-normal tracking-[0.015em]">
-                        <span class="material-symbols-outlined">add</span>
-                        <span class="truncate">Thêm Nhân viên</span>
-                    </button>
-                </div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/categories.css" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+}
 
-                <div class="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div class="flex-1">
-                        <label class="flex flex-col min-w-40 h-12 w-full md:max-w-md">
-                            <div class="flex w-full flex-1 items-stretch rounded-lg h-full shadow-sm">
-                                <div class="text-gray-500 flex border border-r-0 border-gray-300 bg-white items-center justify-center pl-4 rounded-l-lg">
-                                    <span class="material-symbols-outlined text-2xl">search</span>
-                                </div>
-                                <input id="searchInput"
-                                       class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg text-gray-900 focus:outline-0 focus:ring-2 focus:ring-[#f27f0d]/50 border border-l-0 border-gray-300 bg-white h-full placeholder:text-gray-400 px-4 pl-2 text-base font-normal leading-normal"
-                                       placeholder="Tìm kiếm theo tên, email..." value="" />
-                            </div>
-                        </label>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <div class="flex gap-2">
-                            <button class="flex h-12 shrink-0 items-center justify-center gap-x-2 rounded-lg border border-gray-300 bg-white px-4 shadow-sm transition-colors hover:bg-gray-50">
-                                <span class="material-symbols-outlined text-gray-700">filter_list</span>
-                                <p class="text-gray-700 text-sm font-medium leading-normal">
-                                    Bộ lọc
-                                </p>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="messageContainer" class="mt-4"></div>
-
-                <div class="mt-6 flow-root">
-                    <div class="-mx-6 -my-2 overflow-x-auto">
-                        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                            <div class="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th class="relative py-3.5 pl-4 pr-3 text-left sm:pl-6" scope="col">
-                                                <input id="checkbox-all"
-                                                       class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-[#f27f0d] focus:ring-[#f27f0d]"
-                                                       type="checkbox" />
-                                            </th>
-                                            <th class="py-3.5 pl-3 pr-3 text-left text-sm font-bold text-gray-900" scope="col">ID</th>
-                                            <th class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-gray-900" scope="col">Tên</th>
-                                            <th class="px-3 py-3.5 text-left text-sm font-bold text-gray-900" scope="col">Email</th>
-                                            <th class="px-3 py-3.5 text-left text-sm font-bold text-gray-900" scope="col">Vai trò</th>
-                                            <th class="px-3 py-3.5 text-left text-sm font-bold text-gray-900" scope="col">Trạng thái</th>
-                                            <th class="px-3 py-3.5 text-center text-sm font-bold text-gray-900" scope="col">Hành động</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="usersTableBody" class="divide-y divide-gray-200 bg-white">
-                                        @foreach (var user in Model)
-                                        {
-                                            <tr class="hover:bg-gray-50 transition-colors">
-                                                <td class="relative py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                                    <input class="user-checkbox absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-[#f27f0d] focus:ring-[#f27f0d]"
-                                                           type="checkbox" data-id="@user.UserId" />
-                                                </td>
-                                                <td class="whitespace-nowrap py-4 pl-3 pr-3 text-sm font-medium text-gray-600">
-                                                    #@user.UserId
-                                                </td>
-                                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm">
-                                                    <div class="flex items-center">
-                                                        <div class="h-10 w-10 flex-shrink-0 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
-                                                            <span class="material-symbols-outlined">person</span>
-                                                        </div>
-                                                        <div class="ml-4">
-                                                            <div class="font-bold text-gray-900">@user.FullName</div>
-                                                            <div class="text-gray-500 text-xs">@user.Username</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
-                                                    @user.Email
-                                                </td>
-                                                <td class="whitespace-nowrap px-3 py-4 text-sm">
-                                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                                                          @(user.Role?.RoleName == "Admin" ? "bg-purple-100 text-purple-800" :
-                                                                                                                  user.Role?.RoleName == "Staff" ? "bg-blue-100 text-blue-800" :
-                                                                                                                  "bg-gray-100 text-gray-800")">
-                                                    @user.Role?.RoleName
-                                                </span>
-                                            </td>
-                                            <td class="whitespace-nowrap px-3 py-4 text-sm">
-                                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                                                          @(user.IsActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")">
-                                                    @(user.IsActive ? "Đang hoạt động" : "Đã khóa")
-                                                </span>
-                                            </td>
-                                            <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-6">
-                                                <div class="flex items-center justify-center gap-2">
-                                                    <button class="toggle-active-btn flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-yellow-50 hover:text-yellow-600"
-                                                            data-id="@user.UserId" data-active="@user.IsActive" @(user.RoleId == 1 ? "disabled" : "")>
-                                                        <span class="material-symbols-outlined text-xl">@(user.IsActive ? "toggle_on" : "toggle_off")</span>
-                                                    </button>
-                                                    <button class="edit-btn flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-[#f27f0d]"
-                                                            data-id="@user.UserId">
-                                                        <span class="material-symbols-outlined text-xl">edit</span>
-                                                    </button>
-                                                    <button class="delete-btn flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-red-50 hover:text-red-500"
-                                                            data-id="@user.UserId" @(user.RoleId == 1 ? "disabled" : "")>
-                                                        <span class="material-symbols-outlined text-xl">delete</span>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                                                                }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="category-management">
+    <!-- Header Section -->
+    <div class="mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Quản lý Nhân viên</h1>
+                <p class="text-sm text-gray-500 mt-1">Quản lý và theo dõi thông tin nhân viên của bạn.</p>
             </div>
-        </main>
+            
+            <div class="flex items-center gap-3">
+                <div class="relative group">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors">search</span>
+                    <input type="text" id="searchInput" 
+                           class="w-full md:w-64 pl-10 pr-4 py-2 bg-transparent border-b border-gray-300 focus:outline-none focus:border-emerald-500 transition-all text-black"
+                           placeholder="Tìm kiếm nhân viên..." />
+                </div>
+                
+                <button type="button" id="addUserBtn"
+                        class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded font-semibold text-sm transition-all">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                    Thêm mới
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-white border border-gray-300">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse border border-gray-300" id="staffTable">
+                <thead>
+                    <tr class="bg-gray-100 border-b border-gray-300">
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider w-12 text-center border-r border-gray-300">
+                            <input class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-gray-400 cursor-pointer" type="checkbox" id="selectAll" />
+                        </th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">ID</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Họ và tên</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Email</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Vai trò</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-center border-r border-gray-300">Trạng thái</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-right">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-300">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="staff-row border-b border-gray-300 hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3 text-center border-r border-gray-300">
+                                <input class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-gray-400 cursor-pointer staff-checkbox" type="checkbox" value="@item.UserId" />
+                            </td>
+                            <td class="px-4 py-3 border-r border-gray-300">
+                                <span class="font-bold text-black">#@item.UserId</span>
+                            </td>
+                            <td class="px-4 py-3 text-black font-medium border-r border-gray-300">
+                                @item.FullName
+                            </td>
+                            <td class="px-4 py-3 text-black text-sm border-r border-gray-300 max-w-xs truncate">
+                                @item.Email
+                            </td>
+                            <td class="px-4 py-3 text-black text-sm border-r border-gray-300">
+                                <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full
+                                           @(item.Role?.RoleName == "Admin" ? "bg-purple-100 text-purple-700" :
+                                             item.Role?.RoleName == "Staff" ? "bg-blue-100 text-blue-700" :
+                                             "bg-gray-100 text-gray-700")">
+                                    @item.Role?.RoleName
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-center border-r border-gray-300">
+                                <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full
+                                           @(item.IsActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")">
+                                    @(item.IsActive ? "Đang hoạt động" : "Đã khóa")
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button class="p-1 px-2 text-amber-700 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded text-xs font-bold uppercase transition-colors edit-btn"
+                                            data-id="@item.UserId"
+                                            title="Sửa">
+                                        Sửa
+                                    </button>
+                                    <button class="p-1 px-2 text-red-700 bg-red-100 hover:bg-red-200 border border-red-300 rounded text-xs font-bold uppercase transition-colors delete-btn"
+                                            data-id="@item.UserId" @(item.RoleId == 1 ? "disabled" : "")
+                                            title="Xóa">
+                                        Xóa
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="px-4 py-12 text-center text-gray-500">
+                                <span class="material-symbols-outlined text-4xl mb-2 text-gray-300">person</span>
+                                <p>Chưa có nhân viên nào được tạo.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+<div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" style="display: none;">
     <div class="bg-white rounded-xl shadow-lg w-full max-w-lg mx-4 overflow-hidden transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
         <div class="p-6 border-b border-gray-200 flex justify-between items-center">
             <h3 id="modalTitle" class="text-xl font-bold text-gray-900">Thêm nhân viên mới</h3>
@@ -213,7 +187,7 @@
     </div>
 </div>
 
-<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" style="display: none;">
     <div class="bg-white rounded-xl shadow-lg w-full max-w-md mx-4">
         <div class="p-6 border-b border-gray-200">
             <h3 class="text-xl font-bold text-gray-900">Xác nhận xóa</h3>
@@ -232,197 +206,220 @@
     </div>
 </div>
 
+<div id="messageContainer" class="mt-4"></div>
+
 @section Scripts {
     <script>
-        let currentUserId = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentUserId = 0;
 
-        // --- UTILS ---
-        function showMessage(message, type = 'success') {
-            const container = document.getElementById('messageContainer');
-            const bgColor = type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700';
-            container.innerHTML = `<div class="${bgColor} border px-4 py-3 rounded relative" role="alert"><span class="block sm:inline">${message}</span></div>`;
-            setTimeout(() => container.innerHTML = '', 5000);
-        }
+            // --- UTILS ---
+            function showMessage(message, type = 'success') {
+                const container = document.getElementById('messageContainer');
+                const bgColor = type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700';
+                container.innerHTML = `<div class="${bgColor} border px-4 py-3 rounded relative" role="alert"><span class="block sm:inline">${message}</span></div>`;
+                setTimeout(() => container.innerHTML = '', 5000);
+            }
 
-        // --- MODAL ACTIONS ---
-        function showModal() {
-            document.getElementById('userModal').classList.remove('hidden');
-            setTimeout(() => {
-                document.getElementById('modalContent').classList.remove('scale-95', 'opacity-0');
-                document.getElementById('modalContent').classList.add('scale-100', 'opacity-100');
-            }, 10);
-        }
+            // --- MODAL ACTIONS ---
+            function showModal() {
+                const modal = document.getElementById('userModal');
+                const content = document.getElementById('modalContent');
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+                setTimeout(() => {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 50);
+            }
 
-        function hideModal() {
-            const modal = document.getElementById('userModal');
-            const content = document.getElementById('modalContent');
-            content.classList.add('scale-95', 'opacity-0');
-            content.classList.remove('scale-100', 'opacity-100');
+            function hideModal() {
+                const modal = document.getElementById('userModal');
+                const content = document.getElementById('modalContent');
+                content.classList.add('scale-95', 'opacity-0');
+                content.classList.remove('scale-100', 'opacity-100');
 
-            setTimeout(() => {
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.style.display = 'none';
+                    document.getElementById('userForm').reset();
+                    document.getElementById('UserId').value = '0';
+                    document.getElementById('modalTitle').textContent = 'Thêm nhân viên mới';
+
+                    // Reset trạng thái form về Thêm mới
+                    document.getElementById('Password').required = true;
+                    document.getElementById('Password').placeholder = "Nhập mật khẩu...";
+
+                    // Ẩn lỗi
+                    document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+                }, 300);
+            }
+
+            function showDeleteModal() { 
+                const modal = document.getElementById('deleteModal');
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+            function hideDeleteModal() { 
+                const modal = document.getElementById('deleteModal');
                 modal.classList.add('hidden');
-                document.getElementById('userForm').reset();
-                document.getElementById('UserId').value = '0';
-                document.getElementById('modalTitle').textContent = 'Thêm nhân viên mới';
+                modal.style.display = 'none';
+                currentUserId = 0; 
+            }
 
-                // Reset trạng thái form về Thêm mới
-                document.getElementById('Password').required = true;
-                document.getElementById('Password').placeholder = "Nhập mật khẩu...";
+            // --- EVENT LISTENERS ---
+            const addUserBtn = document.getElementById('addUserBtn');
+            if (addUserBtn) addUserBtn.addEventListener('click', showModal);
+            
+            document.getElementById('cancelBtn').addEventListener('click', hideModal);
+            document.getElementById('closeModalBtn').addEventListener('click', hideModal);
+            document.getElementById('cancelDeleteBtn').addEventListener('click', hideDeleteModal);
 
-                // Ẩn lỗi
-                document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
-            }, 300);
-        }
-
-        function showDeleteModal() { document.getElementById('deleteModal').classList.remove('hidden'); }
-        function hideDeleteModal() { document.getElementById('deleteModal').classList.add('hidden'); currentUserId = 0; }
-
-        // --- EVENT LISTENERS ---
-        document.getElementById('addUserBtn').addEventListener('click', showModal);
-        document.getElementById('cancelBtn').addEventListener('click', hideModal);
-        document.getElementById('closeModalBtn').addEventListener('click', hideModal);
-        document.getElementById('cancelDeleteBtn').addEventListener('click', hideDeleteModal);
-
-        // Nút Edit
-        document.querySelectorAll('.edit-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
-                const userId = this.getAttribute('data-id');
-                await loadUserData(userId);
-            });
-        });
-
-        // Nút Delete
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                currentUserId = this.getAttribute('data-id');
-                showDeleteModal();
-            });
-        });
-
-        // Nút Toggle Active
-        document.querySelectorAll('.toggle-active-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
-                const userId = this.getAttribute('data-id');
-                await toggleUserActive(userId, this);
-            });
-        });
-
-        // --- LOGIC GỌI API ---
-
-        // 1. Load User
-        async function loadUserData(userId) {
-            try {
-                const response = await fetch(`/Staff/GetUser?id=${userId}`);
-                const result = await response.json();
-
-                if (result.success) {
-                    const u = result.data;
-                    document.getElementById('UserId').value = u.userId;
-                    document.getElementById('Username').value = u.username;
-                    document.getElementById('FullName').value = u.fullName;
-                    document.getElementById('Email').value = u.email;
-                    document.getElementById('RoleId').value = u.roleId;
-                    // Gán checked dựa trên true/false
-                    document.getElementById('IsActive').checked = u.isActive;
-
-                    document.getElementById('modalTitle').textContent = 'Sửa thông tin nhân viên';
-                    document.getElementById('Password').required = false;
-                    document.getElementById('Password').placeholder = 'Để trống nếu không đổi mật khẩu';
-                    showModal();
-                } else {
-                    showMessage(result.message, 'error');
-                }
-            } catch (error) { showMessage('Lỗi tải dữ liệu', 'error'); }
-        }
-
-        // 2. Submit Form (Create/Edit)
-        document.getElementById('userForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            // Ẩn lỗi cũ
-            document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
-
-            const formData = new FormData(this);
-
-            // --- FIX QUAN TRỌNG: Xử lý Checkbox IsActive ---
-            // FormData mặc định gửi "on" nếu checked, và không gửi gì nếu unchecked.
-            // Ta cần set thủ công thành "true" hoặc "false" để C# hiểu.
-            const isActiveChecked = document.getElementById('IsActive').checked;
-            formData.set('IsActive', isActiveChecked.toString());
-            // ------------------------------------------------
-
-            const userId = document.getElementById('UserId').value;
-            const url = userId === '0' ? '/Staff/CreateUser' : `/Staff/EditUser?id=${userId}`;
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData,
-                    headers: { 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value }
+            // Tìm kiếm nhân viên
+            document.getElementById('searchInput').addEventListener('keyup', function() {
+                var value = this.value.toLowerCase();
+                document.querySelectorAll('.staff-row').forEach(function(row) {
+                    row.style.display = row.textContent.toLowerCase().indexOf(value) > -1 ? '' : 'none';
                 });
-                const result = await response.json();
+            });
 
-                if (result.success) {
-                    showMessage(result.message, 'success');
-                    hideModal();
-                    setTimeout(() => window.location.reload(), 1000);
-                } else {
-                    // Hiển thị lỗi
-                    const msg = result.message.toLowerCase();
-                    let handled = false;
-                    if (msg.includes('tên đăng nhập')) { document.getElementById('usernameError').textContent = result.message; document.getElementById('usernameError').classList.remove('hidden'); handled = true; }
-                    if (msg.includes('email')) { document.getElementById('emailError').textContent = result.message; document.getElementById('emailError').classList.remove('hidden'); handled = true; }
-                    if (msg.includes('mật khẩu')) { document.getElementById('passwordError').textContent = result.message; document.getElementById('passwordError').classList.remove('hidden'); handled = true; }
+            // Chọn tất cả
+            document.getElementById('selectAll').addEventListener('click', function() {
+                document.querySelectorAll('.staff-checkbox').forEach(cb => cb.checked = this.checked);
+            });
 
-                    if (!handled) showMessage(result.message, 'error');
-                }
-            } catch (error) { showMessage('Lỗi kết nối server', 'error'); }
+            // Nút Edit
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const userId = this.getAttribute('data-id');
+                    await loadUserData(userId);
+                });
+            });
+
+            // Nút Delete
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    currentUserId = this.getAttribute('data-id');
+                    showDeleteModal();
+                });
+            });
+
+            // Nút Toggle Active
+            document.querySelectorAll('.toggle-active-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const userId = this.getAttribute('data-id');
+                    await toggleUserActive(userId, this);
+                });
+            });
+
+            // --- LOGIC GỌI API ---
+
+            // 1. Load User
+            async function loadUserData(userId) {
+                try {
+                    const response = await fetch(`/Staff/GetUser?id=${userId}`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const u = result.data;
+                        document.getElementById('UserId').value = u.userId;
+                        document.getElementById('Username').value = u.username;
+                        document.getElementById('FullName').value = u.fullName;
+                        document.getElementById('Email').value = u.email;
+                        document.getElementById('RoleId').value = u.roleId;
+                        document.getElementById('IsActive').checked = u.isActive;
+
+                        document.getElementById('modalTitle').textContent = 'Sửa thông tin nhân viên';
+                        document.getElementById('Password').required = false;
+                        document.getElementById('Password').placeholder = 'Để trống nếu không đổi mật khẩu';
+                        showModal();
+                    } else {
+                        showMessage(result.message, 'error');
+                    }
+                } catch (error) { showMessage('Lỗi tải dữ liệu', 'error'); }
+            }
+
+            // 2. Submit Form (Create/Edit)
+            document.getElementById('userForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+
+                const formData = new FormData(this);
+                const isActiveChecked = document.getElementById('IsActive').checked;
+                formData.set('IsActive', isActiveChecked.toString());
+
+                const userId = document.getElementById('UserId').value;
+                const url = userId === '0' ? '/Staff/CreateUser' : `/Staff/EditUser?id=${userId}`;
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value }
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showMessage(result.message, 'success');
+                        hideModal();
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        const msg = result.message.toLowerCase();
+                        let handled = false;
+                        if (msg.includes('tên đăng nhập')) { document.getElementById('usernameError').textContent = result.message; document.getElementById('usernameError').classList.remove('hidden'); handled = true; }
+                        if (msg.includes('email')) { document.getElementById('emailError').textContent = result.message; document.getElementById('emailError').classList.remove('hidden'); handled = true; }
+                        if (msg.includes('mật khẩu')) { document.getElementById('passwordError').textContent = result.message; document.getElementById('passwordError').classList.remove('hidden'); handled = true; }
+
+                        if (!handled) showMessage(result.message, 'error');
+                    }
+                } catch (error) { showMessage('Lỗi kết nối server', 'error'); }
+            });
+
+            // 3. Delete Action
+            document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+                if (!currentUserId) return;
+                try {
+                    const formData = new FormData();
+                    formData.append('userId', currentUserId);
+                    formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+                    const response = await fetch('/Staff/DeleteUser', { method: 'POST', body: formData });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showMessage(result.message, 'success');
+                        hideDeleteModal();
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        showMessage(result.message, 'error');
+                        hideDeleteModal();
+                    }
+                } catch (error) { showMessage('Lỗi khi xóa', 'error'); hideDeleteModal(); }
+            });
+
+            // 4. Toggle Active Action
+            async function toggleUserActive(userId, button) {
+                try {
+                    const formData = new FormData();
+                    formData.append('userId', userId);
+
+                    const response = await fetch('/Staff/ToggleActive', { method: 'POST', body: formData });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showMessage(result.message, 'success');
+                        const isActive = result.isActive;
+                        button.querySelector('span').textContent = isActive ? 'toggle_on' : 'toggle_off';
+                        const row = button.closest('tr');
+                        const badge = row.querySelector('td:nth-child(6) span');
+                        badge.textContent = isActive ? 'Đang hoạt động' : 'Đã khóa';
+                        badge.className = `inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full ${isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+                    } else {
+                        showMessage(result.message, 'error');
+                    }
+                } catch (error) { showMessage('Lỗi cập nhật trạng thái', 'error'); }
+            }
         });
-
-        // 3. Delete Action
-        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
-            if (!currentUserId) return;
-            try {
-                const formData = new FormData();
-                formData.append('userId', currentUserId);
-                // Gửi Token để qua mặt ValidateAntiForgeryToken
-                formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
-
-                const response = await fetch('/Staff/DeleteUser', { method: 'POST', body: formData });
-                const result = await response.json();
-
-                if (result.success) {
-                    showMessage(result.message, 'success');
-                    hideDeleteModal();
-                    setTimeout(() => window.location.reload(), 1000);
-                } else {
-                    showMessage(result.message, 'error');
-                    hideDeleteModal();
-                }
-            } catch (error) { showMessage('Lỗi khi xóa', 'error'); hideDeleteModal(); }
-        });
-
-        // 4. Toggle Active Action
-        async function toggleUserActive(userId, button) {
-            try {
-                const formData = new FormData();
-                formData.append('userId', userId);
-
-                const response = await fetch('/Staff/ToggleActive', { method: 'POST', body: formData });
-                const result = await response.json();
-
-                if (result.success) {
-                    showMessage(result.message, 'success');
-                    // Cập nhật UI ngay lập tức
-                    const isActive = result.isActive;
-                    button.querySelector('span').textContent = isActive ? 'toggle_on' : 'toggle_off';
-                    const badge = button.closest('tr').querySelector('td:nth-child(6) span');
-                    badge.textContent = isActive ? 'Đang hoạt động' : 'Đã khóa';
-                    badge.className = `inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
-                } else {
-                    showMessage(result.message, 'error');
-                }
-            } catch (error) { showMessage('Lỗi cập nhật trạng thái', 'error'); }
-        }
     </script>
 }
