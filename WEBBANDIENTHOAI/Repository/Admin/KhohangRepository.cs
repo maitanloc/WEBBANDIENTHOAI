@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WEBBANDIENTHOAI.Data;
-using WebBanDienThoai.Models;
+using WEBBANDIENTHOAI.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

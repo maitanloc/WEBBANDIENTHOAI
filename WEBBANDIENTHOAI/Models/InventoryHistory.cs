@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WebBanDienThoai.Models
+namespace WEBBANDIENTHOAI.Models
 {
     public class InventoryHistory
     {

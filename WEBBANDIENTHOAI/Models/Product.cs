@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using WebBanDienThoai.Models;
+using WEBBANDIENTHOAI.Models;
 
 namespace WEBBANDIENTHOAI.Models
 {

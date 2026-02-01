@@ -14,6 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
+    <!-- BOOTSTRAP CSS (cần cho Modal) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- LOẠI BỎ CSS CONFLICT -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
@@ -486,8 +489,8 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                             <span class="material-symbols-outlined text-sm">inventory_2</span>
                             Kho Hàng
                         </a>
-                        <a href="@Url.Action("ImportExport", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
-                            <span class="material-symbols-outlined text-sm">import_export</span>
+                        <a href="@Url.Action("Index", "ImportReceipt")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
+                            <span class="material-symbols-outlined text-sm">input</span>
                             Nhập hàng 
                         </a>
                         <a href="@Url.Action("Index", "ExportReceipt")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
@@ -784,6 +787,9 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
             }
         };
     </script>
+
+    <!-- Bootstrap JS (cần cho Modal) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     @RenderSection("Scripts", required: false)
 </body>

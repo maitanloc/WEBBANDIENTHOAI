@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WebBanDienThoai.Models
+namespace WEBBANDIENTHOAI.Models
 {
     public class ImportReceipt
     {
@@ -29,11 +29,10 @@ namespace WebBanDienThoai.Models
         public string Notes { get; set; } // (Notes)
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // (CreatedAt)
+        public DateTime? LastUpdated { get; set; } // (LastUpdated)
+        public bool IsFinalized { get; set; } = false; // (IsFinalized)
 
         // Navigation
         public ICollection<ImportReceiptDetail> Details { get; set; }
-
-        // -> Thêm dòng này:
-        public bool IsFinalized { get; set; } = false;
     }
 }

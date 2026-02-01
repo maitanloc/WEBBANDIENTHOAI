@@ -1,0 +1,689 @@
+@model WEBBANDIENTHOAI.Controllers.Admin.PagedResult<WEBBANDIENTHOAI.Models.ImportReceipt>
+
+@{
+    ViewData["Title"] = "Quản lý Phiếu Nhập Hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/categories.css" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+}
+
+<div class="category-management">
+    <!-- Header Section -->
+    <div class="mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Quản lý Phiếu Nhập Hàng</h1>
+                <p class="text-sm text-gray-500 mt-1">Tạo và theo dõi các phiếu nhập hàng. Tổng cộng: <strong>@Model.TotalCount</strong> phiếu</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="bg-transparent p-0 mb-6">
+        <form id="import-filter-form" class="flex flex-wrap gap-4 items-center">
+            <div class="relative flex-1 min-w-[250px]">
+                <span class="material-symbols-outlined absolute left-0 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                <input name="search" placeholder="Tìm mã phiếu, nhà cung cấp..." 
+                       class="w-full pl-8 pr-4 py-2 bg-transparent border-b border-gray-300 focus:outline-none focus:border-emerald-500 text-black" />
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button type="button" id="addImportBtn" data-bs-toggle="modal" data-bs-target="#importModal"
+                        class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold uppercase transition-colors">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                    Tạo Phiếu Nhập
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-white border border-gray-300">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse border border-gray-300" id="importReceiptTable">
+                <thead>
+                    <tr class="bg-gray-100 border-b border-gray-300">
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Mã Phiếu</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Ngày Nhập</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-center border-r border-gray-300">Số Lượng</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-right border-r border-gray-300">Tổng Giá Trị</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Người Tạo</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-right">Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-300">
+                    @if (Model.Items == null || !Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="px-4 py-12 text-center text-gray-500">
+                                <span class="material-symbols-outlined text-4xl mb-2 text-gray-300">inventory_2</span>
+                                <p>Không có phiếu nhập hàng nào.</p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var receipt in Model.Items)
+                        {
+                            <tr class="import-receipt-row border-b border-gray-300 hover:bg-gray-50 transition-colors">
+                                <td class="px-4 py-3 border-r border-gray-300">
+                                    <span class="font-bold text-emerald-700">#@(receipt.ReceiptNumber ?? $"PHN{receipt.ImportReceiptId:00000}")</span>
+                                </td>
+                                <td class="px-4 py-3 border-r border-gray-300 text-black text-sm">
+                                    <div class="font-semibold">@receipt.ImportDate.ToString("dd/MM/yyyy")</div>
+                                    <div class="text-xs text-gray-500">@receipt.ImportDate.ToString("HH:mm")</div>
+                                </td>
+                                <td class="px-4 py-3 border-r border-gray-300 text-center">
+                                    <span class="inline-flex items-center justify-center px-3 py-1 bg-blue-100 text-blue-800 font-bold rounded text-sm">
+                                        @(receipt.Details?.Sum(d => d.Quantity) ?? 0)
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 border-r border-gray-300 text-right text-black font-bold">
+                                    @((receipt.Details?.Sum(d => d.TotalCost) ?? 0).ToString("N0"))đ
+                                </td>
+                                <td class="px-4 py-3 border-r border-gray-300 text-black text-sm">
+                                    Quản trị viên
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    <button type="button" onclick="openImportDetailsModal(@receipt.ImportReceiptId)"
+                                            class="p-1 px-2 text-emerald-700 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 rounded text-xs font-bold uppercase transition-colors">
+                                        Xem
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ================== MODAL TẠO PHIẾU NHẬP ================== -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 rounded-lg shadow-lg">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-100">
+                <h5 class="text-lg font-bold text-gray-900">Tạo Phiếu Nhập Hàng</h5>
+                <button type="button" class="text-gray-500 hover:text-gray-700" data-bs-dismiss="modal">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <!-- Thông tin chung phiếu nhập -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-900 mb-2">Tên Nhà Cung Cấp</label>
+                    <input type="text" id="supplierName" placeholder="Nhập tên nhà cung cấp" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-emerald-500 text-black" />
+                </div>
+
+                <!-- Tìm kiếm sản phẩm -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-900 mb-2">Tìm Sản Phẩm</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="searchProductInput" placeholder="Tìm theo tên hoặc SKU..." 
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-emerald-500 text-black" />
+                        <button type="button" id="searchProductBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-bold">
+                            Tìm
+                        </button>
+                        <button type="button" id="createNewProductBtn" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm font-bold">
+                            Tạo Mới
+                        </button>
+                    </div>
+                    <div id="productSearchResults" class="mt-3 max-h-48 overflow-y-auto hidden">
+                        <div class="bg-gray-50 border border-gray-300 rounded">
+                            <!-- Kết quả tìm kiếm sẽ được thêm vào đây -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form tạo sản phẩm mới -->
+                <div id="newProductForm" class="mb-6 p-4 bg-gray-50 border border-gray-300 rounded hidden">
+                    <h6 class="font-bold text-gray-900 mb-3">Thông tin sản phẩm mới</h6>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Tên Sản Phẩm *</label>
+                            <input type="text" id="newProductName" placeholder="Nhập tên sản phẩm" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded text-black text-sm focus:outline-none focus:border-emerald-500" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">SKU *</label>
+                            <input type="text" id="newProductSKU" placeholder="Nhập SKU" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded text-black text-sm focus:outline-none focus:border-emerald-500" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Thương Hiệu</label>
+                            <input type="text" id="newProductBrand" placeholder="Nhập thương hiệu" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded text-black text-sm focus:outline-none focus:border-emerald-500" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danh sách sản phẩm nhập -->
+                <div class="mb-6">
+                    <h6 class="font-bold text-gray-900 mb-3">Sản Phẩm Nhập Hàng</h6>
+                    <div class="border border-gray-300 rounded overflow-x-auto">
+                        <table class="w-full text-sm" id="importItemsTable">
+                            <thead class="bg-gray-100 border-b border-gray-300">
+                                <tr>
+                                    <th class="px-3 py-2 text-left font-bold text-black">Sản Phẩm</th>
+                                    <th class="px-3 py-2 text-center font-bold text-black w-24">SL</th>
+                                    <th class="px-3 py-2 text-right font-bold text-black w-28">Giá Nhập</th>
+                                    <th class="px-3 py-2 text-right font-bold text-black w-28">Tổng</th>
+                                    <th class="px-3 py-2 text-center font-bold text-black w-12">Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="importItemsBody">
+                                <!-- Các item sẽ được thêm vào đây -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="emptyItemsMessage" class="text-center py-6 text-gray-500">
+                        Chưa có sản phẩm nào được thêm
+                    </div>
+                </div>
+
+                <!-- Tổng cộng -->
+                <div class="bg-gray-50 border border-gray-300 rounded p-4 mb-6">
+                    <div class="flex justify-between items-center text-lg font-bold text-black">
+                        <span>Tổng Giá Trị:</span>
+                        <span id="totalImportValue">0đ</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+                <button type="button" class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded text-sm font-bold" data-bs-dismiss="modal">
+                    Hủy
+                </button>
+                <button type="button" id="saveImportBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-sm font-bold">
+                    Lưu Phiếu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================== MODAL XEM CHI TIẾT PHIẾU NHẬP ================== -->
+<div id="importDetailsModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white border border-gray-300 rounded-lg shadow-lg w-full max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-100">
+                <h3 class="text-lg font-bold text-gray-900">Chi Tiết Phiếu Nhập Hàng</h3>
+                <button type="button" onclick="closeImportDetailsModal()" class="text-gray-500 hover:text-gray-700">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <!-- Content -->
+            <div class="p-6 max-h-[70vh] overflow-y-auto">
+                <!-- Loading State -->
+                <div id="importDetailsLoading" class="text-center py-12">
+                    <svg class="animate-spin h-12 w-12 text-gray-400 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="text-gray-500">Đang tải dữ liệu...</p>
+                </div>
+
+                <!-- Content Container -->
+                <div id="importDetailsContainer" class="hidden">
+                    <!-- Thông tin phiếu -->
+                    <div class="bg-gray-50 border border-gray-200 rounded p-4 mb-6">
+                        <h4 class="font-bold text-gray-900 mb-3">Thông Tin Phiếu</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <p><span class="text-gray-600">Mã phiếu:</span> <span class="font-semibold text-black" id="importReceiptNumber">---</span></p>
+                            <p><span class="text-gray-600">Ngày nhập:</span> <span class="font-semibold text-black" id="importDate">---</span></p>
+                            <p><span class="text-gray-600">Người tạo:</span> <span class="font-semibold text-black" id="importCreatedBy">---</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Danh sách sản phẩm -->
+                    <div class="mb-6">
+                        <h4 class="font-bold text-gray-900 mb-3">Sản Phẩm Nhập Kho</h4>
+                        <div class="border border-gray-300 overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-100 border-b border-gray-300">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-bold text-black uppercase">STT</th>
+                                        <th class="px-4 py-3 text-left text-xs font-bold text-black uppercase">Sản Phẩm</th>
+                                        <th class="px-4 py-3 text-center text-xs font-bold text-black uppercase">SL</th>
+                                        <th class="px-4 py-3 text-right text-xs font-bold text-black uppercase">Đơn Giá</th>
+                                        <th class="px-4 py-3 text-right text-xs font-bold text-black uppercase">Thành Tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="importProductsList" class="divide-y divide-gray-200">
+                                    <!-- Products will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tổng kết -->
+                    <div class="bg-gray-50 border border-gray-200 rounded p-4">
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="font-semibold text-gray-700">Tổng số lượng:</span>
+                                <span class="font-bold text-black" id="importTotalQty">0</span>
+                            </div>
+                            <div class="flex justify-between text-lg border-t border-gray-300 pt-2">
+                                <span class="font-bold text-gray-900">Tổng giá trị:</span>
+                                <span class="font-bold text-black" id="importTotalValue">0đ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+                <button type="button" onclick="closeImportDetailsModal()" 
+                        class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded text-sm font-bold">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let importItems = [];
+    let selectedProduct = null;
+
+    // Khởi tạo Bootstrap Modal
+    document.addEventListener('DOMContentLoaded', function() {
+        // Modal tạo phiếu
+        const importModal = new bootstrap.Modal(document.getElementById('importModal'));
+        document.getElementById('addImportBtn').addEventListener('click', function() {
+            importItems = [];
+            updateImportTable();
+            importModal.show();
+        });
+    });
+
+    // Tìm kiếm sản phẩm
+    document.getElementById('searchProductBtn').addEventListener('click', async function() {
+        const query = document.getElementById('searchProductInput').value;
+        if (!query.trim()) return;
+
+        try {
+            const response = await fetch(`/ImportReceipt/SearchProduct?query=${encodeURIComponent(query)}`);
+            const result = await response.json();
+
+            const resultsDiv = document.getElementById('productSearchResults');
+            const resultsContainer = resultsDiv.querySelector('.bg-gray-50');
+            resultsContainer.innerHTML = '';
+
+            if (result.success && result.data.length > 0) {
+                result.data.forEach(product => {
+                    const div = document.createElement('div');
+                    div.className = 'p-3 border-b border-gray-300 hover:bg-gray-100 cursor-pointer';
+                    div.innerHTML = `
+                        <div class="font-semibold text-black">${product.name}</div>
+                        <div class="text-xs text-gray-500">${product.sku} - ${product.brand || ''} - Giá: ${product.price.toLocaleString()}đ</div>
+                    `;
+                    div.addEventListener('click', () => selectProduct({
+                        productId: product.productId,
+                        name: product.name,
+                        sku: product.sku,
+                        brand: product.brand,
+                        price: product.price
+                    }));
+                    resultsContainer.appendChild(div);
+                });
+                resultsDiv.classList.remove('hidden');
+            } else {
+                resultsContainer.innerHTML = '<div class="p-3 text-gray-500">Không tìm thấy sản phẩm</div>';
+                resultsDiv.classList.remove('hidden');
+            }
+        } catch (error) {
+            alert('Lỗi tìm kiếm: ' + error.message);
+        }
+    });
+
+    // Chọn sản phẩm
+    function selectProduct(product) {
+        selectedProduct = product;
+        document.getElementById('searchProductInput').value = product.name;
+        document.getElementById('productSearchResults').classList.add('hidden');
+        document.getElementById('newProductForm').classList.add('hidden');
+        
+        // Hiển thị form nhập số lượng và giá
+        showAddToImportForm(product);
+    }
+
+    // Hiển thị form thêm vào phiếu nhập
+    function showAddToImportForm(product) {
+        const form = document.createElement('div');
+        form.className = 'mb-6 p-4 bg-blue-50 border border-blue-300 rounded';
+        form.innerHTML = `
+            <h6 class="font-bold text-gray-900 mb-3">Thêm: ${product.name}</h6>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Số Lượng *</label>
+                    <input type="number" id="addQty" min="1" value="1" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded text-black text-sm focus:outline-none focus:border-emerald-500" />
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Giá Nhập (VND) *</label>
+                    <input type="number" id="addPrice" min="0" step="0.01" value="${product.price}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded text-black text-sm focus:outline-none focus:border-emerald-500" />
+                </div>
+            </div>
+            <div class="mt-3 flex gap-2">
+                <button type="button" onclick="addToImportTable()" 
+                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-sm font-bold">
+                    Thêm Vào Phiếu
+                </button>
+                <button type="button" onclick="cancelAddProduct()" 
+                        class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded text-sm font-bold">
+                    Hủy
+                </button>
+            </div>
+        `;
+        
+        const existingForm = document.getElementById('addProductForm');
+        if (existingForm) existingForm.remove();
+        form.id = 'addProductForm';
+        document.querySelector('[id="importItemsTable"]').parentElement.parentElement.insertBefore(form, document.querySelector('[id="importItemsTable"]').parentElement);
+    }
+
+    // Thêm sản phẩm vào danh sách nhập
+    function addToImportTable() {
+        if (!selectedProduct) {
+            alert('Vui lòng chọn sản phẩm');
+            return;
+        }
+        
+        const qty = parseInt(document.getElementById('addQty')?.value || 1);
+        const price = parseFloat(document.getElementById('addPrice')?.value || selectedProduct.price);
+        
+        if (qty <= 0 || price < 0) {
+            alert('Số lượng và giá phải lớn hơn 0');
+            return;
+        }
+        
+        importItems.push({
+            productId: selectedProduct.productId || 0,
+            productName: selectedProduct.name,
+            productSKU: selectedProduct.sku,
+            productBrand: selectedProduct.brand || '',
+            quantity: qty,
+            unitPrice: price
+        });
+        
+        updateImportTable();
+        cancelAddProduct();
+        document.getElementById('searchProductInput').value = '';
+    }
+
+    // Hủy form thêm sản phẩm
+    function cancelAddProduct() {
+        const form = document.getElementById('addProductForm');
+        if (form) form.remove();
+        selectedProduct = null;
+    }
+
+    // Tạo sản phẩm mới
+    document.getElementById('createNewProductBtn').addEventListener('click', function() {
+        selectedProduct = null;
+        document.getElementById('newProductForm').classList.remove('hidden');
+        document.getElementById('productSearchResults').classList.add('hidden');
+        
+        // Thêm button thêm vào phiếu sau form tạo sản phẩm mới
+        const form = document.getElementById('newProductForm');
+        let btnGroup = form.querySelector('#newProductBtnGroup');
+        if (!btnGroup) {
+            btnGroup = document.createElement('div');
+            btnGroup.id = 'newProductBtnGroup';
+            btnGroup.className = 'mt-3 flex gap-2';
+            btnGroup.innerHTML = `
+                <button type="button" onclick="addNewProductToImport()" 
+                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-sm font-bold">
+                    Tạo & Thêm Vào Phiếu
+                </button>
+                <button type="button" onclick="cancelNewProduct()" 
+                        class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded text-sm font-bold">
+                    Hủy
+                </button>
+            `;
+            form.appendChild(btnGroup);
+        }
+    });
+
+    // Thêm sản phẩm mới vào phiếu nhập
+    function addNewProductToImport() {
+        const name = document.getElementById('newProductName')?.value;
+        const sku = document.getElementById('newProductSKU')?.value;
+        const brand = document.getElementById('newProductBrand')?.value;
+        
+        if (!name || !sku) {
+            alert('Tên sản phẩm và SKU không được để trống');
+            return;
+        }
+        
+        // Hiển thị form nhập số lượng và giá cho sản phẩm mới
+        const form = document.createElement('div');
+        form.className = 'mb-6 p-4 bg-green-50 border border-green-300 rounded';
+        form.id = 'newProductImportForm';
+        form.innerHTML = `
+            <h6 class="font-bold text-gray-900 mb-3">Sản phẩm mới: ${name}</h6>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Số Lượng *</label>
+                    <input type="number" id="newImportQty" min="1" value="1" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded text-black text-sm focus:outline-none focus:border-emerald-500" />
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Giá Nhập (VND) *</label>
+                    <input type="number" id="newImportPrice" min="0" step="0.01" value="0" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded text-black text-sm focus:outline-none focus:border-emerald-500" />
+                </div>
+            </div>
+            <div class="mt-3 flex gap-2">
+                <button type="button" onclick="confirmAddNewProduct('${name}', '${sku}', '${brand}')" 
+                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-sm font-bold">
+                    Xác Nhận
+                </button>
+                <button type="button" onclick="cancelNewProduct()" 
+                        class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded text-sm font-bold">
+                    Hủy
+                </button>
+            </div>
+        `;
+        
+        const existingForm = document.getElementById('newProductImportForm');
+        if (existingForm) existingForm.remove();
+        
+        const container = document.getElementById('newProductForm').parentElement;
+        container.insertBefore(form, document.getElementById('newProductForm').nextSibling);
+    }
+
+    // Xác nhận thêm sản phẩm mới
+    function confirmAddNewProduct(name, sku, brand) {
+        const qty = parseInt(document.getElementById('newImportQty')?.value || 1);
+        const price = parseFloat(document.getElementById('newImportPrice')?.value || 0);
+        
+        if (qty <= 0 || price < 0) {
+            alert('Số lượng và giá phải lớn hơn 0');
+            return;
+        }
+        
+        importItems.push({
+            productId: 0, // New product
+            productName: name,
+            productSKU: sku,
+            productBrand: brand,
+            quantity: qty,
+            unitPrice: price
+        });
+        
+        updateImportTable();
+        cancelNewProduct();
+        
+        // Xóa form và reset
+        document.getElementById('newProductForm').classList.add('hidden');
+        document.getElementById('newProductName').value = '';
+        document.getElementById('newProductSKU').value = '';
+        document.getElementById('newProductBrand').value = '';
+    }
+
+    // Hủy tạo sản phẩm mới
+    function cancelNewProduct() {
+        const form = document.getElementById('newProductImportForm');
+        if (form) form.remove();
+    }
+
+    // Thêm sản phẩm vào danh sách nhập
+    document.getElementById('importModal').addEventListener('show.bs.modal', function() {
+        importItems = [];
+        updateImportTable();
+    });
+
+    // Lưu phiếu nhập
+    document.getElementById('saveImportBtn').addEventListener('click', async function() {
+        if (importItems.length === 0) {
+            alert('Vui lòng thêm ít nhất 1 sản phẩm');
+            return;
+        }
+
+        const supplierName = document.getElementById('supplierName').value;
+        if (!supplierName.trim()) {
+            alert('Vui lòng nhập tên nhà cung cấp');
+            return;
+        }
+
+        try {
+            const response = await fetch('/ImportReceipt/CreateImport', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    supplierName: supplierName,
+                    items: importItems 
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert(result.message);
+                location.reload();
+            } else {
+                alert('Lỗi: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Lỗi lưu phiếu: ' + error.message);
+        }
+    });
+
+    // Cập nhật bảng nhập hàng
+    function updateImportTable() {
+        const tbody = document.getElementById('importItemsBody');
+        const emptyMsg = document.getElementById('emptyItemsMessage');
+        
+        tbody.innerHTML = '';
+        let totalValue = 0;
+
+        importItems.forEach((item, index) => {
+            const total = item.quantity * item.unitPrice;
+            totalValue += total;
+
+            const row = document.createElement('tr');
+            row.className = 'border-b border-gray-300';
+            row.innerHTML = `
+                <td class="px-3 py-2 text-black font-semibold">${item.productName}</td>
+                <td class="px-3 py-2 text-center">
+                    <input type="number" min="1" value="${item.quantity}" 
+                           onchange="importItems[${index}].quantity = parseInt(this.value); updateImportTable();"
+                           class="w-16 px-2 py-1 border border-gray-300 rounded text-black text-center" />
+                </td>
+                <td class="px-3 py-2 text-right">
+                    <input type="number" min="0" step="0.01" value="${item.unitPrice}" 
+                           onchange="importItems[${index}].unitPrice = parseFloat(this.value); updateImportTable();"
+                           class="w-24 px-2 py-1 border border-gray-300 rounded text-black text-right" />
+                </td>
+                <td class="px-3 py-2 text-right font-semibold text-black">${total.toLocaleString()}đ</td>
+                <td class="px-3 py-2 text-center">
+                    <button type="button" onclick="importItems.splice(${index}, 1); updateImportTable();"
+                            class="text-red-600 hover:text-red-800 font-bold">✕</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        emptyMsg.style.display = importItems.length === 0 ? 'block' : 'none';
+        document.getElementById('totalImportValue').textContent = totalValue.toLocaleString() + 'đ';
+    }
+
+    // Xem chi tiết phiếu nhập
+    async function openImportDetailsModal(id) {
+        const modal = document.getElementById('importDetailsModal');
+        const loading = document.getElementById('importDetailsLoading');
+        const content = document.getElementById('importDetailsContainer');
+
+        modal.classList.remove('hidden');
+        loading.classList.remove('hidden');
+        content.classList.add('hidden');
+
+        try {
+            // Fix URL: sử dụng route đúng (controller trong folder Admin nhưng không phải Area)
+            const response = await fetch(`/ImportReceipt/GetDetails?id=${id}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const text = await response.text();
+            console.log('Response text:', text);
+            
+            if (!text) {
+                throw new Error('Response trống');
+            }
+            
+            const result = JSON.parse(text);
+
+            if (result.success) {
+                document.getElementById('importReceiptNumber').textContent = result.data.receiptNumber;
+                document.getElementById('importDate').textContent = new Date(result.data.importDate).toLocaleString('vi-VN');
+                document.getElementById('importCreatedBy').textContent = result.data.createdByName;
+                document.getElementById('importTotalQty').textContent = result.data.totalQuantity;
+                document.getElementById('importTotalValue').textContent = result.data.totalValue.toLocaleString() + 'đ';
+
+                const productsList = document.getElementById('importProductsList');
+                productsList.innerHTML = '';
+                result.data.details.forEach((detail, index) => {
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-gray-300';
+                    row.innerHTML = `
+                        <td class="px-4 py-3 text-black">${index + 1}</td>
+                        <td class="px-4 py-3 text-black font-medium">${detail.productName}</td>
+                        <td class="px-4 py-3 text-center text-black">${detail.quantity}</td>
+                        <td class="px-4 py-3 text-right text-black">${detail.unitPrice.toLocaleString()}đ</td>
+                        <td class="px-4 py-3 text-right text-black font-semibold">${detail.totalPrice.toLocaleString()}đ</td>
+                    `;
+                    productsList.appendChild(row);
+                });
+
+                loading.classList.add('hidden');
+                content.classList.remove('hidden');
+            } else {
+                alert('Lỗi: ' + result.message);
+                modal.classList.add('hidden');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Lỗi tải chi tiết: ' + error.message);
+            modal.classList.add('hidden');
+        }
+    }
+
+    function closeImportDetailsModal() {
+        document.getElementById('importDetailsModal').classList.add('hidden');
+    }
+</script>

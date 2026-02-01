@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using WEBBANDIENTHOAI.Models;
 
-namespace WebBanDienThoai.Models
+namespace WEBBANDIENTHOAI.Models
 {
     public class ImportReceiptDetail
     {
