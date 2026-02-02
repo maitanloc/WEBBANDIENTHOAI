@@ -1,16 +1,17 @@
 @model IEnumerable<WEBBANDIENTHOAI.Models.Product>
 
-@{
+    @{
     Layout = "~/Views/Shared/_Layoutuser.cshtml";
     ViewData["Title"] = "Tất cả sản phẩm";
 
     var brands = ViewBag.Brands as List<string>;
     string selectedBrand = Context.Request.Query["brand"];
     string selectedSort = Context.Request.Query["sort"];
+    // Tổng số trang được tính toán từ Controller và truyền qua ViewData
     int totalPages = (int)ViewData["TotalPages"];
+    // Trang hiện tại được truyền từ Controller hoặc lấy từ query string
     int currentPage = (int)ViewData["CurrentPage"];
 }
-
 <div class="max-w-7xl mx-auto px-4 my-10">
 
     <!-- FORM FILTER & SORT -->
@@ -53,13 +54,15 @@
         }
     </div>
 
-    <!-- PAGINATION -->
+    <!-- PAGINATION - HIỂN THỊ PHÂN TRANG -->
     <div class="mt-8 flex justify-center">
         <nav class="inline-flex rounded-md shadow">
+            @* Lặp qua từng trang từ 1 đến tổng số trang (totalPages) *@
             @for (int i = 1; i <= totalPages; i++)
             {
                 <a href="@Url.Action("AllProducts", new { brand = selectedBrand, sort = selectedSort, page = i })"
                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium @(i == currentPage ? "text-primary bg-orange-50" : "text-gray-700 hover:bg-gray-50")">
+                    @* Hiển thị số trang *@
                     @i
                 </a>
             }

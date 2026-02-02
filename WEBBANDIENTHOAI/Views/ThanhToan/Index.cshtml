@@ -22,7 +22,7 @@
                     <input type="hidden" name="SelectedItems[@i].ProductName" value="@Model.SelectedItems[i].ProductName" />
                 }
                 <input type="hidden" name="TotalAmount" value="@Model.TotalAmount" />
-                <input type="hidden" name="PaymentMethod" id="payment-method" value="COD" />
+                <input type="hidden" name="PaymentMethod" id="payment-method-hidden" value="COD" />
 
                 <div class="flex flex-col lg:flex-row lg:space-x-12">
                     <!-- Left Column -->
@@ -89,13 +89,13 @@
 
                                 <div class="space-y-3">
                                     <label class="flex items-center p-4 rounded-lg border-2 border-primary bg-primary/10 cursor-pointer payment-option">
-                                        <input type="radio" name="payment-method" value="COD" checked class="form-radio h-5 w-5 text-primary" />
+                                        <input type="radio" name="payment-method-radio" value="COD" checked class="form-radio h-5 w-5 text-primary" />
                                         <span class="ml-4 flex-1">Thanh toán khi nhận hàng (COD)</span>
                                         <span class="material-symbols-outlined text-2xl">local_shipping</span>
                                     </label>
 
                                     <label class="flex items-center p-4 rounded-lg border bg-background-light dark:bg-gray-800 cursor-pointer payment-option">
-                                        <input type="radio" name="payment-method" value="BankTransfer" class="form-radio h-5 w-5 text-primary" />
+                                        <input type="radio" name="payment-method-radio" value="BankTransfer" class="form-radio h-5 w-5 text-primary" />
                                         <span class="ml-4 flex-1">Chuyển khoản qua ngân hàng (QR)</span>
                                         <span class="material-symbols-outlined text-2xl">qr_code_2</span>
                                     </label>
@@ -152,8 +152,7 @@
                                 </div>
                             </div>
 
-                            <!-- THAY ĐỔI NÚT THÀNH "XEM TRƯỚC ĐƠN HÀNG" -->
-                            <button type="submit" class="w-full bg-primary text-white text-lg font-semibold rounded-lg h-14 shadow-lg hover:bg-orange-600 transition-colors">
+                            <button type="button" id="place-order-btn" class="w-full bg-primary text-white text-lg font-semibold rounded-lg h-14 shadow-lg hover:bg-orange-600 transition-colors">
                                 Đặt Đơn Hàng
                             </button>
                         </div>
@@ -166,26 +165,85 @@
 
 @section Scripts {
     <script>
-        // Xử lý chọn phương thức thanh toán
-        document.querySelectorAll('input[name="payment-method"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                document.getElementById('payment-method').value = this.value;
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Payment Method UI Handling ---
+            const paymentRadios = document.querySelectorAll('input[name="payment-method-radio"]');
+            const hiddenPaymentInput = document.getElementById('payment-method-hidden');
 
-                // Cập nhật giao diện
-                document.querySelectorAll('.payment-option').forEach(option => {
-                    option.classList.remove('border-2', 'border-primary', 'bg-primary/10');
-                    option.classList.add('border', 'bg-background-light', 'dark:bg-gray-800');
+            paymentRadios.forEach(radio => {
+                radio.addEventListener('change', function () {
+                    hiddenPaymentInput.value = this.value;
+
+                    document.querySelectorAll('.payment-option').forEach(option => {
+                        option.classList.remove('border-2', 'border-primary', 'bg-primary/10');
+                        option.classList.add('border', 'bg-background-light', 'dark:bg-gray-800');
+                    });
+
+                    if (this.checked) {
+                        const parent = this.closest('.payment-option');
+                        parent.classList.add('border-2', 'border-primary', 'bg-primary/10');
+                        parent.classList.remove('border', 'bg-background-light', 'dark:bg-gray-800');
+                    }
                 });
+            });
 
-                if (this.checked) {
-                    const parent = this.closest('.payment-option');
-                    parent.classList.add('border-2', 'border-primary', 'bg-primary/10');
-                    parent.classList.remove('border', 'bg-background-light', 'dark:bg-gray-800');
+            // --- Order Placement Handling ---
+            const placeOrderBtn = document.getElementById('place-order-btn');
+            const checkoutForm = document.getElementById('checkout-form');
+
+            placeOrderBtn.addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent default button action
+
+                // Basic form validation check
+                if (!checkoutForm.checkValidity()) {
+                    checkoutForm.reportValidity();
+                    return;
+                }
+
+                const selectedPaymentMethod = document.querySelector('input[name="payment-method-radio"]:checked').value;
+                
+                // Set the hidden input value right before deciding the action
+                hiddenPaymentInput.value = selectedPaymentMethod;
+
+                if (selectedPaymentMethod === 'BankTransfer') {
+                    // --- VNPay Flow ---
+                    this.disabled = true;
+                    this.textContent = 'Đang xử lý...';
+
+                    const formData = new FormData(checkoutForm);
+
+                    fetch('/ThanhToan/CreateVnpayPayment', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.paymentUrl) {
+                            window.location.href = data.paymentUrl;
+                        } else {
+                            alert('Có lỗi xảy ra khi tạo thanh toán. ' + (data.message || 'Vui lòng thử lại.'));
+                            this.disabled = false;
+                            this.textContent = 'Đặt Đơn Hàng';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Đã xảy ra lỗi kết nối. Vui lòng kiểm tra lại đường truyền và thử lại.');
+                        this.disabled = false;
+                        this.textContent = 'Đặt Đơn Hàng';
+                    });
+
+                } else {
+                    // --- COD Flow (or other standard methods) ---
+                    checkoutForm.submit();
                 }
             });
-        });
 
-        // Khởi tạo trạng thái ban đầu
-        document.querySelector('input[name="payment-method"]:checked').dispatchEvent(new Event('change'));
+            // Initialize UI state on page load
+            const checkedRadio = document.querySelector('input[name="payment-method-radio"]:checked');
+            if (checkedRadio) {
+                checkedRadio.dispatchEvent(new Event('change'));
+            }
+        });
     </script>
 }

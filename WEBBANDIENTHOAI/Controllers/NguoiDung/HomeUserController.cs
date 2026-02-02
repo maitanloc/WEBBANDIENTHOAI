@@ -377,13 +377,22 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 .Distinct()
                 .ToListAsync();
 
-            const int PageSize = 12;
-            var totalItems = await query.CountAsync();
-            var products = await query.Skip((page - 1) * PageSize).Take(PageSize).ToListAsync();
 
+            
+            const int PageSize = 12;// số lượng sản phẩm của mỗi trang 
+            var totalItems = await query.CountAsync();// Đếm tổng số sản phẩm thỏa mãn điều kiện lọc (trước khi phân trang)
+            var products = await query
+            .Skip((page - 1) * PageSize)// bỏ các sản phẩm ở trang đầu vd: trang đầu bỏ 0 sản phẩm, trang 2 bỏ 12 sản phẩm đầu 
+            .Take(PageSize)// lấy số lượng sản phẩm tương ứng với pagesize
+            .ToListAsync();
+
+            // Tính toán tổng số trang cần có
+            // Dùng Math.Ceiling để làm tròn lên, đảm bảo tất cả sản phẩm đều được hiển thị
             ViewData["TotalPages"] = (int)Math.Ceiling(totalItems / (double)PageSize);
+            // Truyền số trang hiện tại sang View để biết trang nào đang được active
             ViewData["CurrentPage"] = page;
 
+            // --- KẾT THÚC LOGIC PHÂN TRANG ---
 
             return View(products);
         }

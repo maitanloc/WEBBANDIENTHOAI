@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
+using WEBBANDIENTHOAI.Services.VNPay;
 using WEBBANDIENTHOAI.ViewModels;
 
 namespace WEBBANDIENTHOAI.Controllers.NguoiDung
@@ -12,11 +13,13 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
     public class ThanhToanController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IVnPayService _vnPayService;
         private const string CheckoutSessionKey = "CheckoutData";
 
-        public ThanhToanController(AppDbContext context)
+        public ThanhToanController(AppDbContext context, IVnPayService vnPayService)
         {
             _context = context;
+            _vnPayService = vnPayService;
         }
 
         public IActionResult Index(string selectedProductIds)
@@ -272,5 +275,157 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 
             return View(billViewModel);
         }
-    }
-}
+
+                [HttpGet]
+
+                public IActionResult PaymentCallbackVnpay()
+
+                {
+
+            try
+            {
+                var response = _vnPayService.PaymentExecute(Request.Query);
+
+                if (response.Success)
+                {
+                    // Cập nhật trạng thái đơn hàng thành đã thanh toán
+                    var orderId = long.Parse(response.OrderId);
+                    var order = _context.Orders.Find((int)orderId);
+
+                    if (order != null)
+                    {
+                        order.StatusId = 2; // Đã thanh toán
+                        order.PaymentMethod = "VNPay";
+                        _context.SaveChanges();
+
+                        TempData["SuccessMessage"] = $"Thanh toán thành công đơn hàng #{orderId}";
+                        return RedirectToAction("OrderSuccess", new { orderId = order.OrderId });
+                    }
+                }
+
+                TempData["ErrorMessage"] = "Thanh toán thất bại. Vui lòng thử lại.";
+                return RedirectToAction("Index", "HomeCarts");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in PaymentCallbackVnpay: {ex.Message}");
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xử lý thanh toán.";
+                return RedirectToAction("Index", "HomeCarts");
+            }
+        }
+
+        
+
+                [HttpPost]
+
+                public IActionResult CreateVnpayPayment([FromForm] CheckoutViewModel model)
+
+                {
+
+                    var customerId = HttpContext.Session.GetString("UserId");
+
+                    if (string.IsNullOrEmpty(customerId))
+
+                    {
+
+                        return Json(new { success = false, message = "Vui lòng đăng nhập lại." });
+
+                    }
+
+        
+
+                    // Step 1: Create and save the order to get a persistent OrderId
+
+                    var order = new Order
+
+                    {
+
+                        CustomerId = int.Parse(customerId),
+
+                        OrderDate = DateTime.UtcNow,
+
+                        Total = model.TotalAmount,
+
+                        StatusId = 1, // Status: "Chờ xác nhận" hoặc "Pending". Sẽ cập nhật sau khi thanh toán thành công.
+
+                        ShippingAddress = model.Address,
+
+                        PaymentMethod = "VNPay",
+
+                        Notes = model.Notes ?? string.Empty
+
+                    };
+
+        
+
+                    _context.Orders.Add(order);
+
+                    // Must save here to generate OrderId
+
+                    _context.SaveChanges(); 
+
+        
+
+                    foreach (var item in model.SelectedItems)
+
+                    {
+
+                        var orderDetail = new OrderDetail
+
+                        {
+
+                            OrderId = order.OrderId,
+
+                            ProductId = item.ProductId,
+
+                            Quantity = item.Quantity,
+
+                            UnitPrice = item.Price
+
+                        };
+
+                        _context.OrderDetails.Add(orderDetail);
+
+                    }
+
+                    // Save again to add details
+
+                    _context.SaveChanges();
+
+        
+
+                    // Step 2: Create PaymentInformationModel for VNPay
+
+                    var paymentModel = new PaymentInformationModel
+
+                    {
+
+                        Amount = (double)order.Total,
+
+                        Name = model.FullName,
+
+                                        OrderDescription = $"DH{order.OrderId}",
+
+                                        OrderType = "other",
+
+                                        OrderId = order.OrderId
+
+                    };
+
+        
+
+                    // Step 3: Create payment URL
+
+                    var paymentUrl = _vnPayService.CreatePaymentUrl(paymentModel, HttpContext);
+
+        
+
+                    // Step 4: Return URL to client
+
+                    return Json(new { success = true, paymentUrl });
+
+                }
+
+            }
+
+        }

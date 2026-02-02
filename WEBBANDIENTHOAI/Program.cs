@@ -6,6 +6,7 @@ using WEBBANDIENTHOAI.Repository.Admin;
 using WEBBANDIENTHOAI.Repository.NguoiDung;
 using WEBBANDIENTHOAI.Repository.TaiKhoan;
 using WEBBANDIENTHOAI.Services;
+using WEBBANDIENTHOAI.Services.VNPay;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +68,9 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IOTPService, OTPService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IMailService, MailService>();
+
+//Connect VNPay API
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 // ===============================================
 // 5) Cấu hình Session - QUAN TRỌNG
@@ -130,6 +134,8 @@ app.Use(async (context, next) =>
 
     await next();
 });
+
+
 
 app.UseAuthorization();
 
