@@ -58,8 +58,8 @@ namespace WEBBANDIENTHOAI.Data
 
             modelBuilder.Entity<Category>().ToTable("Categories");
             modelBuilder.Entity<ProductStatus>().ToTable("ProductStatuses");
-            modelBuilder.Entity<Product>().ToTable("Products");
-            modelBuilder.Entity<ProductImage>().ToTable("ProductImages");
+            modelBuilder.Entity<Product>().ToTable("Products", tb => tb.HasTrigger("ProductTrigger"));
+            modelBuilder.Entity<ProductImage>().ToTable("ProductImages", tb => tb.HasTrigger("ProductImageTrigger"));
 
             modelBuilder.Entity<Inventory>().ToTable("Inventory");
             modelBuilder.Entity<InventoryHistory>().ToTable("InventoryHistory");
@@ -76,8 +76,8 @@ namespace WEBBANDIENTHOAI.Data
             modelBuilder.Entity<Cart>().ToTable("Carts");
             modelBuilder.Entity<CartDetail>().ToTable("CartDetails");
 
-            modelBuilder.Entity<LaptopConfiguration>().ToTable("LaptopConfigurations");
-            modelBuilder.Entity<PhoneConfiguration>().ToTable("PhoneConfigurations");
+            modelBuilder.Entity<LaptopConfiguration>().ToTable("LaptopConfigurations", tb => tb.HasTrigger("LaptopConfigTrigger"));
+            modelBuilder.Entity<PhoneConfiguration>().ToTable("PhoneConfigurations", tb => tb.HasTrigger("PhoneConfigTrigger"));
 
             modelBuilder.Entity<AuditLog>().ToTable("AuditLogs");
 

@@ -244,36 +244,180 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                 return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
             }
         }
-    }
 
-    // Model tiếp nhận dữ liệu
-    public class CreateImportModel
+
+    // ==========================================
+    // NEW: Quick Create Product DTOs & Action
+    // ==========================================
+
+    [HttpPost]
+    public async Task<IActionResult> QuickCreateProduct([FromBody] ProductCreationRequest request)
     {
-        public string? SupplierName { get; set; }
-        public List<ImportItemModel>? Items { get; set; }
-    }
-
-    public class ImportItemModel
-    {
-        public int? ProductId { get; set; }
-        public string? ProductName { get; set; }
-        public string? ProductSKU { get; set; }
-        public string? ProductBrand { get; set; }
-        public int Quantity { get; set; }
-        public decimal UnitPrice { get; set; }
-    }
-
-    // PagedResult model (nếu chưa có)
-    public class PagedResult<T>
-    {
-        public List<T>? Items { get; set; }
-        public int TotalCount { get; set; }
-        public int TotalPages { get; set; }
-        public int CurrentPage { get; set; }
-
-        public PagedResult()
+        try
         {
-            Items = new List<T>();
+            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.SKU))
+            {
+               return Json(new { success = false, message = "Tên và SKU là bắt buộc." });
+            }
+
+            // Map Product
+            var product = new Product
+            {
+                Name = request.Name,
+                SKU = request.SKU,
+                Brand = request.Brand,
+                Price = request.Price,
+                // CategoryId: 1=Phone, 2=Laptop. Default to 1 if unknown.
+                CategoryId = request.ProductType == "Laptop" ? 2 : 1,
+                StockCode = $"STK-{request.SKU}", // Auto generate stock code
+                Color = request.Color,
+                Size = request.Size,
+                ShortDescription = request.ShortDescription,
+                StatusId = 1, // Available
+                CreatedAt = DateTime.UtcNow
+            };
+
+            PhoneConfiguration? phoneConfig = null;
+            LaptopConfiguration? laptopConfig = null;
+
+            if (request.ProductType == "Phone" && request.PhoneConfig != null)
+            {
+                phoneConfig = new PhoneConfiguration
+                {
+                    CPU = request.PhoneConfig.CPU,
+                    RAM = request.PhoneConfig.RAM,
+                    InternalStorage = request.PhoneConfig.InternalStorage,
+                    Screen = request.PhoneConfig.Screen,
+                    OperatingSystem = request.PhoneConfig.OperatingSystem,
+                    Battery = request.PhoneConfig.Battery,
+                    Camera = request.PhoneConfig.Camera,
+                    Color = request.Color // Sync color
+                };
+            }
+            else if (request.ProductType == "Laptop" && request.LaptopConfig != null)
+            {
+                laptopConfig = new LaptopConfiguration
+                {
+                    CPU = request.LaptopConfig.CPU,
+                    RAM = request.LaptopConfig.RAM,
+                    Storage = request.LaptopConfig.Storage,
+                    GraphicsCard = request.LaptopConfig.GraphicsCard,
+                    ScreenSize = request.LaptopConfig.ScreenSize,
+                    OperatingSystem = request.LaptopConfig.OperatingSystem,
+                    Weight = request.LaptopConfig.Weight,
+                    Color = request.Color
+                };
+            }
+
+            byte[]? imageBytes = null;
+            if (!string.IsNullOrEmpty(request.ImageBase64))
+            {
+                // Simple Base64 check
+                try
+                {
+                    // Remove header if present (e.g. "data:image/png;base64,")
+                    var cleanBase64 = request.ImageBase64;
+                    if (cleanBase64.Contains(","))
+                    {
+                        cleanBase64 = cleanBase64.Substring(cleanBase64.IndexOf(",") + 1);
+                    }
+                    imageBytes = Convert.FromBase64String(cleanBase64);
+                }
+                catch
+                {
+                    // Ignore bad image data
+                }
+            }
+
+            var createdProduct = await _repository.CreateFullProductAsync(product, phoneConfig, laptopConfig, imageBytes);
+
+            return Json(new 
+            { 
+                success = true, 
+                message = "Tạo sản phẩm thành công!",
+                data = new {
+                    productId = createdProduct.ProductId,
+                    name = createdProduct.Name,
+                    sku = createdProduct.SKU,
+                    brand = createdProduct.Brand,
+                    price = createdProduct.Price
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = $"Lỗi tạo sản phẩm: {ex.Message}" });
         }
     }
+}
+
+// Model tiếp nhận dữ liệu
+public class CreateImportModel
+{
+    public string? SupplierName { get; set; }
+    public List<ImportItemModel>? Items { get; set; }
+}
+
+public class ImportItemModel
+{
+    public int? ProductId { get; set; }
+    public string? ProductName { get; set; }
+    public string? ProductSKU { get; set; }
+    public string? ProductBrand { get; set; }
+    public int Quantity { get; set; }
+    public decimal UnitPrice { get; set; }
+}
+
+// PagedResult model
+public class PagedResult<T>
+{
+    public List<T>? Items { get; set; }
+    public int TotalCount { get; set; }
+    public int TotalPages { get; set; }
+    public int CurrentPage { get; set; }
+
+    public PagedResult()
+    {
+        Items = new List<T>();
+    }
+}
+
+public class ProductCreationRequest
+{
+    public string Name { get; set; }
+    public string SKU { get; set; }
+    public string Brand { get; set; }
+    public decimal Price { get; set; }
+    public string? Color { get; set; }
+    public string? Size { get; set; }
+    public string? ShortDescription { get; set; }
+    public string? ImageBase64 { get; set; }
+    
+    public string ProductType { get; set; } // "Phone" or "Laptop"
+    
+    public PhoneConfigDto? PhoneConfig { get; set; }
+    public LaptopConfigDto? LaptopConfig { get; set; }
+}
+
+public class PhoneConfigDto 
+{
+    public string? CPU { get; set; }
+    public string? RAM { get; set; }
+    public string? InternalStorage { get; set; }
+    public string? Screen { get; set; }
+    public string? OperatingSystem { get; set; }
+    public string? Battery { get; set; }
+    public string? Camera { get; set; }
+}
+
+public class LaptopConfigDto 
+{
+    public string? CPU { get; set; }
+    public string? RAM { get; set; }
+    public string? Storage { get; set; }
+    public string? GraphicsCard { get; set; }
+    public string? ScreenSize { get; set; }
+    public string? OperatingSystem { get; set; }
+    public string? Weight { get; set; }
+}
 }

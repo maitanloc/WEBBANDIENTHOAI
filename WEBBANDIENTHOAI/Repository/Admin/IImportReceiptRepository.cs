@@ -18,5 +18,6 @@ namespace WEBBANDIENTHOAI.Repository.Admin
         Task UpdateInventoryAsync(Inventory inventory);
         Task CreateInventoryAsync(Inventory inventory);
         Task<Inventory> GetInventoryByProductIdAsync(int productId);
+        Task<Product> CreateFullProductAsync(Product product, PhoneConfiguration? phoneConfig, LaptopConfiguration? laptopConfig, byte[]? imageBytes);
     }
 }

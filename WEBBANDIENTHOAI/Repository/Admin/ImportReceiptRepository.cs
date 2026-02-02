@@ -94,5 +94,56 @@ namespace WEBBANDIENTHOAI.Repository.Admin
         {
              return await _context.Inventories.FirstOrDefaultAsync(i => i.ProductId == productId);
         }
+
+        public async Task<Product> CreateFullProductAsync(Product product, PhoneConfiguration? phoneConfig, LaptopConfiguration? laptopConfig, byte[]? imageBytes)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // 1. Create Product
+                _context.Products.Add(product);
+                await _context.SaveChangesAsync(); // Generates ProductId
+
+                // 2. Create Configuration
+                if (phoneConfig != null)
+                {
+                    phoneConfig.ProductId = product.ProductId;
+                    _context.PhoneConfigurations.Add(phoneConfig);
+                }
+                else if (laptopConfig != null)
+                {
+                    laptopConfig.ProductId = product.ProductId;
+                    _context.LaptopConfigurations.Add(laptopConfig);
+                }
+
+                // 3. Handle Image
+                if (imageBytes != null && imageBytes.Length > 0)
+                {
+                    var image = new ProductImage
+                    {
+                        ProductId = product.ProductId,
+                        ImagePath = imageBytes,
+                        IsPrimary = true,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.ProductImages.Add(image);
+                    await _context.SaveChangesAsync();
+
+                    // Update Product with ImageId
+                    product.ImageId = image.ImageId;
+                    _context.Products.Update(product);
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return product;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
     }
 }
