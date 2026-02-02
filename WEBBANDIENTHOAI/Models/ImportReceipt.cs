@@ -16,23 +16,21 @@ namespace WEBBANDIENTHOAI.Models
         public DateTime ImportDate { get; set; } = DateTime.UtcNow; // (ImportDate)
 
         [MaxLength(200)]
-        public string SupplierName { get; set; } // (SupplierName)
+        public string? SupplierName { get; set; } // (SupplierName)
 
-        public int TotalQuantity { get; set; } = 0; // (TotalQuantity)
+        public int? TotalQuantity { get; set; } = 0; // (TotalQuantity)
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal TotalValue { get; set; } = 0m; // (TotalValue)
+        public decimal? TotalValue { get; set; } = 0m; // (TotalValue)
 
-        public int CreatedByUserId { get; set; } // (CreatedByUserId)
+        public int? CreatedByUserId { get; set; } // (CreatedByUserId)
 
         [MaxLength(500)]
-        public string Notes { get; set; } // (Notes)
+        public string? Notes { get; set; } // (Notes)
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // (CreatedAt)
-        public DateTime? LastUpdated { get; set; } // (LastUpdated)
-        public bool IsFinalized { get; set; } = false; // (IsFinalized)
-
-        // Navigation
+        public bool IsFinalized { get; set; } = false;
+        public DateTime? LastUpdated { get; set; } 
         public ICollection<ImportReceiptDetail> Details { get; set; }
     }
 }

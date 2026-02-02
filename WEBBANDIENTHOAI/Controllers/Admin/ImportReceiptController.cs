@@ -5,19 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using WEBBANDIENTHOAI.Data;
 
 namespace WEBBANDIENTHOAI.Controllers.Admin
 {
     public class ImportReceiptController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IImportReceiptRepository _repository;
         private readonly IKhohangRepository _khohangRepository;
 
-        public ImportReceiptController(AppDbContext context, IKhohangRepository khohangRepository)
+        public ImportReceiptController(IImportReceiptRepository repository, IKhohangRepository khohangRepository)
         {
-            _context = context;
+            _repository = repository;
             _khohangRepository = khohangRepository;
         }
 
@@ -26,16 +24,14 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
         {
             try
             {
-                // Load dữ liệu an toàn mà không include Details (vì Details cũ có null)
-                var importReceipts = await _context.ImportReceipts
-                    .AsNoTracking()
-                    .OrderByDescending(x => x.ImportReceiptId)
-                    .ToListAsync();
+                var importReceipts = await _repository.GetAllAsync();
+                
+                var list = importReceipts.ToList();
 
                 var result = new PagedResult<ImportReceipt>
                 {
-                    Items = importReceipts ?? new List<ImportReceipt>(),
-                    TotalCount = importReceipts?.Count ?? 0,
+                    Items = list,
+                    TotalCount = list.Count,
                     TotalPages = 1,
                     CurrentPage = 1
                 };
@@ -47,7 +43,6 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
             }
             catch (Exception ex)
             {
-                // Nếu có lỗi, trả về danh sách rỗng
                 ViewBag.Error = $"Lỗi tải dữ liệu: {ex.Message}";
                 var emptyResult = new PagedResult<ImportReceipt>
                 {
@@ -66,20 +61,14 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
         {
             try
             {
-                var receipt = await _context.ImportReceipts
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.ImportReceiptId == id);
+                var receipt = await _repository.GetByIdAsync(id);
 
                 if (receipt == null)
                 {
                     return Json(new { success = false, message = "Phiếu nhập không tồn tại" });
                 }
 
-                // Load Details riêng và lọc null
-                var details = await _context.ImportReceiptDetails
-                    .AsNoTracking()
-                    .Where(x => x.ImportReceiptId == id && x.SnapshotName != null && x.SnapshotSKU != null)
-                    .ToListAsync();
+                var details = await _repository.GetDetailsByReceiptIdAsync(id);
 
                 var result = new
                 {
@@ -122,21 +111,18 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                 {
                     return Json(new { success = false, data = new List<object>() });
                 }
+                
+                var products = await _repository.SearchProductsAsync(query);
 
-                var products = await _context.Products
-                    .Where(p => p.Name.Contains(query) || p.SKU.Contains(query))
-                    .Take(10)
-                    .Select(p => new
+                return Json(new { success = true, data = products.Select(p => new
                     {
                         productId = p.ProductId,
                         name = p.Name,
                         sku = p.SKU,
                         brand = p.Brand ?? "",
                         price = p.Price
-                    })
-                    .ToListAsync();
-
-                return Json(new { success = true, data = products });
+                    }) 
+                });
             }
             catch (Exception ex)
             {
@@ -159,15 +145,25 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                 {
                     ReceiptNumber = $"PHN{DateTime.Now:yyyyMMddHHmmss}",
                     ImportDate = DateTime.Now,
-                    SupplierName = model.SupplierName ?? "Không xác định",
+                    SupplierName = model.SupplierName,
                     CreatedByUserId = 1, // TODO: Lấy từ User hiện tại
-                    Details = new List<ImportReceiptDetail>()
+                    Details = new List<ImportReceiptDetail>(),
+                    TotalQuantity = 0,
+                    TotalValue = 0,
+                    IsFinalized = true // Auto finalize for now
                 };
+
+                int totalQty = 0;
+                decimal totalVal = 0;
 
                 foreach (var item in model.Items)
                 {
-                    // Kiểm tra hoặc tạo sản phẩm
-                    var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == item.ProductId);
+                    // Update or create product
+                    Product product = null;
+                    if (item.ProductId.HasValue && item.ProductId.Value > 0)
+                    {
+                        product = await _repository.GetProductByIdAsync(item.ProductId.Value);
+                    }
 
                     if (product == null && !string.IsNullOrWhiteSpace(item.ProductName))
                     {
@@ -181,8 +177,7 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                             Price = item.UnitPrice,
                             Brand = item.ProductBrand ?? ""
                         };
-                        _context.Products.Add(product);
-                        await _context.SaveChangesAsync();
+                        await _repository.CreateProductAsync(product);
                     }
 
                     if (product != null)
@@ -201,15 +196,18 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                             CreatedAt = DateTime.Now
                         };
                         importReceipt.Details.Add(detail);
+                        
+                        totalQty += item.Quantity;
+                        totalVal += detailTotalCost;
 
-                        // Cập nhật tồn kho
-                        var inventory = await _context.Inventories
-                            .FirstOrDefaultAsync(i => i.ProductId == product.ProductId);
+                        // Cập nhật tồn kho via repository
+                        var inventory = await _repository.GetInventoryByProductIdAsync(product.ProductId);
 
                         if (inventory != null)
                         {
                             inventory.CurrentQuantity += item.Quantity;
                             inventory.LastUpdated = DateTime.Now;
+                            await _repository.UpdateInventoryAsync(inventory);
                         }
                         else
                         {
@@ -224,20 +222,16 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                                 Location = "Chưa xác định",
                                 LastUpdated = DateTime.Now
                             };
-                            _context.Inventories.Add(newInventory);
+                            await _repository.CreateInventoryAsync(newInventory);
                         }
                     }
                 }
 
-                // Set total values
-                var totalQty = importReceipt.Details.Sum(d => d.Quantity);
-                var totalValue = importReceipt.Details.Sum(d => d.TotalCost);
                 importReceipt.TotalQuantity = totalQty;
-                importReceipt.TotalValue = totalValue;
+                importReceipt.TotalValue = totalVal;
                 importReceipt.LastUpdated = DateTime.Now;
 
-                _context.ImportReceipts.Add(importReceipt);
-                await _context.SaveChangesAsync();
+                await _repository.CreateAsync(importReceipt);
 
                 return Json(new { 
                     success = true, 

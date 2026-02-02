@@ -15,16 +15,16 @@ namespace WEBBANDIENTHOAI.Models
         public int? ProductId { get; set; } // (ProductId: mapping nếu có)
 
         [Required, MaxLength(60)]
-        public string SnapshotSKU { get; set; } // (SnapshotSKU)
+        public string? SnapshotSKU { get; set; } // (SnapshotSKU)
 
         [MaxLength(250)]
-        public string SnapshotName { get; set; } // (SnapshotName)
+        public string? SnapshotName { get; set; } // (SnapshotName)
 
         [MaxLength(100)]
-        public string SnapshotBrand { get; set; } // (SnapshotBrand)
+        public string? SnapshotBrand { get; set; } // (SnapshotBrand)
 
         [Required, MaxLength(50)]
-        public string StockCode { get; set; } // (StockCode)
+        public string? StockCode { get; set; } // (StockCode)
 
         public int Quantity { get; set; } = 0; // (Quantity)
 
@@ -35,7 +35,7 @@ namespace WEBBANDIENTHOAI.Models
         public decimal TotalCost { get; set; } = 0m; // (TotalCost)
 
         [MaxLength(100)]
-        public string BatchNumber { get; set; } // (BatchNumber)
+        public string? BatchNumber { get; set; } // (BatchNumber)
 
         public DateTime? ExpiryDate { get; set; } // (ExpiryDate)
 

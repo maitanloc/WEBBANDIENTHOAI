@@ -48,9 +48,11 @@
                     <tr class="bg-gray-100 border-b border-gray-300">
                         <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Mã Phiếu</th>
                         <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Ngày Nhập</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Nhà Cung Cấp</th>
                         <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-center border-r border-gray-300">Số Lượng</th>
                         <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-right border-r border-gray-300">Tổng Giá Trị</th>
-                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Người Tạo</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Ghi Chú</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-center border-r border-gray-300">Trạng Thái</th>
                         <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-right">Hành Động</th>
                     </tr>
                 </thead>
@@ -58,7 +60,7 @@
                     @if (Model.Items == null || !Model.Items.Any())
                     {
                         <tr>
-                            <td colspan="6" class="px-4 py-12 text-center text-gray-500">
+                            <td colspan="8" class="px-4 py-12 text-center text-gray-500">
                                 <span class="material-symbols-outlined text-4xl mb-2 text-gray-300">inventory_2</span>
                                 <p>Không có phiếu nhập hàng nào.</p>
                             </td>
@@ -76,16 +78,29 @@
                                     <div class="font-semibold">@receipt.ImportDate.ToString("dd/MM/yyyy")</div>
                                     <div class="text-xs text-gray-500">@receipt.ImportDate.ToString("HH:mm")</div>
                                 </td>
+                                <td class="px-4 py-3 border-r border-gray-300 text-black text-sm font-medium">
+                                    @(receipt.SupplierName ?? "---")
+                                </td>
                                 <td class="px-4 py-3 border-r border-gray-300 text-center">
                                     <span class="inline-flex items-center justify-center px-3 py-1 bg-blue-100 text-blue-800 font-bold rounded text-sm">
-                                        @(receipt.Details?.Sum(d => d.Quantity) ?? 0)
+                                        @(receipt.TotalQuantity.GetValueOrDefault(0))
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 border-r border-gray-300 text-right text-black font-bold">
-                                    @((receipt.Details?.Sum(d => d.TotalCost) ?? 0).ToString("N0"))đ
+                                    @(receipt.TotalValue.GetValueOrDefault(0).ToString("N0"))đ
                                 </td>
-                                <td class="px-4 py-3 border-r border-gray-300 text-black text-sm">
-                                    Quản trị viên
+                                <td class="px-4 py-3 border-r border-gray-300 text-black text-sm italic">
+                                    @(receipt.Notes ?? "")
+                                </td>
+                                <td class="px-4 py-3 border-r border-gray-300 text-center text-sm">
+                                    @if (receipt.IsFinalized)
+                                    {
+                                        <span class="px-2 py-1 rounded-full bg-green-100 text-green-800 font-bold text-xs">Hoàn thành</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 font-bold text-xs">Nháp</span>
+                                    }
                                 </td>
                                 <td class="px-4 py-3 text-right">
                                     <button type="button" onclick="openImportDetailsModal(@receipt.ImportReceiptId)"
