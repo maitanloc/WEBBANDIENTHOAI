@@ -305,7 +305,12 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                     ScreenSize = request.LaptopConfig.ScreenSize,
                     OperatingSystem = request.LaptopConfig.OperatingSystem,
                     Weight = request.LaptopConfig.Weight,
-                    Color = request.Color
+                    Color = request.Color,
+                    // New Fields
+                    Battery = request.LaptopConfig.Battery,
+                    ScreenTechnology = request.LaptopConfig.ScreenTechnology,
+                    Resolution = request.LaptopConfig.Resolution,
+                    Ports = request.LaptopConfig.Ports
                 };
             }
 
@@ -419,5 +424,10 @@ public class LaptopConfigDto
     public string? ScreenSize { get; set; }
     public string? OperatingSystem { get; set; }
     public string? Weight { get; set; }
+    
+    public string? Battery { get; set; }
+    public string? ScreenTechnology { get; set; }
+    public string? Resolution { get; set; }
+    public string? Ports { get; set; }
 }
 }

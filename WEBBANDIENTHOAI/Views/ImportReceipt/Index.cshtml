@@ -379,6 +379,12 @@
                             <div><label class="text-xs font-semibold text-gray-700">Màn Hình</label><input id="qc-laptop-screen" type="text" class="w-full px-3 py-2 border rounded text-sm text-black"></div>
                             <div><label class="text-xs font-semibold text-gray-700">Hệ Điều Hành</label><input id="qc-laptop-os" type="text" class="w-full px-3 py-2 border rounded text-sm text-black"></div>
                             <div><label class="text-xs font-semibold text-gray-700">Trọng Lượng</label><input id="qc-laptop-weight" type="text" class="w-full px-3 py-2 border rounded text-sm text-black"></div>
+                            
+                            <!-- New Fields -->
+                            <div><label class="text-xs font-semibold text-gray-700">Pin</label><input id="qc-laptop-battery" type="text" class="w-full px-3 py-2 border rounded text-sm text-black"></div>
+                            <div><label class="text-xs font-semibold text-gray-700">Công Nghệ Màn Hình</label><input id="qc-laptop-screen-tech" type="text" class="w-full px-3 py-2 border rounded text-sm text-black"></div>
+                            <div><label class="text-xs font-semibold text-gray-700">Độ Phân Giải</label><input id="qc-laptop-resolution" type="text" class="w-full px-3 py-2 border rounded text-sm text-black"></div>
+                            <div class="md:col-span-3"><label class="text-xs font-semibold text-gray-700">Cổng Kết Nối</label><input id="qc-laptop-ports" type="text" class="w-full px-3 py-2 border rounded text-sm text-black"></div>
                         </div>
                     </div>
                 </form>
@@ -624,7 +630,12 @@
                 GraphicsCard: document.getElementById('qc-laptop-vga').value,
                 ScreenSize: document.getElementById('qc-laptop-screen').value,
                 OperatingSystem: document.getElementById('qc-laptop-os').value,
-                Weight: document.getElementById('qc-laptop-weight').value
+                Weight: document.getElementById('qc-laptop-weight').value,
+                // New Fields
+                Battery: document.getElementById('qc-laptop-battery').value,
+                ScreenTechnology: document.getElementById('qc-laptop-screen-tech').value,
+                Resolution: document.getElementById('qc-laptop-resolution').value,
+                Ports: document.getElementById('qc-laptop-ports').value
             } : null
         };
 

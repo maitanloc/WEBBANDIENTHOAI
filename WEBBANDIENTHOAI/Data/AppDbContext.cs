@@ -85,6 +85,20 @@ namespace WEBBANDIENTHOAI.Data
             modelBuilder.Entity<PasswordResetToken>().ToTable("PasswordResetTokens");
             modelBuilder.Entity<OTPCode>().ToTable("OTPCodes");
 
+            // CẤU HÌNH QUAN HỆ Product ↔ Category
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // CẤU HÌNH QUAN HỆ Product ↔ ProductStatus
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.ProductStatus)
+                .WithMany(ps => ps.Products)
+                .HasForeignKey(p => p.StatusId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // CẤU HÌNH QUAN HỆ Product ↔ ProductImage
             modelBuilder.Entity<Product>()
                 .HasMany(p => p.Images)
@@ -99,6 +113,20 @@ namespace WEBBANDIENTHOAI.Data
                 .HasForeignKey<Product>(p => p.ImageId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // CẤU HÌNH QUAN HỆ LaptopConfiguration ↔ Product
+            modelBuilder.Entity<LaptopConfiguration>()
+                .HasOne(lc => lc.Product)
+                .WithOne(p => p.LaptopConfiguration)
+                .HasForeignKey<LaptopConfiguration>(lc => lc.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // CẤU HÌNH QUAN HỆ PhoneConfiguration ↔ Product
+            modelBuilder.Entity<PhoneConfiguration>()
+                .HasOne(pc => pc.Product)
+                .WithOne(p => p.PhoneConfiguration)
+                .HasForeignKey<PhoneConfiguration>(pc => pc.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // CẤU HÌNH CHO PASSWORD RESET TOKENS
             modelBuilder.Entity<PasswordResetToken>(entity =>

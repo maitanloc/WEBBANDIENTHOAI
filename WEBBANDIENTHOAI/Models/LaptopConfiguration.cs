@@ -27,7 +27,7 @@ namespace WEBBANDIENTHOAI.Models
         [MaxLength(100)]
         public string? OperatingSystem { get; set; }
 
-        [MaxLength(50)]
+        [MaxLength(100)]
         public string? ScreenSize { get; set; }
 
         [MaxLength(100)]
@@ -39,10 +39,10 @@ namespace WEBBANDIENTHOAI.Models
         [MaxLength(500)]
         public string? Ports { get; set; }
 
-        [MaxLength(50)]
+        [MaxLength(100)]
         public string? Color { get; set; }
 
-        [MaxLength(50)]
+        [MaxLength(100)]
         public string? Weight { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
