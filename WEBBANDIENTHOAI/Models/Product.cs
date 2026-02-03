@@ -12,22 +12,26 @@ namespace WEBBANDIENTHOAI.Models
         [Required]
         public int CategoryId { get; set; }
 
-        [Required, MaxLength(60)]
+        [Required(ErrorMessage = "Mã SKU là bắt buộc.")]
+        [MaxLength(60, ErrorMessage = "Mã SKU không được quá 60 ký tự.")]
         public string SKU { get; set; } = null!;
 
-        [Required, MaxLength(250)]
+        [Required(ErrorMessage = "Tên sản phẩm là bắt buộc.")]
+        [MaxLength(250, ErrorMessage = "Tên sản phẩm không được quá 250 ký tự.")]
         public string Name { get; set; } = null!;
 
         [MaxLength(100)]
         public string? Brand { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
+        [Range(0, double.MaxValue, ErrorMessage = "Giá bán phải lớn hơn hoặc bằng 0.")]
         public decimal Price { get; set; } = 0m;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal? OldPrice { get; set; }
 
-        [Required, MaxLength(50)]
+        [Required(ErrorMessage = "Mã kho là bắt buộc.")]
+        [MaxLength(50, ErrorMessage = "Mã kho không được quá 50 ký tự.")]
         public string StockCode { get; set; } = null!;
 
         [MaxLength(100)]

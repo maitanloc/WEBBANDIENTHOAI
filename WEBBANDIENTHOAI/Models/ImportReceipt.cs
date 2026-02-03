@@ -10,7 +10,8 @@ namespace WEBBANDIENTHOAI.Models
         [Key]
         public int ImportReceiptId { get; set; } // (ImportReceiptId)
 
-        [Required, MaxLength(50)]
+        [Required(ErrorMessage = "Số phiếu nhập là bắt buộc.")]
+        [MaxLength(50, ErrorMessage = "Số phiếu nhập không được quá 50 ký tự.")]
         public string ReceiptNumber { get; set; } // (ReceiptNumber)
 
         public DateTime ImportDate { get; set; } = DateTime.UtcNow; // (ImportDate)

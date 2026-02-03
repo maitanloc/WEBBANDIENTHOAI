@@ -8,7 +8,8 @@ namespace WEBBANDIENTHOAI.Models
         [Key]
         public int CategoryId { get; set; }
 
-        [Required, MaxLength(120)]
+        [Required(ErrorMessage = "Tên danh mục là bắt buộc.")]
+        [MaxLength(120, ErrorMessage = "Tên danh mục không được quá 120 ký tự.")]
         public string CategoryName { get; set; }
 
         [MaxLength(500)]

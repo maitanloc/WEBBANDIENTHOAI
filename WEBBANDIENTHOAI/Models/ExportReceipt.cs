@@ -12,8 +12,8 @@ namespace WEBBANDIENTHOAI.Models
         [Key]
         public int ExportReceiptId { get; set; }
 
-        [Required]
-        [MaxLength(50)]
+        [Required(ErrorMessage = "Số phiếu xuất là bắt buộc.")]
+        [MaxLength(50, ErrorMessage = "Số phiếu xuất không được quá 50 ký tự.")]
         public string? ReceiptNumber { get; set; }
 
         public DateTime ExportDate { get; set; } = DateTime.UtcNow;
