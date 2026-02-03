@@ -317,7 +317,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
         
 
                 [HttpPost]
-
+                // thanh toán vnpay 
                 public IActionResult CreateVnpayPayment([FromForm] CheckoutViewModel model)
 
                 {
