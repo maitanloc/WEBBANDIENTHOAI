@@ -1,0 +1,95 @@
+@model WEBBANDIENTHOAI.Models.ViewModels.RevenueReportViewModel
+@{
+      ViewData["Title"] = "Báo Cáo Doanh Thu";
+      Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+            <h1 class="text-2xl font-bold text-gray-900">Báo Cáo Doanh Thu</h1>
+            <p class="text-sm text-gray-500 mt-1">Chi tiết doanh thu từ @Model.StartDate.ToString("dd/MM/yyyy") đến
+                  @Model.EndDate.ToString("dd/MM/yyyy")</p>
+      </div>
+
+      <!-- Filter Form -->
+      <form method="get"
+            class="flex flex-wrap items-center gap-2 bg-white p-2 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center gap-2">
+                  <span class="text-sm text-gray-500 pl-2">Từ:</span>
+                  <input type="date" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")"
+                        class="border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div class="flex items-center gap-2">
+                  <span class="text-sm text-gray-500">Đến:</span>
+                  <input type="date" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")"
+                        class="border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <button type="submit"
+                  class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                  Lọc dữ liệu
+            </button>
+            <a href="/Admin/Reports/Revenue" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">Đặt
+                  lại</a>
+      </form>
+</div>
+
+<!-- Summary Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <p class="text-sm font-semibold text-gray-500">Tổng doanh thu</p>
+            <h3 class="text-2xl font-bold text-blue-600">@Model.TotalRevenue.ToString("N0")đ</h3>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <p class="text-sm font-semibold text-gray-500">Số đơn hàng</p>
+            <h3 class="text-2xl font-bold text-gray-900">@Model.TotalOrders</h3>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <p class="text-sm font-semibold text-gray-500">Giá trị trung bình/đơn</p>
+            <h3 class="text-2xl font-bold text-gray-900">@Model.AverageOrderValue.ToString("N0")đ</h3>
+      </div>
+</div>
+
+<!-- Detailed Table -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-bold text-gray-900">Chi tiết theo ngày</h3>
+            <!-- Print/Export buttons could go here -->
+      </div>
+      <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                  <thead class="text-xs text-gray-500 uppercase bg-gray-50">
+                        <tr>
+                              <th class="px-6 py-3">Ngày</th>
+                              <th class="px-6 py-3 text-center">Số đơn hàng</th>
+                              <th class="px-6 py-3 text-right">Doanh thu</th>
+                              <th class="px-6 py-3 text-right">Trung bình</th>
+                        </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100">
+                        @if (Model.DailyStats.Any())
+                        {
+                              foreach (var item in Model.DailyStats)
+                              {
+                                    <tr class="hover:bg-gray-50">
+                                          <td class="px-6 py-4 font-medium text-gray-900">@item.Date.ToString("dd/MM/yyyy")</td>
+                                          <td class="px-6 py-4 text-center">@item.OrderCount</td>
+                                          <td class="px-6 py-4 text-right font-bold text-emerald-600">@item.Revenue.ToString("N0")đ
+                                          </td>
+                                          <td class="px-6 py-4 text-right text-gray-600">
+                                                @((item.OrderCount > 0 ? item.Revenue / item.OrderCount : 0).ToString("N0"))đ
+                                          </td>
+                                    </tr>
+                              }
+                        }
+                        else
+                        {
+                              <tr>
+                                    <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                                          Chưa có dữ liệu cho khoảng thời gian này.
+                                    </td>
+                              </tr>
+                        }
+                  </tbody>
+            </table>
+      </div>
+</div>

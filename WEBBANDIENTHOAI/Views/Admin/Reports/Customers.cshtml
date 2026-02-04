@@ -1,0 +1,89 @@
+@model WEBBANDIENTHOAI.Models.ViewModels.CustomerReportViewModel
+@{
+      ViewData["Title"] = "Báo Cáo Khách Hàng";
+      Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900">Báo Cáo Khách Hàng</h1>
+      <p class="text-sm text-gray-500 mt-1">Phân tích hành vi & nhận diện khách hàng thân thiết.</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center">
+                  <span class="material-symbols-outlined">group</span>
+            </div>
+            <div>
+                  <p class="text-sm font-semibold text-gray-500">Tổng khách hàng</p>
+                  <h3 class="text-2xl font-bold text-gray-900">@Model.TotalCustomers</h3>
+            </div>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
+                  <span class="material-symbols-outlined">person_add</span>
+            </div>
+            <div>
+                  <p class="text-sm font-semibold text-gray-500">Khách mới (tháng này)</p>
+                  <h3 class="text-2xl font-bold text-gray-900">@Model.NewCustomersThisMonth</h3>
+            </div>
+      </div>
+</div>
+
+<!-- Top Spenders Table -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 bg-orange-50/50 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-orange-600">military_tech</span>
+                  <h3 class="font-bold text-gray-900">Top 20 Khách Hàng "VIP"</h3>
+            </div>
+      </div>
+      <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                  <thead class="text-xs text-gray-500 uppercase bg-gray-50">
+                        <tr>
+                              <th class="px-6 py-3">Khách hàng</th>
+                              <th class="px-6 py-3">Liên hệ</th>
+                              <th class="px-6 py-3 text-center">Số đơn</th>
+                              <th class="px-6 py-3 text-right">Tổng chi tiêu</th>
+                              <th class="px-6 py-3 text-right">Mua gần nhất</th>
+                        </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100">
+                        @if (Model.TopCustomers.Any())
+                        {
+                              var rank = 1;
+                              foreach (var item in Model.TopCustomers)
+                              {
+                                    <tr class="hover:bg-gray-50">
+                                          <td class="px-6 py-4">
+                                                <div class="flex items-center gap-3">
+                                                      <span
+                                                            class="w-6 h-6 flex items-center justify-center rounded-full @(rank <= 3 ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600") text-xs font-bold">@rank</span>
+                                                      <span class="font-bold text-gray-900">@item.FullName</span>
+                                                </div>
+                                          </td>
+                                          <td class="px-6 py-4">
+                                                <p class="text-xs text-gray-500">@item.Phone</p>
+                                                <p class="text-xs text-gray-500">@item.Email</p>
+                                          </td>
+                                          <td class="px-6 py-4 text-center">@item.TotalOrders</td>
+                                          <td class="px-6 py-4 text-right font-bold text-emerald-600">
+                                                @item.TotalSpent.ToString("N0")đ</td>
+                                          <td class="px-6 py-4 text-right text-gray-500">@item.LastOrderDate.ToString("dd/MM/yyyy")
+                                          </td>
+                                    </tr>
+                                    rank++;
+                              }
+                        }
+                        else
+                        {
+                              <tr>
+                                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">Chưa có dữ liệu.</td>
+                              </tr>
+                        }
+                  </tbody>
+            </table>
+      </div>
+</div>

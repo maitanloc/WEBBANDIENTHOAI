@@ -4,6 +4,7 @@
 }
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -66,7 +67,7 @@
 
         /* ACTIVE LINK STYLES */
         .panel-link.active-panel-link {
-            background: rgba(11,107,255,0.08);
+            background: rgba(11, 107, 255, 0.08);
             color: #0b6bff;
             border-radius: 0.5rem;
         }
@@ -96,21 +97,23 @@
             margin: 0 !important;
             padding: 0 !important;
             border: none !important;
-            background: white !important; /* NỀN TRẮNG NGAY LẬP TỨC */
+            background: white !important;
+            /* NỀN TRẮNG NGAY LẬP TỨC */
             transform: none !important;
             opacity: 1 !important;
-            transition: none !important; /* KHÔNG CÓ TRANSITION GÂY DELAY */
+            transition: none !important;
+            /* KHÔNG CÓ TRANSITION GÂY DELAY */
         }
 
-            #initial-loader.fade-out {
-                opacity: 0 !important;
-                pointer-events: none !important;
-                transition: opacity 0.5s ease-in-out !important;
-            }
+        #initial-loader.fade-out {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.5s ease-in-out !important;
+        }
 
-            #navigation-loader.hidden {
-                display: none !important;
-            }
+        #navigation-loader.hidden {
+            display: none !important;
+        }
 
         /* RESET CONTAINER LOADER */
         .loader {
@@ -179,9 +182,9 @@
             bottom: 0;
         }
 
-            .truckTires svg {
-                width: 24px;
-            }
+        .truckTires svg {
+            width: 24px;
+        }
 
         .road {
             width: 100%;
@@ -193,29 +196,29 @@
             border-radius: 3px;
         }
 
-            .road::before {
-                content: "";
-                position: absolute;
-                width: 20px;
-                height: 100%;
-                background-color: #282828;
-                right: -50%;
-                border-radius: 3px;
-                animation: roadAnimation 1.4s linear infinite;
-                border-left: 10px solid white;
-            }
+        .road::before {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 100%;
+            background-color: #282828;
+            right: -50%;
+            border-radius: 3px;
+            animation: roadAnimation 1.4s linear infinite;
+            border-left: 10px solid white;
+        }
 
-            .road::after {
-                content: "";
-                position: absolute;
-                width: 10px;
-                height: 100%;
-                background-color: #282828;
-                right: -65%;
-                border-radius: 3px;
-                animation: roadAnimation 1.4s linear infinite;
-                border-left: 4px solid white;
-            }
+        .road::after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 100%;
+            background-color: #282828;
+            right: -65%;
+            border-radius: 3px;
+            animation: roadAnimation 1.4s linear infinite;
+            border-left: 4px solid white;
+        }
 
         .lampPost {
             position: absolute;
@@ -320,9 +323,9 @@
             transition: background-color 0.2s;
         }
 
-            .logout-btn-cancel:hover {
-                background: #4b5563;
-            }
+        .logout-btn-cancel:hover {
+            background: #4b5563;
+        }
 
         .logout-btn-confirm {
             background: #ef4444;
@@ -335,13 +338,14 @@
             transition: background-color 0.2s;
         }
 
-            .logout-btn-confirm:hover {
-                background: #dc2626;
-            }
+        .logout-btn-confirm:hover {
+            background: #dc2626;
+        }
     </style>
 
     @RenderSection("Styles", required: false)
 </head>
+
 <body class="bg-gray-50 text-gray-800">
     <!-- INITIAL LOADER - HIỆN KHI BẮT ĐẦU LOAD TRANG -->
     <div id="initial-loader">
@@ -349,13 +353,23 @@
             <div class="truckWrapper">
                 <div class="truckBody">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 198 93" class="trucksvg">
-                        <path stroke-width="3" stroke="#282828" fill="#f97316" d="M135 22.5H177.264C178.295 22.5 179.22 23.133 179.594 24.0939L192.33 56.8443C192.442 57.1332 192.5 57.4404 192.5 57.7504V89C192.5 90.3807 191.381 91.5 190 91.5H135C133.619 91.5 132.5 90.3807 132.5 89V25C132.5 23.6193 133.619 22.5 135 22.5Z"></path>
-                        <path stroke-width="3" stroke="#282828" fill="#7D7C7C" d="M146 33.5H181.741C182.779 33.5 183.709 34.1415 184.078 35.112L190.538 52.112C191.16 53.748 189.951 55.5 188.201 55.5H146C144.619 55.5 143.5 54.3807 143.5 53V36C143.5 34.6193 144.619 33.5 146 33.5Z"></path>
-                        <path stroke-width="2" stroke="#282828" fill="#282828" d="M150 65C150 65.39 149.763 65.8656 149.127 66.2893C148.499 66.7083 147.573 67 146.5 67C145.427 67 144.501 66.7083 143.873 66.2893C143.237 65.8656 143 65.39 143 65C143 64.61 143.237 64.1344 143.873 63.7107C144.501 63.2917 145.427 63 146.5 63C147.573 63 148.499 63.2917 149.127 63.7107C149.763 64.1344 150 64.61 150 65Z"></path>
-                        <rect stroke-width="2" stroke="#282828" fill="#FFFCAB" rx="1" height="7" width="5" y="63" x="187"></rect>
-                        <rect stroke-width="2" stroke="#282828" fill="#282828" rx="1" height="11" width="4" y="81" x="193"></rect>
-                        <rect stroke-width="3" stroke="#282828" fill="#DFDFDF" rx="2.5" height="90" width="121" y="1.5" x="6.5"></rect>
-                        <rect stroke-width="2" stroke="#282828" fill="#DFDFDF" rx="2" height="4" width="6" y="84" x="1"></rect>
+                        <path stroke-width="3" stroke="#282828" fill="#f97316"
+                            d="M135 22.5H177.264C178.295 22.5 179.22 23.133 179.594 24.0939L192.33 56.8443C192.442 57.1332 192.5 57.4404 192.5 57.7504V89C192.5 90.3807 191.381 91.5 190 91.5H135C133.619 91.5 132.5 90.3807 132.5 89V25C132.5 23.6193 133.619 22.5 135 22.5Z">
+                        </path>
+                        <path stroke-width="3" stroke="#282828" fill="#7D7C7C"
+                            d="M146 33.5H181.741C182.779 33.5 183.709 34.1415 184.078 35.112L190.538 52.112C191.16 53.748 189.951 55.5 188.201 55.5H146C144.619 55.5 143.5 54.3807 143.5 53V36C143.5 34.6193 144.619 33.5 146 33.5Z">
+                        </path>
+                        <path stroke-width="2" stroke="#282828" fill="#282828"
+                            d="M150 65C150 65.39 149.763 65.8656 149.127 66.2893C148.499 66.7083 147.573 67 146.5 67C145.427 67 144.501 66.7083 143.873 66.2893C143.237 65.8656 143 65.39 143 65C143 64.61 143.237 64.1344 143.873 63.7107C144.501 63.2917 145.427 63 146.5 63C147.573 63 148.499 63.2917 149.127 63.7107C149.763 64.1344 150 64.61 150 65Z">
+                        </path>
+                        <rect stroke-width="2" stroke="#282828" fill="#FFFCAB" rx="1" height="7" width="5" y="63"
+                            x="187"></rect>
+                        <rect stroke-width="2" stroke="#282828" fill="#282828" rx="1" height="11" width="4" y="81"
+                            x="193"></rect>
+                        <rect stroke-width="3" stroke="#282828" fill="#DFDFDF" rx="2.5" height="90" width="121" y="1.5"
+                            x="6.5"></rect>
+                        <rect stroke-width="2" stroke="#282828" fill="#DFDFDF" rx="2" height="4" width="6" y="84" x="1">
+                        </rect>
                     </svg>
                 </div>
                 <div class="truckTires">
@@ -369,8 +383,9 @@
                     </svg>
                 </div>
                 <div class="road"></div>
-                <svg xml:space="preserve" viewBox="0 0 453.459 453.459" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="Capa_1" version="1.1" fill="#000000" class="lampPost">
-                <path d="M252.882,0c-37.781,0-68.686,29.953-70.245,67.358h-6.917v8.954c-26.109,2.163-45.463,10.011-45.463,19.366h9.993
+                <svg xml:space="preserve" viewBox="0 0 453.459 453.459" xmlns:xlink="http://www.w3.org/1999/xlink"
+                    xmlns="http://www.w3.org/2000/svg" id="Capa_1" version="1.1" fill="#000000" class="lampPost">
+                    <path d="M252.882,0c-37.781,0-68.686,29.953-70.245,67.358h-6.917v8.954c-26.109,2.163-45.463,10.011-45.463,19.366h9.993
 c-1.65,5.146-2.507,10.54-2.507,16.017c0,28.956,23.558,52.514,52.514,52.514c28.956,0,52.514-23.558,52.514-52.514
 c0-5.478-0.856-10.872-2.506-16.017h9.992c0-9.354-19.352-17.204-45.463-19.366v-8.954h-6.149C200.189,38.779,223.924,16,252.882,16
 c29.952,0,54.32,24.368,54.32,54.32c0,28.774-11.078,37.009-25.105,47.437c-17.444,12.968-37.216,27.667-37.216,78.884v113.914
@@ -413,18 +428,25 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                             <span class="material-symbols-outlined text-gray-600">smartphone</span>
                             <span class="font-medium text-sm">Quản lý Sản Phẩm</span>
                         </div>
-                        <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
+                        <span
+                            class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
                     </summary>
                     <div class="pl-8 pt-2 flex flex-col gap-2">
-                        <a href="@Url.Action("Index", "Products")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
+                        <a href="@Url.Action("Index", "Products")"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
                             <span class="material-symbols-outlined text-sm">inventory_2</span>
                             Sản Phẩm
                         </a>
-                        <a href="@Url.Action("ProductStatuses", "ProductStatuses")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
+                        <a href="@Url.Action("ProductStatuses", "ProductStatuses")"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
                             <span class="material-symbols-outlined text-base">category</span>
                             Trạng thái sản phẩm
                         </a>
-                        <a href="@Url.Action("Index", "Categories")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
+                        <a href="@Url.Action("Index", "Categories")"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
                             <span class="material-symbols-outlined text-sm">category</span>
                             Danh mục
                         </a>
@@ -438,37 +460,89 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                             <span class="material-symbols-outlined text-gray-600">receipt_long</span>
                             <span class="font-medium text-sm">Quản lý Đơn Hàng</span>
                         </div>
-                        <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
+                        <span
+                            class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
                     </summary>
                     <div class="pl-8 pt-2 flex flex-col gap-2">
                         <a href="@Url.Action("Index", "Order", new { area = "Admin" })"
-                           class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
-                           data-loader="true">
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
                             <span class="material-symbols-outlined text-sm">shopping_cart</span>
                             Đơn Hàng
                         </a>
                     </div>
                 </details>
 
-                <!-- Quản lý Tài Khoản -->
+                <!-- Báo Cáo Thống Kê -->
+                <details class="group">
+                    <summary class="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-orange-50">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-gray-600">analytics</span>
+                            <span class="font-medium text-sm">Báo Cáo Thống Kê</span>
+                        </div>
+                        <span
+                            class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
+                    </summary>
+                    <div class="pl-8 pt-2 flex flex-col gap-2">
+                        <a href="@Url.Action("Index", "Reports", new { area = "Admin" })"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
+                            <span class="material-symbols-outlined text-sm">dashboard</span>
+                            Tổng quan
+                        </a>
+                        <a href="@Url.Action("Revenue", "Reports", new { area = "Admin" })"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
+                            <span class="material-symbols-outlined text-sm">payments</span>
+                            Doanh thu
+                        </a>
+                        <a href="@Url.Action("Products", "Reports", new { area = "Admin" })"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
+                            <span class="material-symbols-outlined text-sm">trending_up</span>
+                            Sản phẩm
+                        </a>
+                        <a href="@Url.Action("Customers", "Reports", new { area = "Admin" })"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
+                            <span class="material-symbols-outlined text-sm">person_search</span>
+                            Khách hàng
+                        </a>
+                        <a href="@Url.Action("Inventory", "Reports", new { area = "Admin" })"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
+                            <span class="material-symbols-outlined text-sm">warehouse</span>
+                            Tồn kho
+                        </a>
+                    </div>
+                </details>
+
+
                 <details class="group">
                     <summary class="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-orange-50">
                         <div class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-gray-600">group</span>
                             <span class="font-medium text-sm">Quản lý Tài Khoản</span>
                         </div>
-                        <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
+                        <span
+                            class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
                     </summary>
                     <div class="pl-8 pt-2 flex flex-col gap-2">
-                        <a href="@Url.Action("Index", "Customer")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
+                        <a href="@Url.Action("Index", "Customer")"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
                             <span class="material-symbols-outlined text-sm">people</span>
                             Khách Hàng
                         </a>
-                        <a href="@Url.Action("StaffList", "Admin")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
+                        <a href="@Url.Action("StaffList", "Admin")"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
                             <span class="material-symbols-outlined text-sm">badge</span>
                             Nhân Viên
                         </a>
-                        <a href="@Url.Action("Index", "Role")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
+                        <a href="@Url.Action("Index", "Role")"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
                             <span class="material-symbols-outlined text-sm">badge</span>
                             Vai Trò
                         </a>
@@ -477,23 +551,31 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
 
                 <!-- Báo Cáo & Công Cụ -->
                 <details class="group" open>
-                    <summary class="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-orange-50 bg-orange-50">
+                    <summary
+                        class="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-orange-50 bg-orange-50">
                         <div class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-orange-500">assessment</span>
                             <span class="font-medium text-sm text-orange-500">Báo Cáo & Công Cụ</span>
                         </div>
-                        <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm text-orange-500">chevron_right</span>
+                        <span
+                            class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm text-orange-500">chevron_right</span>
                     </summary>
                     <div class="pl-8 pt-2 flex flex-col gap-2">
-                        <a href="@Url.Action("Index", "Kho")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
+                        <a href="@Url.Action("Index", "Kho")"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
                             <span class="material-symbols-outlined text-sm">inventory_2</span>
                             Kho Hàng
                         </a>
-                        <a href="@Url.Action("Index", "ImportReceipt")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
+                        <a href="@Url.Action("Index", "ImportReceipt")"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
                             <span class="material-symbols-outlined text-sm">input</span>
-                            Nhập hàng 
+                            Nhập hàng
                         </a>
-                        <a href="@Url.Action("Index", "ExportReceipt")" class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link" data-loader="true">
+                        <a href="@Url.Action("Index", "ExportReceipt")"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
                             <span class="material-symbols-outlined text-sm">import_export</span>
                             Xuất hàng
                         </a>
@@ -503,7 +585,9 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
 
             <div class="mt-auto">
                 <div class="flex items-center gap-3 p-3 bg-gray-100 rounded-lg mb-3">
-                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-orange-50 text-orange-500 font-semibold">AD</div>
+                    <div
+                        class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-orange-50 text-orange-500 font-semibold">
+                        AD</div>
                     <div class="flex flex-col">
                         <h1 class="text-gray-800 text-sm font-medium">Admin User</h1>
                         <p class="text-gray-500 text-xs">administrator@example.com</p>
@@ -511,7 +595,8 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                 </div>
 
                 <!-- Sửa link đăng xuất trong sidebar -->
-                <a id="nav-logout" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer logout-trigger">
+                <a id="nav-logout"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer logout-trigger">
                     <span class="material-symbols-outlined">logout</span>
                     <p class="text-sm font-medium">Đăng Xuất</p>
                 </a>
@@ -551,13 +636,23 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
             <div class="truckWrapper">
                 <div class="truckBody">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 198 93" class="trucksvg">
-                        <path stroke-width="3" stroke="#282828" fill="#f97316" d="M135 22.5H177.264C178.295 22.5 179.22 23.133 179.594 24.0939L192.33 56.8443C192.442 57.1332 192.5 57.4404 192.5 57.7504V89C192.5 90.3807 191.381 91.5 190 91.5H135C133.619 91.5 132.5 90.3807 132.5 89V25C132.5 23.6193 133.619 22.5 135 22.5Z"></path>
-                        <path stroke-width="3" stroke="#282828" fill="#7D7C7C" d="M146 33.5H181.741C182.779 33.5 183.709 34.1415 184.078 35.112L190.538 52.112C191.16 53.748 189.951 55.5 188.201 55.5H146C144.619 55.5 143.5 54.3807 143.5 53V36C143.5 34.6193 144.619 33.5 146 33.5Z"></path>
-                        <path stroke-width="2" stroke="#282828" fill="#282828" d="M150 65C150 65.39 149.763 65.8656 149.127 66.2893C148.499 66.7083 147.573 67 146.5 67C145.427 67 144.501 66.7083 143.873 66.2893C143.237 65.8656 143 65.39 143 65C143 64.61 143.237 64.1344 143.873 63.7107C144.501 63.2917 145.427 63 146.5 63C147.573 63 148.499 63.2917 149.127 63.7107C149.763 64.1344 150 64.61 150 65Z"></path>
-                        <rect stroke-width="2" stroke="#282828" fill="#FFFCAB" rx="1" height="7" width="5" y="63" x="187"></rect>
-                        <rect stroke-width="2" stroke="#282828" fill="#282828" rx="1" height="11" width="4" y="81" x="193"></rect>
-                        <rect stroke-width="3" stroke="#282828" fill="#DFDFDF" rx="2.5" height="90" width="121" y="1.5" x="6.5"></rect>
-                        <rect stroke-width="2" stroke="#282828" fill="#DFDFDF" rx="2" height="4" width="6" y="84" x="1"></rect>
+                        <path stroke-width="3" stroke="#282828" fill="#f97316"
+                            d="M135 22.5H177.264C178.295 22.5 179.22 23.133 179.594 24.0939L192.33 56.8443C192.442 57.1332 192.5 57.4404 192.5 57.7504V89C192.5 90.3807 191.381 91.5 190 91.5H135C133.619 91.5 132.5 90.3807 132.5 89V25C132.5 23.6193 133.619 22.5 135 22.5Z">
+                        </path>
+                        <path stroke-width="3" stroke="#282828" fill="#7D7C7C"
+                            d="M146 33.5H181.741C182.779 33.5 183.709 34.1415 184.078 35.112L190.538 52.112C191.16 53.748 189.951 55.5 188.201 55.5H146C144.619 55.5 143.5 54.3807 143.5 53V36C143.5 34.6193 144.619 33.5 146 33.5Z">
+                        </path>
+                        <path stroke-width="2" stroke="#282828" fill="#282828"
+                            d="M150 65C150 65.39 149.763 65.8656 149.127 66.2893C148.499 66.7083 147.573 67 146.5 67C145.427 67 144.501 66.7083 143.873 66.2893C143.237 65.8656 143 65.39 143 65C143 64.61 143.237 64.1344 143.873 63.7107C144.501 63.2917 145.427 63 146.5 63C147.573 63 148.499 63.2917 149.127 63.7107C149.763 64.1344 150 64.61 150 65Z">
+                        </path>
+                        <rect stroke-width="2" stroke="#282828" fill="#FFFCAB" rx="1" height="7" width="5" y="63"
+                            x="187"></rect>
+                        <rect stroke-width="2" stroke="#282828" fill="#282828" rx="1" height="11" width="4" y="81"
+                            x="193"></rect>
+                        <rect stroke-width="3" stroke="#282828" fill="#DFDFDF" rx="2.5" height="90" width="121" y="1.5"
+                            x="6.5"></rect>
+                        <rect stroke-width="2" stroke="#282828" fill="#DFDFDF" rx="2" height="4" width="6" y="84" x="1">
+                        </rect>
                     </svg>
                 </div>
                 <div class="truckTires">
@@ -571,8 +666,9 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                     </svg>
                 </div>
                 <div class="road"></div>
-                <svg xml:space="preserve" viewBox="0 0 453.459 453.459" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="Capa_1" version="1.1" fill="#000000" class="lampPost">
-                <path d="M252.882,0c-37.781,0-68.686,29.953-70.245,67.358h-6.917v8.954c-26.109,2.163-45.463,10.011-45.463,19.366h9.993
+                <svg xml:space="preserve" viewBox="0 0 453.459 453.459" xmlns:xlink="http://www.w3.org/1999/xlink"
+                    xmlns="http://www.w3.org/2000/svg" id="Capa_1" version="1.1" fill="#000000" class="lampPost">
+                    <path d="M252.882,0c-37.781,0-68.686,29.953-70.245,67.358h-6.917v8.954c-26.109,2.163-45.463,10.011-45.463,19.366h9.993
 c-1.65,5.146-2.507,10.54-2.507,16.017c0,28.956,23.558,52.514,52.514,52.514c28.956,0,52.514-23.558,52.514-52.514
 c0-5.478-0.856-10.872-2.506-16.017h9.992c0-9.354-19.352-17.204-45.463-19.366v-8.954h-6.149C200.189,38.779,223.924,16,252.882,16
 c29.952,0,54.32,24.368,54.32,54.32c0,28.774-11.078,37.009-25.105,47.437c-17.444,12.968-37.216,27.667-37.216,78.884v113.914
@@ -588,7 +684,7 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
 
     <script>
         // QUẢN LÝ LOADER TOÀN TRANG - ĐÃ SỬA LỖI
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const initialLoader = document.getElementById('initial-loader');
             const navigationLoader = document.getElementById('navigation-loader');
             const logoutPopup = document.getElementById('logout-popup');
@@ -608,19 +704,19 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
 
             // Gán sự kiện cho các nút đăng xuất
             logoutTriggers.forEach(trigger => {
-                trigger.addEventListener('click', function(e) {
+                trigger.addEventListener('click', function (e) {
                     e.preventDefault();
                     showLogoutPopup();
                 });
             });
 
             // Xử lý nút hủy
-            logoutCancel.addEventListener('click', function() {
+            logoutCancel.addEventListener('click', function () {
                 hideLogoutPopup();
             });
 
             // Xử lý nút xác nhận đăng xuất
-            logoutConfirm.addEventListener('click', function() {
+            logoutConfirm.addEventListener('click', function () {
                 hideLogoutPopup();
                 // Hiển thị loader và chuyển đến trang đăng xuất
                 resetLoaderPosition();
@@ -628,13 +724,13 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                 navigationLoader.style.display = 'flex';
                 navigationLoader.classList.remove('hidden');
 
-                setTimeout(function() {
+                setTimeout(function () {
                     window.location.href = '@Url.Action("Logout", "Account")';
                 }, minLoadTime);
             });
 
             // Đóng popup khi click bên ngoài
-            logoutPopup.addEventListener('click', function(e) {
+            logoutPopup.addEventListener('click', function (e) {
                 if (e.target === logoutPopup) {
                     hideLogoutPopup();
                 }
@@ -669,12 +765,12 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                 const elapsed = currentTime - startTime;
                 const remainingTime = Math.max(0, minLoadTime - elapsed);
 
-                setTimeout(function() {
+                setTimeout(function () {
                     document.body.classList.add('content-loaded');
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         initialLoader.classList.add('fade-out');
-                        setTimeout(function() {
+                        setTimeout(function () {
                             initialLoader.style.display = 'none';
                         }, 500);
                     }, 300);
@@ -685,14 +781,14 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
             if (document.readyState === 'complete') {
                 showContent();
             } else {
-                window.addEventListener('load', function() {
+                window.addEventListener('load', function () {
                     resetLoaderPosition();
                     showContent();
                 });
             }
 
             // Fallback
-            setTimeout(function() {
+            setTimeout(function () {
                 resetLoaderPosition();
                 showContent();
             }, 3000);
@@ -706,7 +802,7 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                     link.classList.add('active-panel-link');
                 }
 
-                link.addEventListener('click', function(e) {
+                link.addEventListener('click', function (e) {
                     if (!this.target || this.target !== '_blank') {
                         e.preventDefault();
                         const href = this.getAttribute('href');
@@ -717,7 +813,7 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                         navigationLoader.style.display = 'flex';
                         navigationLoader.classList.remove('hidden');
 
-                        setTimeout(function() {
+                        setTimeout(function () {
                             window.location.href = href;
                         }, minLoadTime);
                     }
@@ -727,13 +823,13 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
             // Xử lý form submit
             const forms = document.querySelectorAll('form');
             forms.forEach(form => {
-                form.addEventListener('submit', function() {
+                form.addEventListener('submit', function () {
                     resetLoaderPosition();
                     navigationLoader.style.background = 'white';
                     navigationLoader.style.display = 'flex';
                     navigationLoader.classList.remove('hidden');
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         navigationLoader.classList.add('hidden');
                     }, 5000);
                 });
@@ -742,14 +838,14 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
             // Xử lý nút sản phẩm
             const openProductsBtn = document.getElementById('open-products-btn');
             if (openProductsBtn) {
-                openProductsBtn.addEventListener('click', function(e) {
+                openProductsBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     resetLoaderPosition();
                     navigationLoader.style.background = 'white';
                     navigationLoader.style.display = 'flex';
                     navigationLoader.classList.remove('hidden');
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         window.location.href = '@Url.Action("Index", "Products")';
                     }, minLoadTime);
                 });
@@ -758,7 +854,7 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
             // Xử lý search form
             const searchForm = document.getElementById('search-form');
             if (searchForm) {
-                searchForm.addEventListener('submit', function(e) {
+                searchForm.addEventListener('submit', function (e) {
                     resetLoaderPosition();
                     navigationLoader.style.background = 'white';
                     navigationLoader.style.display = 'flex';
@@ -768,7 +864,7 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
         });
 
         // Hàm để hiện/ẩn loader từ bất kỳ đâu
-        window.showLoader = function() {
+        window.showLoader = function () {
             const navigationLoader = document.getElementById('navigation-loader');
             if (navigationLoader) {
                 navigationLoader.style.position = 'fixed';
@@ -780,7 +876,7 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
             }
         };
 
-        window.hideLoader = function() {
+        window.hideLoader = function () {
             const navigationLoader = document.getElementById('navigation-loader');
             if (navigationLoader) {
                 navigationLoader.classList.add('hidden');
@@ -793,4 +889,5 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
 
     @RenderSection("Scripts", required: false)
 </body>
+
 </html>

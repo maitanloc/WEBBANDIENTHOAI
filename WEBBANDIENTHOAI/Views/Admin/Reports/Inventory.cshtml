@@ -1,0 +1,81 @@
+@model WEBBANDIENTHOAI.Models.ViewModels.InventoryReportViewModel
+@{
+      ViewData["Title"] = "Báo Cáo Tồn Kho";
+      Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900">Báo Cáo Tồn Kho</h1>
+      <p class="text-sm text-gray-500 mt-1">Định giá tài sản & Kiểm soát hàng hóa.</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center">
+                  <span class="material-symbols-outlined">monetization_on</span>
+            </div>
+            <div>
+                  <p class="text-sm font-semibold text-gray-500">Giá trị tồn kho ước tính</p>
+                  <h3 class="text-2xl font-bold text-gray-900">@Model.TotalInventoryValue.ToString("N0")đ</h3>
+            </div>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 bg-gray-50 text-gray-600 rounded-full flex items-center justify-center">
+                  <span class="material-symbols-outlined">inventory</span>
+            </div>
+            <div>
+                  <p class="text-sm font-semibold text-gray-500">Tổng mã hàng (SKU)</p>
+                  <h3 class="text-2xl font-bold text-gray-900">@Model.TotalItems</h3>
+            </div>
+      </div>
+</div>
+
+<!-- Inventory Table -->
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 bg-purple-50/50 flex justify-between items-center">
+            <h3 class="font-bold text-gray-900">Chi tiết tồn kho</h3>
+      </div>
+      <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                  <thead class="text-xs text-gray-500 uppercase bg-gray-50">
+                        <tr>
+                              <th class="px-6 py-3">Mã kho</th>
+                              <th class="px-6 py-3">Sản phẩm</th>
+                              <th class="px-6 py-3 text-center">Số lượng</th>
+                              <th class="px-6 py-3 text-right">Đơn giá bán</th>
+                              <th class="px-6 py-3 text-right">Tổng giá trị</th>
+                              <th class="px-6 py-3">Vị trí</th>
+                        </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100">
+                        @if (Model.Items.Any())
+                        {
+                              foreach (var item in Model.Items)
+                              {
+                                    <tr class="hover:bg-gray-50">
+                                          <td class="px-6 py-4 font-mono text-xs text-gray-500">@item.StockCode</td>
+                                          <td class="px-6 py-4 font-medium text-gray-900">@item.ProductName</td>
+                                          <td class="px-6 py-4 text-center font-bold">@item.Quantity</td>
+                                          <td class="px-6 py-4 text-right">@item.UnitPrice.ToString("N0")đ</td>
+                                          <td class="px-6 py-4 text-right font-bold text-purple-600">
+                                                @item.TotalValue.ToString("N0")đ</td>
+                                          <td class="px-6 py-4 text-gray-500">
+                                                <div class="flex items-center gap-1">
+                                                      <span class="material-symbols-outlined text-xs">location_on</span>
+                                                      <span>@item.Location</span>
+                                                </div>
+                                          </td>
+                                    </tr>
+                              }
+                        }
+                        else
+                        {
+                              <tr>
+                                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">Kho hàng trống.</td>
+                              </tr>
+                        }
+                  </tbody>
+            </table>
+      </div>
+</div>
