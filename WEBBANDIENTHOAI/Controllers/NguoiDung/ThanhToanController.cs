@@ -157,66 +157,101 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 
                 var strategy = _context.Database.CreateExecutionStrategy(); // Tạo execution strategy
 
+                IActionResult result = null; 
+
                 strategy.Execute(() => // Bọc toàn bộ transaction vào strategy để hỗ trợ retry
                 {
                     using var transaction = _context.Database.BeginTransaction(); // Bắt đầu transaction
 
-                    // 1. Tạo đơn hàng mới
-                    var order = new Order
+                    try
                     {
-                        CustomerId = int.Parse(customerId),
-                        OrderDate = DateTime.UtcNow,
-                        Total = model.TotalAmount,
-                        StatusId = 1,
-                        ShippingAddress = model.Address,
-                        CreatedByUserId = null,
-                        PaymentMethod = model.PaymentMethod,
-                        Notes = model.Notes ?? string.Empty // Set to empty string if null to avoid null issues
-                    };
-
-                    _context.Orders.Add(order);
-                    _context.SaveChanges();
-
-                    orderId = order.OrderId; // Gán orderId sau khi SaveChanges()
-
-                    // 2. Tạo chi tiết đơn hàng
-                    foreach (var item in model.SelectedItems)
-                    {
-                        var orderDetail = new OrderDetail
+                        // 0. KIỂM TRA TỒN KHO (Overselling Prevention)
+                        foreach (var item in model.SelectedItems)
                         {
-                            OrderId = order.OrderId,
-                            ProductId = item.ProductId,
-                            Quantity = item.Quantity,
-                            UnitPrice = item.Price
-                        };
-                        _context.OrderDetails.Add(orderDetail);
-                    }
+                            var totalStock = _context.Inventories
+                                .Where(i => i.ProductId == item.ProductId)
+                                .Sum(i => i.CurrentQuantity);
 
-                    // 3. Xóa các sản phẩm đã thanh toán khỏi giỏ hàng
-                    var cart = _context.Carts
-                        .Include(c => c.Details)
-                        .FirstOrDefault(c => c.CustomerId == int.Parse(customerId));
-
-                    if (cart != null)
-                    {
-                        var selectedCartDetails = cart.Details
-                            .Where(cd => model.SelectedItems.Select(si => si.ProductId).Contains(cd.ProductId))
-                            .ToList();
-
-                        foreach (var cartDetail in selectedCartDetails)
-                        {
-                            _context.CartDetails.Remove(cartDetail);
+                            if (totalStock < item.Quantity)
+                            {
+                                // Nếu thiếu hàng, gán result và return để thoát lambda
+                                result = Json(new { success = false, message = $"Sản phẩm '{item.ProductName}' chỉ còn {totalStock} sản phẩm. Vui lòng cập nhật giỏ hàng." });
+                                return;
+                            }
                         }
-                    }
 
-                    _context.SaveChanges();
-                    transaction.Commit(); // Commit transaction
+                        // 1. Tạo đơn hàng mới
+                        var order = new Order
+                        {
+                            CustomerId = int.Parse(customerId),
+                            OrderDate = DateTime.UtcNow,
+                            Total = model.TotalAmount,
+                            StatusId = 1,
+                            ShippingAddress = model.Address,
+                            CreatedByUserId = null,
+                            PaymentMethod = model.PaymentMethod,
+                            Notes = model.Notes ?? string.Empty // Set to empty string if null to avoid null issues
+                        };
+
+                        _context.Orders.Add(order);
+                        _context.SaveChanges();
+
+                        orderId = order.OrderId; // Gán orderId sau khi SaveChanges()
+
+                        // 2. Tạo chi tiết đơn hàng
+                        foreach (var item in model.SelectedItems)
+                        {
+                            var orderDetail = new OrderDetail
+                            {
+                                OrderId = order.OrderId,
+                                ProductId = item.ProductId,
+                                Quantity = item.Quantity,
+                                UnitPrice = item.Price
+                            };
+                            _context.OrderDetails.Add(orderDetail);
+                        }
+
+                        // 3. Xóa các sản phẩm đã thanh toán khỏi giỏ hàng
+                        var cart = _context.Carts
+                            .Include(c => c.Details)
+                            .FirstOrDefault(c => c.CustomerId == int.Parse(customerId));
+
+                        if (cart != null)
+                        {
+                            var selectedCartDetails = cart.Details
+                                .Where(cd => model.SelectedItems.Select(si => si.ProductId).Contains(cd.ProductId))
+                                .ToList();
+
+                            foreach (var cartDetail in selectedCartDetails)
+                            {
+                                _context.CartDetails.Remove(cartDetail);
+                            }
+                        }
+
+                        _context.SaveChanges();
+                        transaction.Commit(); // Commit transaction
+
+                        // Xóa session sau khi xử lý thành công
+                        HttpContext.Session.Remove(CheckoutSessionKey);
+                        
+                        result = Json(new { success = true, message = "Đặt hàng thành công!", redirectUrl = Url.Action("OrderSuccess", new { orderId }) });
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw; // Re-throw để catch ở ngoài xử lý logging
+                    }
                 });
 
-                // Xóa session sau khi xử lý thành công
-                HttpContext.Session.Remove(CheckoutSessionKey);
+                if (result != null)
+                {
+                    return result;
+                }
+                
+                // Should not happen if strategy executes successfully or catches exception
+                return Json(new { success = false, message = "Lỗi không xác định khi xử lý đơn hàng." });
 
-                return Json(new { success = true, message = "Đặt hàng thành công!", redirectUrl = Url.Action("OrderSuccess", new { orderId }) });
+
             }
             catch (Exception ex)
             {

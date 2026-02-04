@@ -143,12 +143,67 @@ namespace WEBBANDIENTHOAI.Repository.Admin
                 if (order == null)
                     return false;
 
+                int currentStatusId = order.StatusId; // Lưu trạng thái hiện tại
+
                 // Kiểm tra trạng thái có tồn tại không
                 var statusExists = await _context.OrderStatuses.AnyAsync(s => s.StatusId == statusId);
                 if (!statusExists)
                     throw new InvalidOperationException($"Trạng thái ID {statusId} không tồn tại");
 
                 order.StatusId = statusId;
+
+                // --- LOGIC HOÀN TRẢ KHO (Inventory Return) ---
+                // Nếu đơn hàng đang là "Shipped" (3) hoặc "Delivered" (4) mà chuyển sang "Cancelled" (5)
+                // Thì cần hoàn trả số lượng tồn kho đã bị trừ (từ phiếu xuất)
+                if ((currentStatusId == 3 || currentStatusId == 4) && statusId == 5)
+                {
+                    // Tìm các phiếu xuất kho của đơn hàng này
+                    var exportReceipts = await _context.ExportReceipts
+                        .Include(e => e.ExportReceiptDetails)
+                        .Where(e => e.OrderId == orderId)
+                        .ToListAsync();
+
+                    if (exportReceipts.Any())
+                    {
+                        foreach (var receipt in exportReceipts)
+                        {
+                            foreach (var detail in receipt.ExportReceiptDetails)
+                            {
+                                // Tìm kho hàng tương ứng với StockCode (hoặc ProductId)
+                                Inventory inventory = null;
+                                
+                                if (!string.IsNullOrEmpty(detail.StockCode))
+                                {
+                                    inventory = await _context.Inventories
+                                        .FirstOrDefaultAsync(i => i.StockCode == detail.StockCode);
+                                }
+                                
+                                // Fallback: Nếu không tìm thấy theo StockCode, thử tìm theo ProductId (lấy kho có hàng nhiều nhất hoặc kho mặc định)
+                                if (inventory == null && detail.ProductId.HasValue)
+                                {
+                                    inventory = await _context.Inventories
+                                        .OrderByDescending(i => i.CurrentQuantity)
+                                        .FirstOrDefaultAsync(i => i.ProductId == detail.ProductId);
+                                }
+
+                                if (inventory != null)
+                                {
+                                    // Hoàn trả số lượng
+                                    inventory.CurrentQuantity += detail.Quantity;
+                                    inventory.LastUpdated = DateTime.UtcNow;
+                                    
+                                    // (Optional) Update Audit Log here if needed
+                                }
+                            }
+                            
+                            // HỦY PHIẾU XUẤT (Delete Export Receipt)
+                            // Sau khi đã hoàn kho, ta xóa phiếu xuất để hủy bỏ giao dịch xuất này
+                            _context.ExportReceipts.Remove(receipt);
+                        }
+                    }
+                }
+                // --- END LOGIC ---
+
                 await _context.SaveChangesAsync();
                 return true;
             }
