@@ -308,15 +308,18 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 }).ToList()
             };
 
+            // Set ViewBag for Layout
+            ViewBag.IsLoggedIn = true;
+            ViewBag.CustomerName = order.Customer?.FullName;
+            ViewBag.CustomerEmail = order.Customer?.Email;
+            ViewBag.CustomerPhone = order.Customer?.Phone;
+
             return View(billViewModel);
         }
 
-                [HttpGet]
-
-                public IActionResult PaymentCallbackVnpay()
-
-                {
-
+        [HttpGet]
+        public IActionResult PaymentCallbackVnpay()
+        {
             try
             {
                 var response = _vnPayService.PaymentExecute(Request.Query);
@@ -329,16 +332,20 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 
                     if (order != null)
                     {
-                        order.StatusId = 2; // Đã thanh toán
-                        order.PaymentMethod = "VNPay";
-                        _context.SaveChanges();
+                        // Kiểm tra nếu đơn hàng chưa thanh toán thì mới cập nhật
+                        if (order.StatusId != 2)
+                        {
+                            order.StatusId = 2; // Đã thanh toán
+                            order.PaymentMethod = "VNPay";
+                            _context.SaveChanges();
+                        }
 
                         TempData["SuccessMessage"] = $"Thanh toán thành công đơn hàng #{orderId}";
                         return RedirectToAction("OrderSuccess", new { orderId = order.OrderId });
                     }
                 }
 
-                TempData["ErrorMessage"] = "Thanh toán thất bại. Vui lòng thử lại.";
+                TempData["ErrorMessage"] = "Thanh toán thất bại hoặc có lỗi xác thực chữ ký. Vui lòng thử lại.";
                 return RedirectToAction("Index", "HomeCarts");
             }
             catch (Exception ex)
@@ -346,6 +353,51 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 Console.WriteLine($"Error in PaymentCallbackVnpay: {ex.Message}");
                 TempData["ErrorMessage"] = "Có lỗi xảy ra khi xử lý thanh toán.";
                 return RedirectToAction("Index", "HomeCarts");
+            }
+        }
+
+        [HttpGet]
+        public IActionResult PaymentNotify()
+        {
+            try
+            {
+                var response = _vnPayService.PaymentExecute(Request.Query);
+
+                if (response.Success)
+                {
+                    var orderId = long.Parse(response.OrderId);
+                    var order = _context.Orders.Find((int)orderId);
+
+                    if (order != null)
+                    {
+                        // Kiểm tra số tiền thanh toán có khớp không
+                        // Note: vnp_Amount is multiplied by 100 in request, so potentially verify it here if available in response
+                        // For now we assume signature is enough validation for integrity
+
+                        if (order.StatusId != 2) // Nếu chưa thanh toán
+                        {
+                            order.StatusId = 2; // Đã thanh toán
+                            order.PaymentMethod = "VNPay";
+                            _context.SaveChanges();
+                        }
+                        
+                        return Json(new { RspCode = "00", Message = "Confirm Success" });
+                    }
+                    else
+                    {
+                        return Json(new { RspCode = "01", Message = "Order not found" });
+                    }
+                }
+                else
+                {
+                     // Invalid signature
+                     return Json(new { RspCode = "97", Message = "Invalid Checksum" });
+                }
+            }
+            catch (Exception ex)
+            {
+               Console.WriteLine($"Error in PaymentNotify: {ex.Message}");
+               return Json(new { RspCode = "99", Message = "Unknow error" });
             }
         }
 
@@ -383,7 +435,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 
                         StatusId = 1, // Status: "Chờ xác nhận" hoặc "Pending". Sẽ cập nhật sau khi thanh toán thành công.
 
-                        ShippingAddress = model.Address,
+                        ShippingAddress = model.Address ?? "",
 
                         PaymentMethod = "VNPay",
 

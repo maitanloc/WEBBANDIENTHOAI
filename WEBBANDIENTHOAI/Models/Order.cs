@@ -22,12 +22,12 @@ namespace WEBBANDIENTHOAI.Models
         public int StatusId { get; set; } = 1; // 1 = Pending
 
         [MaxLength(300)]
-        public string ShippingAddress { get; set; }
+        public string? ShippingAddress { get; set; }
 
         public int? CreatedByUserId { get; set; }
         
         [MaxLength(50)]
-        public string PaymentMethod { get; set; } = "COD";
+        public string? PaymentMethod { get; set; } = "COD";
 
         [MaxLength(500)]
         public string? Notes { get; set; }
