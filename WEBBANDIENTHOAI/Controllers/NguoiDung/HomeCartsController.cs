@@ -73,6 +73,22 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                     return Json(new { success = false, message = "Vui lòng đăng nhập để mua hàng!", requireLogin = true });
                 }
 
+                // Check stock
+                var product = await _context.Products.Include(p => p.Inventory).FirstOrDefaultAsync(p => p.ProductId == productId);
+                if (product == null) return Json(new { success = false, message = "Sản phẩm không tồn tại!" });
+
+                var currentStock = product.Inventory?.Sum(i => i.CurrentQuantity) ?? 0;
+                
+                // Get current cart quantity
+                var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId.Value);
+                var existingItem = cart?.Details?.FirstOrDefault(d => d.ProductId == productId);
+                var currentCartQuantity = existingItem?.Quantity ?? 0;
+
+                if (currentCartQuantity + quantity > currentStock)
+                {
+                    return Json(new { success = false, message = $"Số lượng sản phẩm không đủ. Tối đa: {currentStock}" });
+                }
+
                 await _cartRepository.AddToCartAsync(customerId.Value, productId, quantity);
                 return Json(new { success = true, message = "Đã thêm vào giỏ hàng" });
             }
@@ -87,20 +103,34 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
             var customerId = GetCurrentCustomerId();
             if (customerId == null)
             {
-                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập và lưu lại trang định quay về
                 return RedirectToAction("LoginRegister", "Account", new { returnUrl = Url.Action("Productdetails", "HomeUser", new { id = productId }) });
             }
 
             try
             {
+                // Check stock
+                var product = await _context.Products.Include(p => p.Inventory).FirstOrDefaultAsync(p => p.ProductId == productId);
+                if (product == null) 
+                {
+                    TempData["ErrorMessage"] = "Sản phẩm không tồn tại!";
+                    return RedirectToAction("Productdetails", "HomeUser", new { id = productId });
+                }
+
+                var currentStock = product.Inventory?.Sum(i => i.CurrentQuantity) ?? 0;
+                
+                // For BuyNow, we just check if requested quantity <= stock (ignoring existing cart for simplicity, or we could add it)
+                if (quantity > currentStock)
+                {
+                    TempData["ErrorMessage"] = $"Số lượng sản phẩm không đủ. Tối đa: {currentStock}";
+                    return RedirectToAction("Productdetails", "HomeUser", new { id = productId });
+                }
+
                 await _cartRepository.AddToCartAsync(customerId.Value, productId, quantity);
 
-                // Chuyển hướng thẳng đến trang thanh toán với ID sản phẩm vừa thêm
                 return RedirectToAction("Index", "ThanhToan", new { selectedProductIds = productId.ToString() });
             }
             catch (Exception)
             {
-                // Xử lý lỗi nếu có, ví dụ: hiển thị thông báo lỗi và quay lại trang chi tiết sản phẩm
                 TempData["ErrorMessage"] = "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.";
                 return RedirectToAction("Productdetails", "HomeUser", new { id = productId });
             }
@@ -115,6 +145,17 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 if (customerId == null)
                 {
                     return Json(new { success = false, message = "Phiên đăng nhập hết hạn." });
+                }
+
+                // Check stock
+                var product = await _context.Products.Include(p => p.Inventory).FirstOrDefaultAsync(p => p.ProductId == productId);
+                if (product == null) return Json(new { success = false, message = "Sản phẩm không tồn tại!" });
+
+                var currentStock = product.Inventory?.Sum(i => i.CurrentQuantity) ?? 0;
+
+                if (quantity > currentStock)
+                {
+                    return Json(new { success = false, message = $"Số lượng sản phẩm không đủ. Tối đa: {currentStock}" });
                 }
 
                 await _cartRepository.UpdateCartItemAsync(customerId.Value, productId, quantity);
