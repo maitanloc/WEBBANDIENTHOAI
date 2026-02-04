@@ -20,7 +20,8 @@
                     <i class="fas fa-chevron-right text-gray-300 text-xs mx-2"></i>
                     @if (Model.CategoryId == 1) // Smartphone
                     {
-                        <a href="/HomeUser/Smartphones" class="text-gray-500 hover:text-primary transition-colors">Điện thoại</a>
+                        <a href="/HomeUser/Smartphones" class="text-gray-500 hover:text-primary transition-colors">Điện
+                            thoại</a>
                     }
                     else if (Model.CategoryId == 2) // Laptop
                     {
@@ -45,17 +46,14 @@
                 <div class="bg-gray-50 rounded-2xl p-8 border border-gray-200">
                     @if (Model.Images.Any())
                     {
-                        <img id="mainImage" 
-                             src="@Url.Action("GetProductImage", "HomeUser", new { imageId = Model.Images.First().ImageId })" 
-                             class="w-full h-96 object-contain transition-opacity duration-300" 
-                             alt="@Model.Name" />
+                        <img id="mainImage"
+                            src="@Url.Action("GetProductImage", "HomeUser", new { imageId = Model.Images.First().ImageId })"
+                            class="w-full h-96 object-contain transition-opacity duration-300" alt="@Model.Name" />
                     }
                     else
                     {
-                        <img id="mainImage" 
-                             src="/images/default-product.png" 
-                             class="w-full h-96 object-contain" 
-                             alt="@Model.Name" />
+                        <img id="mainImage" src="/images/default-product.png" class="w-full h-96 object-contain"
+                            alt="@Model.Name" />
                     }
                 </div>
 
@@ -71,7 +69,7 @@
                         <span class="text-primary font-semibold text-lg">@Model.Brand</span>
                     }
                     <h1 class="text-3xl font-bold text-gray-900 mt-2 leading-tight">@Model.Name</h1>
-                    
+
                     <!-- Rating -->
                     <div class="flex items-center space-x-2 mt-3">
                         <div class="flex text-yellow-400">
@@ -126,7 +124,8 @@
                         <div>
                             <span class="font-semibold text-gray-800 block mb-2">Màu sắc:</span>
                             <div class="flex space-x-3">
-                                <button class="px-4 py-2 bg-primary text-white rounded-lg font-medium border-2 border-primary">
+                                <button
+                                    class="px-4 py-2 bg-primary text-white rounded-lg font-medium border-2 border-primary">
                                     @Model.Color
                                 </button>
                             </div>
@@ -138,7 +137,8 @@
                         <div>
                             <span class="font-semibold text-gray-800 block mb-2">Kích thước:</span>
                             <div class="flex space-x-3">
-                                <button class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg font-medium border-2 border-gray-300 hover:border-primary transition-colors">
+                                <button
+                                    class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg font-medium border-2 border-gray-300 hover:border-primary transition-colors">
                                     @Model.Size
                                 </button>
                             </div>
@@ -151,18 +151,21 @@
                     <div class="flex items-center space-x-4">
                         <span class="font-semibold text-gray-800">Số lượng:</span>
                         <div class="flex items-center border border-gray-300 rounded-lg bg-white">
-                            <button type="button" id="decreaseQty" class="px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors rounded-l-lg">
+                            <button type="button" id="decreaseQty"
+                                class="px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors rounded-l-lg">
                                 <i class="fas fa-minus text-xs"></i>
                             </button>
                             <input type="number" id="quantity" value="1" min="1" max="@Model.InventoryQuantity"
-                                   class="w-16 text-center border-0 focus:ring-0 focus:outline-none bg-transparent" />
-                            <button type="button" id="increaseQty" class="px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors rounded-r-lg">
+                                class="w-16 text-center border-0 focus:ring-0 focus:outline-none bg-transparent" />
+                            <button type="button" id="increaseQty"
+                                class="px-4 py-3 text-gray-600 hover:bg-gray-100 transition-colors rounded-r-lg">
                                 <i class="fas fa-plus text-xs"></i>
                             </button>
                         </div>
                         @if (Model.InventoryQuantity > 0)
                         {
-                            <span class="text-sm text-gray-500">Còn <span class="font-semibold">@Model.InventoryQuantity</span> sản phẩm</span>
+                            <span class="text-sm text-gray-500">Còn <span
+                                    class="font-semibold">@Model.InventoryQuantity</span> sản phẩm</span>
                         }
                         else
                         {
@@ -171,16 +174,15 @@
                     </div>
 
                     <div class="flex space-x-4">
-                        <button id="addToCartBtn"
-                                data-product-id="@Model.ProductId"
-                                class="flex-1 bg-gradient-to-r from-primary to-primary-dark text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                @(Model.InventoryQuantity == 0 ? "disabled" : "")>
+                        <button id="addToCartBtn" data-product-id="@Model.ProductId"
+                            class="flex-1 bg-gradient-to-r from-primary to-primary-dark text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            @(Model.InventoryQuantity == 0 ? "disabled" : "")>
                             <i class="fas fa-shopping-cart"></i>
                             <span>Thêm vào giỏ hàng</span>
                         </button>
                         <button id="buyNowBtn"
-                                class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                @(Model.InventoryQuantity == 0 ? "disabled" : "")>
+                            class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            @(Model.InventoryQuantity == 0 ? "disabled" : "")>
                             <i class="fas fa-bolt"></i>
                             <span>Đặt hàng</span>
                         </button>
@@ -239,7 +241,7 @@
 <section class="py-12 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-2xl font-bold mb-8 text-gray-900">Thông số kỹ thuật</h2>
-        
+
         @if (Model.CategoryId == 2 && Model.LaptopConfiguration != null)
         {
             <!-- Laptop Specifications -->
@@ -250,21 +252,24 @@
                         {
                             <div class="flex justify-between items-start border-b border-gray-100 pb-4">
                                 <span class="text-gray-600 font-medium flex-1">Bộ vi xử lý:</span>
-                                <span class="font-semibold text-gray-900 text-right flex-1">@Model.LaptopConfiguration.CPU</span>
+                                <span
+                                    class="font-semibold text-gray-900 text-right flex-1">@Model.LaptopConfiguration.CPU</span>
                             </div>
                         }
                         @if (!string.IsNullOrEmpty(Model.LaptopConfiguration.RAM))
                         {
                             <div class="flex justify-between items-start border-b border-gray-100 pb-4">
                                 <span class="text-gray-600 font-medium flex-1">RAM:</span>
-                                <span class="font-semibold text-gray-900 text-right flex-1">@Model.LaptopConfiguration.RAM</span>
+                                <span
+                                    class="font-semibold text-gray-900 text-right flex-1">@Model.LaptopConfiguration.RAM</span>
                             </div>
                         }
                         @if (!string.IsNullOrEmpty(Model.LaptopConfiguration.Storage))
                         {
                             <div class="flex justify-between items-start border-b border-gray-100 pb-4">
                                 <span class="text-gray-600 font-medium flex-1">Lưu trữ:</span>
-                                <span class="font-semibold text-gray-900 text-right flex-1">@Model.LaptopConfiguration.Storage</span>
+                                <span
+                                    class="font-semibold text-gray-900 text-right flex-1">@Model.LaptopConfiguration.Storage</span>
                             </div>
                         }
                     </div>
@@ -273,21 +278,24 @@
                         {
                             <div class="flex justify-between items-start border-b border-gray-100 pb-4">
                                 <span class="text-gray-600 font-medium flex-1">Pin:</span>
-                                <span class="font-semibold text-gray-900 text-right flex-1">@Model.LaptopConfiguration.Battery</span>
+                                <span
+                                    class="font-semibold text-gray-900 text-right flex-1">@Model.LaptopConfiguration.Battery</span>
                             </div>
                         }
                         @if (!string.IsNullOrEmpty(Model.LaptopConfiguration.OperatingSystem))
                         {
                             <div class="flex justify-between items-start border-b border-gray-100 pb-4">
                                 <span class="text-gray-600 font-medium flex-1">Hệ điều hành:</span>
-                                <span class="font-semibold text-gray-900 text-right flex-1">@Model.LaptopConfiguration.OperatingSystem</span>
+                                <span
+                                    class="font-semibold text-gray-900 text-right flex-1">@Model.LaptopConfiguration.OperatingSystem</span>
                             </div>
                         }
                         @if (!string.IsNullOrEmpty(Model.LaptopConfiguration.ScreenSize))
                         {
                             <div class="flex justify-between items-start border-b border-gray-100 pb-4">
                                 <span class="text-gray-600 font-medium flex-1">Màn hình:</span>
-                                <span class="font-semibold text-gray-900 text-right flex-1">@Model.LaptopConfiguration.ScreenSize</span>
+                                <span
+                                    class="font-semibold text-gray-900 text-right flex-1">@Model.LaptopConfiguration.ScreenSize</span>
                             </div>
                         }
                     </div>
@@ -318,7 +326,8 @@
                         {
                             <div class="flex justify-between items-start border-b border-gray-100 pb-4">
                                 <span class="text-gray-600 font-medium flex-1">Bộ nhớ trong:</span>
-                                <span class="font-semibold text-gray-900 text-right flex-1">@Model.PhoneConfiguration.InternalStorage</span>
+                                <span
+                                    class="font-semibold text-gray-900 text-right flex-1">@Model.PhoneConfiguration.InternalStorage</span>
                             </div>
                         }
                     </div>
@@ -327,21 +336,24 @@
                         {
                             <div class="flex justify-between items-start border-b border-gray-100 pb-4">
                                 <span class="text-gray-600 font-medium flex-1">Pin:</span>
-                                <span class="font-semibold text-gray-900 text-right flex-1">@Model.PhoneConfiguration.Battery</span>
+                                <span
+                                    class="font-semibold text-gray-900 text-right flex-1">@Model.PhoneConfiguration.Battery</span>
                             </div>
                         }
                         @if (!string.IsNullOrEmpty(Model.PhoneConfiguration.Camera))
                         {
                             <div class="flex justify-between items-start border-b border-gray-100 pb-4">
                                 <span class="text-gray-600 font-medium flex-1">Camera:</span>
-                                <span class="font-semibold text-gray-900 text-right flex-1">@Model.PhoneConfiguration.Camera</span>
+                                <span
+                                    class="font-semibold text-gray-900 text-right flex-1">@Model.PhoneConfiguration.Camera</span>
                             </div>
                         }
                         @if (!string.IsNullOrEmpty(Model.PhoneConfiguration.Cores))
                         {
                             <div class="flex justify-between items-start border-b border-gray-100 pb-4">
                                 <span class="text-gray-600 font-medium flex-1">Số nhân:</span>
-                                <span class="font-semibold text-gray-900 text-right flex-1">@Model.PhoneConfiguration.Cores</span>
+                                <span
+                                    class="font-semibold text-gray-900 text-right flex-1">@Model.PhoneConfiguration.Cores</span>
                             </div>
                         }
                     </div>
@@ -386,19 +398,19 @@
 
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Image Gallery Functionality
             const mainImage = document.getElementById('mainImage');
             const thumbnails = document.querySelectorAll('.thumbnail');
 
             thumbnails.forEach(thumb => {
-                thumb.addEventListener('click', function() {
+                thumb.addEventListener('click', function () {
                     const imageId = this.dataset.imageid;
                     const newSrc = `@Url.Action("GetProductImage", "HomeUser")?imageId=${imageId}`;
-                    
+
                     // Fade out current image
                     mainImage.style.opacity = '0';
-                    
+
                     setTimeout(() => {
                         mainImage.src = newSrc;
                         mainImage.style.opacity = '1';
@@ -415,9 +427,15 @@
             const decreaseBtn = document.getElementById('decreaseQty');
             const increaseBtn = document.getElementById('increaseQty');
 
-            quantityInput.addEventListener('input', function () {
-                const current = parseInt(this.value);
+            quantityInput.addEventListener('change', function () {
+                let current = parseInt(this.value);
                 const max = parseInt(this.max);
+
+                if (current < 1) {
+                    showCustomAlert('Số lượng phải lớn hơn 0');
+                    this.value = 1;
+                    return;
+                }
 
                 if (current > max) {
                     showCustomAlert('Số lượng sản phẩm không đủ. Tối đa: ' + max);
@@ -426,23 +444,25 @@
             });
 
             decreaseBtn.addEventListener('click', () => {
-                const current = parseInt(quantityInput.value);
+                let current = parseInt(quantityInput.value);
                 if (current > 1) {
                     quantityInput.value = current - 1;
                 }
             });
 
             increaseBtn.addEventListener('click', () => {
-                const current = parseInt(quantityInput.value);
+                let current = parseInt(quantityInput.value);
                 const max = parseInt(quantityInput.max);
                 if (current < max) {
                     quantityInput.value = current + 1;
+                } else {
+                    showCustomAlert('Số lượng sản phẩm không đủ. Tối đa: ' + max);
                 }
             });
 
             // Add to Cart Functionality
             const addToCartBtn = document.getElementById('addToCartBtn');
-            addToCartBtn.addEventListener('click', function() {
+            addToCartBtn.addEventListener('click', function () {
                 const productId = @Model.ProductId;
                 const quantity = parseInt(quantityInput.value);
 
@@ -463,53 +483,53 @@
                     },
                     body: `productId=${productId}&quantity=${quantity}`
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Show success state
-                        this.innerHTML = '<i class="fas fa-check"></i><span>Đã thêm!</span>';
-                        this.classList.remove('from-primary', 'to-primary-dark');
-                        this.classList.add('bg-green-500');
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success state
+                            this.innerHTML = '<i class="fas fa-check"></i><span>Đã thêm!</span>';
+                            this.classList.remove('from-primary', 'to-primary-dark');
+                            this.classList.add('bg-green-500');
 
-                        // Update cart count
-                        const cartCount = document.querySelector('.cart-count');
-                        if (cartCount) {
-                            const currentCount = parseInt(cartCount.textContent) || 0;
-                            cartCount.textContent = currentCount + quantity;
-                            cartCount.classList.add('animate-bounce');
-                            setTimeout(() => cartCount.classList.remove('animate-bounce'), 1000);
-                        }
+                            // Update cart count
+                            const cartCount = document.querySelector('.cart-count');
+                            if (cartCount) {
+                                const currentCount = parseInt(cartCount.textContent) || 0;
+                                cartCount.textContent = currentCount + quantity;
+                                cartCount.classList.add('animate-bounce');
+                                setTimeout(() => cartCount.classList.remove('animate-bounce'), 1000);
+                            }
 
-                        // Show success notification
-                        showNotification('Đã thêm sản phẩm vào giỏ hàng!', 'success');
+                            // Show success notification
+                            showNotification('Đã thêm sản phẩm vào giỏ hàng!', 'success');
 
-                        // Reset button after 2 seconds
-                        setTimeout(() => {
-                            this.innerHTML = originalHTML;
-                            this.classList.remove('bg-green-500');
-                            this.classList.add('from-primary', 'to-primary-dark');
-                            this.disabled = false;
-                        }, 2000);
-                    } else {
-                        if (data.requireLogin) {
-                            if (confirm('Bạn cần đăng nhập để mua hàng. Đến trang đăng nhập?')) {
-                                window.location.href = '/Account/LoginRegister';
+                            // Reset button after 2 seconds
+                            setTimeout(() => {
+                                this.innerHTML = originalHTML;
+                                this.classList.remove('bg-green-500');
+                                this.classList.add('from-primary', 'to-primary-dark');
+                                this.disabled = false;
+                            }, 2000);
+                        } else {
+                            if (data.requireLogin) {
+                                if (confirm('Bạn cần đăng nhập để mua hàng. Đến trang đăng nhập?')) {
+                                    window.location.href = '/Account/LoginRegister';
+                                } else {
+                                    this.innerHTML = originalHTML;
+                                    this.disabled = false;
+                                }
                             } else {
+                                showNotification(data.message, 'error');
                                 this.innerHTML = originalHTML;
                                 this.disabled = false;
                             }
-                        } else {
-                            showNotification(data.message, 'error');
-                            this.innerHTML = originalHTML;
-                            this.disabled = false;
                         }
-                    }
-                })
-                .catch(error => {
-                    showNotification('Có lỗi xảy ra khi thêm vào giỏ hàng', 'error');
-                    this.innerHTML = originalHTML;
-                    this.disabled = false;
-                });
+                    })
+                    .catch(error => {
+                        showNotification('Có lỗi xảy ra khi thêm vào giỏ hàng', 'error');
+                        this.innerHTML = originalHTML;
+                        this.disabled = false;
+                    });
             });
 
             const buyNowBtn = document.getElementById('buyNowBtn');
@@ -538,28 +558,28 @@
                         const container = document.getElementById('relatedProducts');
                         if (products && products.length > 0) {
                             container.innerHTML = products.map(product => `
-                                <a href="/HomeUser/Productdetails/${product.productId}" class="block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group hover:shadow-lg transition-all duration-300">
-                                    <div class="relative overflow-hidden">
-                                        <img src="/HomeUser/GetProductImage?imageId=${product.primaryImageId || 0}" 
-                                             class="w-full h-40 object-contain p-4 transition-transform duration-300 group-hover:scale-105" 
-                                             alt="${product.name}" />
-                                        <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            <button class="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50">
-                                                <i class="fas fa-heart text-gray-600 text-sm"></i>
-                                            </button>
+                                    <a href="/HomeUser/Productdetails/${product.productId}" class="block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group hover:shadow-lg transition-all duration-300">
+                                        <div class="relative overflow-hidden">
+                                            <img src="/HomeUser/GetProductImage?imageId=${product.primaryImageId || 0}" 
+                                                 class="w-full h-40 object-contain p-4 transition-transform duration-300 group-hover:scale-105" 
+                                                 alt="${product.name}" />
+                                            <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                <button class="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50">
+                                                    <i class="fas fa-heart text-gray-600 text-sm"></i>
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="p-4">
-                                        <h3 class="font-semibold text-gray-800 text-sm line-clamp-2 mb-2">${product.name}</h3>
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-primary font-bold">${formatPrice(product.price)}</span>
-                                            <button data-product-id="${product.productId}" class="add-to-cart-related w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-primary-dark transition-colors">
-                                                <i class="fas fa-shopping-cart text-xs"></i>
-                                            </button>
+                                        <div class="p-4">
+                                            <h3 class="font-semibold text-gray-800 text-sm line-clamp-2 mb-2">${product.name}</h3>
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-primary font-bold">${formatPrice(product.price)}</span>
+                                                <button data-product-id="${product.productId}" class="add-to-cart-related w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-primary-dark transition-colors">
+                                                    <i class="fas fa-shopping-cart text-xs"></i>
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                </a>
-                            `).join('');
+                                    </a>
+                                `).join('');
                         } else {
                             container.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8">Không có sản phẩm liên quan</p>';
                         }
@@ -575,15 +595,14 @@
 
             function showNotification(message, type = 'info') {
                 const notification = document.createElement('div');
-                notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 ${
-                    type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-                }`;
+                notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                    }`;
                 notification.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                        <span>${message}</span>
-                    </div>
-                `;
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                            <span>${message}</span>
+                        </div>
+                    `;
 
                 document.body.appendChild(notification);
 

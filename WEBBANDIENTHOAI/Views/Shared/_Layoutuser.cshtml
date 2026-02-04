@@ -1,12 +1,14 @@
 ﻿<!DOCTYPE html>
 <html class="light" lang="vi">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FOXMOBILE | Thế giới công nghệ cao cấp</title>
 
     <!-- SEO Optimization -->
-    <meta name="description" content="FOXMOBILE - Cửa hàng điện thoại, laptop, tablet và phụ kiện chính hãng. Giá tốt nhất, bảo hành dài hạn, giao hàng miễn phí.">
+    <meta name="description"
+        content="FOXMOBILE - Cửa hàng điện thoại, laptop, tablet và phụ kiện chính hãng. Giá tốt nhất, bảo hành dài hạn, giao hàng miễn phí.">
     <meta name="keywords" content="điện thoại, laptop, tablet, foxmobile, công nghệ, smartphone">
     <meta name="author" content="FOXMOBILE">
 
@@ -25,7 +27,8 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
     <!-- AOS Animation -->
@@ -83,9 +86,9 @@
             border-radius: 4px;
         }
 
-            ::-webkit-scrollbar-thumb:hover {
-                background: #d97a1a;
-            }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d97a1a;
+        }
 
         /* Gradient text */
         .gradient-text {
@@ -156,9 +159,9 @@
             transition: background-color 0.2s;
         }
 
-            .logout-btn-cancel:hover {
-                background: #4b5563;
-            }
+        .logout-btn-cancel:hover {
+            background: #4b5563;
+        }
 
         .logout-btn-confirm {
             background: #ef4444;
@@ -171,9 +174,9 @@
             transition: background-color 0.2s;
         }
 
-            .logout-btn-confirm:hover {
-                background: #dc2626;
-            }
+        .logout-btn-confirm:hover {
+            background: #dc2626;
+        }
 
         /* === CHAT WIDGET STYLES === */
         #chat-container {
@@ -225,9 +228,11 @@
     <!-- Welcome Notification -->
     @if (ViewBag.IsLoggedIn == true && !string.IsNullOrEmpty(ViewBag.CustomerName?.ToString()))
     {
-        <div id="welcome-notification" class="fixed top-20 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-50 border border-primary/20 animate-bounce-slow">
+        <div id="welcome-notification"
+            class="fixed top-20 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-50 border border-primary/20 animate-bounce-slow">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center">
                     <span class="text-white font-bold text-sm">
                         @ViewBag.CustomerName?.ToString().Substring(0, 1).ToUpper()
                     </span>
@@ -244,7 +249,8 @@
     }
 
     <!-- Loading Screen -->
-    <div id="loadingScreen" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex items-center justify-center transition-opacity duration-500">
+    <div id="loadingScreen"
+        class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex items-center justify-center transition-opacity duration-500">
         <div class="text-center">
             <div class="w-20 h-20 mx-auto mb-4 relative">
                 <div class="absolute inset-0 bg-primary rounded-full animate-ping"></div>
@@ -263,15 +269,20 @@
         <div class="layout-container flex h-full grow flex-col">
 
             <!-- Enhanced Header -->
-            <header class="sticky top-0 z-40 flex items-center justify-between border-b border-solid border-primary/20 bg-background-light/95 dark:bg-background-dark/95 px-4 sm:px-6 lg:px-8 py-3 backdrop-blur-md transition-all duration-300 shadow-sm" id="mainHeader">
+            <header
+                class="sticky top-0 z-40 flex items-center justify-between border-b border-solid border-primary/20 bg-background-light/95 dark:bg-background-dark/95 px-4 sm:px-6 lg:px-8 py-3 backdrop-blur-md transition-all duration-300 shadow-sm"
+                id="mainHeader">
                 <!-- Logo Section -->
                 <div class="flex items-center gap-6">
                     <a href="/HomeUser" class="flex items-center gap-3 text-gray-800 dark:text-white group">
                         <div class="relative">
-                            <div class="size-12 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
+                            <div
+                                class="size-12 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
                                 <span class="text-white font-bold text-lg">F</span>
                             </div>
-                            <div class="absolute -inset-1 bg-primary/20 rounded-xl blur-sm group-hover:blur-md transition-all duration-300"></div>
+                            <div
+                                class="absolute -inset-1 bg-primary/20 rounded-xl blur-sm group-hover:blur-md transition-all duration-300">
+                            </div>
                         </div>
                         <div>
                             <h2 class="text-xl font-black tracking-tight gradient-text">FOXMOBILE</h2>
@@ -283,24 +294,28 @@
                 <!-- Enhanced Search -->
                 <div class="hidden lg:flex flex-1 justify-center px-8 max-w-2xl">
                     <form action="/HomeUser/Search" method="get" class="relative w-full group">
-                        <div class="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-dark/20 rounded-xl blur-sm group-hover:blur transition-all duration-300"></div>
-                        <div class="relative flex items-stretch rounded-xl h-12 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 group-hover:shadow-md transition-all duration-300">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-dark/20 rounded-xl blur-sm group-hover:blur transition-all duration-300">
+                        </div>
+                        <div
+                            class="relative flex items-stretch rounded-xl h-12 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 group-hover:shadow-md transition-all duration-300">
                             <div class="text-gray-500 dark:text-gray-400 flex items-center justify-center pl-4">
                                 <i class="fas fa-search"></i>
                             </div>
-                            <input class="flex-1 rounded-r-xl text-gray-800 dark:text-white bg-transparent border-none h-full px-4 text-sm focus:outline-none focus:ring-0"
-                                   placeholder="Tìm kiếm sản phẩm, thương hiệu..."
-                                   id="globalSearch"
-                                   name="query"
-                                   autocomplete="off" />
+                            <input
+                                class="flex-1 rounded-r-xl text-gray-800 dark:text-white bg-transparent border-none h-full px-4 text-sm focus:outline-none focus:ring-0"
+                                placeholder="Tìm kiếm sản phẩm, thương hiệu..." id="globalSearch" name="query"
+                                autocomplete="off" />
                             <button type="submit" class="px-4 text-gray-500 hover:text-primary transition-colors">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                         <!-- Search Suggestions -->
-                        <div class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden z-50 overflow-hidden" id="searchSuggestions">
+                        <div class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden z-50 overflow-hidden"
+                            id="searchSuggestions">
                             <div class="p-3 border-b border-gray-100 dark:border-gray-700">
-                                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Đề xuất tìm kiếm</p>
+                                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Đề xuất tìm kiếm
+                                </p>
                             </div>
                             <div class="max-h-60 overflow-y-auto">
                                 <!-- Suggestions will be populated by JavaScript -->
@@ -313,11 +328,13 @@
                 <div class="flex items-center gap-4">
                     <!-- Desktop Navigation -->
                     <nav class="hidden xl:flex items-center gap-6 mr-4">
-                        <a href="/HomeUser/Smartphones" class="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 flex items-center gap-2 group">
+                        <a href="/HomeUser/Smartphones"
+                            class="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 flex items-center gap-2 group">
                             <i class="fas fa-mobile-alt text-base"></i>
                             <span>Điện thoại</span>
                         </a>
-                        <a href="/HomeUser/Laptops" class="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 flex items-center gap-2 group">
+                        <a href="/HomeUser/Laptops"
+                            class="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 flex items-center gap-2 group">
                             <i class="fas fa-laptop text-base"></i>
                             <span>Laptop</span>
                         </a>
@@ -328,8 +345,10 @@
 
 
                         <!-- Cart with Enhanced Badge -->
-                        <a href="/HomeCarts/Index" class="flex items-center justify-center rounded-xl w-10 h-10 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 relative group">
-                            <i class="fas fa-shopping-cart text-gray-600 dark:text-gray-400 group-hover:text-primary"></i>
+                        <a href="/HomeCarts/Index"
+                            class="flex items-center justify-center rounded-xl w-10 h-10 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 relative group">
+                            <i
+                                class="fas fa-shopping-cart text-gray-600 dark:text-gray-400 group-hover:text-primary"></i>
                             @* <span class="absolute -top-1 -right-1 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center shadow-lg cart-count transform group-hover:scale-110 transition-transform">
                                 !
                             </span> *@
@@ -339,37 +358,46 @@
 
                         <!-- User Profile với Click Dropdown -->
                         <div class="relative" id="user-profile-container">
-                            <button id="user-profile-button" class="flex items-center gap-2 rounded-xl px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200">
+                            <button id="user-profile-button"
+                                class="flex items-center gap-2 rounded-xl px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200">
                                 @if (ViewBag.IsLoggedIn == true)
                                 {
-                                    <div class="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                                    <div
+                                        class="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-sm font-semibold">
                                         @ViewBag.CustomerName?.ToString().Substring(0, 1).ToUpper()
                                     </div>
-                                    <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="user-profile-chevron"></i>
+                                    <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform"
+                                        id="user-profile-chevron"></i>
                                 }
                                 else
                                 {
-                                    <div class="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                                    <div
+                                        class="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-sm font-semibold">
                                         <i class="fas fa-user text-xs"></i>
                                     </div>
-                                    <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="user-profile-chevron"></i>
+                                    <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform"
+                                        id="user-profile-chevron"></i>
                                 }
                             </button>
 
                             <!-- Enhanced User Dropdown -->
-                            <div id="user-profile-dropdown" class="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden z-50 overflow-hidden">
+                            <div id="user-profile-dropdown"
+                                class="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden z-50 overflow-hidden">
                                 @if (ViewBag.IsLoggedIn == true)
                                 {
                                     <div class="p-4 border-b border-gray-100 dark:border-gray-700">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white font-semibold">
+                                            <div
+                                                class="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white font-semibold">
                                                 @ViewBag.CustomerName?.ToString().Substring(0, 1).ToUpper()
                                             </div>
                                             <div>
-                                                <p class="font-semibold text-gray-800 dark:text-white">@ViewBag.CustomerName</p>
+                                                <p class="font-semibold text-gray-800 dark:text-white">@ViewBag.CustomerName
+                                                </p>
                                                 @if (!string.IsNullOrEmpty(ViewBag.CustomerEmail?.ToString()))
                                                 {
-                                                    <p class="text-sm text-gray-500 dark:text-gray-400">@ViewBag.CustomerEmail</p>
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400">@ViewBag.CustomerEmail
+                                                    </p>
                                                 }
                                                 @if (!string.IsNullOrEmpty(ViewBag.CustomerPhone?.ToString()))
                                                 {
@@ -379,15 +407,18 @@
                                         </div>
                                     </div>
                                     <div class="p-2">
-                                        <a href="/Info/ThongTinKH" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <a href="/Info/ThongTinKH"
+                                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-user text-gray-500 w-5"></i>
                                             <span>Tài khoản của tôi</span>
                                         </a>
-                                        <a asp-controller="Orders" asp-action="HomeOrders" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <a asp-controller="Orders" asp-action="HomeOrders"
+                                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-clipboard-list text-gray-500 w-5"></i>
                                             <span>Đơn hàng</span>
                                         </a>
-                                        <button class="logout-trigger w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors text-left">
+                                        <button
+                                            class="logout-trigger w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors text-left">
                                             <i class="fas fa-sign-out-alt w-5"></i>
                                             <span>Đăng xuất</span>
                                         </button>
@@ -397,7 +428,8 @@
                                 {
                                     <div class="p-4 border-b border-gray-100 dark:border-gray-700">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white font-semibold">
+                                            <div
+                                                class="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white font-semibold">
                                                 <i class="fas fa-user"></i>
                                             </div>
                                             <div>
@@ -407,16 +439,19 @@
                                         </div>
                                     </div>
                                     <div class="p-2">
-                                        <a href="/Account/Login" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <a href="/Account/Login"
+                                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-sign-in-alt text-gray-500 w-5"></i>
                                             <span>Đăng nhập</span>
                                         </a>
-                                        <a href="/Account/Login" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <a href="/Account/Login"
+                                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-user-plus text-gray-500 w-5"></i>
                                             <span>Đăng ký</span>
                                         </a>
                                         <div class="border-t border-gray-100 dark:border-gray-700 my-2"></div>
-                                        <a href="/help" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <a href="/help"
+                                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-question-circle text-gray-500 w-5"></i>
                                             <span>Trợ giúp</span>
                                         </a>
@@ -429,7 +464,8 @@
             </header>
 
             <!-- Mobile Navigation Bottom Bar -->
-            <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-30 lg:hidden">
+            <div
+                class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-30 lg:hidden">
                 <div class="flex justify-around items-center py-2">
                     <a href="/" class="flex flex-col items-center text-primary">
                         <i class="fas fa-home text-lg"></i>
@@ -446,7 +482,8 @@
                     <a href="/cart" class="flex flex-col items-center text-gray-600 dark:text-gray-400 relative">
                         <i class="fas fa-shopping-cart text-lg"></i>
                         <span class="text-xs mt-1">Giỏ hàng</span>
-                        <span class="absolute -top-1 -right-2 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">2</span>
+                        <span
+                            class="absolute -top-1 -right-2 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">2</span>
                     </a>
                     <a href="/account" class="flex flex-col items-center text-gray-600 dark:text-gray-400">
                         <i class="fas fa-user text-lg"></i>
@@ -464,7 +501,10 @@
             <footer class="bg-gradient-to-br from-gray-900 to-gray-800 text-white relative overflow-hidden">
                 <!-- Background Pattern -->
                 <div class="absolute inset-0 opacity-5">
-                    <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\" 60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+                    <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\" 60\"
+                        height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\"
+                        fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\"
+                        cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
                 </div>
 
                 <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -472,7 +512,8 @@
                         <!-- Brand Column -->
                         <div class="lg:col-span-1">
                             <div class="flex items-center gap-3 mb-6">
-                                <div class="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center shadow-lg">
+                                <div
+                                    class="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center shadow-lg">
                                     <span class="text-white font-bold text-lg">F</span>
                                 </div>
                                 <div>
@@ -481,19 +522,24 @@
                                 </div>
                             </div>
                             <p class="text-gray-300 mb-6 leading-relaxed">
-                                Đồng hành cùng bạn trong hành trình khám phá thế giới công nghệ. Chất lượng - Uy tín - Đẳng cấp.
+                                Đồng hành cùng bạn trong hành trình khám phá thế giới công nghệ. Chất lượng - Uy tín -
+                                Đẳng cấp.
                             </p>
                             <div class="flex space-x-4">
-                                <a href="https://www.facebook.com/share/1BruCUcK9c/" target="_blank" class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
+                                <a href="https://www.facebook.com/share/1BruCUcK9c/" target="_blank"
+                                    class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
                                     <i class="fab fa-facebook-f"></i>
                                 </a>
-                                <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
+                                <a href="#"
+                                    class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
                                     <i class="fab fa-youtube"></i>
                                 </a>
-                                <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
+                                <a href="#"
+                                    class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
                                     <i class="fab fa-tiktok"></i>
                                 </a>
-                                <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
+                                <a href="#"
+                                    class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
                                     <i class="fab fa-zalo"></i>
                                 </a>
                             </div>
@@ -507,26 +553,34 @@
                             </h4>
                             <ul class="space-y-3">
                                 <li>
-                                    <a href="/help" class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
-                                        <i class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    <a href="/help"
+                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                        <i
+                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Trung tâm trợ giúp
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/shipping" class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
-                                        <i class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    <a href="/shipping"
+                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                        <i
+                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Chính sách vận chuyển
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/returns" class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
-                                        <i class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    <a href="/returns"
+                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                        <i
+                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Đổi trả & Hoàn tiền
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/warranty" class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
-                                        <i class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    <a href="/warranty"
+                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                        <i
+                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Chính sách bảo hành
                                     </a>
                                 </li>
@@ -541,26 +595,34 @@
                             </h4>
                             <ul class="space-y-3">
                                 <li>
-                                    <a href="/privacy" class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
-                                        <i class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    <a href="/privacy"
+                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                        <i
+                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Chính sách bảo mật
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/terms" class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
-                                        <i class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    <a href="/terms"
+                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                        <i
+                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Điều khoản sử dụng
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/payment" class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
-                                        <i class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    <a href="/payment"
+                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                        <i
+                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Phương thức thanh toán
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/installment" class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
-                                        <i class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    <a href="/installment"
+                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                        <i
+                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Mua trả góp
                                     </a>
                                 </li>
@@ -603,8 +665,9 @@
                                 <p class="text-xs text-gray-400 mb-3">Nhận ưu đãi độc quyền & tin tức mới nhất</p>
                                 <div class="flex gap-2">
                                     <input type="email" placeholder="Email của bạn"
-                                           class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                    <button class="bg-primary hover:bg-primary-dark text-white rounded-lg px-4 transition-colors">
+                                        class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <button
+                                        class="bg-primary hover:bg-primary-dark text-white rounded-lg px-4 transition-colors">
                                         <i class="fas fa-paper-plane"></i>
                                     </button>
                                 </div>
@@ -613,9 +676,11 @@
                     </div>
 
                     <!-- Bottom Bar -->
-                    <div class="border-t border-gray-700 mt-12 pt-8 flex flex-col lg:flex-row justify-between items-center">
+                    <div
+                        class="border-t border-gray-700 mt-12 pt-8 flex flex-col lg:flex-row justify-between items-center">
                         <p class="text-gray-400 text-sm text-center lg:text-left mb-4 lg:mb-0">
-                            &copy; 2024 <span class="text-primary font-semibold">FOXMOBILE</span>. Tất cả các quyền được bảo lưu.
+                            &copy; 2024 <span class="text-primary font-semibold">FOXMOBILE</span>. Tất cả các quyền được
+                            bảo lưu.
                         </p>
                         <div class="flex items-center gap-6 text-sm text-gray-400">
                             <span>Accepted Payments:</span>
@@ -633,18 +698,21 @@
     </div>
 
     <div id="chat-widget" class="fixed bottom-6 right-6 z-50">
-        <button id="chat-toggle" class="w-14 h-14 bg-primary hover:bg-primary-dark rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
+        <button id="chat-toggle"
+            class="w-14 h-14 bg-primary hover:bg-primary-dark rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
             <i class="fas fa-headset text-white text-xl"></i>
             <span class="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full animate-ping"></span>
             <span class="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full"></span>
         </button>
 
-        <div id="chat-container" class="hidden absolute bottom-16 right-0 w-80 h-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col">
+        <div id="chat-container"
+            class="hidden absolute bottom-16 right-0 w-80 h-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col">
             <div class="bg-gradient-to-r from-primary to-primary-dark p-4 text-white">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-white rounded-full overflow-hidden">
-                            <img src="~/images/nhân viên tư vấn.png" alt="Nhân viên tư vấn" class="w-full h-full object-cover">
+                            <img src="~/images/nhân viên tư vấn.png" alt="Nhân viên tư vấn"
+                                class="w-full h-full object-cover">
                         </div>
 
                         <div class="flex flex-col">
@@ -666,8 +734,9 @@
             <div class="border-t border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-800">
                 <div class="flex items-center gap-2">
                     <input type="text" id="chat-input" placeholder="Type your message..."
-                           class="flex-1 bg-gray-100 dark:bg-gray-700 border-none rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                    <button id="chat-send" class="w-10 h-10 bg-primary hover:bg-primary-dark rounded-full flex items-center justify-center transition-colors">
+                        class="flex-1 bg-gray-100 dark:bg-gray-700 border-none rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                    <button id="chat-send"
+                        class="w-10 h-10 bg-primary hover:bg-primary-dark rounded-full flex items-center justify-center transition-colors">
                         <i class="fas fa-paper-plane text-white text-sm"></i>
                     </button>
                 </div>
@@ -703,7 +772,7 @@
         });
 
         // Loading Screen
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             const loadingScreen = document.getElementById('loadingScreen');
             const progressFill = document.querySelector('.progress-fill');
 
@@ -795,7 +864,7 @@
         }
 
         // User Profile Dropdown với Click
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const userProfileButton = document.getElementById('user-profile-button');
             const userProfileDropdown = document.getElementById('user-profile-dropdown');
             const userProfileChevron = document.getElementById('user-profile-chevron');
@@ -803,7 +872,7 @@
 
             // Toggle dropdown khi click
             if (userProfileButton && userProfileDropdown && userProfileChevron) {
-                userProfileButton.addEventListener('click', function(e) {
+                userProfileButton.addEventListener('click', function (e) {
                     e.stopPropagation();
                     const isHidden = userProfileDropdown.classList.contains('hidden');
                     userProfileDropdown.classList.toggle('hidden', !isHidden);
@@ -812,7 +881,7 @@
             }
 
             // Đóng dropdown khi click ra ngoài
-            document.addEventListener('click', function() {
+            document.addEventListener('click', function () {
                 if (userProfileDropdown && userProfileChevron) {
                     userProfileDropdown.classList.add('hidden');
                     userProfileChevron.classList.remove('rotate-180');
@@ -821,7 +890,7 @@
 
             // Ngăn đóng dropdown khi click vào dropdown
             if (userProfileDropdown) {
-                userProfileDropdown.addEventListener('click', function(e) {
+                userProfileDropdown.addEventListener('click', function (e) {
                     e.stopPropagation();
                 });
             }
@@ -841,7 +910,7 @@
 
             // Gán sự kiện cho các nút đăng xuất
             logoutTriggers.forEach(trigger => {
-                trigger.addEventListener('click', function(e) {
+                trigger.addEventListener('click', function (e) {
                     e.preventDefault();
                     // Đóng dropdown trước khi mở popup
                     if (userProfileDropdown) userProfileDropdown.classList.add('hidden');
@@ -852,14 +921,14 @@
 
             // Xử lý nút hủy
             if (logoutCancel) {
-                logoutCancel.addEventListener('click', function() {
+                logoutCancel.addEventListener('click', function () {
                     hideLogoutPopup();
                 });
             }
 
             // Xử lý nút xác nhận đăng xuất
             if (logoutConfirm) {
-                logoutConfirm.addEventListener('click', function() {
+                logoutConfirm.addEventListener('click', function () {
                     hideLogoutPopup();
                     // Optional: show a loader here
                     window.location.href = '/Account/Logout';
@@ -868,7 +937,7 @@
 
             // Đóng popup khi click bên ngoài
             if (logoutPopup) {
-                logoutPopup.addEventListener('click', function(e) {
+                logoutPopup.addEventListener('click', function (e) {
                     if (e.target === logoutPopup) {
                         hideLogoutPopup();
                     }
@@ -892,7 +961,7 @@
         // =======================================================
         // 🤖 CHAT WIDGET FUNCTIONALITY (ĐÃ SỬA CHO CẤU TRÚC HTML MỚI)
         // =======================================================
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Lấy các phần tử DOM
             const chatToggle = document.getElementById('chat-toggle');
             const chatContainer = document.getElementById('chat-container'); // Khối chat chính
@@ -1029,28 +1098,28 @@
 
             // Hàm xóa lịch sử
             async function clearHistory() {
-                 if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử chat không?")) {
+                if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử chat không?")) {
                     await fetch('/Chat/ClearHistory', { method: 'POST' });
                     loadHistory();
-                 }
+                }
             }
 
             // --- KÍCH HOẠT CÁC CHỨC NĂNG CHATBOT ---
 
             // Toggle chat visibility
             if (chatToggle && chatContainer) {
-                chatToggle.addEventListener('click', function() {
+                chatToggle.addEventListener('click', function () {
                     chatContainer.classList.toggle('hidden');
                     if (!chatContainer.classList.contains('hidden')) {
-                         loadHistory(); // Tải lịch sử khi mở
-                         chatInput.focus();
+                        loadHistory(); // Tải lịch sử khi mở
+                        chatInput.focus();
                     }
                 });
             }
 
             // Close chat
             if (chatClose && chatContainer) {
-                chatClose.addEventListener('click', function() {
+                chatClose.addEventListener('click', function () {
                     chatContainer.classList.add('hidden');
                 });
             }
@@ -1062,7 +1131,7 @@
 
             // Send message on Enter key
             if (chatInput) {
-                chatInput.addEventListener('keypress', function(e) {
+                chatInput.addEventListener('keypress', function (e) {
                     if (e.key === 'Enter') {
                         sendMessage();
                         e.preventDefault();
@@ -1078,6 +1147,21 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        function showCustomAlert(message, type = 'error') {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: type,
+                    title: 'Thông báo',
+                    text: message,
+                    confirmButtonColor: '#f48c25'
+                });
+            } else {
+                alert(message);
+            }
+        }
+    </script>
     @RenderSection("Scripts", required: false)
 </body>
+
 </html>
