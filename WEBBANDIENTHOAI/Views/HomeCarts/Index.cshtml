@@ -13,7 +13,8 @@
         </div>
 
         <div class="flex flex-wrap justify-between gap-3 mb-8">
-            <h1 class="text-gray-800 dark:text-gray-100 text-3xl md:text-4xl font-bold leading-tight tracking-tight">Giỏ hàng của bạn</h1>
+            <h1 class="text-gray-800 dark:text-gray-100 text-3xl md:text-4xl font-bold leading-tight tracking-tight">Giỏ
+                hàng của bạn</h1>
             <span class="text-gray-500 dark:text-gray-400 text-sm">@(Model.TotalItems) sản phẩm</span>
         </div>
 
@@ -33,107 +34,124 @@
 
         @if (Model.CartItems != null && Model.CartItems.Count > 0)
         {
-            <form asp-controller="ThanhToan" asp-action="Index" method="post" id="checkout-form">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="selectedProductIds" id="selected-product-ids" />
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div class="lg:col-span-2 flex flex-col gap-6">
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                    <div class="lg:col-span-2 flex flex-col gap-6">
-
-                        <div class="flex items-center gap-4 bg-white dark:bg-gray-800 p-4 min-h-16 justify-between border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm">
-                            <div class="flex items-center gap-4">
-                                <input id="select-all" type="checkbox" class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" />
-                                <label for="select-all" class="text-base font-medium text-gray-800 dark:text-gray-200 cursor-pointer">Chọn tất cả (@Model.TotalItems sản phẩm)</label>
-                            </div>
-                            <button type="submit" asp-controller="HomeCarts" asp-action="ClearCart" formmethod="post" class="flex items-center gap-2 text-sm font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors">
+                    <div
+                        class="flex items-center gap-4 bg-white dark:bg-gray-800 p-4 min-h-16 justify-between border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <input id="select-all" type="checkbox"
+                                class="h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" />
+                            <label for="select-all"
+                                class="text-base font-medium text-gray-800 dark:text-gray-200 cursor-pointer">Chọn tất cả
+                                (@Model.TotalItems sản phẩm)</label>
+                        </div>
+                        <form asp-controller="HomeCarts" asp-action="ClearCart" method="post">
+                            <button type="submit"
+                                class="flex items-center gap-2 text-sm font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors">
                                 <i class="fas fa-trash-alt text-base"></i> Xoá tất cả
                             </button>
-                        </div>
-
-                        <div class="flex flex-col gap-4">
-                            @foreach (var item in Model.CartItems)
-                            {
-                                <div class="flex items-center gap-4 p-6 cart-item bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm"
-                                     data-price="@item.Price" data-quantity="@item.Quantity" data-product-id="@item.ProductId" data-inventory-quantity="@item.InventoryQuantity">
-
-                                    <input type="checkbox" class="item-checkbox h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" checked />
-
-                                    <img src="@item.ProductImage"
-                                         class="w-24 h-24 object-contain rounded-xl bg-gray-100 p-1 shadow-sm"
-                                         alt="@item.ProductName" />
-
-                                    <div class="flex-1">
-                                        <h3 class="text-gray-800 dark:text-gray-200 font-semibold text-lg">@item.ProductName</h3>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Mã SP: @item.ProductId</p>
-                                        <p class="text-primary font-bold text-xl mt-2">@item.Price.ToString("N0")₫</p>
-                                    </div>
-
-                                    <div class="flex items-center gap-2">
-                                        <button type="button" onclick="updateQuantity(@item.ProductId, 'decrease')" class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                            <i class="fas fa-minus text-xs"></i>
-                                        </button>
-
-                                        <input type="number" value="@item.Quantity" class="w-16 px-1 text-center border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 py-2 quantity-input" data-product-id="@item.ProductId" min="1" max="@item.InventoryQuantity" />
-
-
-                                        <button type="button" onclick="updateQuantity(@item.ProductId, 'increase')" class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                            <i class="fas fa-plus text-xs"></i>
-                                        </button>
-
-                                        <form asp-action="RemoveItem" method="post" class="ml-2">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="productId" value="@item.ProductId" />
-                                            <button type="submit" class="text-red-500 hover:text-red-700 transition-colors">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-
-                        <div class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
-                            <a asp-controller="HomeUser" asp-action="Index" class="flex items-center gap-2 text-primary hover:text-primary-dark font-medium transition-colors">
-                                <i class="fas fa-arrow-left text-sm"></i> Tiếp tục mua sắm
-                            </a>
-                        </div>
+                        </form>
                     </div>
 
-                    <aside class="lg:col-span-1 sticky top-24">
-                        <div class="bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm flex flex-col gap-6">
-                            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">Tóm tắt đơn hàng</h2>
+                    <div class="flex flex-col gap-4">
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <div class="flex items-center gap-4 p-6 cart-item bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm"
+                                data-price="@item.Price" data-quantity="@item.Quantity" data-product-id="@item.ProductId"
+                                data-inventory-quantity="@item.InventoryQuantity">
 
-                            <div class="flex items-center justify-between">
-                                <p class="text-gray-600 dark:text-gray-400">Tạm tính</p>
-                                <p id="subtotal-price" class="font-bold text-2xl text-primary">
-                                    @Model.GrandTotal.ToString("N0")₫
-                                </p>
+                                <input type="checkbox"
+                                    class="item-checkbox h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50"
+                                    checked />
+
+                                <img src="@item.ProductImage"
+                                    class="w-24 h-24 object-contain rounded-xl bg-gray-100 p-1 shadow-sm"
+                                    alt="@item.ProductName" />
+
+                                <div class="flex-1">
+                                    <h3 class="text-gray-800 dark:text-gray-200 font-semibold text-lg">@item.ProductName</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Mã SP: @item.ProductId</p>
+                                    <p class="text-primary font-bold text-xl mt-2">@item.Price.ToString("N0")₫</p>
+                                </div>
+
+                                <div class="flex items-center gap-2">
+                                    <button type="button" onclick="updateQuantity(@item.ProductId, 'decrease')"
+                                        class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <i class="fas fa-minus text-xs"></i>
+                                    </button>
+
+                                    <input type="number" value="@item.Quantity"
+                                        class="w-16 px-1 text-center border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 py-2 quantity-input"
+                                        data-product-id="@item.ProductId" min="1" max="@item.InventoryQuantity" />
+
+
+                                    <button type="button" onclick="updateQuantity(@item.ProductId, 'increase')"
+                                        class="w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <i class="fas fa-plus text-xs"></i>
+                                    </button>
+
+                                    <form asp-action="RemoveItem" method="post" class="ml-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <button type="submit" class="text-red-500 hover:text-red-700 transition-colors">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
+                        }
+                    </div>
 
-                            <div class="border-t border-dashed border-gray-300 dark:border-gray-600"></div>
+                    <div class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <a asp-controller="HomeUser" asp-action="Index"
+                            class="flex items-center gap-2 text-primary hover:text-primary-dark font-medium transition-colors">
+                            <i class="fas fa-arrow-left text-sm"></i> Tiếp tục mua sắm
+                        </a>
+                    </div>
+                </div>
 
-                            <div class="flex items-center justify-between">
-                                <p class="text-lg text-gray-600 dark:text-gray-400">Tổng cộng</p>
-                                <p id="total-price" class="font-medium text-gray-800 dark:text-gray-200">
-                                    @Model.GrandTotal.ToString("N0")₫
-                                </p>
-                            </div>
+                <aside class="lg:col-span-1 sticky top-24">
+                    <div
+                        class="bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm flex flex-col gap-6">
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">Tóm tắt đơn hàng</h2>
 
-                            <button type="submit" class="flex w-full h-12 items-center justify-center bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105 gap-2">
+                        <div class="flex items-center justify-between">
+                            <p class="text-gray-600 dark:text-gray-400">Tạm tính</p>
+                            <p id="subtotal-price" class="font-bold text-2xl text-primary">
+                                @Model.GrandTotal.ToString("N0")₫
+                            </p>
+                        </div>
+
+                        <div class="border-t border-dashed border-gray-300 dark:border-gray-600"></div>
+
+                        <div class="flex items-center justify-between">
+                            <p class="text-lg text-gray-600 dark:text-gray-400">Tổng cộng</p>
+                            <p id="total-price" class="font-medium text-gray-800 dark:text-gray-200">
+                                @Model.GrandTotal.ToString("N0")₫
+                            </p>
+                        </div>
+
+                        <form asp-controller="ThanhToan" asp-action="Index" method="post" id="checkout-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="selectedProductIds" id="selected-product-ids" />
+                            <button type="submit"
+                                class="flex w-full h-12 items-center justify-center bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105 gap-2">
                                 <span>Tiến hành thanh toán</span>
                                 <i class="fas fa-arrow-right text-sm"></i>
                             </button>
-                        </div>
-                    </aside>
-                </div>
-            </form>
+                        </form>
+                    </div>
+                </aside>
+            </div>
         }
         else
         {
             <div class="text-center py-16">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Giỏ hàng của bạn đang trống</h2>
                 <p class="text-gray-500 mb-8">Hãy quay lại trang chủ để chọn món hàng yêu thích nhé!</p>
-                <a asp-controller="HomeUser" asp-action="Index" class="px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-colors">
+                <a asp-controller="HomeUser" asp-action="Index"
+                    class="px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-colors">
                     Về trang chủ
                 </a>
             </div>
@@ -211,19 +229,19 @@
                 },
                 body: `productId=${productId}&quantity=${newQuantity}`
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload(); // Tải lại trang để cập nhật giỏ hàng
-                } else {
-                    showCustomAlert(data.message);
-                    location.reload(); // Tải lại trang để reset về giá trị đúng
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showCustomAlert('Có lỗi xảy ra khi cập nhật số lượng');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload(); // Tải lại trang để cập nhật giỏ hàng
+                    } else {
+                        showCustomAlert(data.message);
+                        location.reload(); // Tải lại trang để reset về giá trị đúng
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showCustomAlert('Có lỗi xảy ra khi cập nhật số lượng');
+                });
         }
 
 
@@ -273,8 +291,8 @@
             if (itemCheckboxes.length > 0) {
                 itemCheckboxes.forEach(cb => cb.checked = true);
             }
-             updateTotal(); // Cập nhật tổng tiền khi tải trang
-             if (selectAllCheckbox) {
+            updateTotal(); // Cập nhật tổng tiền khi tải trang
+            if (selectAllCheckbox) {
                 selectAllCheckbox.checked = true;
             }
         });
@@ -287,7 +305,7 @@
                 const allChecked = Array.from(itemCheckboxes).every(x => x.checked);
                 const noneChecked = Array.from(itemCheckboxes).every(x => !x.checked);
 
-                if (selectAllCheckbox){
+                if (selectAllCheckbox) {
                     if (allChecked) {
                         selectAllCheckbox.checked = true;
                         selectAllCheckbox.indeterminate = false;
