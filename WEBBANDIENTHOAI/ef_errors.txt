@@ -1,0 +1,7 @@
+﻿Build started...
+Build succeeded.
+The Entity Framework tools version '8.0.22' is older than that of the runtime '9.0.10'. Update the tools for the latest features and bug fixes. See https://aka.ms/AAc1fbw for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[30001]
+      The property 'StatusId' on entity type 'ProductStatus' is of type 'byte', but is set up to use a SQL Server identity column; this requires that values starting at 255 and counting down will be used for temporary key values. A temporary key value is needed for every entity inserted in a single call to 'SaveChanges'. Care must be taken that these values do not collide with real key values.
+An operation was scaffolded that may result in the loss of data. Please review the migration for accuracy.
+Done. To undo this action, use 'ef migrations remove'

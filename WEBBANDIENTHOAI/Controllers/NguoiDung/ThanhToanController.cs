@@ -190,7 +190,9 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                             ShippingAddress = model.Address,
                             CreatedByUserId = null,
                             PaymentMethod = model.PaymentMethod,
-                            Notes = model.Notes ?? string.Empty // Set to empty string if null to avoid null issues
+                            Notes = model.Notes ?? string.Empty, // Set to empty string if null to avoid null issues
+                            Latitude = model.Latitude,
+                            Longitude = model.Longitude
                         };
 
                         _context.Orders.Add(order);
@@ -422,25 +424,17 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
         
 
                     // Step 1: Create and save the order to get a persistent OrderId
-
                     var order = new Order
-
                     {
-
                         CustomerId = int.Parse(customerId),
-
                         OrderDate = DateTime.UtcNow,
-
                         Total = model.TotalAmount,
-
                         StatusId = 1, // Status: "Chờ xác nhận" hoặc "Pending". Sẽ cập nhật sau khi thanh toán thành công.
-
                         ShippingAddress = model.Address ?? "",
-
                         PaymentMethod = "VNPay",
-
-                        Notes = model.Notes ?? string.Empty
-
+                        Notes = model.Notes ?? string.Empty,
+                        Latitude = model.Latitude,
+                        Longitude = model.Longitude
                     };
 
         

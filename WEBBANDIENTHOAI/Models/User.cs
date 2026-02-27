@@ -25,7 +25,7 @@ namespace WEBBANDIENTHOAI.Models
         public string Email { get; set; } // Email
 
         public int RoleId { get; set; }
-        public Role Role { get; set; } // <-- navigation property
+        public virtual Role Role { get; set; } // <-- navigation property
 
         public bool IsActive { get; set; } = true;
 

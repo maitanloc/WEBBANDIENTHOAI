@@ -44,6 +44,9 @@ namespace WEBBANDIENTHOAI.ViewModels
         [Required(ErrorMessage = "Địa chỉ là bắt buộc")]
         public string Address { get; set; }
 
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
+
         public string Notes { get; set; }
         public string PaymentMethod { get; set; } = "COD";
 

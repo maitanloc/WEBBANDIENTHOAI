@@ -32,6 +32,6 @@ namespace WEBBANDIENTHOAI.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // (CreatedAt)
         public bool IsFinalized { get; set; } = false;
         public DateTime? LastUpdated { get; set; } 
-        public ICollection<ImportReceiptDetail> Details { get; set; }
+        public virtual ICollection<ImportReceiptDetail> Details { get; set; }
     }
 }

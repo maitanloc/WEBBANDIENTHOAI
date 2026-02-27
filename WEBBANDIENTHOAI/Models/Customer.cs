@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WEBBANDIENTHOAI.Models
 {
@@ -35,5 +36,11 @@ namespace WEBBANDIENTHOAI.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public bool IsActive { get; set; } = true;
+
+        [Column(TypeName = "decimal(18,8)")]
+        public decimal? Latitude { get; set; }
+
+        [Column(TypeName = "decimal(18,8)")]
+        public decimal? Longitude { get; set; }
     }
 }

@@ -116,7 +116,7 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
         // ========== REGISTER ==========
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(string fullname, string email, string phone, string password, string address)
+        public async Task<IActionResult> Register(string fullname, string email, string phone, string password, string address, decimal? latitude, decimal? longitude)
         {
             try
             {
@@ -206,7 +206,8 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
                     Address = address?.Trim(),
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
-                    
+                    Latitude = latitude,
+                    Longitude = longitude
                 };
 
                 // Thêm customer vào database (KHÔNG dùng transaction)

@@ -27,9 +27,9 @@ namespace WEBBANDIENTHOAI.Models
         public DateTime LastUpdated { get; set; } = DateTime.UtcNow; // (LastUpdated)
 
         [ForeignKey("ProductId")]
-        public Product Product { get; set; }
+        public virtual Product Product { get; set; }
 
-        public ICollection<InventoryHistory> History { get; set; }
+        public virtual ICollection<InventoryHistory> History { get; set; }
         [NotMapped]
         public int StockQuantity { get; internal set; }
     }

@@ -36,15 +36,15 @@ namespace WEBBANDIENTHOAI.Models
 
         // Navigation Properties
         [ForeignKey("CustomerId")]
-        public Customer Customer { get; set; }
+        public virtual Customer Customer { get; set; }
 
         [ForeignKey("OrderId")]
-        public Order? Order { get; set; }
+        public virtual Order? Order { get; set; }
 
         [ForeignKey("CreatedByUserId")]
-        public User? CreatedByUser { get; set; }
+        public virtual User? CreatedByUser { get; set; }
 
-        public ICollection<ExportReceiptDetail> ExportReceiptDetails { get; set; }
+        public virtual ICollection<ExportReceiptDetail> ExportReceiptDetails { get; set; }
     }
 
     // DTO để gửi data vào stored procedure

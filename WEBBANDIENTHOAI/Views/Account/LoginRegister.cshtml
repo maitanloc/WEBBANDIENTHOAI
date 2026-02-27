@@ -14,6 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/auth.css" />
+    
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 
 <body>
@@ -166,8 +169,17 @@
                                     <input id="regPhone" name="phone" type="tel" class="w-full rounded-lg border border-gray-200 px-4 py-3 mb-3" placeholder="0912xxxxxx" />
 
                                     <!-- THÊM TRƯỜNG ĐỊA CHỈ VÀO ĐÂY -->
-                                    <label class="block text-sm font-medium mb-2" for="regAddress">Địa chỉ</label>
-                                    <input id="regAddress" name="address" type="text" class="w-full rounded-lg border border-gray-200 px-4 py-3 mb-3" placeholder="Địa chỉ nhận hàng" />
+                                    <div class="relative relative-container z-20">
+                                        <label class="block text-sm font-medium mb-2" for="regAddress">Địa chỉ</label>
+                                        <input id="regAddress" name="address" type="text" class="w-full rounded-lg border border-gray-200 px-4 py-3 mb-1 focus:ring-primary focus:border-primary" placeholder="Tìm kiếm địa chỉ của bạn..." autocomplete="off" />
+                                        <ul id="address-suggestions" class="absolute top-[80px] left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-xl z-50 hidden max-h-60 overflow-y-auto w-full text-black"></ul>
+                                        <!-- Map Instance -->
+                                        <div id="map-container" class="w-full h-48 mt-1 mb-3 rounded-lg border border-gray-200 overflow-hidden shadow-sm z-10"></div>
+                                        
+                                        <!-- Hidden LatLng Form Data -->
+                                        <input type="hidden" name="latitude" id="latitude" />
+                                        <input type="hidden" name="longitude" id="longitude" />
+                                    </div>
 
                                     <label class="block text-sm font-medium mb-2" for="regPw">Mật khẩu</label>
                                     <div class="mb-2">
@@ -198,8 +210,24 @@
     <!-- local JS -->
     <script src="~/js/auth.js"></script>
 
+    <!-- Leaflet JS for Maps -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Map Address Handler -->
+    <script src="~/js/map-address.js"></script>
+
     <!-- Script tự động ẩn thông báo -->
     <script>
+        // Init Map if MapAddressIntegration is loaded
+        if (typeof MapAddressIntegration !== 'undefined') {
+            new MapAddressIntegration({
+                mapId: 'map-container',
+                inputId: 'regAddress',
+                latId: 'latitude',
+                lngId: 'longitude',
+                suggestionsId: 'address-suggestions'
+            });
+        }
+
         // Tự động ẩn thông báo sau 5 giây
         setTimeout(() => {
             const notifications = document.querySelectorAll('.fixed.top-4');

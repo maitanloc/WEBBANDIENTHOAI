@@ -31,10 +31,11 @@ builder.Services.AddControllersWithViews().AddRazorOptions(options =>
 });
 
 // ========================
-// 3) Add DbContext với retry policy
+// 3) Add DbContext với retry policy và Lazy Loading Proxy
 // ========================
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(conn, sqlOptions =>
+    options.UseLazyLoadingProxies() // <--- Kích hoạt Lazy Loading Proxy ở đây
+           .UseSqlServer(conn, sqlOptions =>
     {
         // TẮT TẠM RETRY STRATEGY ĐỂ DEBUG
         // sqlOptions.EnableRetryOnFailure(

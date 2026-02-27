@@ -6,8 +6,9 @@
         <div class="relative overflow-hidden flex-1">
             @if (Model.PrimaryImage != null)
             {
-                <img src="@Url.Action("GetProductImage", "HomeUser", new { imageId = Model.PrimaryImage.ImageId })"
-                     class="w-full h-40 object-contain p-2 transition-transform duration-500 group-hover:scale-105 bg-white"
+                <img src="/images/default-product.png" 
+                     data-src="@Url.Action("GetProductImage", "HomeUser", new { imageId = Model.PrimaryImage.ImageId })"
+                     class="lazy w-full h-40 object-contain p-2 transition-transform duration-500 group-hover:scale-105 bg-white"
                      alt="@Model.Name" />
             }
             else

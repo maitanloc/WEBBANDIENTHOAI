@@ -32,14 +32,20 @@ namespace WEBBANDIENTHOAI.Models
         [MaxLength(500)]
         public string? Notes { get; set; }
 
+        [Column(TypeName = "decimal(18,8)")]
+        public decimal? Latitude { get; set; }
+
+        [Column(TypeName = "decimal(18,8)")]
+        public decimal? Longitude { get; set; }
+
         // Navigation properties
         [ForeignKey("CustomerId")]
-        public Customer Customer { get; set; }
+        public virtual Customer Customer { get; set; }
 
         [ForeignKey("StatusId")]
-        public OrderStatus OrderStatus { get; set; }  // Mới thêm
+        public virtual OrderStatus OrderStatus { get; set; }  // Mới thêm
 
-        public ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; }
     }
     // DTO cho thống kê đơn hàng
     public class OrderStatisticsDto

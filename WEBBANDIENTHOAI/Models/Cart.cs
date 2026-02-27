@@ -15,9 +15,9 @@ namespace WEBBANDIENTHOAI.Models
         public DateTime? UpdatedAt { get; set; } // (UpdatedAt)
 
         [ForeignKey("CustomerId")]
-        public Customer Customer { get; set; }
+        public virtual Customer Customer { get; set; }
 
-        public ICollection<CartDetail> Details { get; set; }
+        public virtual ICollection<CartDetail> Details { get; set; }
     }
 
 }

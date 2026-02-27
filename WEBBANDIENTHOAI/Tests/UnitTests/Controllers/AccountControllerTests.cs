@@ -199,7 +199,7 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
             var address = "123 Test Street";
 
             // Act
-            var result = await _controller.Register(fullname, email, phone, password, address) as ViewResult;
+            var result = await _controller.Register(fullname, email, phone, password, address, null, null) as ViewResult;
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -242,7 +242,7 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
             var address = "123 Test Street";
 
             // Act
-            var result = await _controller.Register(fullname, email, phone, password, address) as ViewResult;
+            var result = await _controller.Register(fullname, email, phone, password, address, null, null) as ViewResult;
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -265,7 +265,7 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
             var address = "123 Test Street";
 
             // Act
-            var result = await _controller.Register(fullname, email, phone, password, address) as ViewResult;
+            var result = await _controller.Register(fullname, email, phone, password, address, null, null) as ViewResult;
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -288,7 +288,7 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
             var address = "123 Test Street";
 
             // Act
-            var result = await _controller.Register(fullname, email, phone, password, address) as ViewResult;
+            var result = await _controller.Register(fullname, email, phone, password, address, null, null) as ViewResult;
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -511,7 +511,7 @@ namespace WEBBANDIENTHOAI.Tests.UnitTests.Controllers
             var address = "";
 
             // Act
-            var result = await _controller.Register(fullname, email, phone, password, address) as ViewResult;
+            var result = await _controller.Register(fullname, email, phone, password, address, null, null) as ViewResult;
 
             // Assert
             Assert.That(result, Is.Not.Null);

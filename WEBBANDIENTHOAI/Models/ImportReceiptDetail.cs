@@ -42,9 +42,9 @@ namespace WEBBANDIENTHOAI.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // (CreatedAt)
 
         [ForeignKey("ImportReceiptId")]
-        public ImportReceipt ImportReceipt { get; set; }
+        public virtual ImportReceipt ImportReceipt { get; set; }
 
         [ForeignKey("ProductId")]
-        public Product Product { get; set; }
+        public virtual Product Product { get; set; }
     }
 }

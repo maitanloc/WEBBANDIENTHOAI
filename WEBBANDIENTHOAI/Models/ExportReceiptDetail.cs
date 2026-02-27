@@ -40,9 +40,9 @@ namespace WEBBANDIENTHOAI.Models
 
         // Navigation Properties
         [ForeignKey("ExportReceiptId")]
-        public ExportReceipt ExportReceipt { get; set; }
+        public virtual ExportReceipt ExportReceipt { get; set; }
 
         [ForeignKey("ProductId")]
-        public Product Product { get; set; }
+        public virtual Product Product { get; set; }
     }
 }

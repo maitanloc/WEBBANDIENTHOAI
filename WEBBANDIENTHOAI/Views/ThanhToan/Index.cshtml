@@ -68,11 +68,19 @@
                                         <span class="text-red-500 text-sm mt-1" asp-validation-for="FullName"></span>
                                     </label>
 
-                                    <label class="flex flex-col col-span-2">
+                                    <label class="flex flex-col col-span-2 relative relative-container z-20">
                                         <p class="text-[#1c140d] dark:text-gray-300 pb-2">Địa chỉ</p>
-                                        <input type="text" name="Address" class="form-input rounded-lg border bg-background-light dark:bg-gray-800 h-12 px-4"
-                                               value="@Model.Address" placeholder="Ví dụ: 123 Đường ABC" required />
+                                        <input type="text" name="Address" id="Address" class="form-input rounded-lg border bg-background-light dark:bg-gray-800 h-12 px-4 focus:ring-primary focus:border-primary"
+                                               value="@Model.Address" placeholder="Tìm kiếm địa chỉ của bạn..." required autocomplete="off" />
+                                        <ul id="address-suggestions" class="absolute top-[80px] left-0 right-0 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl z-50 hidden max-h-60 overflow-y-auto w-full"></ul>
+                                        <!-- Map Instance -->
+                                        <div id="map-container" class="w-full h-64 mt-3 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm z-10"></div>
+                                        
                                         <span class="text-red-500 text-sm mt-1" asp-validation-for="Address"></span>
+                                        
+                                        <!-- Hidden LatLng Form Data -->
+                                        <input type="hidden" name="Latitude" id="Latitude" value="@Model.Latitude" />
+                                        <input type="hidden" name="Longitude" id="Longitude" value="@Model.Longitude" />
                                     </label>
 
                                     <label class="flex flex-col col-span-2">
@@ -243,6 +251,17 @@
             const checkedRadio = document.querySelector('input[name="payment-method-radio"]:checked');
             if (checkedRadio) {
                 checkedRadio.dispatchEvent(new Event('change'));
+            }
+
+            // --- Initialize Map & Autocomplete ---
+            if (typeof MapAddressIntegration !== 'undefined') {
+                new MapAddressIntegration({
+                    mapId: 'map-container',
+                    inputId: 'Address',
+                    latId: 'Latitude',
+                    lngId: 'Longitude',
+                    suggestionsId: 'address-suggestions'
+                });
             }
         });
     </script>

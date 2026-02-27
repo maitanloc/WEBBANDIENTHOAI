@@ -26,6 +26,6 @@ namespace WEBBANDIENTHOAI.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // (CreatedAt)
 
         [ForeignKey("InventoryId")]
-        public Inventory Inventory { get; set; }
+        public virtual Inventory Inventory { get; set; }
     }
 }

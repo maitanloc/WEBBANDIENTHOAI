@@ -18,9 +18,9 @@ namespace WEBBANDIENTHOAI.Models
         public decimal UnitPrice { get; set; } // (UnitPrice)
 
         [ForeignKey("CartId")]
-        public Cart Cart { get; set; }
+        public virtual Cart Cart { get; set; }
 
         [ForeignKey("ProductId")]
-        public Product Product { get; set; }
+        public virtual Product Product { get; set; }
     }
 }

@@ -17,7 +17,7 @@ namespace WEBBANDIENTHOAI.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<Product> Products { get; set; }
+        public virtual ICollection<Product> Products { get; set; }
     }
 
     // ==================== DTOs ====================

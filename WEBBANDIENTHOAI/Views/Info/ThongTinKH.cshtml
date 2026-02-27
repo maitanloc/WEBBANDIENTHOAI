@@ -120,10 +120,14 @@
                                     <span asp-validation-for="CitizenID" class="text-red-500 text-sm"></span>
                                 </div>
 
-                                <div class="md:col-span-2">
+                                <div class="md:col-span-2 relative relative-container z-20">
                                     <label asp-for="Address" class="block text-sm font-medium text-text-light dark:text-text-dark mb-1.5">Địa chỉ</label>
-                                    <input asp-for="Address" readonly class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" />
+                                    <input asp-for="Address" id="Address" readonly class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark read-only-styles" autocomplete="off" />
+                                    <ul id="address-suggestions" class="absolute top-[80px] left-0 right-0 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl z-50 hidden max-h-60 overflow-y-auto w-full"></ul>
+                                    <div id="map-container" class="w-full h-64 mt-3 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm z-10"></div>
                                     <span asp-validation-for="Address" class="text-red-500 text-sm"></span>
+                                    <input type="hidden" asp-for="Latitude" id="Latitude" />
+                                    <input type="hidden" asp-for="Longitude" id="Longitude" />
                                 </div>
                             </div>
                         </div>
@@ -360,6 +364,16 @@
                 }
             });
 
+            // === INITIALIZE MAP ===
+            if (typeof MapAddressIntegration !== 'undefined') {
+                new MapAddressIntegration({
+                    mapId: 'map-container',
+                    inputId: 'Address',
+                    latId: 'Latitude',
+                    lngId: 'Longitude',
+                    suggestionsId: 'address-suggestions'
+                });
+            }
         });
     </script>
 }

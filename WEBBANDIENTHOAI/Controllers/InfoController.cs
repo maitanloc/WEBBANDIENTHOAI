@@ -45,7 +45,9 @@ namespace WEBBANDIENTHOAI.Controllers
                 CitizenID = customer.CitizenID,
                 Address = customer.Address,
                 CreatedAt = customer.CreatedAt,
-                IsActive = customer.IsActive
+                IsActive = customer.IsActive,
+                Latitude = customer.Latitude,
+                Longitude = customer.Longitude
             };
 
             await PopulateViewBagForCustomer(customerId);
@@ -82,6 +84,8 @@ namespace WEBBANDIENTHOAI.Controllers
             customerToUpdate.Phone = model.Phone;
             customerToUpdate.Address = model.Address;
             customerToUpdate.CitizenID = model.CitizenID;
+            customerToUpdate.Latitude = model.Latitude;
+            customerToUpdate.Longitude = model.Longitude;
 
             await _context.SaveChangesAsync();
 
