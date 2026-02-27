@@ -152,4 +152,54 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+// ========================
+// 8) Khởi tạo Database & Admin mặc định (dành cho DB trống)
+// ========================
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        // 1. Tạo Role Admin nếu chưa có
+        var adminRole = context.Roles.FirstOrDefault(r => r.RoleName == "Admin");
+        if (adminRole == null)
+        {
+            adminRole = new WEBBANDIENTHOAI.Models.Role { RoleName = "Admin", Description = "Quản trị viên hệ thống" };
+            context.Roles.Add(adminRole);
+            context.SaveChanges();
+            Console.WriteLine("Đã tạo Role Admin mặc định.");
+        }
+
+        // 2. Tạo tài khoản admin nếu chưa có, hoặc cập nhật password nếu đã có
+        var adminUser = context.Users.FirstOrDefault(u => u.Username == "admin");
+        if (adminUser == null)
+        {
+            adminUser = new WEBBANDIENTHOAI.Models.User
+            {
+                Username = "admin",
+                FullName = "Quản Trị Viên",
+                Email = "admin@foxmobile.vn",
+                PasswordHash = WEBBANDIENTHOAI.Services.PasswordHasher.Hash("123456"),
+                RoleId = adminRole.RoleId,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+            context.Users.Add(adminUser);
+            context.SaveChanges();
+            Console.WriteLine("Đã tạo User Admin mặc định (admin / 123456).");
+        }
+        else
+        {
+            // Reset bắt buộc để user chắc chắn có thể đăng nhập bằng 123456 thay vì mật khẩu cũ
+            adminUser.PasswordHash = WEBBANDIENTHOAI.Services.PasswordHasher.Hash("123456");
+            context.SaveChanges();
+            Console.WriteLine("Đã reset mật khẩu Admin có sẵn về 123456.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Lỗi khi kiểm tra/khởi tạo Admin: {ex.Message}");
+    }
+}
+
 app.Run();

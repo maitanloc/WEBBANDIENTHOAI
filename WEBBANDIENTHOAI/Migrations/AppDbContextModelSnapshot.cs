@@ -90,11 +90,18 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.Property<int>("CartId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("OptionsPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<string>("SelectedOptions")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
@@ -147,6 +154,54 @@ namespace WEBBANDIENTHOAI.Migrations
                             CategoryName = "Laptops",
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Các loại máy tính xách tay"
+                        });
+                });
+
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.CrossSellRule", b =>
+                {
+                    b.Property<int>("CrossSellRuleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CrossSellRuleId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("DiscountedPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("DisplayMessage")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SuggestedProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TriggerProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CrossSellRuleId");
+
+                    b.HasIndex("SuggestedProductId");
+
+                    b.HasIndex("TriggerProductId");
+
+                    b.ToTable("CrossSellRules", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            CrossSellRuleId = 1,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountedPrice = 45990000m,
+                            DisplayMessage = "Hoàn thiện bộ đôi Apple của bạn!",
+                            IsActive = true,
+                            SuggestedProductId = 2,
+                            TriggerProductId = 1
                         });
                 });
 
@@ -743,6 +798,10 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<string>("SelectedOptions")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
 
@@ -1112,6 +1171,165 @@ namespace WEBBANDIENTHOAI.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.ProductOption", b =>
+                {
+                    b.Property<int>("ProductOptionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductOptionId"));
+
+                    b.Property<decimal>("AdditionalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("GroupName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OptionName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductOptionId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductOptions", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ProductOptionId = 1,
+                            AdditionalPrice = 0m,
+                            DisplayOrder = 1,
+                            GroupName = "Màu sắc",
+                            IsActive = true,
+                            OptionName = "Titan Tự Nhiên",
+                            ProductId = 1
+                        },
+                        new
+                        {
+                            ProductOptionId = 2,
+                            AdditionalPrice = 0m,
+                            DisplayOrder = 2,
+                            GroupName = "Màu sắc",
+                            IsActive = true,
+                            OptionName = "Titan Xanh",
+                            ProductId = 1
+                        },
+                        new
+                        {
+                            ProductOptionId = 3,
+                            AdditionalPrice = 0m,
+                            DisplayOrder = 3,
+                            GroupName = "Màu sắc",
+                            IsActive = true,
+                            OptionName = "Titan Đen",
+                            ProductId = 1
+                        },
+                        new
+                        {
+                            ProductOptionId = 4,
+                            AdditionalPrice = 0m,
+                            DisplayOrder = 4,
+                            GroupName = "Màu sắc",
+                            IsActive = true,
+                            OptionName = "Titan Trắng",
+                            ProductId = 1
+                        },
+                        new
+                        {
+                            ProductOptionId = 5,
+                            AdditionalPrice = 0m,
+                            DisplayOrder = 1,
+                            GroupName = "Bộ nhớ trong",
+                            IsActive = true,
+                            OptionName = "256GB",
+                            ProductId = 1
+                        },
+                        new
+                        {
+                            ProductOptionId = 6,
+                            AdditionalPrice = 3000000m,
+                            DisplayOrder = 2,
+                            GroupName = "Bộ nhớ trong",
+                            IsActive = true,
+                            OptionName = "512GB",
+                            ProductId = 1
+                        },
+                        new
+                        {
+                            ProductOptionId = 7,
+                            AdditionalPrice = 6000000m,
+                            DisplayOrder = 3,
+                            GroupName = "Bộ nhớ trong",
+                            IsActive = true,
+                            OptionName = "1TB",
+                            ProductId = 1
+                        },
+                        new
+                        {
+                            ProductOptionId = 8,
+                            AdditionalPrice = 0m,
+                            DisplayOrder = 1,
+                            GroupName = "RAM",
+                            IsActive = true,
+                            OptionName = "18GB",
+                            ProductId = 2
+                        },
+                        new
+                        {
+                            ProductOptionId = 9,
+                            AdditionalPrice = 5000000m,
+                            DisplayOrder = 2,
+                            GroupName = "RAM",
+                            IsActive = true,
+                            OptionName = "36GB",
+                            ProductId = 2
+                        },
+                        new
+                        {
+                            ProductOptionId = 10,
+                            AdditionalPrice = 0m,
+                            DisplayOrder = 1,
+                            GroupName = "SSD",
+                            IsActive = true,
+                            OptionName = "512GB",
+                            ProductId = 2
+                        },
+                        new
+                        {
+                            ProductOptionId = 11,
+                            AdditionalPrice = 5000000m,
+                            DisplayOrder = 2,
+                            GroupName = "SSD",
+                            IsActive = true,
+                            OptionName = "1TB",
+                            ProductId = 2
+                        },
+                        new
+                        {
+                            ProductOptionId = 12,
+                            AdditionalPrice = 10000000m,
+                            DisplayOrder = 3,
+                            GroupName = "SSD",
+                            IsActive = true,
+                            OptionName = "2TB",
+                            ProductId = 2
+                        });
+                });
+
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.ProductStatus", b =>
                 {
                     b.Property<byte>("StatusId")
@@ -1289,6 +1507,25 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.CrossSellRule", b =>
+                {
+                    b.HasOne("WEBBANDIENTHOAI.Models.Product", "SuggestedProduct")
+                        .WithMany()
+                        .HasForeignKey("SuggestedProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WEBBANDIENTHOAI.Models.Product", "TriggerProduct")
+                        .WithMany("CrossSellRulesTrigger")
+                        .HasForeignKey("TriggerProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("SuggestedProduct");
+
+                    b.Navigation("TriggerProduct");
+                });
+
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.ExportReceipt", b =>
                 {
                     b.HasOne("WEBBANDIENTHOAI.Models.User", "CreatedByUser")
@@ -1463,6 +1700,17 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.ProductOption", b =>
+                {
+                    b.HasOne("WEBBANDIENTHOAI.Models.Product", "Product")
+                        .WithMany("ProductOptions")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.User", b =>
                 {
                     b.HasOne("WEBBANDIENTHOAI.Models.Role", "Role")
@@ -1513,6 +1761,8 @@ namespace WEBBANDIENTHOAI.Migrations
                 {
                     b.Navigation("CartDetails");
 
+                    b.Navigation("CrossSellRulesTrigger");
+
                     b.Navigation("ExportDetails");
 
                     b.Navigation("Images");
@@ -1526,6 +1776,8 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.Navigation("OrderDetails");
 
                     b.Navigation("PhoneConfiguration");
+
+                    b.Navigation("ProductOptions");
                 });
 
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.ProductStatus", b =>

@@ -20,6 +20,10 @@ namespace WEBBANDIENTHOAI.Models
         [StringLength(255)]
         public string ProductName { get; set; } = string.Empty;
 
+        /// <summary>Snapshot cấu hình đã chọn khi đặt hàng. Ví dụ: {"Màu sắc":"Titan Xanh","Bộ nhớ":"256GB"}</summary>
+        [MaxLength(1000)]
+        public string? SelectedOptions { get; set; }
+
         [ForeignKey("OrderId")]
         public virtual Order? Order { get; set; }
 

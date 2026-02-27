@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WEBBANDIENTHOAI.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateLaptopConfigFieldLengths : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -57,7 +57,9 @@ namespace WEBBANDIENTHOAI.Migrations
                     CitizenID = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
                     Address = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    Latitude = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
+                    Longitude = table.Column<decimal>(type: "decimal(18,8)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -194,10 +196,12 @@ namespace WEBBANDIENTHOAI.Migrations
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     StatusId = table.Column<int>(type: "int", nullable: false),
-                    ShippingAddress = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    ShippingAddress = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
                     CreatedByUserId = table.Column<int>(type: "int", nullable: true),
-                    PaymentMethod = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+                    PaymentMethod = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Latitude = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
+                    Longitude = table.Column<decimal>(type: "decimal(18,8)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -287,7 +291,9 @@ namespace WEBBANDIENTHOAI.Migrations
                     CartId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    SelectedOptions = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    OptionsPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -298,6 +304,24 @@ namespace WEBBANDIENTHOAI.Migrations
                         principalTable: "Carts",
                         principalColumn: "CartId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CrossSellRules",
+                columns: table => new
+                {
+                    CrossSellRuleId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TriggerProductId = table.Column<int>(type: "int", nullable: false),
+                    SuggestedProductId = table.Column<int>(type: "int", nullable: false),
+                    DiscountedPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DisplayMessage = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CrossSellRules", x => x.CrossSellRuleId);
                 });
 
             migrationBuilder.CreateTable(
@@ -437,7 +461,9 @@ namespace WEBBANDIENTHOAI.Migrations
                     OrderId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ProductName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    SelectedOptions = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -536,6 +562,30 @@ namespace WEBBANDIENTHOAI.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ProductOptions",
+                columns: table => new
+                {
+                    ProductOptionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    GroupName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    OptionName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    AdditionalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DisplayOrder = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductOptions", x => x.ProductOptionId);
+                    table.ForeignKey(
+                        name: "FK_ProductOptions_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Categories",
                 columns: new[] { "CategoryId", "CategoryName", "CreatedAt", "Description" },
@@ -547,8 +597,8 @@ namespace WEBBANDIENTHOAI.Migrations
 
             migrationBuilder.InsertData(
                 table: "Customers",
-                columns: new[] { "CustomerId", "Address", "CitizenID", "CreatedAt", "Email", "FullName", "IsActive", "PasswordHash", "Phone" },
-                values: new object[] { 1, "123 Đường ABC, Quận 1, TP. HCM", "0123456789", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "customer@example.com", "Nguyễn Văn A", true, new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 }, "0987654321" });
+                columns: new[] { "CustomerId", "Address", "CitizenID", "CreatedAt", "Email", "FullName", "IsActive", "Latitude", "Longitude", "PasswordHash", "Phone" },
+                values: new object[] { 1, "123 Đường ABC, Quận 1, TP. HCM", "0123456789", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "customer@example.com", "Nguyễn Văn A", true, null, null, new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 }, "0987654321" });
 
             migrationBuilder.InsertData(
                 table: "OrderStatuses",
@@ -600,6 +650,11 @@ namespace WEBBANDIENTHOAI.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "CrossSellRules",
+                columns: new[] { "CrossSellRuleId", "CreatedAt", "DiscountedPrice", "DisplayMessage", "IsActive", "SuggestedProductId", "TriggerProductId" },
+                values: new object[] { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 45990000m, "Hoàn thiện bộ đôi Apple của bạn!", true, 2, 1 });
+
+            migrationBuilder.InsertData(
                 table: "Inventory",
                 columns: new[] { "InventoryId", "CurrentQuantity", "LastUpdated", "Location", "MaximumQuantity", "MinimumQuantity", "ProductId", "StockCode" },
                 values: new object[,]
@@ -628,6 +683,25 @@ namespace WEBBANDIENTHOAI.Migrations
                     { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new byte[0], true, 2 }
                 });
 
+            migrationBuilder.InsertData(
+                table: "ProductOptions",
+                columns: new[] { "ProductOptionId", "AdditionalPrice", "DisplayOrder", "GroupName", "IsActive", "OptionName", "ProductId" },
+                values: new object[,]
+                {
+                    { 1, 0m, 1, "Màu sắc", true, "Titan Tự Nhiên", 1 },
+                    { 2, 0m, 2, "Màu sắc", true, "Titan Xanh", 1 },
+                    { 3, 0m, 3, "Màu sắc", true, "Titan Đen", 1 },
+                    { 4, 0m, 4, "Màu sắc", true, "Titan Trắng", 1 },
+                    { 5, 0m, 1, "Bộ nhớ trong", true, "256GB", 1 },
+                    { 6, 3000000m, 2, "Bộ nhớ trong", true, "512GB", 1 },
+                    { 7, 6000000m, 3, "Bộ nhớ trong", true, "1TB", 1 },
+                    { 8, 0m, 1, "RAM", true, "18GB", 2 },
+                    { 9, 5000000m, 2, "RAM", true, "36GB", 2 },
+                    { 10, 0m, 1, "SSD", true, "512GB", 2 },
+                    { 11, 5000000m, 2, "SSD", true, "1TB", 2 },
+                    { 12, 10000000m, 3, "SSD", true, "2TB", 2 }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_CartDetails_CartId",
                 table: "CartDetails",
@@ -642,6 +716,16 @@ namespace WEBBANDIENTHOAI.Migrations
                 name: "IX_Carts_CustomerId",
                 table: "Carts",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CrossSellRules_SuggestedProductId",
+                table: "CrossSellRules",
+                column: "SuggestedProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CrossSellRules_TriggerProductId",
+                table: "CrossSellRules",
+                column: "TriggerProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_Email",
@@ -763,6 +847,11 @@ namespace WEBBANDIENTHOAI.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductOptions_ProductId",
+                table: "ProductOptions",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
@@ -796,6 +885,22 @@ namespace WEBBANDIENTHOAI.Migrations
                 principalTable: "Products",
                 principalColumn: "ProductId",
                 onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_CrossSellRules_Products_SuggestedProductId",
+                table: "CrossSellRules",
+                column: "SuggestedProductId",
+                principalTable: "Products",
+                principalColumn: "ProductId",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_CrossSellRules_Products_TriggerProductId",
+                table: "CrossSellRules",
+                column: "TriggerProductId",
+                principalTable: "Products",
+                principalColumn: "ProductId",
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_ExportReceiptDetails_Products_ProductId",
@@ -864,6 +969,9 @@ namespace WEBBANDIENTHOAI.Migrations
                 name: "CartDetails");
 
             migrationBuilder.DropTable(
+                name: "CrossSellRules");
+
+            migrationBuilder.DropTable(
                 name: "ExportReceiptDetails");
 
             migrationBuilder.DropTable(
@@ -886,6 +994,9 @@ namespace WEBBANDIENTHOAI.Migrations
 
             migrationBuilder.DropTable(
                 name: "PhoneConfigurations");
+
+            migrationBuilder.DropTable(
+                name: "ProductOptions");
 
             migrationBuilder.DropTable(
                 name: "Carts");

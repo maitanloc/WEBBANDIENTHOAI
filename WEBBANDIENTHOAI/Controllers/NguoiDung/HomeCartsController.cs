@@ -63,7 +63,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
+        public async Task<IActionResult> AddToCart(int productId, int quantity = 1, string? selectedOptions = null)
         {
             try
             {
@@ -78,8 +78,8 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 if (product == null) return Json(new { success = false, message = "Sản phẩm không tồn tại!" });
 
                 var currentStock = product.Inventory?.Sum(i => i.CurrentQuantity) ?? 0;
-                
-                // Get current cart quantity
+
+                // Get current cart quantity for this product+option combo
                 var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId.Value);
                 var existingItem = cart?.Details?.FirstOrDefault(d => d.ProductId == productId);
                 var currentCartQuantity = existingItem?.Quantity ?? 0;
@@ -89,7 +89,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                     return Json(new { success = false, message = $"Số lượng sản phẩm không đủ. Tối đa: {currentStock}" });
                 }
 
-                await _cartRepository.AddToCartAsync(customerId.Value, productId, quantity);
+                await _cartRepository.AddToCartAsync(customerId.Value, productId, quantity, selectedOptions);
                 return Json(new { success = true, message = "Đã thêm vào giỏ hàng" });
             }
             catch (Exception ex)
@@ -98,7 +98,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
             }
         }
 
-        public async Task<IActionResult> BuyNow(int productId, int quantity = 1)
+        public async Task<IActionResult> BuyNow(int productId, int quantity = 1, string? selectedOptions = null)
         {
             var customerId = GetCurrentCustomerId();
             if (customerId == null)
@@ -110,23 +110,20 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
             {
                 // Check stock
                 var product = await _context.Products.Include(p => p.Inventory).FirstOrDefaultAsync(p => p.ProductId == productId);
-                if (product == null) 
+                if (product == null)
                 {
                     TempData["ErrorMessage"] = "Sản phẩm không tồn tại!";
                     return RedirectToAction("Productdetails", "HomeUser", new { id = productId });
                 }
 
                 var currentStock = product.Inventory?.Sum(i => i.CurrentQuantity) ?? 0;
-                
-                // For BuyNow, we just check if requested quantity <= stock (ignoring existing cart for simplicity, or we could add it)
                 if (quantity > currentStock)
                 {
                     TempData["ErrorMessage"] = $"Số lượng sản phẩm không đủ. Tối đa: {currentStock}";
                     return RedirectToAction("Productdetails", "HomeUser", new { id = productId });
                 }
 
-                await _cartRepository.AddToCartAsync(customerId.Value, productId, quantity);
-
+                await _cartRepository.AddToCartAsync(customerId.Value, productId, quantity, selectedOptions);
                 return RedirectToAction("Index", "ThanhToan", new { selectedProductIds = productId.ToString() });
             }
             catch (Exception)
@@ -231,6 +228,19 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                         // Tính tổng tồn kho
                         var inventoryQuantity = product.Inventory?.Sum(i => i.CurrentQuantity) ?? 0;
 
+                        // Tạo chuỗi hiển thị tùy chọn: "Màu sắc: Titan Xanh | Bộ nhớ: 512GB"
+                        var selectedOptionsDisplay = "";
+                        if (!string.IsNullOrEmpty(item.SelectedOptions))
+                        {
+                            try
+                            {
+                                var optionsDict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(item.SelectedOptions);
+                                if (optionsDict != null)
+                                    selectedOptionsDisplay = string.Join(" | ", optionsDict.Select(kv => $"{kv.Key}: {kv.Value}"));
+                            }
+                            catch { /* ignore parse errors */ }
+                        }
+
                         viewModel.CartItems.Add(new ViewModels.CartItemViewModel
                         {
                             CartDetailId = item.CartDetailId,
@@ -238,8 +248,11 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                             ProductName = product.Name,
                             ProductImage = imageUrl,
                             Price = item.UnitPrice,
+                            OptionsPrice = item.OptionsPrice,
                             Quantity = item.Quantity,
-                            InventoryQuantity = inventoryQuantity // Thêm dòng này
+                            InventoryQuantity = inventoryQuantity,
+                            SelectedOptions = item.SelectedOptions,
+                            SelectedOptionsDisplay = selectedOptionsDisplay
                         });
                     }
                 }

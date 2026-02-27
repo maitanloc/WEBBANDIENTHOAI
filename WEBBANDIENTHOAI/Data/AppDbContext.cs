@@ -40,10 +40,16 @@ namespace WEBBANDIENTHOAI.Data
         public DbSet<LaptopConfiguration> LaptopConfigurations { get; set; }
         public DbSet<PhoneConfiguration> PhoneConfigurations { get; set; }
 
+        // Product Options (tùy chọn cấu hình sản phẩm)
+        public DbSet<ProductOption> ProductOptions { get; set; }
+
+        // Cross-sell rules (bán chéo)
+        public DbSet<CrossSellRule> CrossSellRules { get; set; }
+
         // Audit / Logs
         public DbSet<AuditLog> AuditLogs { get; set; }
 
-        // 🔥 THÊM CÁC MODELS MỚI CHO FORGOT PASSWORD
+        // Forgot Password
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
         public DbSet<OTPCode> OTPCodes { get; set; }
 
@@ -81,9 +87,11 @@ namespace WEBBANDIENTHOAI.Data
 
             modelBuilder.Entity<AuditLog>().ToTable("AuditLogs");
 
-            // CẤU HÌNH CHO CÁC TABLE MỚI
             modelBuilder.Entity<PasswordResetToken>().ToTable("PasswordResetTokens");
             modelBuilder.Entity<OTPCode>().ToTable("OTPCodes");
+
+            modelBuilder.Entity<ProductOption>().ToTable("ProductOptions");
+            modelBuilder.Entity<CrossSellRule>().ToTable("CrossSellRules");
 
             // CẤU HÌNH QUAN HỆ Product ↔ Category
             modelBuilder.Entity<Product>()
@@ -127,6 +135,26 @@ namespace WEBBANDIENTHOAI.Data
                 .WithOne(p => p.PhoneConfiguration)
                 .HasForeignKey<PhoneConfiguration>(pc => pc.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // CẤU HÌNH QUAN HỆ ProductOption ↔ Product (1-N)
+            modelBuilder.Entity<ProductOption>()
+                .HasOne(po => po.Product)
+                .WithMany(p => p.ProductOptions)
+                .HasForeignKey(po => po.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // CẤU HÌNH QUAN HỆ CrossSellRule ↔ Product (2 FK, no cascade)
+            modelBuilder.Entity<CrossSellRule>()
+                .HasOne(r => r.TriggerProduct)
+                .WithMany(p => p.CrossSellRulesTrigger)
+                .HasForeignKey(r => r.TriggerProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CrossSellRule>()
+                .HasOne(r => r.SuggestedProduct)
+                .WithMany()
+                .HasForeignKey(r => r.SuggestedProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // CẤU HÌNH CHO PASSWORD RESET TOKENS
             modelBuilder.Entity<PasswordResetToken>(entity =>
@@ -318,7 +346,42 @@ namespace WEBBANDIENTHOAI.Data
                                                                 Weight = "1.55 kg",
                                                                 CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                                                             }
-                                                        );                                
+                                                        );
+
+                                            // Gieo dữ liệu cho ProductOption (iPhone 15 Pro)
+                                            modelBuilder.Entity<ProductOption>().HasData(
+                                                // iPhone 15 Pro - Màu sắc
+                                                new ProductOption { ProductOptionId = 1, ProductId = 1, GroupName = "Màu sắc", OptionName = "Titan Tự Nhiên", AdditionalPrice = 0m, DisplayOrder = 1, IsActive = true },
+                                                new ProductOption { ProductOptionId = 2, ProductId = 1, GroupName = "Màu sắc", OptionName = "Titan Xanh", AdditionalPrice = 0m, DisplayOrder = 2, IsActive = true },
+                                                new ProductOption { ProductOptionId = 3, ProductId = 1, GroupName = "Màu sắc", OptionName = "Titan Đen", AdditionalPrice = 0m, DisplayOrder = 3, IsActive = true },
+                                                new ProductOption { ProductOptionId = 4, ProductId = 1, GroupName = "Màu sắc", OptionName = "Titan Trắng", AdditionalPrice = 0m, DisplayOrder = 4, IsActive = true },
+                                                // iPhone 15 Pro - Bộ nhớ trong
+                                                new ProductOption { ProductOptionId = 5, ProductId = 1, GroupName = "Bộ nhớ trong", OptionName = "256GB", AdditionalPrice = 0m, DisplayOrder = 1, IsActive = true },
+                                                new ProductOption { ProductOptionId = 6, ProductId = 1, GroupName = "Bộ nhớ trong", OptionName = "512GB", AdditionalPrice = 3000000m, DisplayOrder = 2, IsActive = true },
+                                                new ProductOption { ProductOptionId = 7, ProductId = 1, GroupName = "Bộ nhớ trong", OptionName = "1TB", AdditionalPrice = 6000000m, DisplayOrder = 3, IsActive = true },
+                                                // MacBook Pro 14 - RAM
+                                                new ProductOption { ProductOptionId = 8, ProductId = 2, GroupName = "RAM", OptionName = "18GB", AdditionalPrice = 0m, DisplayOrder = 1, IsActive = true },
+                                                new ProductOption { ProductOptionId = 9, ProductId = 2, GroupName = "RAM", OptionName = "36GB", AdditionalPrice = 5000000m, DisplayOrder = 2, IsActive = true },
+                                                // MacBook Pro 14 - SSD
+                                                new ProductOption { ProductOptionId = 10, ProductId = 2, GroupName = "SSD", OptionName = "512GB", AdditionalPrice = 0m, DisplayOrder = 1, IsActive = true },
+                                                new ProductOption { ProductOptionId = 11, ProductId = 2, GroupName = "SSD", OptionName = "1TB", AdditionalPrice = 5000000m, DisplayOrder = 2, IsActive = true },
+                                                new ProductOption { ProductOptionId = 12, ProductId = 2, GroupName = "SSD", OptionName = "2TB", AdditionalPrice = 10000000m, DisplayOrder = 3, IsActive = true }
+                                            );
+
+                                            // Gieo dữ liệu cho CrossSellRule
+                                            modelBuilder.Entity<CrossSellRule>().HasData(
+                                                new CrossSellRule
+                                                {
+                                                    CrossSellRuleId = 1,
+                                                    TriggerProductId = 1, // iPhone 15 Pro
+                                                    SuggestedProductId = 2, // MacBook Pro (placeholder cross-sell)
+                                                    DiscountedPrice = 45990000m,
+                                                    DisplayMessage = "Hoàn thiện bộ đôi Apple của bạn!",
+                                                    IsActive = true,
+                                                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                }
+                                            );
+
                                             // Gieo dữ liệu cho Inventory
                                             modelBuilder.Entity<Inventory>().HasData(
                                                 new Inventory

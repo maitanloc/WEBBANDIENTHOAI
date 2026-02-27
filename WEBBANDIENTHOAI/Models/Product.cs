@@ -67,5 +67,7 @@ namespace WEBBANDIENTHOAI.Models
         public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
         public virtual ICollection<CartDetail> CartDetails { get; set; } = new List<CartDetail>();
         public virtual ICollection<Inventory> Inventory { get; set; } = new List<Inventory>();
+        public virtual ICollection<ProductOption> ProductOptions { get; set; } = new List<ProductOption>();
+        public virtual ICollection<CrossSellRule> CrossSellRulesTrigger { get; set; } = new List<CrossSellRule>();
     }
 }

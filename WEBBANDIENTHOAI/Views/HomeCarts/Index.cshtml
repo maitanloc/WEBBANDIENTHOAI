@@ -58,7 +58,7 @@
                         @foreach (var item in Model.CartItems)
                         {
                             <div class="flex items-center gap-4 p-6 cart-item bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm"
-                                data-price="@item.Price" data-quantity="@item.Quantity" data-product-id="@item.ProductId"
+                                data-price="@(item.Price + item.OptionsPrice)" data-quantity="@item.Quantity" data-product-id="@item.ProductId"
                                 data-inventory-quantity="@item.InventoryQuantity">
 
                                 <input type="checkbox"
@@ -71,8 +71,12 @@
 
                                 <div class="flex-1">
                                     <h3 class="text-gray-800 dark:text-gray-200 font-semibold text-lg">@item.ProductName</h3>
+                                    @if (!string.IsNullOrEmpty(item.SelectedOptionsDisplay))
+                                    {
+                                        <p class="text-sm font-medium text-orange-600 mt-1">Cấu hình: @item.SelectedOptionsDisplay</p>
+                                    }
                                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Mã SP: @item.ProductId</p>
-                                    <p class="text-primary font-bold text-xl mt-2">@item.Price.ToString("N0")₫</p>
+                                    <p class="text-primary font-bold text-xl mt-2">@((item.Price + item.OptionsPrice).ToString("N0"))₫</p>
                                 </div>
 
                                 <div class="flex items-center gap-2">

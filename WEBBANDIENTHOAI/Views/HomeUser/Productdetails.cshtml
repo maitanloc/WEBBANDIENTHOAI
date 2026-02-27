@@ -117,34 +117,34 @@
                     </div>
                 }
 
-                <!-- Color & Size Options -->
-                <div class="space-y-4">
-                    @if (!string.IsNullOrEmpty(Model.Color))
-                    {
-                        <div>
-                            <span class="font-semibold text-gray-800 block mb-2">Màu sắc:</span>
-                            <div class="flex space-x-3">
-                                <button
-                                    class="px-4 py-2 bg-primary text-white rounded-lg font-medium border-2 border-primary">
-                                    @Model.Color
-                                </button>
+                <!-- Tùy chọn cấu hình sản phẩm (Product Options) -->
+                @if (Model.ProductOptions.Any())
+                {
+                    var groups = Model.ProductOptions.GroupBy(o => o.GroupName);
+                    <div class="space-y-4" id="optionGroups">
+                        @foreach (var group in groups)
+                        {
+                            <div>
+                                <span class="font-semibold text-gray-800 block mb-2">@group.Key:</span>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach (var opt in group)
+                                    {
+                                        var priceLabel = opt.AdditionalPrice > 0
+                                            ? $" (+{opt.AdditionalPrice:N0}⍣)"
+                                            : "";
+                                        <button type="button"
+                                            class="option-btn px-3 py-2 rounded-lg border-2 border-gray-300 text-sm font-medium hover:border-primary transition-colors"
+                                            data-group="@group.Key"
+                                            data-option="@opt.OptionName"
+                                            data-price="@opt.AdditionalPrice.ToString("0")">
+                                            @opt.OptionName@priceLabel
+                                        </button>
+                                    }
+                                </div>
                             </div>
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(Model.Size))
-                    {
-                        <div>
-                            <span class="font-semibold text-gray-800 block mb-2">Kích thước:</span>
-                            <div class="flex space-x-3">
-                                <button
-                                    class="px-4 py-2 bg-gray-100 text-gray-800 rounded-lg font-medium border-2 border-gray-300 hover:border-primary transition-colors">
-                                    @Model.Size
-                                </button>
-                            </div>
-                        </div>
-                    }
-                </div>
+                        }
+                    </div>
+                }
 
                 <!-- Add to Cart Section -->
                 <div class="space-y-4 pt-4 border-t border-gray-200">
@@ -388,10 +388,20 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-
         .thumbnail.active {
             border-color: #f97316;
             box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1);
+        }
+        .option-btn.selected {
+            background-color: #f97316;
+            color: white;
+            border-color: #f97316;
+        }
+        .option-btn:focus {
+            outline: none;
+        }
+        #currentPrice {
+            transition: color 0.2s ease;
         }
     </style>
 }
@@ -460,11 +470,11 @@
                 }
             });
 
-            // Add to Cart Functionality
             const addToCartBtn = document.getElementById('addToCartBtn');
             addToCartBtn.addEventListener('click', function () {
                 const productId = @Model.ProductId;
                 const quantity = parseInt(quantityInput.value);
+                const selectedOptions = JSON.stringify(getSelectedOptions());
 
                 // Show loading state
                 const originalHTML = this.innerHTML;
@@ -481,7 +491,7 @@
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'RequestVerificationToken': token
                     },
-                    body: `productId=${productId}&quantity=${quantity}`
+                    body: `productId=${productId}&quantity=${quantity}&selectedOptions=${encodeURIComponent(selectedOptions)}`
                 })
                     .then(response => response.json())
                     .then(data => {
@@ -536,14 +546,60 @@
             buyNowBtn.addEventListener('click', function () {
                 const productId = @Model.ProductId;
                 const quantity = parseInt(quantityInput.value);
+                const selectedOptions = encodeURIComponent(JSON.stringify(getSelectedOptions()));
 
-                // Hiển thị trạng thái loading
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Đang xử lý...</span>';
                 this.disabled = true;
-
-                // Chuyển hướng đến trang BuyNow
-                window.location.href = `/HomeCarts/BuyNow?productId=${productId}&quantity=${quantity}`;
+                window.location.href = `/HomeCarts/BuyNow?productId=${productId}&quantity=${quantity}&selectedOptions=${selectedOptions}`;
             });
+
+            // ===== OPTION SELECTION LOGIC =====
+            const basePrice = @Model.Price.ToString("0");
+            const priceDisplay = document.querySelector('.text-3xl.font-bold.text-primary');
+            const selectedOptionsMap = {}; // { "Màu sắc": "Titan Xanh", "Bộ nhớ": "512GB" }
+
+            function getSelectedOptions() {
+                return Object.keys(selectedOptionsMap).length > 0 ? { ...selectedOptionsMap } : {};
+            }
+
+            function updatePrice() {
+                let extra = 0;
+                document.querySelectorAll('.option-btn.selected').forEach(btn => {
+                    extra += parseFloat(btn.dataset.price || 0);
+                });
+                const total = basePrice + extra;
+                if (priceDisplay) {
+                    priceDisplay.textContent = new Intl.NumberFormat('vi-VN').format(total) + '⍣';
+                }
+            }
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const group = this.dataset.group;
+                    const option = this.dataset.option;
+
+                    // Deselect other buttons in the same group
+                    document.querySelectorAll(`.option-btn[data-group="${group}"]`).forEach(b => {
+                        b.classList.remove('selected');
+                    });
+
+                    // Select this button
+                    this.classList.add('selected');
+                    selectedOptionsMap[group] = option;
+                    updatePrice();
+                });
+            });
+
+            // Auto-select first option in each group
+            const groups = {};
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                const g = btn.dataset.group;
+                if (!groups[g]) {
+                    groups[g] = btn;
+                }
+            });
+            Object.values(groups).forEach(btn => btn.click());
+            // ===== END OPTION LOGIC =====
 
             // Load related products
             loadRelatedProducts();

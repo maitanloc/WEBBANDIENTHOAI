@@ -24,5 +24,6 @@ namespace WEBBANDIENTHOAI.ViewModels
         public List<ProductImageVm> Images { get; set; } = new();
         public LaptopConfigurationVm? LaptopConfiguration { get; set; }
         public PhoneConfigurationVm? PhoneConfiguration { get; set; }
+        public List<ProductOptionVm> ProductOptions { get; set; } = new();
     }
 }

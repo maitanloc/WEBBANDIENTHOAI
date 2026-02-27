@@ -9,12 +9,17 @@ namespace WEBBANDIENTHOAI.ViewModels
     {
         public int CartDetailId { get; set; }
         public int ProductId { get; set; }
-        public string ProductName { get; set; }
-        public string ProductImage { get; set; } // Đảm bảo dùng ProductImage thay vì ImageUrl
+        public string ProductName { get; set; } = "";
+        public string ProductImage { get; set; } = "";
         public decimal Price { get; set; }
+        public decimal OptionsPrice { get; set; } = 0m;
         public int Quantity { get; set; }
         public int InventoryQuantity { get; set; }
-        public decimal TotalPrice => Price * Quantity;
+        /// <summary>JSON cấu hình đã chọn</summary>
+        public string? SelectedOptions { get; set; }
+        /// <summary>Hiển thị thân thiện: "Màu sắc: Titan Xanh, Bộ nhớ: 512GB"</summary>
+        public string SelectedOptionsDisplay { get; set; } = "";
+        public decimal TotalPrice => (Price + OptionsPrice) * Quantity;
     }
 
     public class CartIndexViewModel

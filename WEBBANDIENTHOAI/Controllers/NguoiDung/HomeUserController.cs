@@ -103,7 +103,8 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 .Include(p => p.Images)
                 .Include(p => p.PhoneConfiguration)
                 .Include(p => p.LaptopConfiguration)
-                .Include(p => p.Inventory) // <<< Tải dữ liệu tồn kho
+                .Include(p => p.Inventory)
+                .Include(p => p.ProductOptions.Where(po => po.IsActive)) // Tải tùy chọn cấu hình
                 .FirstOrDefaultAsync(p => p.ProductId == id);
 
             if (product == null)
@@ -182,6 +183,18 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                     OperatingSystem = product.LaptopConfiguration.OperatingSystem,
                     ScreenSize = product.LaptopConfiguration.ScreenSize
                 } : null,
+
+                ProductOptions = product.ProductOptions
+                    .OrderBy(po => po.GroupName)
+                    .ThenBy(po => po.DisplayOrder)
+                    .Select(po => new ProductOptionVm
+                    {
+                        ProductOptionId = po.ProductOptionId,
+                        GroupName = po.GroupName,
+                        OptionName = po.OptionName,
+                        AdditionalPrice = po.AdditionalPrice,
+                        DisplayOrder = po.DisplayOrder
+                    }).ToList(),
             };
 
             return View(viewModel);
