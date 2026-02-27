@@ -18,7 +18,11 @@ namespace WEBBANDIENTHOAI.Controllers
             if (HttpContext.Session.GetString("UserId") == null)
                 return RedirectToAction("Login", "Account");
 
-            return View();
+            var role = HttpContext.Session.GetString("RoleName");
+            if (role == "Admin") return RedirectToAction("Index", "Admin", new { area = "Admin" });
+            if (role == "Staff") return RedirectToAction("Index", "Staff", new { area = "Admin" });
+            
+            return RedirectToAction("Index", "HomeUser");
         }
 
         public IActionResult Privacy()

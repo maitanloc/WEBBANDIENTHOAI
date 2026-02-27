@@ -367,7 +367,7 @@
                                 {
                                     <div
                                         class="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                                        @ViewBag.CustomerName?.ToString().Substring(0, 1).ToUpper()
+                                        @( !string.IsNullOrEmpty(ViewBag.CustomerName?.ToString()) ? ViewBag.CustomerName.ToString().Substring(0, 1).ToUpper() : "U" )
                                     </div>
                                     <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform"
                                         id="user-profile-chevron"></i>
@@ -392,7 +392,7 @@
                                         <div class="flex items-center gap-3">
                                             <div
                                                 class="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white font-semibold">
-                                                @ViewBag.CustomerName?.ToString().Substring(0, 1).ToUpper()
+                                                @( !string.IsNullOrEmpty(ViewBag.CustomerName?.ToString()) ? ViewBag.CustomerName.ToString().Substring(0, 1).ToUpper() : "U" )
                                             </div>
                                             <div>
                                                 <p class="font-semibold text-gray-800 dark:text-white">@ViewBag.CustomerName
@@ -768,33 +768,39 @@
             closeWelcome();
         }, 5000);
 
-        // Initialize AOS
-        AOS.init({
-            duration: 800,
-            once: true,
-            offset: 100
-        });
+        // Loading Screen & AOS Initialization
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize AOS
+            if (typeof AOS !== 'undefined') {
+                AOS.init({
+                    duration: 800,
+                    once: true,
+                    offset: 100
+                });
+            }
 
-        // Loading Screen
-        window.addEventListener('load', function () {
             const loadingScreen = document.getElementById('loadingScreen');
             const progressFill = document.querySelector('.progress-fill');
 
             let progress = 0;
             const interval = setInterval(() => {
-                progress += Math.random() * 30;
+                progress += Math.random() * 40 + 20;
                 if (progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
+                    if (progressFill) progressFill.style.width = '100%';
                     setTimeout(() => {
-                        loadingScreen.style.opacity = '0';
-                        setTimeout(() => {
-                            loadingScreen.style.display = 'none';
-                        }, 300);
+                        if (loadingScreen) {
+                            loadingScreen.style.opacity = '0';
+                            setTimeout(() => {
+                                loadingScreen.style.display = 'none';
+                            }, 300);
+                        }
                     }, 100);
+                } else {
+                    if (progressFill) progressFill.style.width = progress + '%';
                 }
-                if (progressFill) progressFill.style.width = progress + '%';
-            }, 100);
+            }, 50);
         });
 
         // Header Scroll Effect

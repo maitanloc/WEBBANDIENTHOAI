@@ -113,9 +113,9 @@
                             @foreach (var detail in order.OrderDetails)
                             {
                                 <div class="flex gap-4 py-4 first:pt-0 last:pb-0">
-                                     <img class="h-20 w-20 rounded-lg object-cover" src="@(detail.Product?.PrimaryImage != null ? Url.Action("GetProductImage", "HomeUser", new { imageId = detail.Product.PrimaryImage.ImageId }) : "/images/default-product.png")" alt="@detail.Product.Name">
+                                     <img class="h-20 w-20 rounded-lg object-cover" src="@(detail.Product?.PrimaryImage != null ? Url.Action("GetProductImage", "HomeUser", new { imageId = detail.Product.PrimaryImage.ImageId }) : "/images/default-product.png")" alt="@detail.ProductName">
                                     <div class="flex flex-1 flex-col justify-center">
-                                        <p class="font-semibold text-slate-800 dark:text-slate-100">@detail.Product.Name</p>
+                                        <p class="font-semibold text-slate-800 dark:text-slate-100">@detail.ProductName</p>
                                         <p class="text-sm text-slate-500 dark:text-slate-400">Số lượng: @detail.Quantity</p>
                                     </div>
                                     <div class="flex items-center">

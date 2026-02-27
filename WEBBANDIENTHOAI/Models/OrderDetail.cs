@@ -17,6 +17,9 @@ namespace WEBBANDIENTHOAI.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal UnitPrice { get; set; }
 
+        [StringLength(255)]
+        public string ProductName { get; set; } = string.Empty;
+
         [ForeignKey("OrderId")]
         public virtual Order? Order { get; set; }
 

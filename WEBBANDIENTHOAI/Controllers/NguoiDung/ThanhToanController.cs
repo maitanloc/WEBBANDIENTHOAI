@@ -208,7 +208,8 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                                 OrderId = order.OrderId,
                                 ProductId = item.ProductId,
                                 Quantity = item.Quantity,
-                                UnitPrice = item.Price
+                                UnitPrice = item.Price,
+                                ProductName = item.ProductName
                             };
                             _context.OrderDetails.Add(orderDetail);
                         }
@@ -461,7 +462,9 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 
                             Quantity = item.Quantity,
 
-                            UnitPrice = item.Price
+                            UnitPrice = item.Price,
+
+                            ProductName = item.ProductName
 
                         };
 
