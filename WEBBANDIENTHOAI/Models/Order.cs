@@ -32,6 +32,20 @@ namespace WEBBANDIENTHOAI.Models
         [MaxLength(500)]
         public string? Notes { get; set; }
 
+        // ===== PROMOTION & LOYALTY =====
+        /// <summary>Voucher đã áp dụng (null nếu không dùng voucher)</summary>
+        public int? VoucherId { get; set; }
+
+        /// <summary>Số tiền được giảm từ voucher</summary>
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal DiscountAmount { get; set; } = 0m;
+
+        /// <summary>Điểm thưởng đã cộng cho đơn hàng này (chỉ cộng khi Delivered)</summary>
+        public int PointsEarned { get; set; } = 0;
+
+        /// <summary>Điểm đã dùng để thanh toán đơn hàng này</summary>
+        public int PointsUsed { get; set; } = 0;
+
         [Column(TypeName = "decimal(18,8)")]
         public decimal? Latitude { get; set; }
 
@@ -43,9 +57,14 @@ namespace WEBBANDIENTHOAI.Models
         public virtual Customer Customer { get; set; }
 
         [ForeignKey("StatusId")]
-        public virtual OrderStatus OrderStatus { get; set; }  // Mới thêm
+        public virtual OrderStatus OrderStatus { get; set; }
+
+        [ForeignKey("VoucherId")]
+        public virtual Voucher? Voucher { get; set; }
 
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual ICollection<UserPointHistory> PointHistories { get; set; } = new List<UserPointHistory>();
+        public virtual ICollection<UserVoucher> UserVouchers { get; set; } = new List<UserVoucher>();
     }
     // DTO cho thống kê đơn hàng
     public class OrderStatisticsDto

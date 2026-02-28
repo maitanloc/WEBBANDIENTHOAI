@@ -214,6 +214,54 @@ namespace WEBBANDIENTHOAI.Controllers.TaiKhoan
                 await _context.Customers.AddAsync(customer);
                 await _context.SaveChangesAsync();
 
+                // ──────────────────────────────────────────────────────────────────
+                // TỰ ĐỘNG TẶNG WELCOME VOUCHER CHO KHÁCH HÀNG MỚI ĐĂNG KÝ
+                // ──────────────────────────────────────────────────────────────────
+                try
+                {
+                    // 1. Tìm trong DB xem có voucher nào dành cho người mới không (vd: VoucherCode = "WELCOME")
+                    var welcomeVoucher = await _context.Vouchers.FirstOrDefaultAsync(v => v.Code == "WELCOME" && v.IsActive && v.EndDate > DateTime.UtcNow);
+                    
+                    if (welcomeVoucher == null)
+                    {
+                        // 2. Nếu chưa có, tự động tạo ra một Welcome Voucher cơ bản
+                        welcomeVoucher = new Voucher
+                        {
+                            Code = "WELCOME",
+                            Description = "Voucher chào mừng thành viên mới - Giảm 50.000đ cho đơn từ 200.000đ",
+                            DiscountType = DiscountType.Fixed,
+                            Value = 50000, // 50k
+                            MinOrderValue = 200000, // Đơn tối thiểu 200k
+                            Quantity = 999999, // Không giới hạn số lượng user nhận
+                            UsedCount = 0,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow,
+                            StartDate = DateTime.UtcNow,
+                            EndDate = DateTime.UtcNow.AddYears(10) // 10 năm
+                        };
+                        _context.Vouchers.Add(welcomeVoucher);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    // 3. Giao voucher này cho khách mới trong bảng UserVouchers
+                    var userVoucher = new UserVoucher
+                    {
+                        CustomerId = customer.CustomerId,
+                        VoucherId = welcomeVoucher.VoucherId,
+                        AssignedAt = DateTime.UtcNow,
+                        IsUsed = false
+                    };
+                    _context.UserVouchers.Add(userVoucher);
+                    await _context.SaveChangesAsync();
+                    Console.WriteLine($"Đã tặng Welcome Voucher ({welcomeVoucher.Code}) cho Customer {customer.CustomerId}");
+                }
+                catch (Exception vEx)
+                {
+                    // Lỗi tặng voucher không ảnh hưởng đến việc tạo user
+                    Console.WriteLine($"Lỗi khi tặng Welcome Voucher: {vEx.Message}");
+                }
+                // ──────────────────────────────────────────────────────────────────
+
                 Console.WriteLine($"=== REGISTER SUCCESS ===");
                 Console.WriteLine($"New customer: {customer.FullName}, Email: {customer.Email}, Phone: {customer.Phone}");
 

@@ -16,6 +16,12 @@ namespace WEBBANDIENTHOAI.ViewModels
         public string StatusName { get; set; }
         public string Notes { get; set; }
         public decimal Total { get; set; }
+        
+        // --- THÊM THÔNG TIN KHUYẾN MÃI ---
+        public decimal DiscountAmount { get; set; }
+        public int PointsUsed { get; set; }
+        public string? AppliedVoucherCode { get; set; }
+        public decimal OriginalTotal => OrderDetails.Sum(od => od.Quantity * od.UnitPrice);
 
         // Chi tiết sản phẩm
         public List<OrderDetailItem> OrderDetails { get; set; } = new List<OrderDetailItem>();

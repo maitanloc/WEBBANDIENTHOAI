@@ -119,7 +119,9 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                     {
                         orderId = exportReceipt.Order.OrderId,
                         orderDate = exportReceipt.Order.OrderDate,
-                        total = exportReceipt.Order.Total
+                        total = exportReceipt.Order.Total,
+                        discountAmount = exportReceipt.Order.DiscountAmount,
+                        pointsUsed = exportReceipt.Order.PointsUsed
                     } : null,
                     createdByUser = exportReceipt.CreatedByUser != null ? new
                     {

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WEBBANDIENTHOAI.Data;
 
@@ -11,9 +12,11 @@ using WEBBANDIENTHOAI.Data;
 namespace WEBBANDIENTHOAI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260228063703_AddSeedData2026")]
+    partial class AddSeedData2026
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -270,9 +273,6 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.Property<int>("TierId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("TotalSpent")
-                        .HasColumnType("decimal(18,2)");
-
                     b.HasKey("CustomerId");
 
                     b.HasIndex("Email")
@@ -295,8 +295,7 @@ namespace WEBBANDIENTHOAI.Migrations
                             LoyaltyPoints = 0,
                             PasswordHash = new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 },
                             Phone = "0987654321",
-                            TierId = 1,
-                            TotalSpent = 0m
+                            TierId = 1
                         });
                 });
 
@@ -315,8 +314,8 @@ namespace WEBBANDIENTHOAI.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<decimal>("MinSpending")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("MinPoints")
+                        .HasColumnType("int");
 
                     b.Property<string>("TierName")
                         .IsRequired()
@@ -333,31 +332,31 @@ namespace WEBBANDIENTHOAI.Migrations
                             TierId = 1,
                             BonusMultiplier = 1.0m,
                             Description = "Thành viên thường – nhận 1 điểm / 10.000đ",
-                            MinSpending = 0m,
+                            MinPoints = 0,
                             TierName = "Member"
                         },
                         new
                         {
                             TierId = 2,
                             BonusMultiplier = 1.2m,
-                            Description = "Thành viên Bạc – Chi tiêu > 10Tr, hệ số điểm x1.2",
-                            MinSpending = 10000000m,
+                            Description = "Thành viên Bạc – nhân hệ số điểm x1.2",
+                            MinPoints = 1000,
                             TierName = "Silver"
                         },
                         new
                         {
                             TierId = 3,
                             BonusMultiplier = 1.5m,
-                            Description = "Thành viên Vàng – Chi tiêu > 50Tr, hệ số điểm x1.5",
-                            MinSpending = 50000000m,
+                            Description = "Thành viên Vàng – nhân hệ số điểm x1.5",
+                            MinPoints = 5000,
                             TierName = "Gold"
                         },
                         new
                         {
                             TierId = 4,
                             BonusMultiplier = 2.0m,
-                            Description = "Thành viên Kim Cương – Chi tiêu > 100Tr, hệ số điểm x2.0",
-                            MinSpending = 100000000m,
+                            Description = "Thành viên Kim Cương – nhân hệ số điểm x2.0",
+                            MinPoints = 10000,
                             TierName = "Diamond"
                         });
                 });

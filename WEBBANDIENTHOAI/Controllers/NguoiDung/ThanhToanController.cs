@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
+using WEBBANDIENTHOAI.Services;
 using WEBBANDIENTHOAI.Services.VNPay;
 using WEBBANDIENTHOAI.ViewModels;
 
@@ -14,12 +15,14 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
     {
         private readonly AppDbContext _context;
         private readonly IVnPayService _vnPayService;
+        private readonly IPromotionService _promotionSvc;
         private const string CheckoutSessionKey = "CheckoutData";
 
-        public ThanhToanController(AppDbContext context, IVnPayService vnPayService)
+        public ThanhToanController(AppDbContext context, IVnPayService vnPayService, IPromotionService promotionSvc)
         {
             _context = context;
             _vnPayService = vnPayService;
+            _promotionSvc = promotionSvc;
         }
 
         public IActionResult Index(string selectedProductIds)
@@ -84,6 +87,8 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 Email = customer.Email
             };
 
+            ViewBag.LoyaltyPoints = customer.LoyaltyPoints;
+
             return View(viewModel);
         }
 
@@ -125,10 +130,84 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 }
             }
 
+            // Lấy thông tin voucher và điểm từ Session gán vào model để check lại ở Preview
+            model.AppliedVoucherCode = HttpContext.Session.GetString("AppliedVoucherCode");
+            
+            if (decimal.TryParse(HttpContext.Session.GetString("AppliedVoucherDiscount"), out decimal voucherDisc))
+                model.VoucherDiscount = voucherDisc;
+
+            model.PointsUsed = HttpContext.Session.GetInt32("AppliedPoints") ?? 0;
+            
+            if (decimal.TryParse(HttpContext.Session.GetString("AppliedPointsMoney"), out decimal pointsDisc))
+                model.PointsDiscount = pointsDisc;
+
             // Lưu tạm thông tin thanh toán vào session
             HttpContext.Session.SetString(CheckoutSessionKey, JsonSerializer.Serialize(model));
 
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableVouchers()
+        {
+            var customerId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(customerId)) return Json(new List<object>());
+
+            var userVouchers = await _context.UserVouchers
+                .Include(uv => uv.Voucher)
+                .Where(uv => uv.CustomerId == int.Parse(customerId) && !uv.IsUsed 
+                    && uv.Voucher.IsActive && uv.Voucher.EndDate >= DateTime.UtcNow
+                    && uv.Voucher.UsedCount < uv.Voucher.Quantity)
+                .Select(uv => new {
+                    code = uv.Voucher.Code,
+                    description = uv.Voucher.Description,
+                    minOrderValue = uv.Voucher.MinOrderValue,
+                    discountType = uv.Voucher.DiscountType
+                }).ToListAsync();
+
+            return Json(userVouchers);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApplyVoucher([FromForm] string voucherCode, [FromForm] decimal totalAmount)
+        {
+            var customerId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(customerId)) return Json(new { success = false, message = "Vui lòng đăng nhập." });
+
+            var result = await _promotionSvc.ValidateVoucherAsync(voucherCode, totalAmount, int.Parse(customerId));
+            if (result.IsValid && result.Voucher != null)
+            {
+                HttpContext.Session.SetString("AppliedVoucherCode", voucherCode);
+                HttpContext.Session.SetInt32("AppliedVoucherId", result.Voucher.VoucherId);
+                HttpContext.Session.SetString("AppliedVoucherDiscount", result.DiscountAmount.ToString());
+                return Json(new { success = true, discountAmount = result.DiscountAmount, message = "Áp dụng voucher thành công!" });
+            }
+            return Json(new { success = false, message = result.Message });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UsePoints([FromForm] int points)
+        {
+            var customerId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(customerId)) return Json(new { success = false, message = "Vui lòng đăng nhập." });
+
+            if (points < 10 && points != 0) return Json(new { success = false, message = "Cần sử dụng tối thiểu 10 điểm." });
+
+            var customer = _context.Customers.Find(int.Parse(customerId));
+            if (customer == null || customer.LoyaltyPoints < points)
+            {
+                return Json(new { success = false, message = "Điểm F-Point không đủ." });
+            }
+
+            decimal discount = points * 1000m; // 1 F-Point = 1.000đ
+            if (points == 0) discount = 0m;
+            
+            HttpContext.Session.SetInt32("AppliedPoints", points);
+            HttpContext.Session.SetString("AppliedPointsMoney", discount.ToString());
+            
+            return Json(new { success = true, discountAmount = discount, message = points == 0 ? "Bỏ dùng điểm." : $"Sử dụng {points} F-Point thành công!" });
         }
 
         [HttpPost]
@@ -180,12 +259,52 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                             }
                         }
 
+                        // ===== PROMOTION & LOYALTY (Re-validate before saving order) =====
+                        int? appliedVoucherId = HttpContext.Session.GetInt32("AppliedVoucherId");
+                        string? appliedVoucherCode = HttpContext.Session.GetString("AppliedVoucherCode");
+                        decimal currentDiscount = 0m;
+                        int pointsUsed = HttpContext.Session.GetInt32("AppliedPoints") ?? 0;
+
+                        if (!string.IsNullOrEmpty(appliedVoucherCode) && appliedVoucherId.HasValue)
+                        {
+                            // ValidateVoucherAsync is async, wait for it
+                            var vResTask = _promotionSvc.ValidateVoucherAsync(appliedVoucherCode, model.TotalAmount, int.Parse(customerId));
+                            vResTask.Wait(); // Blocking call trong Strategy có thể gây chú ý, tốt nhất nên validate ở ngoài ExecutionStrategy, 
+                                             // nhưng ở đây ExecutionStrategy cho EFCore hỗ trợ async rất tốt. 
+                                             // Sẽ sửa chỗ này thành Validate đồng bộ hoặc bọc strategy async ở hàm bao ngoài nếu lỗi.
+                                             // Vì lambda trong Execute hiện tại là KHÔNG ASYNC: `strategy.Execute(() => ...)`
+                            var vRes = vResTask.Result;
+
+                            if (!vRes.IsValid) {
+                                result = Json(new { success = false, message = $"Voucher không hợp lệ: {vRes.Message}. Vui lòng tải lại trang." });
+                                return;
+                            }
+                            currentDiscount = vRes.DiscountAmount;
+                        }
+
+                        // Guard điểm
+                        if (pointsUsed > 0)
+                        {
+                            var cust = _context.Customers.Find(int.Parse(customerId));
+                            if (cust == null || cust.LoyaltyPoints < pointsUsed) {
+                                result = Json(new { success = false, message = "Điểm F-Point không đủ hoặc không hợp lệ." });
+                                return;
+                            }
+                        }
+
+                        // Tính toán giá sau cùng (Final Amount)
+                        decimal pointsDiscount = pointsUsed * 1000m;
+                        decimal finalTotal = Math.Max(0, model.TotalAmount - currentDiscount - pointsDiscount);
+
                         // 1. Tạo đơn hàng mới
                         var order = new Order
                         {
                             CustomerId = int.Parse(customerId),
                             OrderDate = DateTime.UtcNow,
-                            Total = model.TotalAmount,
+                            Total = finalTotal, // Lưu giá ĐÃ GIẢM vào DB để gửi qua VNPay
+                            VoucherId = appliedVoucherId,
+                            DiscountAmount = currentDiscount,
+                            PointsUsed = pointsUsed,
                             StatusId = 1,
                             ShippingAddress = model.Address,
                             CreatedByUserId = null,
@@ -232,12 +351,50 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                         }
 
                         _context.SaveChanges();
-                        transaction.Commit(); // Commit transaction
 
-                        // Xóa session sau khi xử lý thành công
-                        HttpContext.Session.Remove(CheckoutSessionKey);
-                        
-                        result = Json(new { success = true, message = "Đặt hàng thành công!", redirectUrl = Url.Action("OrderSuccess", new { orderId }) });
+                        if (model.PaymentMethod == "BankTransfer")
+                        {
+                            // KHÔNG commit voucher và điểm ngay cho VNPay, chờ Callback
+                            var paymentModel = new PaymentInformationModel
+                            {
+                                Amount = (double)order.Total,
+                                Name = model.FullName,
+                                OrderDescription = $"DH{order.OrderId}",
+                                OrderType = "other",
+                                OrderId = order.OrderId
+                            };
+                            var paymentUrl = _vnPayService.CreatePaymentUrl(paymentModel, HttpContext);
+                            
+                            // Giữ lại Session vì Callback cần? Thực ra Callback không cần vì ID voucher lưu vào order rồi
+                            transaction.Commit();
+                            result = Json(new { success = true, message = "Chuyển hướng thanh toán VNPay...", redirectUrl = paymentUrl });
+                        }
+                        else 
+                        {
+                            // ===== COMMIT VOUCHER & POINTS CHO COD =====
+                            if (appliedVoucherId.HasValue)
+                            {
+                                var commitTask = _promotionSvc.CommitVoucherUsageAsync(appliedVoucherId.Value, int.Parse(customerId), order.OrderId);
+                                commitTask.Wait();
+                            }
+                            if (pointsUsed > 0)
+                            {
+                                var usePointsTask = _promotionSvc.UsePointsAsync(int.Parse(customerId), pointsUsed);
+                                usePointsTask.Wait();
+                            }
+
+                            transaction.Commit(); // Commit transaction
+
+                            // Xóa session sau khi xử lý thành công
+                            HttpContext.Session.Remove(CheckoutSessionKey);
+                            HttpContext.Session.Remove("AppliedVoucherCode");
+                            HttpContext.Session.Remove("AppliedVoucherId");
+                            HttpContext.Session.Remove("AppliedVoucherDiscount");
+                            HttpContext.Session.Remove("AppliedPoints");
+                            HttpContext.Session.Remove("AppliedPointsMoney");
+                            
+                            result = Json(new { success = true, message = "Đặt hàng thành công!", redirectUrl = Url.Action("OrderSuccess", new { orderId }) });
+                        }
                     }
                     catch (Exception)
                     {
@@ -282,6 +439,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 .Include(o => o.Customer)
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
+                .Include(o => o.Voucher) // Include thêm Voucher
                 .FirstOrDefault(o => o.OrderId == orderId);
 
             if (order == null)
@@ -299,7 +457,11 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 CustomerEmail = order.Customer?.Email ?? string.Empty,
                 CustomerPhone = order.Customer?.Phone ?? string.Empty,
                 ShippingAddress = order.ShippingAddress ?? string.Empty,
-                TotalAmount = order.Total,
+                TotalAmount = order.OrderDetails != null ? order.OrderDetails.Sum(od => od.Quantity * od.UnitPrice) : order.Total + order.DiscountAmount,
+                VoucherDiscount = order.DiscountAmount,
+                PointsUsed = order.PointsUsed,
+                PointsDiscount = order.PointsUsed > 0 ? order.PointsUsed * 1000 : 0,
+                AppliedVoucherCode = order.Voucher?.Code,
                 PaymentMethod = order.PaymentMethod ?? string.Empty,
                 Status = order.OrderStatus?.StatusName ?? "Pending",
                 OrderItems = order.OrderDetails.Select(od => new OrderItemViewModel
@@ -321,7 +483,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
         }
 
         [HttpGet]
-        public IActionResult PaymentCallbackVnpay()
+        public async Task<IActionResult> PaymentCallbackVnpay()
         {
             try
             {
@@ -331,7 +493,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 {
                     // Cập nhật trạng thái đơn hàng thành đã thanh toán
                     var orderId = long.Parse(response.OrderId);
-                    var order = _context.Orders.Find((int)orderId);
+                    var order = await _context.Orders.FindAsync((int)orderId);
 
                     if (order != null)
                     {
@@ -340,7 +502,18 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                         {
                             order.StatusId = 2; // Đã thanh toán
                             order.PaymentMethod = "VNPay";
-                            _context.SaveChanges();
+                            
+                            // Commit voucher and points
+                            if (order.VoucherId.HasValue)
+                            {
+                                await _promotionSvc.CommitVoucherUsageAsync(order.VoucherId.Value, order.CustomerId, order.OrderId);
+                            }
+                            if (order.PointsUsed > 0)
+                            {
+                                await _promotionSvc.UsePointsAsync(order.CustomerId, order.PointsUsed);
+                            }
+
+                            await _context.SaveChangesAsync();
                         }
 
                         TempData["SuccessMessage"] = $"Thanh toán thành công đơn hàng #{orderId}";
@@ -360,7 +533,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
         }
 
         [HttpGet]
-        public IActionResult PaymentNotify()
+        public async Task<IActionResult> PaymentNotify()
         {
             try
             {
@@ -369,7 +542,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 if (response.Success)
                 {
                     var orderId = long.Parse(response.OrderId);
-                    var order = _context.Orders.Find((int)orderId);
+                    var order = await _context.Orders.FindAsync((int)orderId);
 
                     if (order != null)
                     {
@@ -381,7 +554,18 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                         {
                             order.StatusId = 2; // Đã thanh toán
                             order.PaymentMethod = "VNPay";
-                            _context.SaveChanges();
+                            
+                            // Commit voucher and points
+                            if (order.VoucherId.HasValue)
+                            {
+                                await _promotionSvc.CommitVoucherUsageAsync(order.VoucherId.Value, order.CustomerId, order.OrderId);
+                            }
+                            if (order.PointsUsed > 0)
+                            {
+                                await _promotionSvc.UsePointsAsync(order.CustomerId, order.PointsUsed);
+                            }
+
+                            await _context.SaveChangesAsync();
                         }
                         
                         return Json(new { RspCode = "00", Message = "Confirm Success" });
@@ -406,109 +590,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 
         
 
-                [HttpPost]
-                // thanh toán vnpay 
-                public IActionResult CreateVnpayPayment([FromForm] CheckoutViewModel model)
-
-                {
-
-                    var customerId = HttpContext.Session.GetString("UserId");
-
-                    if (string.IsNullOrEmpty(customerId))
-
-                    {
-
-                        return Json(new { success = false, message = "Vui lòng đăng nhập lại." });
-
-                    }
-
-        
-
-                    // Step 1: Create and save the order to get a persistent OrderId
-                    var order = new Order
-                    {
-                        CustomerId = int.Parse(customerId),
-                        OrderDate = DateTime.UtcNow,
-                        Total = model.TotalAmount,
-                        StatusId = 1, // Status: "Chờ xác nhận" hoặc "Pending". Sẽ cập nhật sau khi thanh toán thành công.
-                        ShippingAddress = model.Address ?? "",
-                        PaymentMethod = "VNPay",
-                        Notes = model.Notes ?? string.Empty,
-                        Latitude = model.Latitude,
-                        Longitude = model.Longitude
-                    };
-
-        
-
-                    _context.Orders.Add(order);
-
-                    // Must save here to generate OrderId
-
-                    _context.SaveChanges(); 
-
-        
-
-                    foreach (var item in model.SelectedItems)
-
-                    {
-
-                        var orderDetail = new OrderDetail
-
-                        {
-
-                            OrderId = order.OrderId,
-
-                            ProductId = item.ProductId,
-
-                            Quantity = item.Quantity,
-
-                            UnitPrice = item.Price,
-
-                            ProductName = item.ProductName
-
-                        };
-
-                        _context.OrderDetails.Add(orderDetail);
-
-                    }
-
-                    // Save again to add details
-
-                    _context.SaveChanges();
-
-        
-
-                    // Step 2: Create PaymentInformationModel for VNPay
-
-                    var paymentModel = new PaymentInformationModel
-
-                    {
-
-                        Amount = (double)order.Total,
-
-                        Name = model.FullName,
-
-                                        OrderDescription = $"DH{order.OrderId}",
-
-                                        OrderType = "other",
-
-                                        OrderId = order.OrderId
-
-                    };
-
-        
-
-                    // Step 3: Create payment URL
-
-                    var paymentUrl = _vnPayService.CreatePaymentUrl(paymentModel, HttpContext);
-
-        
-
-                    // Step 4: Return URL to client
-
-                    return Json(new { success = true, paymentUrl });
-
-                }
+        // Method CreateVnpayPayment removed, logic moved to ProcessOrder
 
             }
 

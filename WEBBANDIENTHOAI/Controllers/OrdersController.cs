@@ -7,20 +7,26 @@ using WEBBANDIENTHOAI.Repository.TaiKhoan; // Add this using statement
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using WEBBANDIENTHOAI.Services;
 
 namespace WEBBANDIENTHOAI.Controllers
 {
     public class OrdersController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly ICustomerRepository _customerRepository; // Inject ICustomerRepository
+        private readonly ICustomerRepository _customerRepository; 
         private readonly ICartRepository _cartRepository;
+        private readonly IPromotionService _promotionService;
 
-        public OrdersController(AppDbContext context, ICustomerRepository customerRepository, ICartRepository cartRepository) // Update constructor
+        public OrdersController(AppDbContext context, 
+            ICustomerRepository customerRepository, 
+            ICartRepository cartRepository,
+            IPromotionService promotionService)
         {
             _context = context;
             _customerRepository = customerRepository;
             _cartRepository = cartRepository;
+            _promotionService = promotionService;
         }
 
         private int? GetCurrentCustomerId()
@@ -143,11 +149,19 @@ namespace WEBBANDIENTHOAI.Controllers
             }
 
             // Assuming StatusId 3 is "Shipping"
-            if (order.StatusId == 3)
+            if (order.StatusId == 3 || order.StatusId == 2)
             {
-                order.StatusId = 4; // StatusId 4 for "Delivered"
+                order.StatusId = 4; // Delivered
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, message = "Xác nhận đã nhận hàng thành công." });
+
+                // Cộng điểm F-Point
+                int pointsEarned = await _promotionService.AwardPointsAsync(id);
+
+                return Json(new { 
+                    success = true, 
+                    message = "Xác nhận đã nhận hàng thành công.",
+                    pointsEarned = pointsEarned
+                });
             }
 
             return BadRequest(new { success = false, message = "Không thể xác nhận đơn hàng ở trạng thái này." });

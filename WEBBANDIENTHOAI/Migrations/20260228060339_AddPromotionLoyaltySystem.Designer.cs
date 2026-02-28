@@ -12,8 +12,8 @@ using WEBBANDIENTHOAI.Data;
 namespace WEBBANDIENTHOAI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260227064243_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260228060339_AddPromotionLoyaltySystem")]
+    partial class AddPromotionLoyaltySystem
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -248,6 +248,9 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.Property<decimal?>("Longitude")
                         .HasColumnType("decimal(18,8)");
 
+                    b.Property<int>("LoyaltyPoints")
+                        .HasColumnType("int");
+
                     b.Property<byte[]>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
@@ -257,10 +260,15 @@ namespace WEBBANDIENTHOAI.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
+                    b.Property<int>("TierId")
+                        .HasColumnType("int");
+
                     b.HasKey("CustomerId");
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("TierId");
 
                     b.ToTable("Customers", (string)null);
 
@@ -274,8 +282,72 @@ namespace WEBBANDIENTHOAI.Migrations
                             Email = "customer@example.com",
                             FullName = "Nguyễn Văn A",
                             IsActive = true,
+                            LoyaltyPoints = 0,
                             PasswordHash = new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 },
-                            Phone = "0987654321"
+                            Phone = "0987654321",
+                            TierId = 1
+                        });
+                });
+
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.CustomerTier", b =>
+                {
+                    b.Property<int>("TierId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TierId"));
+
+                    b.Property<decimal>("BonusMultiplier")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("MinPoints")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TierName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("TierId");
+
+                    b.ToTable("CustomerTiers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            TierId = 1,
+                            BonusMultiplier = 1.0m,
+                            Description = "Thành viên thường – nhận 1 điểm / 10.000đ",
+                            MinPoints = 0,
+                            TierName = "Member"
+                        },
+                        new
+                        {
+                            TierId = 2,
+                            BonusMultiplier = 1.2m,
+                            Description = "Thành viên Bạc – nhân hệ số điểm x1.2",
+                            MinPoints = 1000,
+                            TierName = "Silver"
+                        },
+                        new
+                        {
+                            TierId = 3,
+                            BonusMultiplier = 1.5m,
+                            Description = "Thành viên Vàng – nhân hệ số điểm x1.5",
+                            MinPoints = 5000,
+                            TierName = "Gold"
+                        },
+                        new
+                        {
+                            TierId = 4,
+                            BonusMultiplier = 2.0m,
+                            Description = "Thành viên Kim Cương – nhân hệ số điểm x2.0",
+                            MinPoints = 10000,
+                            TierName = "Diamond"
                         });
                 });
 
@@ -741,6 +813,9 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal?>("Latitude")
                         .HasColumnType("decimal(18,8)");
 
@@ -758,6 +833,12 @@ namespace WEBBANDIENTHOAI.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("PointsEarned")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PointsUsed")
+                        .HasColumnType("int");
+
                     b.Property<string>("ShippingAddress")
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
@@ -768,6 +849,9 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("VoucherId")
+                        .HasColumnType("int");
+
                     b.HasKey("OrderId");
 
                     b.HasIndex("CustomerId");
@@ -775,6 +859,8 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.HasIndex("OrderDate");
 
                     b.HasIndex("StatusId");
+
+                    b.HasIndex("VoucherId");
 
                     b.ToTable("Orders", (string)null);
                 });
@@ -869,6 +955,12 @@ namespace WEBBANDIENTHOAI.Migrations
                             StatusId = 5,
                             Description = "Đơn hàng đã bị hủy",
                             StatusName = "Cancelled"
+                        },
+                        new
+                        {
+                            StatusId = 6,
+                            Description = "Đơn hàng đã được hoàn trả / hoàn tiền",
+                            StatusName = "Returned"
                         });
                 });
 
@@ -1480,6 +1572,305 @@ namespace WEBBANDIENTHOAI.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.UserPointHistory", b =>
+                {
+                    b.Property<int>("HistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HistoryId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.HasKey("HistoryId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("UserPointHistories", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            HistoryId = 1,
+                            CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 1,
+                            Points = 500,
+                            Reason = "Tích điểm đơn hàng #1001 - Giao thành công"
+                        },
+                        new
+                        {
+                            HistoryId = 2,
+                            CreatedAt = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 1,
+                            Points = 300,
+                            Reason = "Tích điểm đơn hàng #1002 - Giao thành công"
+                        },
+                        new
+                        {
+                            HistoryId = 3,
+                            CreatedAt = new DateTime(2024, 2, 20, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 1,
+                            Points = -200,
+                            Reason = "Dùng điểm thanh toán đơn hàng #1003"
+                        },
+                        new
+                        {
+                            HistoryId = 4,
+                            CreatedAt = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 1,
+                            Points = 150,
+                            Reason = "Tích điểm đơn hàng #1004 - Giao thành công"
+                        },
+                        new
+                        {
+                            HistoryId = 5,
+                            CreatedAt = new DateTime(2024, 3, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 1,
+                            Points = 100,
+                            Reason = "Thưởng sự kiện Vòng quay may mắn"
+                        },
+                        new
+                        {
+                            HistoryId = 6,
+                            CreatedAt = new DateTime(2024, 3, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 1,
+                            Points = -100,
+                            Reason = "Hoàn trả điểm đơn hàng #1005 - Hoàn hàng"
+                        });
+                });
+
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.UserVoucher", b =>
+                {
+                    b.Property<int>("UserVoucherId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserVoucherId"));
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("VoucherId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserVoucherId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("VoucherId");
+
+                    b.HasIndex("CustomerId", "VoucherId", "IsUsed")
+                        .HasFilter("[IsUsed] = 0");
+
+                    b.ToTable("UserVouchers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserVoucherId = 1,
+                            AssignedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 1,
+                            IsUsed = false,
+                            VoucherId = 1
+                        },
+                        new
+                        {
+                            UserVoucherId = 2,
+                            AssignedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 1,
+                            IsUsed = false,
+                            VoucherId = 2
+                        },
+                        new
+                        {
+                            UserVoucherId = 3,
+                            AssignedAt = new DateTime(2024, 2, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 1,
+                            IsUsed = false,
+                            VoucherId = 3
+                        },
+                        new
+                        {
+                            UserVoucherId = 4,
+                            AssignedAt = new DateTime(2024, 2, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 1,
+                            IsUsed = false,
+                            VoucherId = 4
+                        },
+                        new
+                        {
+                            UserVoucherId = 5,
+                            AssignedAt = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 1,
+                            IsUsed = false,
+                            VoucherId = 5
+                        });
+                });
+
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.Voucher", b =>
+                {
+                    b.Property<int>("VoucherId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VoucherId"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("DiscountType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("MaxDiscountAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MinOrderValue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UsedCount")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("VoucherId");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Vouchers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            VoucherId = 1,
+                            Code = "WELCOME50",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Voucher chào mừng thành viên mới - giảm 50.000đ",
+                            DiscountType = 2,
+                            EndDate = new DateTime(2026, 12, 31, 23, 59, 59, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            MinOrderValue = 500000m,
+                            Quantity = 0,
+                            StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsedCount = 0,
+                            Value = 50000m
+                        },
+                        new
+                        {
+                            VoucherId = 2,
+                            Code = "SALE10PCT",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Giảm 10% tối đa 100.000đ cho đơn từ 1.000.000đ",
+                            DiscountType = 1,
+                            EndDate = new DateTime(2026, 12, 31, 23, 59, 59, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            MaxDiscountAmount = 100000m,
+                            MinOrderValue = 1000000m,
+                            Quantity = 500,
+                            StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsedCount = 0,
+                            Value = 10m
+                        },
+                        new
+                        {
+                            VoucherId = 3,
+                            Code = "SILVER100",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Ưu đãi hạng Bạc - giảm 100.000đ cho đơn từ 2.000.000đ",
+                            DiscountType = 2,
+                            EndDate = new DateTime(2026, 12, 31, 23, 59, 59, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            MinOrderValue = 2000000m,
+                            Quantity = 200,
+                            StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsedCount = 0,
+                            Value = 100000m
+                        },
+                        new
+                        {
+                            VoucherId = 4,
+                            Code = "GOLD15PCT",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Ưu đãi hạng Vàng - giảm 15% tối đa 300.000đ",
+                            DiscountType = 1,
+                            EndDate = new DateTime(2026, 12, 31, 23, 59, 59, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            MaxDiscountAmount = 300000m,
+                            MinOrderValue = 5000000m,
+                            Quantity = 100,
+                            StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsedCount = 0,
+                            Value = 15m
+                        },
+                        new
+                        {
+                            VoucherId = 5,
+                            Code = "DIAMOND20",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Ưu đãi hạng Kim Cương - giảm 20% tối đa 1.000.000đ",
+                            DiscountType = 1,
+                            EndDate = new DateTime(2026, 12, 31, 23, 59, 59, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            MaxDiscountAmount = 1000000m,
+                            MinOrderValue = 10000000m,
+                            Quantity = 50,
+                            StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsedCount = 0,
+                            Value = 20m
+                        });
+                });
+
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.Cart", b =>
                 {
                     b.HasOne("WEBBANDIENTHOAI.Models.Customer", "Customer")
@@ -1527,6 +1918,17 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.Navigation("SuggestedProduct");
 
                     b.Navigation("TriggerProduct");
+                });
+
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.Customer", b =>
+                {
+                    b.HasOne("WEBBANDIENTHOAI.Models.CustomerTier", "Tier")
+                        .WithMany("Customers")
+                        .HasForeignKey("TierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tier");
                 });
 
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.ExportReceipt", b =>
@@ -1631,9 +2033,16 @@ namespace WEBBANDIENTHOAI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("WEBBANDIENTHOAI.Models.Voucher", "Voucher")
+                        .WithMany("Orders")
+                        .HasForeignKey("VoucherId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Customer");
 
                     b.Navigation("OrderStatus");
+
+                    b.Navigation("Voucher");
                 });
 
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.OrderDetail", b =>
@@ -1725,6 +2134,50 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.UserPointHistory", b =>
+                {
+                    b.HasOne("WEBBANDIENTHOAI.Models.Customer", "Customer")
+                        .WithMany("PointHistories")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WEBBANDIENTHOAI.Models.Order", "Order")
+                        .WithMany("PointHistories")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.UserVoucher", b =>
+                {
+                    b.HasOne("WEBBANDIENTHOAI.Models.Customer", "Customer")
+                        .WithMany("UserVouchers")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WEBBANDIENTHOAI.Models.Order", "Order")
+                        .WithMany("UserVouchers")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("WEBBANDIENTHOAI.Models.Voucher", "Voucher")
+                        .WithMany("UserVouchers")
+                        .HasForeignKey("VoucherId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Voucher");
+                });
+
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.Cart", b =>
                 {
                     b.Navigation("Details");
@@ -1733,6 +2186,18 @@ namespace WEBBANDIENTHOAI.Migrations
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.Customer", b =>
+                {
+                    b.Navigation("PointHistories");
+
+                    b.Navigation("UserVouchers");
+                });
+
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.CustomerTier", b =>
+                {
+                    b.Navigation("Customers");
                 });
 
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.ExportReceipt", b =>
@@ -1753,6 +2218,10 @@ namespace WEBBANDIENTHOAI.Migrations
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.Order", b =>
                 {
                     b.Navigation("OrderDetails");
+
+                    b.Navigation("PointHistories");
+
+                    b.Navigation("UserVouchers");
                 });
 
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.OrderStatus", b =>
@@ -1786,6 +2255,13 @@ namespace WEBBANDIENTHOAI.Migrations
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.ProductStatus", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.Voucher", b =>
+                {
+                    b.Navigation("Orders");
+
+                    b.Navigation("UserVouchers");
                 });
 #pragma warning restore 612, 618
         }

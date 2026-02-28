@@ -145,7 +145,7 @@ namespace WEBBANDIENTHOAI.Controllers
 
         private async Task PopulateViewBagForCustomer(int customerId)
         {
-            var customer = await _context.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.CustomerId == customerId);
+            var customer = await _context.Customers.Include(c => c.Tier).AsNoTracking().FirstOrDefaultAsync(c => c.CustomerId == customerId);
             if (customer != null)
             {
                 var totalSpending = await _context.Orders
@@ -157,6 +157,8 @@ namespace WEBBANDIENTHOAI.Controllers
                 ViewBag.CustomerEmail = customer.Email;
                 ViewBag.CustomerPhone = customer.Phone;
                 ViewBag.IsLoggedIn = true;
+                ViewBag.LoyaltyPoints = customer.LoyaltyPoints;
+                ViewBag.TierName = customer.Tier?.TierName ?? "Thành viên";
             }
         }
     }

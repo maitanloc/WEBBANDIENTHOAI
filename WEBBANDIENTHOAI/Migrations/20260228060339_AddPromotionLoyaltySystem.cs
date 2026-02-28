@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WEBBANDIENTHOAI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class AddPromotionLoyaltySystem : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -45,25 +45,19 @@ namespace WEBBANDIENTHOAI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Customers",
+                name: "CustomerTiers",
                 columns: table => new
                 {
-                    CustomerId = table.Column<int>(type: "int", nullable: false)
+                    TierId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FullName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    CitizenID = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    Latitude = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
-                    Longitude = table.Column<decimal>(type: "decimal(18,8)", nullable: true)
+                    TierName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    MinPoints = table.Column<int>(type: "int", nullable: false),
+                    BonusMultiplier = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Customers", x => x.CustomerId);
+                    table.PrimaryKey("PK_CustomerTiers", x => x.TierId);
                 });
 
             migrationBuilder.CreateTable(
@@ -166,6 +160,85 @@ namespace WEBBANDIENTHOAI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Vouchers",
+                columns: table => new
+                {
+                    VoucherId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    DiscountType = table.Column<int>(type: "int", nullable: false),
+                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MaxDiscountAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    MinOrderValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    UsedCount = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vouchers", x => x.VoucherId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Customers",
+                columns: table => new
+                {
+                    CustomerId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    CitizenID = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    LoyaltyPoints = table.Column<int>(type: "int", nullable: false),
+                    TierId = table.Column<int>(type: "int", nullable: false),
+                    Latitude = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
+                    Longitude = table.Column<decimal>(type: "decimal(18,8)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Customers", x => x.CustomerId);
+                    table.ForeignKey(
+                        name: "FK_Customers_CustomerTiers_TierId",
+                        column: x => x.TierId,
+                        principalTable: "CustomerTiers",
+                        principalColumn: "TierId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Username = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_Users_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "RoleId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Carts",
                 columns: table => new
                 {
@@ -200,6 +273,10 @@ namespace WEBBANDIENTHOAI.Migrations
                     CreatedByUserId = table.Column<int>(type: "int", nullable: true),
                     PaymentMethod = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    VoucherId = table.Column<int>(type: "int", nullable: true),
+                    DiscountAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PointsEarned = table.Column<int>(type: "int", nullable: false),
+                    PointsUsed = table.Column<int>(type: "int", nullable: false),
                     Latitude = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
                     Longitude = table.Column<decimal>(type: "decimal(18,8)", nullable: true)
                 },
@@ -218,31 +295,12 @@ namespace WEBBANDIENTHOAI.Migrations
                         principalTable: "OrderStatuses",
                         principalColumn: "StatusId",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Username = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.UserId);
                     table.ForeignKey(
-                        name: "FK_Users_Roles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "Roles",
-                        principalColumn: "RoleId",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Orders_Vouchers_VoucherId",
+                        column: x => x.VoucherId,
+                        principalTable: "Vouchers",
+                        principalColumn: "VoucherId",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -280,6 +338,69 @@ namespace WEBBANDIENTHOAI.Migrations
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserPointHistories",
+                columns: table => new
+                {
+                    HistoryId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: true),
+                    Points = table.Column<int>(type: "int", nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPointHistories", x => x.HistoryId);
+                    table.ForeignKey(
+                        name: "FK_UserPointHistories_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserPointHistories_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "OrderId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserVouchers",
+                columns: table => new
+                {
+                    UserVoucherId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    VoucherId = table.Column<int>(type: "int", nullable: false),
+                    AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    UsedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    OrderId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserVouchers", x => x.UserVoucherId);
+                    table.ForeignKey(
+                        name: "FK_UserVouchers_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserVouchers_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "OrderId");
+                    table.ForeignKey(
+                        name: "FK_UserVouchers_Vouchers_VoucherId",
+                        column: x => x.VoucherId,
+                        principalTable: "Vouchers",
+                        principalColumn: "VoucherId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -596,9 +717,15 @@ namespace WEBBANDIENTHOAI.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Customers",
-                columns: new[] { "CustomerId", "Address", "CitizenID", "CreatedAt", "Email", "FullName", "IsActive", "Latitude", "Longitude", "PasswordHash", "Phone" },
-                values: new object[] { 1, "123 Đường ABC, Quận 1, TP. HCM", "0123456789", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "customer@example.com", "Nguyễn Văn A", true, null, null, new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 }, "0987654321" });
+                table: "CustomerTiers",
+                columns: new[] { "TierId", "BonusMultiplier", "Description", "MinPoints", "TierName" },
+                values: new object[,]
+                {
+                    { 1, 1.0m, "Thành viên thường – nhận 1 điểm / 10.000đ", 0, "Member" },
+                    { 2, 1.2m, "Thành viên Bạc – nhân hệ số điểm x1.2", 1000, "Silver" },
+                    { 3, 1.5m, "Thành viên Vàng – nhân hệ số điểm x1.5", 5000, "Gold" },
+                    { 4, 2.0m, "Thành viên Kim Cương – nhân hệ số điểm x2.0", 10000, "Diamond" }
+                });
 
             migrationBuilder.InsertData(
                 table: "OrderStatuses",
@@ -609,7 +736,8 @@ namespace WEBBANDIENTHOAI.Migrations
                     { 2, "Đơn hàng đang được chuẩn bị", "Processing" },
                     { 3, "Đơn hàng đã được giao cho đơn vị vận chuyển", "Shipped" },
                     { 4, "Đơn hàng đã giao thành công", "Delivered" },
-                    { 5, "Đơn hàng đã bị hủy", "Cancelled" }
+                    { 5, "Đơn hàng đã bị hủy", "Cancelled" },
+                    { 6, "Đơn hàng đã được hoàn trả / hoàn tiền", "Returned" }
                 });
 
             migrationBuilder.InsertData(
@@ -630,6 +758,23 @@ namespace WEBBANDIENTHOAI.Migrations
                     { 2, "Nhân viên quản lý", "Staff" },
                     { 3, "Khách hàng", "Customer" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Vouchers",
+                columns: new[] { "VoucherId", "Code", "CreatedAt", "Description", "DiscountType", "EndDate", "IsActive", "MaxDiscountAmount", "MinOrderValue", "Quantity", "StartDate", "UsedCount", "Value" },
+                values: new object[,]
+                {
+                    { 1, "WELCOME50", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Voucher chào mừng thành viên mới - giảm 50.000đ", 2, new DateTime(2026, 12, 31, 23, 59, 59, 0, DateTimeKind.Utc), true, null, 500000m, 0, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, 50000m },
+                    { 2, "SALE10PCT", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Giảm 10% tối đa 100.000đ cho đơn từ 1.000.000đ", 1, new DateTime(2026, 12, 31, 23, 59, 59, 0, DateTimeKind.Utc), true, 100000m, 1000000m, 500, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, 10m },
+                    { 3, "SILVER100", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Ưu đãi hạng Bạc - giảm 100.000đ cho đơn từ 2.000.000đ", 2, new DateTime(2026, 12, 31, 23, 59, 59, 0, DateTimeKind.Utc), true, null, 2000000m, 200, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, 100000m },
+                    { 4, "GOLD15PCT", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Ưu đãi hạng Vàng - giảm 15% tối đa 300.000đ", 1, new DateTime(2026, 12, 31, 23, 59, 59, 0, DateTimeKind.Utc), true, 300000m, 5000000m, 100, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, 15m },
+                    { 5, "DIAMOND20", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Ưu đãi hạng Kim Cương - giảm 20% tối đa 1.000.000đ", 1, new DateTime(2026, 12, 31, 23, 59, 59, 0, DateTimeKind.Utc), true, 1000000m, 10000000m, 50, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 0, 20m }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Customers",
+                columns: new[] { "CustomerId", "Address", "CitizenID", "CreatedAt", "Email", "FullName", "IsActive", "Latitude", "Longitude", "LoyaltyPoints", "PasswordHash", "Phone", "TierId" },
+                values: new object[] { 1, "123 Đường ABC, Quận 1, TP. HCM", "0123456789", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "customer@example.com", "Nguyễn Văn A", true, null, null, 0, new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 }, "0987654321", 1 });
 
             migrationBuilder.InsertData(
                 table: "Products",
@@ -702,6 +847,31 @@ namespace WEBBANDIENTHOAI.Migrations
                     { 12, 10000000m, 3, "SSD", true, "2TB", 2 }
                 });
 
+            migrationBuilder.InsertData(
+                table: "UserPointHistories",
+                columns: new[] { "HistoryId", "CreatedAt", "CustomerId", "OrderId", "Points", "Reason" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc), 1, null, 500, "Tích điểm đơn hàng #1001 - Giao thành công" },
+                    { 2, new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Utc), 1, null, 300, "Tích điểm đơn hàng #1002 - Giao thành công" },
+                    { 3, new DateTime(2024, 2, 20, 0, 0, 0, 0, DateTimeKind.Utc), 1, null, -200, "Dùng điểm thanh toán đơn hàng #1003" },
+                    { 4, new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, null, 150, "Tích điểm đơn hàng #1004 - Giao thành công" },
+                    { 5, new DateTime(2024, 3, 10, 0, 0, 0, 0, DateTimeKind.Utc), 1, null, 100, "Thưởng sự kiện Vòng quay may mắn" },
+                    { 6, new DateTime(2024, 3, 15, 0, 0, 0, 0, DateTimeKind.Utc), 1, null, -100, "Hoàn trả điểm đơn hàng #1005 - Hoàn hàng" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "UserVouchers",
+                columns: new[] { "UserVoucherId", "AssignedAt", "CustomerId", "IsUsed", "OrderId", "UsedAt", "VoucherId" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, false, null, null, 1 },
+                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, false, null, null, 2 },
+                    { 3, new DateTime(2024, 2, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, false, null, null, 3 },
+                    { 4, new DateTime(2024, 2, 15, 0, 0, 0, 0, DateTimeKind.Utc), 1, false, null, null, 4 },
+                    { 5, new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, false, null, null, 5 }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_CartDetails_CartId",
                 table: "CartDetails",
@@ -732,6 +902,11 @@ namespace WEBBANDIENTHOAI.Migrations
                 table: "Customers",
                 column: "Email",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customers_TierId",
+                table: "Customers",
+                column: "TierId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExportReceiptDetails_ExportReceiptId",
@@ -815,6 +990,11 @@ namespace WEBBANDIENTHOAI.Migrations
                 column: "StatusId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_VoucherId",
+                table: "Orders",
+                column: "VoucherId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OTPCodes_CreatedAt",
                 table: "OTPCodes",
                 column: "CreatedAt");
@@ -874,9 +1054,41 @@ namespace WEBBANDIENTHOAI.Migrations
                 column: "StatusId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserPointHistories_CustomerId",
+                table: "UserPointHistories",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserPointHistories_OrderId",
+                table: "UserPointHistories",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleId",
                 table: "Users",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserVouchers_CustomerId_VoucherId_IsUsed",
+                table: "UserVouchers",
+                columns: new[] { "CustomerId", "VoucherId", "IsUsed" },
+                filter: "[IsUsed] = 0");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserVouchers_OrderId",
+                table: "UserVouchers",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserVouchers_VoucherId",
+                table: "UserVouchers",
+                column: "VoucherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vouchers_Code",
+                table: "Vouchers",
+                column: "Code",
+                unique: true);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_CartDetails_Products_ProductId",
@@ -999,6 +1211,12 @@ namespace WEBBANDIENTHOAI.Migrations
                 name: "ProductOptions");
 
             migrationBuilder.DropTable(
+                name: "UserPointHistories");
+
+            migrationBuilder.DropTable(
+                name: "UserVouchers");
+
+            migrationBuilder.DropTable(
                 name: "Carts");
 
             migrationBuilder.DropTable(
@@ -1023,7 +1241,13 @@ namespace WEBBANDIENTHOAI.Migrations
                 name: "OrderStatuses");
 
             migrationBuilder.DropTable(
+                name: "Vouchers");
+
+            migrationBuilder.DropTable(
                 name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "CustomerTiers");
 
             migrationBuilder.DropTable(
                 name: "Products");

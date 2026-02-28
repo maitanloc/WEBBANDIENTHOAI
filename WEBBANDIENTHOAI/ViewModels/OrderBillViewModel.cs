@@ -10,6 +10,14 @@ namespace WEBBANDIENTHOAI.ViewModels
         public string CustomerPhone { get; set; }
         public string ShippingAddress { get; set; }
         public decimal TotalAmount { get; set; }
+        
+        // Dữ liệu áp dụng khuyến mãi
+        public decimal VoucherDiscount { get; set; } = 0;
+        public decimal PointsDiscount { get; set; } = 0;
+        public decimal FinalAmount => TotalAmount - VoucherDiscount - PointsDiscount;
+        public string? AppliedVoucherCode { get; set; }
+        public int PointsUsed { get; set; } = 0;
+        
         public string PaymentMethod { get; set; }
 
         // ĐÃ SỬA: hiển thị tên thay vì số

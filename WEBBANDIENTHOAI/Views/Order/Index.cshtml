@@ -523,10 +523,28 @@
                         </div>
 
                         <!-- Total & Final Actions -->
-                        <div class="flex flex-col items-end gap-4 w-full lg:w-auto ml-auto">
-                            <div class="text-right">
-                                <p class="text-sm font-semibold text-gray-500">Tổng giá trị đơn hàng</p>
-                                <span class="text-3xl font-bold text-red-600" id="orderTotal">0đ</span>
+                        <div class="flex flex-col items-end gap-2 w-full lg:w-auto ml-auto min-w-[250px]">
+                            <div class="flex justify-between w-full text-sm mb-1">
+                                <span class="text-gray-500">Tạm tính:</span>
+                                <span class="font-semibold text-gray-900" id="orderSubTotal">0đ</span>
+                            </div>
+                            
+                            <!-- Khuyến mãi Area -->
+                            <div class="flex justify-between w-full text-sm text-emerald-600 hidden" id="voucherContainer">
+                                <span>Voucher <span id="voucherCodeText" class="font-bold"></span>:</span>
+                                <span>-<span id="voucherDiscount">0đ</span></span>
+                            </div>
+                            
+                            <div class="flex justify-between w-full text-sm text-emerald-600 hidden" id="pointsContainer">
+                                <span>Dùng <span id="pointsUsedText" class="font-bold"></span> F-Points:</span>
+                                <span>-<span id="pointsDiscount">0đ</span></span>
+                            </div>
+
+                            <div class="w-full border-t border-gray-200 my-1"></div>
+                            
+                            <div class="flex justify-between w-full items-center mt-1">
+                                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Tổng cộng:</p>
+                                <span class="text-2xl font-bold text-red-600" id="orderTotal">0đ</span>
                             </div>
                         </div>
                     </div>
@@ -618,7 +636,28 @@
                 document.getElementById('orderDate').textContent = new Date(data.orderDate).toLocaleDateString('vi-VN');
                 document.getElementById('paymentMethod').textContent = data.paymentMethod || 'COD';
                 document.getElementById('orderStatus').textContent = data.statusName || 'Không xác định';
+
+                // Render Giá cả
+                document.getElementById('orderSubTotal').textContent = (data.originalTotal || 0).toLocaleString('vi-VN') + 'đ';
                 document.getElementById('orderTotal').textContent = (data.total || 0).toLocaleString('vi-VN') + 'đ';
+                
+                // Voucher
+                if (data.discountAmount > 0) {
+                    document.getElementById('voucherContainer').classList.remove('hidden');
+                    document.getElementById('voucherCodeText').textContent = data.appliedVoucherCode ? `(${data.appliedVoucherCode})` : '';
+                    document.getElementById('voucherDiscount').textContent = data.discountAmount.toLocaleString('vi-VN') + 'đ';
+                } else {
+                    document.getElementById('voucherContainer').classList.add('hidden');
+                }
+
+                // Points
+                if (data.pointsUsed > 0) {
+                    document.getElementById('pointsContainer').classList.remove('hidden');
+                    document.getElementById('pointsUsedText').textContent = data.pointsUsed;
+                    document.getElementById('pointsDiscount').textContent = (data.pointsUsed * 1000).toLocaleString('vi-VN') + 'đ';
+                } else {
+                    document.getElementById('pointsContainer').classList.add('hidden');
+                }
 
                 // Hiển thị/Ẩn nút Xuất hàng dựa trên StatusId
                 if (data.statusId === 3) { // 3 = Completed

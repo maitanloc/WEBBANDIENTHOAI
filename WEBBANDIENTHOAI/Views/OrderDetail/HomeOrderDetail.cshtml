@@ -70,8 +70,34 @@
                             <span>@GetVietnameseStatusName(Model.OrderStatus.StatusName)</span>
                         </span>
                     </div>
-                    <p class="text-slate-700 dark:text-slate-300 mb-2"><strong>Tổng tiền:</strong> @Model.Total.ToString("N0")₫</p>
-                    <p class="text-slate-700 dark:text-slate-300"><strong>Ghi chú:</strong> @(string.IsNullOrEmpty(Model.Notes) ? "Không có" : Model.Notes)</p>
+                    <p class="text-slate-700 dark:text-slate-300 mb-2"><strong>Ghi chú:</strong> @(string.IsNullOrEmpty(Model.Notes) ? "Không có" : Model.Notes)</p>
+                    @{
+                        var subTotalDetail = Model.OrderDetails.Sum(d => d.Quantity * d.UnitPrice);
+                    }
+                    <div class="mt-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg space-y-2">
+                        <div class="flex justify-between text-sm text-slate-600 dark:text-slate-400">
+                            <span>Tạm tính:</span>
+                            <span>@subTotalDetail.ToString("N0")₫</span>
+                        </div>
+                        @if (Model.DiscountAmount > 0)
+                        {
+                            <div class="flex justify-between text-sm text-emerald-600 dark:text-emerald-400">
+                                <span>Voucher giảm giá:</span>
+                                <span>-@Model.DiscountAmount.ToString("N0")₫</span>
+                            </div>
+                        }
+                        @if (Model.PointsUsed > 0)
+                        {
+                            <div class="flex justify-between text-sm text-emerald-600 dark:text-emerald-400">
+                                <span>Dùng F-Points (@Model.PointsUsed điểm):</span>
+                                <span>-@((Model.PointsUsed * 1000).ToString("N0"))₫</span>
+                            </div>
+                        }
+                        <div class="flex justify-between font-bold text-slate-900 dark:text-slate-50 border-t border-slate-200 dark:border-slate-600 pt-2">
+                            <span>Tổng cộng (thực trả):</span>
+                            <span class="text-primary">@Model.Total.ToString("N0")₫</span>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <h2 class="text-xl font-bold text-slate-900 dark:text-slate-50 mb-4">Thông tin giao hàng</h2>

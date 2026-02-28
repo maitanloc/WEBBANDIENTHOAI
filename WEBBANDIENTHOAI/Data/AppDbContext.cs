@@ -53,6 +53,12 @@ namespace WEBBANDIENTHOAI.Data
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
         public DbSet<OTPCode> OTPCodes { get; set; }
 
+        // ===== PROMOTIONS & LOYALTY =====
+        public DbSet<CustomerTier> CustomerTiers { get; set; }
+        public DbSet<Voucher> Vouchers { get; set; }
+        public DbSet<UserVoucher> UserVouchers { get; set; }
+        public DbSet<UserPointHistory> UserPointHistories { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -92,6 +98,12 @@ namespace WEBBANDIENTHOAI.Data
 
             modelBuilder.Entity<ProductOption>().ToTable("ProductOptions");
             modelBuilder.Entity<CrossSellRule>().ToTable("CrossSellRules");
+
+            // Promotion & Loyalty tables
+            modelBuilder.Entity<CustomerTier>().ToTable("CustomerTiers");
+            modelBuilder.Entity<Voucher>().ToTable("Vouchers");
+            modelBuilder.Entity<UserVoucher>().ToTable("UserVouchers");
+            modelBuilder.Entity<UserPointHistory>().ToTable("UserPointHistories");
 
             // CẤU HÌNH QUAN HỆ Product ↔ Category
             modelBuilder.Entity<Product>()
@@ -184,6 +196,69 @@ namespace WEBBANDIENTHOAI.Data
             modelBuilder.Entity<Order>().HasIndex(o => o.OrderDate);
             modelBuilder.Entity<Customer>().HasIndex(c => c.Email).IsUnique();
 
+            // ===== PROMOTION & LOYALTY RELATIONSHIPS =====
+            // CustomerTier → Customer (1-N)
+            modelBuilder.Entity<Customer>()
+                .HasOne(c => c.Tier)
+                .WithMany(t => t.Customers)
+                .HasForeignKey(c => c.TierId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Customer → UserVoucher (1-N)
+            modelBuilder.Entity<UserVoucher>()
+                .HasOne(uv => uv.Customer)
+                .WithMany(c => c.UserVouchers)
+                .HasForeignKey(uv => uv.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Voucher → UserVoucher (1-N)
+            modelBuilder.Entity<UserVoucher>()
+                .HasOne(uv => uv.Voucher)
+                .WithMany(v => v.UserVouchers)
+                .HasForeignKey(uv => uv.VoucherId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Order → UserVoucher (1-N, optional)
+            modelBuilder.Entity<UserVoucher>()
+                .HasOne(uv => uv.Order)
+                .WithMany(o => o.UserVouchers)
+                .HasForeignKey(uv => uv.OrderId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Order → Voucher (N-1, optional)
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Voucher)
+                .WithMany(v => v.Orders)
+                .HasForeignKey(o => o.VoucherId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Customer → UserPointHistory (1-N)
+            modelBuilder.Entity<UserPointHistory>()
+                .HasOne(ph => ph.Customer)
+                .WithMany(c => c.PointHistories)
+                .HasForeignKey(ph => ph.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Order → UserPointHistory (1-N, optional)
+            modelBuilder.Entity<UserPointHistory>()
+                .HasOne(ph => ph.Order)
+                .WithMany(o => o.PointHistories)
+                .HasForeignKey(ph => ph.OrderId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Unique constraint: Voucher.Code
+            modelBuilder.Entity<Voucher>()
+                .HasIndex(v => v.Code)
+                .IsUnique();
+
+            // Unique: 1 customer chỉ có 1 record chưa dùng của 1 voucher
+            modelBuilder.Entity<UserVoucher>()
+                .HasIndex(uv => new { uv.CustomerId, uv.VoucherId, uv.IsUsed })
+                .HasFilter("[IsUsed] = 0");
+
             // =============== DATA SEEDING ===============
             // Gieo dữ liệu cho Bảng Role
             modelBuilder.Entity<Role>().HasData(
@@ -192,13 +267,131 @@ namespace WEBBANDIENTHOAI.Data
                 new Role { RoleId = 3, RoleName = "Customer", Description = "Khách hàng" }
             );
 
-            // Gieo dữ liệu cho Bảng OrderStatus
+            // ===== SEED: CustomerTier =====
+            modelBuilder.Entity<CustomerTier>().HasData(
+                new CustomerTier { TierId = 1, TierName = "Member",   MinSpending = 0m,          BonusMultiplier = 1.0m, Description = "Thành viên thường – nhận 1 điểm / 10.000đ" },
+                new CustomerTier { TierId = 2, TierName = "Silver",   MinSpending = 10_000_000m, BonusMultiplier = 1.2m, Description = "Thành viên Bạc – Chi tiêu > 10Tr, hệ số điểm x1.2" },
+                new CustomerTier { TierId = 3, TierName = "Gold",     MinSpending = 50_000_000m, BonusMultiplier = 1.5m, Description = "Thành viên Vàng – Chi tiêu > 50Tr, hệ số điểm x1.5" },
+                new CustomerTier { TierId = 4, TierName = "Diamond",  MinSpending = 100_000_000m, BonusMultiplier = 2.0m, Description = "Thành viên Kim Cương – Chi tiêu > 100Tr, hệ số điểm x2.0" }
+            );
+
+            // ===== SEED: OrderStatus (thêm Return/Refund) =====
             modelBuilder.Entity<OrderStatus>().HasData(
-                new OrderStatus { StatusId = 1, StatusName = "Pending", Description = "Đơn hàng đang chờ xử lý" },
+                new OrderStatus { StatusId = 1, StatusName = "Pending",    Description = "Đơn hàng đang chờ xử lý" },
                 new OrderStatus { StatusId = 2, StatusName = "Processing", Description = "Đơn hàng đang được chuẩn bị" },
-                new OrderStatus { StatusId = 3, StatusName = "Shipped", Description = "Đơn hàng đã được giao cho đơn vị vận chuyển" },
-                new OrderStatus { StatusId = 4, StatusName = "Delivered", Description = "Đơn hàng đã giao thành công" },
-                new OrderStatus { StatusId = 5, StatusName = "Cancelled", Description = "Đơn hàng đã bị hủy" }
+                new OrderStatus { StatusId = 3, StatusName = "Shipped",    Description = "Đơn hàng đã được giao cho đơn vị vận chuyển" },
+                new OrderStatus { StatusId = 4, StatusName = "Delivered",  Description = "Đơn hàng đã giao thành công" },
+                new OrderStatus { StatusId = 5, StatusName = "Cancelled",  Description = "Đơn hàng đã bị hủy" },
+                new OrderStatus { StatusId = 6, StatusName = "Returned",   Description = "Đơn hàng đã được hoàn trả / hoàn tiền" }
+            );
+
+            // ===== SEED: Voucher (5 loại) =====
+            modelBuilder.Entity<Voucher>().HasData(
+                // 1. Voucher chào mừng thành viên mới - Fixed 50k
+                new Voucher
+                {
+                    VoucherId    = 1,
+                    Code         = "WELCOME50",
+                    Description  = "Voucher chào mừng thành viên mới - giảm 50.000đ",
+                    DiscountType = DiscountType.Fixed,
+                    Value        = 50000m,
+                    MinOrderValue = 500000m,
+                    StartDate    = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    EndDate      = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc),
+                    Quantity     = 0, // Không giới hạn
+                    UsedCount    = 0,
+                    IsActive     = true,
+                    CreatedAt    = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                },
+                // 2. Voucher giảm 10% (tối đa 100k)
+                new Voucher
+                {
+                    VoucherId      = 2,
+                    Code           = "SALE10PCT",
+                    Description    = "Giảm 10% tối đa 100.000đ cho đơn từ 1.000.000đ",
+                    DiscountType   = DiscountType.Percent,
+                    Value          = 10m,
+                    MaxDiscountAmount = 100000m,
+                    MinOrderValue  = 1000000m,
+                    StartDate      = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    EndDate        = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc),
+                    Quantity       = 500,
+                    UsedCount      = 0,
+                    IsActive       = true,
+                    CreatedAt      = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                },
+                // 3. Voucher Silver – giảm 100k
+                new Voucher
+                {
+                    VoucherId    = 3,
+                    Code         = "SILVER100",
+                    Description  = "Ưu đãi hạng Bạc - giảm 100.000đ cho đơn từ 2.000.000đ",
+                    DiscountType = DiscountType.Fixed,
+                    Value        = 100000m,
+                    MinOrderValue = 2000000m,
+                    StartDate    = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    EndDate      = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc),
+                    Quantity     = 200,
+                    UsedCount    = 0,
+                    IsActive     = true,
+                    CreatedAt    = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                },
+                // 4. Voucher Gold – giảm 15% (tối đa 300k)
+                new Voucher
+                {
+                    VoucherId      = 4,
+                    Code           = "GOLD15PCT",
+                    Description    = "Ưu đãi hạng Vàng - giảm 15% tối đa 300.000đ",
+                    DiscountType   = DiscountType.Percent,
+                    Value          = 15m,
+                    MaxDiscountAmount = 300000m,
+                    MinOrderValue  = 5000000m,
+                    StartDate      = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    EndDate        = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc),
+                    Quantity       = 100,
+                    UsedCount      = 0,
+                    IsActive       = true,
+                    CreatedAt      = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                },
+                // 5. Voucher Diamond VIP – giảm 20% (tối đa 1 triệu)
+                new Voucher
+                {
+                    VoucherId      = 5,
+                    Code           = "DIAMOND20",
+                    Description    = "Ưu đãi hạng Kim Cương - giảm 20% tối đa 1.000.000đ",
+                    DiscountType   = DiscountType.Percent,
+                    Value          = 20m,
+                    MaxDiscountAmount = 1000000m,
+                    MinOrderValue  = 10000000m,
+                    StartDate      = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    EndDate        = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc),
+                    Quantity       = 50,
+                    UsedCount      = 0,
+                    IsActive       = true,
+                    CreatedAt      = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                }
+            );
+
+            // ===== SEED: Customer mẫu (cần TierId) - cập nhật Customer seeded ID=1 có TierId=1 =====
+            // (Customer seeding phía dưới sẽ tự điền TierId = 1 mặc định theo default value)
+
+            // ===== SEED: UserVoucher (5 record – gán voucher cho customer mẫu ID=1) =====
+            modelBuilder.Entity<UserVoucher>().HasData(
+                new UserVoucher { UserVoucherId = 1, CustomerId = 1, VoucherId = 1, AssignedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc), IsUsed = false },
+                new UserVoucher { UserVoucherId = 2, CustomerId = 1, VoucherId = 2, AssignedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc), IsUsed = false },
+                new UserVoucher { UserVoucherId = 3, CustomerId = 1, VoucherId = 3, AssignedAt = new DateTime(2024, 2, 1, 0, 0, 0, DateTimeKind.Utc), IsUsed = false },
+                new UserVoucher { UserVoucherId = 4, CustomerId = 1, VoucherId = 4, AssignedAt = new DateTime(2024, 2, 15, 0, 0, 0, DateTimeKind.Utc), IsUsed = false },
+                new UserVoucher { UserVoucherId = 5, CustomerId = 1, VoucherId = 5, AssignedAt = new DateTime(2024, 3, 1, 0, 0, 0, DateTimeKind.Utc), IsUsed = false }
+            );
+
+            // ===== SEED: UserPointHistory (6 record – lịch sử điểm giả lập cho customer ID=1) =====
+            modelBuilder.Entity<UserPointHistory>().HasData(
+                new UserPointHistory { HistoryId = 1, CustomerId = 1, OrderId = null, Points =  500, Reason = "Tích điểm đơn hàng #1001 - Giao thành công",  CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, DateTimeKind.Utc) },
+                new UserPointHistory { HistoryId = 2, CustomerId = 1, OrderId = null, Points =  300, Reason = "Tích điểm đơn hàng #1002 - Giao thành công",  CreatedAt = new DateTime(2024, 2,  5, 0, 0, 0, DateTimeKind.Utc) },
+                new UserPointHistory { HistoryId = 3, CustomerId = 1, OrderId = null, Points = -200, Reason = "Dùng điểm thanh toán đơn hàng #1003",          CreatedAt = new DateTime(2024, 2, 20, 0, 0, 0, DateTimeKind.Utc) },
+                new UserPointHistory { HistoryId = 4, CustomerId = 1, OrderId = null, Points =  150, Reason = "Tích điểm đơn hàng #1004 - Giao thành công",  CreatedAt = new DateTime(2024, 3,  1, 0, 0, 0, DateTimeKind.Utc) },
+                new UserPointHistory { HistoryId = 5, CustomerId = 1, OrderId = null, Points =  100, Reason = "Thưởng sự kiện Vòng quay may mắn",            CreatedAt = new DateTime(2024, 3, 10, 0, 0, 0, DateTimeKind.Utc) },
+                new UserPointHistory { HistoryId = 6, CustomerId = 1, OrderId = null, Points = -100, Reason = "Hoàn trả điểm đơn hàng #1005 - Hoàn hàng",   CreatedAt = new DateTime(2024, 3, 15, 0, 0, 0, DateTimeKind.Utc) }
             );
 
             // Gieo dữ liệu cho Bảng ProductStatus
@@ -269,11 +462,15 @@ namespace WEBBANDIENTHOAI.Data
                                 
                                             // Gieo dữ liệu cho ProductImages
                                             modelBuilder.Entity<ProductImage>().HasData(
-                                                // Placeholder images for iPhone 15 Pro
-                                                new ProductImage { ImageId = 1, ProductId = 1, ImagePath = new byte[0], IsPrimary = true, CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-                                                new ProductImage { ImageId = 2, ProductId = 1, ImagePath = new byte[0], IsPrimary = false, CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-                                                // Placeholder images for MacBook Pro 14
-                                                new ProductImage { ImageId = 3, ProductId = 2, ImagePath = new byte[0], IsPrimary = true, CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
+                                                // iPhone 16 Pro Max
+                                                new ProductImage { ImageId = 1, ProductId = 1, ImagePath = new byte[0], IsPrimary = true, CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                                                new ProductImage { ImageId = 2, ProductId = 1, ImagePath = new byte[0], IsPrimary = false, CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                                                // MacBook Pro 14 M4
+                                                new ProductImage { ImageId = 3, ProductId = 2, ImagePath = new byte[0], IsPrimary = true, CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                                                // Samsung S24 Ultra
+                                                new ProductImage { ImageId = 4, ProductId = 3, ImagePath = new byte[0], IsPrimary = true, CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                                                // Dell XPS 16
+                                                new ProductImage { ImageId = 5, ProductId = 4, ImagePath = new byte[0], IsPrimary = true, CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
                                             );
                                 
                                                         // Gieo dữ liệu cho Products
@@ -282,33 +479,65 @@ namespace WEBBANDIENTHOAI.Data
                                                             {
                                                                 ProductId = 1,
                                                                 CategoryId = 1,
-                                                                SKU = "IP15P256",
-                                                                Name = "iPhone 15 Pro 256GB",
+                                                                SKU = "IP16PM256",
+                                                                Name = "iPhone 16 Pro Max 256GB",
                                                                 Brand = "Apple",
-                                                                Price = 28990000m,
-                                                                OldPrice = 30990000m,
-                                                                StockCode = "SC-IP15P256",
-                                                                Color = "Titan tự nhiên",
-                                                                ShortDescription = "Chip A17 Pro, Màn hình Super Retina XDR, Camera Pro 48MP.",
+                                                                Price = 34990000m,
+                                                                OldPrice = 36990000m,
+                                                                StockCode = "SC-IP16PM256",
+                                                                Color = "Titan Sa Mạc",
+                                                                ShortDescription = "Chip A18 Pro, Apple Intelligence, Màn hình 6.9 inch Super Retina XDR.",
                                                                 StatusId = 1,
-                                                                ImageId = null, // Đặt là null để phá vỡ tham chiếu vòng tròn
-                                                                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                                ImageId = null,
+                                                                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                                                             },
                                                             new Product
                                                             {
                                                                 ProductId = 2,
                                                                 CategoryId = 2,
-                                                                SKU = "MBP14M3",
-                                                                Name = "MacBook Pro 14 inch M3",
+                                                                SKU = "MBP14M4",
+                                                                Name = "MacBook Pro 14 inch M4",
                                                                 Brand = "Apple",
-                                                                Price = 49990000m,
-                                                                OldPrice = 52990000m,
-                                                                StockCode = "SC-MBP14M3",
-                                                                Color = "Space Gray",
-                                                                ShortDescription = "Chip M3 Pro, 18GB RAM, 512GB SSD, Màn hình Liquid Retina XDR.",
+                                                                Price = 42990000m,
+                                                                OldPrice = 45990000m,
+                                                                StockCode = "SC-MBP14M4",
+                                                                Color = "Space Black",
+                                                                ShortDescription = "Chip M4 tiên tiến, 16GB RAM, 512GB SSD, Màn hình Liquid Retina XDR.",
                                                                 StatusId = 1,
-                                                                ImageId = null, // Đặt là null để phá vỡ tham chiếu vòng tròn
-                                                                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                                ImageId = null,
+                                                                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                            },
+                                                            new Product
+                                                            {
+                                                                ProductId = 3,
+                                                                CategoryId = 1,
+                                                                SKU = "S24U256",
+                                                                Name = "Samsung Galaxy S24 Ultra 256GB",
+                                                                Brand = "Samsung",
+                                                                Price = 33990000m,
+                                                                OldPrice = 35990000m,
+                                                                StockCode = "SC-S24U256",
+                                                                Color = "Xám Titan",
+                                                                ShortDescription = "Galaxy AI, Khung viền Titan, Camera 200MP zoom quang 5x.",
+                                                                StatusId = 1,
+                                                                ImageId = null,
+                                                                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                            },
+                                                            new Product
+                                                            {
+                                                                ProductId = 4,
+                                                                CategoryId = 2,
+                                                                SKU = "DXPS162026",
+                                                                Name = "Dell XPS 16 (2026)",
+                                                                Brand = "Dell",
+                                                                Price = 65990000m,
+                                                                OldPrice = 69990000m,
+                                                                StockCode = "SC-DXPS16",
+                                                                Color = "Platinum",
+                                                                ShortDescription = "Intel Core Ultra 9, 32GB RAM, 1TB SSD, RTX 4070, Màn hình 4K+ OLED Touch.",
+                                                                StatusId = 1,
+                                                                ImageId = null,
+                                                                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                                                             }
                                                         );                                
                                                         // Gieo dữ liệu cho PhoneConfiguration
@@ -317,15 +546,29 @@ namespace WEBBANDIENTHOAI.Data
                                                             {
                                                                 ConfigurationId = 1,
                                                                 ProductId = 1,
-                                                                CPU = "Apple A17 Pro",
+                                                                CPU = "Apple A18 Pro",
                                                                 RAM = "8 GB",
                                                                 InternalStorage = "256 GB",
-                                                                Screen = "6.1-inch Super Retina XDR",
-                                                                OperatingSystem = "iOS 17",
-                                                                Battery = "Li-Ion, sạc nhanh",
-                                                                Camera = "Chính 48 MP & Phụ 12 MP, 12 MP",
-                                                                Color = "Titan tự nhiên",
-                                                                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                                Screen = "6.9-inch Super Retina XDR",
+                                                                OperatingSystem = "iOS 18",
+                                                                Battery = "Li-Ion, sạc nhanh 45W",
+                                                                Camera = "Chính 48 MP & Phụ 48 MP, 12 MP",
+                                                                Color = "Titan Sa Mạc",
+                                                                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                            },
+                                                            new PhoneConfiguration
+                                                            {
+                                                                ConfigurationId = 2,
+                                                                ProductId = 3,
+                                                                CPU = "Snapdragon 8 Gen 3 for Galaxy",
+                                                                RAM = "12 GB",
+                                                                InternalStorage = "256 GB",
+                                                                Screen = "6.8-inch Dynamic AMOLED 2X",
+                                                                OperatingSystem = "Android 14, One UI 6.1",
+                                                                Battery = "5000 mAh, sạc nhanh 45W",
+                                                                Camera = "200 MP & Phụ 50 MP, 12 MP, 10 MP",
+                                                                Color = "Xám Titan",
+                                                                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                                                             }
                                                         );
                                             
@@ -335,37 +578,59 @@ namespace WEBBANDIENTHOAI.Data
                                                             {
                                                                 ConfigurationId = 1,
                                                                 ProductId = 2,
-                                                                CPU = "Apple M3 Pro 11-core",
-                                                                RAM = "18 GB",
+                                                                CPU = "Apple M4 10-core",
+                                                                RAM = "16 GB",
                                                                 Storage = "512 GB SSD",
-                                                                GraphicsCard = "14-core GPU",
+                                                                GraphicsCard = "10-core GPU",
                                                                 ScreenSize = "14.2 inch",
                                                                 ScreenTechnology = "Liquid Retina XDR display",
-                                                                OperatingSystem = "macOS Sonoma",
-                                                                Color = "Space Gray",
+                                                                OperatingSystem = "macOS Sequoia",
+                                                                Color = "Space Black",
                                                                 Weight = "1.55 kg",
-                                                                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                            },
+                                                            new LaptopConfiguration
+                                                            {
+                                                                ConfigurationId = 2,
+                                                                ProductId = 4,
+                                                                CPU = "Intel Core Ultra 9 185H",
+                                                                RAM = "32 GB LPDDR5x",
+                                                                Storage = "1 TB PCIe 4.0 NVMe",
+                                                                GraphicsCard = "NVIDIA GeForce RTX 4070 8GB GDDR6",
+                                                                ScreenSize = "16.3 inch",
+                                                                ScreenTechnology = "OLED Touch 4K+ (3840x2400)",
+                                                                OperatingSystem = "Windows 11 Pro",
+                                                                Color = "Platinum",
+                                                                Weight = "2.13 kg",
+                                                                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                                                             }
                                                         );
 
-                                            // Gieo dữ liệu cho ProductOption (iPhone 15 Pro)
+                                            // Gieo dữ liệu cho ProductOption
                                             modelBuilder.Entity<ProductOption>().HasData(
-                                                // iPhone 15 Pro - Màu sắc
-                                                new ProductOption { ProductOptionId = 1, ProductId = 1, GroupName = "Màu sắc", OptionName = "Titan Tự Nhiên", AdditionalPrice = 0m, DisplayOrder = 1, IsActive = true },
-                                                new ProductOption { ProductOptionId = 2, ProductId = 1, GroupName = "Màu sắc", OptionName = "Titan Xanh", AdditionalPrice = 0m, DisplayOrder = 2, IsActive = true },
+                                                // iPhone 16 Pro Max - Màu sắc
+                                                new ProductOption { ProductOptionId = 1, ProductId = 1, GroupName = "Màu sắc", OptionName = "Titan Sa Mạc", AdditionalPrice = 0m, DisplayOrder = 1, IsActive = true },
+                                                new ProductOption { ProductOptionId = 2, ProductId = 1, GroupName = "Màu sắc", OptionName = "Titan Tự Nhiên", AdditionalPrice = 0m, DisplayOrder = 2, IsActive = true },
                                                 new ProductOption { ProductOptionId = 3, ProductId = 1, GroupName = "Màu sắc", OptionName = "Titan Đen", AdditionalPrice = 0m, DisplayOrder = 3, IsActive = true },
                                                 new ProductOption { ProductOptionId = 4, ProductId = 1, GroupName = "Màu sắc", OptionName = "Titan Trắng", AdditionalPrice = 0m, DisplayOrder = 4, IsActive = true },
-                                                // iPhone 15 Pro - Bộ nhớ trong
+                                                // iPhone 16 Pro Max - Bộ nhớ
                                                 new ProductOption { ProductOptionId = 5, ProductId = 1, GroupName = "Bộ nhớ trong", OptionName = "256GB", AdditionalPrice = 0m, DisplayOrder = 1, IsActive = true },
-                                                new ProductOption { ProductOptionId = 6, ProductId = 1, GroupName = "Bộ nhớ trong", OptionName = "512GB", AdditionalPrice = 3000000m, DisplayOrder = 2, IsActive = true },
-                                                new ProductOption { ProductOptionId = 7, ProductId = 1, GroupName = "Bộ nhớ trong", OptionName = "1TB", AdditionalPrice = 6000000m, DisplayOrder = 3, IsActive = true },
-                                                // MacBook Pro 14 - RAM
-                                                new ProductOption { ProductOptionId = 8, ProductId = 2, GroupName = "RAM", OptionName = "18GB", AdditionalPrice = 0m, DisplayOrder = 1, IsActive = true },
-                                                new ProductOption { ProductOptionId = 9, ProductId = 2, GroupName = "RAM", OptionName = "36GB", AdditionalPrice = 5000000m, DisplayOrder = 2, IsActive = true },
-                                                // MacBook Pro 14 - SSD
+                                                new ProductOption { ProductOptionId = 6, ProductId = 1, GroupName = "Bộ nhớ trong", OptionName = "512GB", AdditionalPrice = 5000000m, DisplayOrder = 2, IsActive = true },
+                                                new ProductOption { ProductOptionId = 7, ProductId = 1, GroupName = "Bộ nhớ trong", OptionName = "1TB", AdditionalPrice = 11000000m, DisplayOrder = 3, IsActive = true },
+                                                
+                                                // MacBook Pro 14 M4
+                                                new ProductOption { ProductOptionId = 8, ProductId = 2, GroupName = "RAM", OptionName = "16GB", AdditionalPrice = 0m, DisplayOrder = 1, IsActive = true },
+                                                new ProductOption { ProductOptionId = 9, ProductId = 2, GroupName = "RAM", OptionName = "24GB", AdditionalPrice = 5000000m, DisplayOrder = 2, IsActive = true },
                                                 new ProductOption { ProductOptionId = 10, ProductId = 2, GroupName = "SSD", OptionName = "512GB", AdditionalPrice = 0m, DisplayOrder = 1, IsActive = true },
                                                 new ProductOption { ProductOptionId = 11, ProductId = 2, GroupName = "SSD", OptionName = "1TB", AdditionalPrice = 5000000m, DisplayOrder = 2, IsActive = true },
-                                                new ProductOption { ProductOptionId = 12, ProductId = 2, GroupName = "SSD", OptionName = "2TB", AdditionalPrice = 10000000m, DisplayOrder = 3, IsActive = true }
+
+                                                // Samsung S24 Ultra
+                                                new ProductOption { ProductOptionId = 16, ProductId = 3, GroupName = "Bộ nhớ trong", OptionName = "256GB", AdditionalPrice = 0m, DisplayOrder = 1, IsActive = true },
+                                                new ProductOption { ProductOptionId = 17, ProductId = 3, GroupName = "Bộ nhớ trong", OptionName = "512GB", AdditionalPrice = 3500000m, DisplayOrder = 2, IsActive = true },
+
+                                                // Dell XPS 16
+                                                new ProductOption { ProductOptionId = 18, ProductId = 4, GroupName = "Màn hình", OptionName = "OLED Touch 4K+", AdditionalPrice = 0m, DisplayOrder = 1, IsActive = true },
+                                                new ProductOption { ProductOptionId = 19, ProductId = 4, GroupName = "Màn hình", OptionName = "FHD+ Non-Touch", AdditionalPrice = -4000000m, DisplayOrder = 2, IsActive = true }
                                             );
 
                                             // Gieo dữ liệu cho CrossSellRule
@@ -373,12 +638,22 @@ namespace WEBBANDIENTHOAI.Data
                                                 new CrossSellRule
                                                 {
                                                     CrossSellRuleId = 1,
-                                                    TriggerProductId = 1, // iPhone 15 Pro
-                                                    SuggestedProductId = 2, // MacBook Pro (placeholder cross-sell)
-                                                    DiscountedPrice = 45990000m,
-                                                    DisplayMessage = "Hoàn thiện bộ đôi Apple của bạn!",
+                                                    TriggerProductId = 1, // iPhone 16 Pro Max
+                                                    SuggestedProductId = 2, // MBP 14 M4
+                                                    DiscountedPrice = 40990000m,
+                                                    DisplayMessage = "Hoàn thiện hệ sinh thái Apple 2026 của bạn!",
                                                     IsActive = true,
-                                                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                    CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                },
+                                                new CrossSellRule
+                                                {
+                                                    CrossSellRuleId = 2,
+                                                    TriggerProductId = 3, // Samsung S24 Ultra
+                                                    SuggestedProductId = 4, // Dell XPS 16
+                                                    DiscountedPrice = 61990000m,
+                                                    DisplayMessage = "Bộ đôi làm việc đa nhiệm siêu mạnh mẽ",
+                                                    IsActive = true,
+                                                    CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                                                 }
                                             );
 
@@ -388,21 +663,41 @@ namespace WEBBANDIENTHOAI.Data
                                                 {
                                                     InventoryId = 1,
                                                     ProductId = 1,
-                                                    StockCode = "SC-IP15P256",
-                                                    CurrentQuantity = 50,
-                                                    MinimumQuantity = 10,
+                                                    StockCode = "SC-IP16PM256",
+                                                    CurrentQuantity = 100,
+                                                    MinimumQuantity = 15,
                                                     Location = "Kho A1",
-                                                    LastUpdated = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                    LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                                                 },
                                                 new Inventory
                                                 {
                                                     InventoryId = 2,
                                                     ProductId = 2,
-                                                    StockCode = "SC-MBP14M3",
-                                                    CurrentQuantity = 30,
-                                                    MinimumQuantity = 5,
+                                                    StockCode = "SC-MBP14M4",
+                                                    CurrentQuantity = 45,
+                                                    MinimumQuantity = 10,
                                                     Location = "Kho B2",
-                                                    LastUpdated = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                    LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                },
+                                                new Inventory
+                                                {
+                                                    InventoryId = 3,
+                                                    ProductId = 3,
+                                                    StockCode = "SC-S24U256",
+                                                    CurrentQuantity = 80,
+                                                    MinimumQuantity = 20,
+                                                    Location = "Kho A2",
+                                                    LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                                                },
+                                                new Inventory
+                                                {
+                                                    InventoryId = 4,
+                                                    ProductId = 4,
+                                                    StockCode = "SC-DXPS16",
+                                                    CurrentQuantity = 25,
+                                                    MinimumQuantity = 5,
+                                                    Location = "Kho C1",
+                                                    LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                                                 }
                                             );
                                         }

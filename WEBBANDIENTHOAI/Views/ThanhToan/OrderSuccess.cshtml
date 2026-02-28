@@ -80,10 +80,33 @@
                 <!-- Order Summary -->
                 <div class="p-6">
                     <div class="space-y-2 mb-4">
+                        <div class="flex justify-between items-center text-gray-600 dark:text-gray-400">
+                            <span>Tạm tính:</span>
+                            <span>@Model.TotalAmount.ToString("N0")₫</span>
+                        </div>
+                        
+                        @if (Model.VoucherDiscount > 0)
+                        {
+                            <div class="flex justify-between items-center text-green-600">
+                                <span>Voucher (@Model.AppliedVoucherCode):</span>
+                                <span>-@Model.VoucherDiscount.ToString("N0")₫</span>
+                            </div>
+                        }
+                        
+                        @if (Model.PointsDiscount > 0)
+                        {
+                            <div class="flex justify-between items-center text-green-600">
+                                <span>Dùng @Model.PointsUsed F-Point:</span>
+                                <span>-@Model.PointsDiscount.ToString("N0")₫</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="space-y-2 mb-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600 dark:text-gray-400">Phương thức thanh toán:</span>
                             <span class="font-semibold">
-                                @(Model.PaymentMethod == "COD" ? "Thanh toán khi nhận hàng (COD)" : "Chuyển khoản ngân hàng")
+                                @(Model.PaymentMethod == "COD" ? "Thanh toán khi nhận hàng (COD)" : (Model.PaymentMethod == "VNPay" ? "Chuyển khoản VNPay" : Model.PaymentMethod))
                             </span>
                         </div>
                         <div class="flex justify-between items-center">
@@ -93,7 +116,7 @@
                     </div>
                     <div class="flex justify-between items-center text-lg font-semibold border-t pt-4">
                         <span class="text-gray-800 dark:text-white">Tổng cộng:</span>
-                        <span class="text-2xl text-green-600">@Model.TotalAmount.ToString("N0")₫</span>
+                        <span class="text-2xl text-green-600">@Math.Max(0, Model.FinalAmount).ToString("N0")₫</span>
                     </div>
                 </div>
             </div>

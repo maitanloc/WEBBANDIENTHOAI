@@ -140,6 +140,32 @@
 
                                 <div class="border-t my-5"></div>
 
+                                <!-- VOUCHER & POINTS SECTION -->
+                                <div class="space-y-4 relative z-10">
+                                    <div class="relative relative-container z-20">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mã Khuyến Mãi</label>
+                                        <div class="flex gap-2">
+                                            <input type="text" id="voucherCode" name="VoucherCode" class="form-input flex-1 rounded-lg border bg-background-light dark:bg-gray-800 h-12 px-4 focus:ring-primary focus:border-primary uppercase" placeholder="Nhập mã voucher" autocomplete="off" />
+                                            <button type="button" id="applyVoucherBtn" class="bg-gray-800 dark:bg-gray-600 text-white px-4 rounded-lg font-medium hover:bg-gray-900 transition-colors">Áp dụng</button>
+                                        </div>
+                                        <div id="voucher-suggestions" class="absolute top-[70px] left-0 right-0 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl z-50 hidden max-h-60 overflow-y-auto w-[calc(100%-100px)]"></div>
+                                        <div id="voucherMessage" class="mt-2 text-sm hidden"></div>
+                                    </div>
+                                    <div class="relative">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            Sử dụng F-Point (Bạn có: <span id="availablePoints" class="font-bold text-primary">@(ViewBag.LoyaltyPoints ?? 0)</span> <i class="fas fa-coins text-yellow-500"></i>)
+                                        </label>
+                                        <div class="flex gap-2">
+                                            <input type="number" id="pointsToUse" name="PointsToUse" class="form-input flex-1 rounded-lg border bg-background-light dark:bg-gray-800 h-12 px-4 focus:ring-primary focus:border-primary" placeholder="0" min="0" max="@(ViewBag.LoyaltyPoints ?? 0)" />
+                                            <button type="button" id="applyPointsBtn" class="bg-gray-800 dark:bg-gray-600 text-white px-4 rounded-lg font-medium hover:bg-gray-900 transition-colors">Dùng điểm</button>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-1">1 điểm = 1.000₫</p>
+                                        <div id="pointsMessage" class="mt-2 text-sm hidden"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="border-t my-5"></div>
+
                                 <div class="space-y-2">
                                     <div class="flex justify-between items-center">
                                         <p class="text-[#9c7349]">Tạm tính</p>
@@ -213,38 +239,8 @@
                 // Set the hidden input value right before deciding the action
                 hiddenPaymentInput.value = selectedPaymentMethod;
 
-                if (selectedPaymentMethod === 'BankTransfer') {
-                    // --- VNPay Flow ---
-                    this.disabled = true;
-                    this.textContent = 'Đang xử lý...';
-
-                    const formData = new FormData(checkoutForm);
-
-                    fetch('/ThanhToan/CreateVnpayPayment', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.paymentUrl) {
-                            window.location.href = data.paymentUrl;
-                        } else {
-                            alert('Có lỗi xảy ra khi tạo thanh toán. ' + (data.message || 'Vui lòng thử lại.'));
-                            this.disabled = false;
-                            this.textContent = 'Đặt Đơn Hàng';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Đã xảy ra lỗi kết nối. Vui lòng kiểm tra lại đường truyền và thử lại.');
-                        this.disabled = false;
-                        this.textContent = 'Đặt Đơn Hàng';
-                    });
-
-                } else {
-                    // --- COD Flow (or other standard methods) ---
-                    checkoutForm.submit();
-                }
+                // Remove the intercept, we want all payment methods to go to Preview first
+                checkoutForm.submit();
             });
 
             // Initialize UI state on page load
@@ -253,7 +249,7 @@
                 checkedRadio.dispatchEvent(new Event('change'));
             }
 
-            // --- Initialize Map & Autocomplete ---
+            // --- Check if MapAddressIntegration is defined ---
             if (typeof MapAddressIntegration !== 'undefined') {
                 new MapAddressIntegration({
                     mapId: 'map-container',
@@ -263,6 +259,152 @@
                     suggestionsId: 'address-suggestions'
                 });
             }
+
+            // --- INTELIGENT VOUCHER SUGGESTIONS & PROMOTION LOGIC ---
+            const originalTotal = @Model.TotalAmount;
+            let currentVoucherDiscount = 0;
+            let currentPointsDiscount = 0;
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            function updateTotal() {
+                const totalCalculated = Math.max(0, originalTotal - currentVoucherDiscount - currentPointsDiscount);
+                
+                // Update specific DOM nodes precisely
+                const totalNodes = document.querySelectorAll('p.text-2xl.font-bold.text-primary, p.text-lg.font-bold.text-primary, .total-final-amount');
+                totalNodes.forEach(node => {
+                    node.textContent = totalCalculated.toLocaleString('vi-VN') + '₫';
+                });
+            }
+
+            // Voucher Input UI & Suggestion Dropdown logic
+            const voucherInput = document.getElementById('voucherCode');
+            const voucherSuggestions = document.getElementById('voucher-suggestions');
+            const applyVoucherBtn = document.getElementById('applyVoucherBtn');
+            const voucherMessage = document.getElementById('voucherMessage');
+            
+            let availableVouchers = [];
+
+            // Fetch available vouchers
+            fetch('/ThanhToan/GetAvailableVouchers')
+                .then(res => res.json())
+                .then(data => {
+                    availableVouchers = data;
+                });
+
+            // Focus showing suggestions
+            voucherInput.addEventListener('focus', function() {
+                if (availableVouchers.length > 0) {
+                    renderVoucherSuggestions(voucherInput.value);
+                }
+            });
+
+            // Keyup filtering
+            voucherInput.addEventListener('input', function() {
+                renderVoucherSuggestions(this.value);
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!voucherInput.contains(e.target) && !voucherSuggestions.contains(e.target)) {
+                    voucherSuggestions.classList.add('hidden');
+                }
+            });
+
+            function renderVoucherSuggestions(filterStr) {
+                voucherSuggestions.innerHTML = '';
+                const lowerStr = filterStr.toLowerCase();
+                const filtered = availableVouchers.filter(v => v.code.toLowerCase().includes(lowerStr));
+                
+                if (filtered.length === 0) {
+                    voucherSuggestions.classList.add('hidden');
+                    return;
+                }
+
+                filtered.forEach(v => {
+                    const isEligible = originalTotal >= v.minOrderValue;
+                    const li = document.createElement('div');
+                    li.className = `p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${!isEligible ? 'opacity-50' : ''}`;
+                    li.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-primary">${v.code}</span>
+                            <span class="text-xs text-gray-500">Đơn TT: ${v.minOrderValue.toLocaleString('vi-VN')}₫</span>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-1">${v.description}</p>
+                        ${!isEligible ? '<p class="text-xs text-red-500 mt-1 mt-1 font-semibold">Đơn hàng không đủ điều kiện</p>' : ''}
+                    `;
+                    if (isEligible) {
+                        li.addEventListener('click', () => {
+                            voucherInput.value = v.code;
+                            voucherSuggestions.classList.add('hidden');
+                            applyVoucherBtn.click();
+                        });
+                    }
+                    voucherSuggestions.appendChild(li);
+                });
+                voucherSuggestions.classList.remove('hidden');
+            }
+
+            // Apply Voucher
+            applyVoucherBtn.addEventListener('click', function() {
+                const code = voucherInput.value.trim();
+                const formData = new FormData();
+                formData.append('voucherCode', code);
+                formData.append('totalAmount', originalTotal);
+                formData.append('__RequestVerificationToken', token);
+
+                fetch('/ThanhToan/ApplyVoucher', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    voucherMessage.classList.remove('hidden', 'text-green-600', 'text-red-500');
+                    if (data.success) {
+                        voucherMessage.classList.add('text-green-600');
+                        voucherMessage.textContent = data.message + ` (Giảm ${data.discountAmount.toLocaleString('vi-VN')}₫)`;
+                        currentVoucherDiscount = data.discountAmount;
+                    } else {
+                        voucherMessage.classList.add('text-red-500');
+                        voucherMessage.textContent = data.message;
+                        currentVoucherDiscount = 0;
+                    }
+                    updateTotal();
+                })
+                .catch(err => console.error(err));
+            });
+
+            // Apply Points
+            const pointsInput = document.getElementById('pointsToUse');
+            const applyPointsBtn = document.getElementById('applyPointsBtn');
+            const pointsMessage = document.getElementById('pointsMessage');
+
+            applyPointsBtn.addEventListener('click', function() {
+                const pts = parseInt(pointsInput.value) || 0;
+                const formData = new FormData();
+                formData.append('points', pts);
+                formData.append('__RequestVerificationToken', token);
+
+                fetch('/ThanhToan/UsePoints', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    pointsMessage.classList.remove('hidden', 'text-green-600', 'text-red-500');
+                    if (data.success) {
+                        pointsMessage.classList.add('text-green-600');
+                        pointsMessage.textContent = data.message;
+                        currentPointsDiscount = data.discountAmount;
+                    } else {
+                        pointsMessage.classList.add('text-red-500');
+                        pointsMessage.textContent = data.message;
+                        currentPointsDiscount = 0;
+                        pointsInput.value = 0;
+                    }
+                    updateTotal();
+                })
+                .catch(err => console.error(err));
+            });
         });
     </script>
 }

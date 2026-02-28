@@ -4,6 +4,7 @@ using WEBBANDIENTHOAI.Data;
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.Repository.NguoiDung;
 using WEBBANDIENTHOAI.Repository.TaiKhoan;
+using WEBBANDIENTHOAI.Services;
 using WEBBANDIENTHOAI.ViewModels;
 
 namespace WEBBANDIENTHOAI.Controllers.NguoiDung
@@ -13,12 +14,14 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
         private readonly ICartRepository _cartRepository;
         private readonly AppDbContext _context;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IPromotionService _promotionSvc;
 
-        public HomeCartsController(ICartRepository cartRepository, AppDbContext context, ICustomerRepository customerRepository)
+        public HomeCartsController(ICartRepository cartRepository, AppDbContext context, ICustomerRepository customerRepository, IPromotionService promotionSvc)
         {
             _cartRepository = cartRepository;
             _context = context;
             _customerRepository = customerRepository;
+            _promotionSvc = promotionSvc;
         }
 
         private int? GetCurrentCustomerId()
@@ -156,7 +159,42 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                 }
 
                 await _cartRepository.UpdateCartItemAsync(customerId.Value, productId, quantity);
-                return Json(new { success = true });
+
+                // TÍNH LẠI VOUCHER SAU KHI UPDATE QUANTITY
+                int? appliedVoucherId = HttpContext.Session.GetInt32("AppliedVoucherId");
+                bool voucherRemoved = false;
+                string voucherMessage = "";
+                decimal newTotal = 0m;
+
+                var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId.Value);
+                if (cart?.Details != null)
+                {
+                    newTotal = cart.Details.Sum(d => (d.UnitPrice + d.OptionsPrice) * d.Quantity);
+
+                    if (appliedVoucherId.HasValue)
+                    {
+                        var recheck = await _promotionSvc.RecalculateCartVoucherAsync(appliedVoucherId.Value, newTotal);
+                        if (recheck.voucherRemoved)
+                        {
+                            HttpContext.Session.Remove("AppliedVoucherCode");
+                            HttpContext.Session.Remove("AppliedVoucherId");
+                            HttpContext.Session.Remove("AppliedVoucherDiscount");
+                            voucherRemoved = true;
+                            voucherMessage = recheck.message;
+                        }
+                        else
+                        {
+                            HttpContext.Session.SetString("AppliedVoucherDiscount", recheck.discount.ToString());
+                        }
+                    }
+                }
+
+                return Json(new { 
+                    success = true, 
+                    voucherRemoved = voucherRemoved, 
+                    voucherMessage = voucherMessage,
+                    newTotal = newTotal 
+                });
             }
             catch (Exception ex)
             {
@@ -174,7 +212,37 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                     return RedirectToAction("Login", "Account");
 
                 await _cartRepository.RemoveFromCartAsync(customerId.Value, productId);
-                TempData["SuccessMessage"] = "Đã xóa sản phẩm khỏi giỏ hàng!";
+
+                // TÍNH LẠI VOUCHER SAU KHI XOÁ SẢN PHẨM
+                int? appliedVoucherId = HttpContext.Session.GetInt32("AppliedVoucherId");
+                if (appliedVoucherId.HasValue)
+                {
+                    decimal newTotal = 0m;
+                    var cart = await _cartRepository.GetCartByCustomerIdAsync(customerId.Value);
+                    if (cart?.Details != null)
+                    {
+                        newTotal = cart.Details.Sum(d => (d.UnitPrice + d.OptionsPrice) * d.Quantity);
+                    }                    
+
+                    var recheck = await _promotionSvc.RecalculateCartVoucherAsync(appliedVoucherId.Value, newTotal);
+                    if (recheck.voucherRemoved)
+                    {
+                        HttpContext.Session.Remove("AppliedVoucherCode");
+                        HttpContext.Session.Remove("AppliedVoucherId");
+                        HttpContext.Session.Remove("AppliedVoucherDiscount");
+                        TempData["ErrorMessage"] = "Voucher đã tự động bị gỡ vì đơn hàng không còn đủ điều kiện áp dụng.";
+                    }
+                    else 
+                    {
+                        HttpContext.Session.SetString("AppliedVoucherDiscount", recheck.discount.ToString());
+                        TempData["SuccessMessage"] = "Đã xóa sản phẩm khỏi giỏ hàng!";
+                    }
+                }
+                else
+                {
+                    TempData["SuccessMessage"] = "Đã xóa sản phẩm khỏi giỏ hàng!";
+                }
+
                 return RedirectToAction("Index");
             }
             catch (Exception ex)

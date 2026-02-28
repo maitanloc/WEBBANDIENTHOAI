@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -36,6 +37,23 @@ namespace WEBBANDIENTHOAI.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public bool IsActive { get; set; } = true;
+
+        // ===== LOYALTY =====
+        /// <summary>Tổng điểm thưởng tích lũy</summary>
+        public int LoyaltyPoints { get; set; } = 0;
+
+        /// <summary>FK đến hạng thành viên hiện tại (1=Member, 2=Silver, 3=Gold, 4=Diamond)</summary>
+        public int TierId { get; set; } = 1;
+
+        /// <summary>Tổng chi tiêu tích lũy (dùng để tính hạng)</summary>
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalSpent { get; set; } = 0m;
+
+        [ForeignKey("TierId")]
+        public virtual CustomerTier? Tier { get; set; }
+
+        public virtual ICollection<UserVoucher> UserVouchers { get; set; } = new List<UserVoucher>();
+        public virtual ICollection<UserPointHistory> PointHistories { get; set; } = new List<UserPointHistory>();
 
         [Column(TypeName = "decimal(18,8)")]
         public decimal? Latitude { get; set; }

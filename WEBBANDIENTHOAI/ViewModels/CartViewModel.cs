@@ -35,6 +35,13 @@ namespace WEBBANDIENTHOAI.ViewModels
         public Customer Customer { get; set; }
         public List<CartItemViewModel> SelectedItems { get; set; }
         public decimal TotalAmount { get; set; }
+        
+        // Thêm các trường lưu trữ Khuyến mãi
+        public decimal VoucherDiscount { get; set; } = 0;
+        public decimal PointsDiscount { get; set; } = 0;
+        public decimal FinalAmount => TotalAmount - VoucherDiscount - PointsDiscount;
+        public string? AppliedVoucherCode { get; set; }
+        public int PointsUsed { get; set; } = 0;
 
         [Required(ErrorMessage = "Email là bắt buộc")]
         [EmailAddress(ErrorMessage = "Email không hợp lệ")]

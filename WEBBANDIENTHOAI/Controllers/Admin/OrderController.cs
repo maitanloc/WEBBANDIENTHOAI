@@ -2,6 +2,7 @@
 using WEBBANDIENTHOAI.Models;
 using WEBBANDIENTHOAI.Repository.Admin;
 using WEBBANDIENTHOAI.Repository.TaiKhoan;
+using WEBBANDIENTHOAI.Services;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -11,21 +12,24 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
 {
     public class OrderController : Controller
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly IOrderStatusRepository _orderStatusRepository;
-        private readonly ICustomerRepository _customerRepository;
-        private readonly IOrderDetailsRepository _orderDetailsRepository;
+        private readonly IOrderRepository        _orderRepository;
+        private readonly IOrderStatusRepository   _orderStatusRepository;
+        private readonly ICustomerRepository      _customerRepository;
+        private readonly IOrderDetailsRepository  _orderDetailsRepository;
+        private readonly IPromotionService        _promotionSvc;
 
         public OrderController(
             IOrderRepository orderRepository,
             IOrderStatusRepository orderStatusRepository,
             ICustomerRepository customerRepository,
-            IOrderDetailsRepository orderDetailsRepository)
+            IOrderDetailsRepository orderDetailsRepository,
+            IPromotionService promotionSvc)
         {
-            _orderRepository = orderRepository;
-            _orderStatusRepository = orderStatusRepository;
-            _customerRepository = customerRepository;
+            _orderRepository        = orderRepository;
+            _orderStatusRepository  = orderStatusRepository;
+            _customerRepository     = customerRepository;
             _orderDetailsRepository = orderDetailsRepository;
+            _promotionSvc           = promotionSvc;
         }
 
         // GET: Admin/Order
@@ -93,16 +97,34 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
 
                 if (result)
                 {
-                    TempData["Success"] = "✅ Cập nhật trạng thái đơn hàng thành công!";
+                    TempData["Success"] = "Cập nhật trạng thái đơn hàng thành công!";
+
+                    // ===== LOYALTY HOOK: cộng / trừ điểm theo trạng thái =====
+                    try
+                    {
+                        if (StatusId == 4) // Delivered
+                        {
+                            await _promotionSvc.AwardPointsAsync(OrderId);
+                        }
+                        else if (StatusId == 5 || StatusId == 6) // Cancelled or Returned
+                        {
+                            await _promotionSvc.RevokePointsAsync(OrderId);
+                        }
+                    }
+                    catch (Exception loyaltyEx)
+                    {
+                        // Lỗi loyalty không nên đổ ngã toàn bộ request
+                        Console.WriteLine($"[LoyaltyHook] Error: {loyaltyEx.Message}");
+                    }
                 }
                 else
                 {
-                    TempData["Error"] = "❌ Không tìm thấy đơn hàng để cập nhật";
+                    TempData["Error"] = "Không tìm thấy đơn hàng để cập nhật";
                 }
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"❌ Lỗi: {ex.Message}";
+                TempData["Error"] = $"Lỗi: {ex.Message}";
             }
 
             return RedirectToAction(nameof(Index));
@@ -152,6 +174,9 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                     StatusName = order.OrderStatus?.StatusName ?? "Không xác định",
                     Notes = order.Notes ?? "",
                     Total = order.Total,
+                    DiscountAmount = order.DiscountAmount,
+                    PointsUsed = order.PointsUsed,
+                    AppliedVoucherCode = order.Voucher?.Code,
                     OrderDetails = orderDetails?.Select(od => new WEBBANDIENTHOAI.ViewModels.OrderDetailItem
                     {
                         OrderDetailId = od.OrderDetailId,
@@ -232,6 +257,14 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
                 if (result)
                 {
                     TempData["Success"] = "Cập nhật trạng thái đơn hàng thành công!";
+
+                    // LOYALTY HOOK
+                    try
+                    {
+                        if (order.StatusId == 4) await _promotionSvc.AwardPointsAsync(order.OrderId);
+                        else if (order.StatusId == 5 || order.StatusId == 6) await _promotionSvc.RevokePointsAsync(order.OrderId);
+                    }
+                    catch { /* ignore */ }
                 }
                 else
                 {

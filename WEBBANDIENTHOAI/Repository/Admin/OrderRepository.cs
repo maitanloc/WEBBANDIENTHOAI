@@ -126,6 +126,7 @@ namespace WEBBANDIENTHOAI.Repository.Admin
                     .Include(o => o.OrderStatus)
                     .Include(o => o.OrderDetails)
                         .ThenInclude(od => od.Product)
+                    .Include(o => o.Voucher) // Bổ sung để lấy AppliedVoucherCode
                     .AsNoTracking()
                     .FirstOrDefaultAsync(o => o.OrderId == id);
             }

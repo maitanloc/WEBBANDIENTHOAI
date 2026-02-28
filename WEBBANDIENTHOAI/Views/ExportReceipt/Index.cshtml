@@ -117,7 +117,10 @@
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 border-r border-gray-300 text-right text-black font-bold">
-                                    @receipt.TotalValue.ToString("N0")đ
+                                    @{
+                                        var finalTotal = receipt.Order != null ? receipt.Order.Total : receipt.TotalValue;
+                                    }
+                                    @finalTotal.ToString("N0")đ
                                 </td>
                                 <td class="px-4 py-3 border-r border-gray-300 text-black text-sm">
                                     @(receipt.CreatedByUser?.FullName ?? "N/A")
@@ -262,9 +265,24 @@
                                 <span class="text-gray-700 font-semibold">Tổng số lượng:</span>
                                 <span class="font-bold text-black text-lg" id="exportTotalQty">0</span>
                             </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700 font-semibold">Tạm tính:</span>
+                                <span class="font-bold text-gray-700" id="exportSubTotal">0đ</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center hidden" id="exportVoucherContainer">
+                                <span class="text-emerald-600">Voucher giảm giá:</span>
+                                <span class="font-bold text-emerald-600" id="exportVoucherDiscount">-0đ</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center hidden" id="exportPointsContainer">
+                                <span class="text-emerald-600">Điểm F-Points:</span>
+                                <span class="font-bold text-emerald-600" id="exportPointsDiscount">-0đ</span>
+                            </div>
+
                             <div class="flex justify-between items-center border-t border-gray-300 pt-3">
-                                <span class="font-bold text-gray-900">Tổng giá trị:</span>
-                                <span class="font-bold text-black text-lg" id="exportTotalValue">0đ</span>
+                                <span class="font-bold text-gray-900">Tổng giá trị (Khách trả):</span>
+                                <span class="font-bold text-red-600 text-lg" id="exportTotalValue">0đ</span>
                             </div>
                         </div>
                     </div>
@@ -381,7 +399,31 @@
 
             // Tổng kết
             document.getElementById('exportTotalQty').textContent = `${receipt.totalQuantity} sản phẩm`;
-            document.getElementById('exportTotalValue').textContent = receipt.totalValue.toLocaleString('vi-VN') + 'đ';
+            
+            const originalTotalStr = receipt.exportReceiptDetails 
+                ? receipt.exportReceiptDetails.reduce((sum, item) => sum + item.totalPrice, 0)
+                : receipt.totalValue;
+
+            // Fix cho dữ liệu cũ: Ưu tiên lấy Tổng tiền đã giảm từ Order nếu có
+            const finalTotal = receipt.order && receipt.order.total ? receipt.order.total : receipt.totalValue;
+
+            document.getElementById('exportSubTotal').textContent = originalTotalStr.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('exportTotalValue').textContent = finalTotal.toLocaleString('vi-VN') + 'đ';
+
+            // Voucher & Points Display
+            if (receipt.order?.discountAmount > 0) {
+                document.getElementById('exportVoucherContainer').classList.remove('hidden');
+                document.getElementById('exportVoucherDiscount').textContent = '-' + receipt.order.discountAmount.toLocaleString('vi-VN') + 'đ';
+            } else {
+                document.getElementById('exportVoucherContainer').classList.add('hidden');
+            }
+
+            if (receipt.order?.pointsUsed > 0) {
+                document.getElementById('exportPointsContainer').classList.remove('hidden');
+                document.getElementById('exportPointsDiscount').textContent = '-' + (receipt.order.pointsUsed * 1000).toLocaleString('vi-VN') + 'đ';
+            } else {
+                document.getElementById('exportPointsContainer').classList.add('hidden');
+            }
 
             // Hiện content, ẩn loading
             loading.classList.add('hidden');

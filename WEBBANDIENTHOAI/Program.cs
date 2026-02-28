@@ -66,6 +66,9 @@ builder.Services.AddScoped<IExportReceiptDetailsRepository, ExportReceiptDetails
 // Đăng ký ImportReceiptRepository
 builder.Services.AddScoped<IImportReceiptRepository, ImportReceiptRepository>();
 
+// ===== PROMOTION & LOYALTY =====
+builder.Services.AddScoped<IPromotionService, PromotionService>();
+
 // Đăng ký services
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IOTPService, OTPService>();

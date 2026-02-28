@@ -341,6 +341,44 @@
         .logout-btn-confirm:hover {
             background: #dc2626;
         }
+        /* CUSTOM SCROLLBAR FOR SIDEBAR (PREMIUM SLIDE BAR) */
+        .sidebar-scrollable {
+            overflow-y: scroll; /* Luôn hiện thanh cuộn để dễ thấy */
+            scrollbar-width: thin;
+            scrollbar-color: #f97316 #f3f4f6;
+            min-height: 0;
+            scrollbar-gutter: stable;
+        }
+
+        .sidebar-scrollable::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-scrollable::-webkit-scrollbar-track {
+            background: #f3f4f6; /* Nền track rõ ràng hơn */
+            border-radius: 10px;
+        }
+
+        .sidebar-scrollable::-webkit-scrollbar-thumb {
+            background-color: #f97316;
+            border-radius: 20px;
+            border: 1px solid #f3f4f6;
+        }
+
+        .sidebar-scrollable::-webkit-scrollbar-thumb:hover {
+            background-color: #ea580c;
+        }
+
+        /* Đảm bảo sidebar cuộn được trên mobile khi tràn */
+        @media (max-width: 768px) {
+            .sidebar-fixed {
+                overflow-y: auto;
+                scrollbar-width: none; /* Ẩn scrollbar thô trên mobile */
+            }
+            .sidebar-fixed::-webkit-scrollbar {
+                display: none;
+            }
+        }
     </style>
 
     @RenderSection("Styles", required: false)
@@ -420,7 +458,7 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                 <h1 class="text-xl font-bold text-gray-800">Fox Mobile</h1>
             </div>
 
-            <nav class="flex flex-col gap-2 flex-grow">
+            <nav class="flex flex-col gap-2 flex-grow sidebar-scrollable pr-1">
                 <!-- Quản lý Sản Phẩm -->
                 <details class="group" open>
                     <summary class="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-orange-50">
@@ -469,6 +507,25 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                             data-loader="true">
                             <span class="material-symbols-outlined text-sm">shopping_cart</span>
                             Đơn Hàng
+                        </a>
+                    </div>
+                </details>
+
+                <!-- Quản lý Khuyến Mãi -->
+                <details class="group" open>
+                    <summary class="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-orange-50">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-gray-600">redeem</span>
+                            <span class="font-medium text-sm">Quản lý Khuyến Mãi</span>
+                        </div>
+                        <span class="material-symbols-outlined transform transition-transform group-open:rotate-90 text-sm">chevron_right</span>
+                    </summary>
+                    <div class="pl-8 pt-2 flex flex-col gap-2">
+                        <a href="@Url.Action("Index", "VouchersAdmin", new { area = "Admin" })"
+                            class="flex items-center gap-3 p-2 rounded-lg text-sm text-gray-600 hover:text-gray-800 hover:bg-orange-50 panel-link"
+                            data-loader="true">
+                            <span class="material-symbols-outlined text-sm">confirmation_number</span>
+                            Quản lý Voucher
                         </a>
                     </div>
                 </details>
@@ -550,7 +607,7 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"></path>
                 </details>
 
                 <!-- Báo Cáo & Công Cụ -->
-                <details class="group" open>
+                <details class="group">
                     <summary
                         class="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-orange-50 bg-orange-50">
                         <div class="flex items-center gap-3">

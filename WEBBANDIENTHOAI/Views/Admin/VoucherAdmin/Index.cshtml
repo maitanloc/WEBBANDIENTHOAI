@@ -1,0 +1,179 @@
+@model IEnumerable<WEBBANDIENTHOAI.Models.Voucher>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Quản lý Voucher";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">Quản lý Voucher</h2>
+            <p class="text-muted small mb-0">Danh sách tất cả các mã giảm giá trong hệ thống</p>
+        </div>
+        <a href="/VouchersAdmin/Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Tạo Voucher mới
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Mã</th>
+                            <th>Mô tả</th>
+                            <th>Loại</th>
+                            <th>Giá trị</th>
+                            <th>Đơn tối thiểu</th>
+                            <th>Hiệu lực</th>
+                            <th>Lượt dùng</th>
+                            <th>Trạng thái</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in Model)
+                        {
+                            var isExpired = v.EndDate < DateTime.UtcNow;
+                            <tr class="@(isExpired ? "table-secondary" : "")">
+                                <td><span class="badge bg-dark fs-6">@v.Code</span></td>
+                                <td>
+                                    <div class="fw-semibold">@(v.Description ?? "---")</div>
+                                </td>
+                                <td>
+                                    @if (v.DiscountType == WEBBANDIENTHOAI.Models.DiscountType.Percent)
+                                    {
+                                        <span class="badge bg-warning text-dark">Phần trăm</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info text-dark">Cố định</span>
+                                    }
+                                </td>
+                                <td class="fw-bold text-success">
+                                    @if (v.DiscountType == WEBBANDIENTHOAI.Models.DiscountType.Percent)
+                                    {
+                                        @($"{v.Value:N0}%")
+                                        if (v.MaxDiscountAmount.HasValue)
+                                        {
+                                            <div class="text-muted small">max @($"{v.MaxDiscountAmount:N0}đ")</div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @($"{v.Value:N0}đ")
+                                    }
+                                </td>
+                                <td>@($"{v.MinOrderValue:N0}đ")</td>
+                                <td>
+                                    <div class="small">
+                                        <div>@v.StartDate.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                                        <div class="text-muted">đến @v.EndDate.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                                    </div>
+                                    @if (isExpired)
+                                    {
+                                        <span class="badge bg-secondary">Hết hạn</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (v.Quantity == 0)
+                                    {
+                                        <span>@v.UsedCount / <span class="text-muted">Vô hạn</span></span>
+                                    }
+                                    else
+                                    {
+                                        <div class="small">@v.UsedCount / @v.Quantity</div>
+                                        <div class="progress" style="height:5px; width:80px;">
+                                            <div class="progress-bar" style="width:@(v.Quantity>0 ? (v.UsedCount*100/v.Quantity) : 0)%"></div>
+                                        </div>
+                                    }
+                                </td>
+                                <td>
+                                    <span id="status-badge-@v.VoucherId"
+                                          class="badge @(v.IsActive ? "bg-success" : "bg-secondary")">
+                                        @(v.IsActive ? "Hoạt động" : "Dừng")
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex gap-1 justify-content-center flex-wrap">
+                                        <a href="/VouchersAdmin/Edit/@v.VoucherId" class="btn btn-sm btn-outline-primary">
+                                            Sửa
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-warning"
+                                                onclick="toggleVoucher(@v.VoucherId)">
+                                            @(v.IsActive ? "Tắt" : "Bật")
+                                        </button>
+                                        @if (v.UsedCount == 0)
+                                        {
+                                            <form method="post" action="/VouchersAdmin/Delete/@v.VoucherId"
+                                                  onsubmit="return confirm('Xác nhận xoá voucher [@v.Code]?')">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Xoá</button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="9" class="text-center py-5 text-muted">
+                                    Chưa có voucher nào. Tạo voucher đầu tiên ngay!
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        async function toggleVoucher(id) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+            const res = await fetch(`/VouchersAdmin/Toggle/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `__RequestVerificationToken=${encodeURIComponent(token)}`
+            });
+            const data = await res.json();
+            if (data.success) {
+                const badge = document.getElementById('status-badge-' + id);
+                badge.textContent = data.isActive ? 'Hoạt động' : 'Dừng';
+                badge.className = 'badge ' + (data.isActive ? 'bg-success' : 'bg-secondary');
+                showToast(data.message, 'success');
+            } else {
+                showToast(data.message, 'danger');
+            }
+        }
+
+        function showToast(msg, type) {
+            const div = document.createElement('div');
+            div.className = `alert alert-${type} position-fixed bottom-0 end-0 m-3 shadow`;
+            div.style.zIndex = 9999;
+            div.style.minWidth = '260px';
+            div.innerHTML = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+    </script>
+}

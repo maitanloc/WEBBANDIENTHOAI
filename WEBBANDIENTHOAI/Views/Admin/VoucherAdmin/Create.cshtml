@@ -1,0 +1,116 @@
+@model WEBBANDIENTHOAI.Models.Voucher
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Tạo Voucher mới";
+}
+
+<div class="container py-4" style="max-width:700px;">
+    <div class="d-flex align-items-center gap-2 mb-4">
+        <a href="/VouchersAdmin" class="btn btn-sm btn-outline-secondary">Quay lại</a>
+        <h2 class="fw-bold mb-0">Tạo Voucher mới</h2>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post" action="/VouchersAdmin/Create" id="createForm">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="alert alert-danger d-none" id="val-summary"></div>
+
+                <div class="row g-3">
+                    <!-- Mã voucher -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Mã Voucher <span class="text-danger">*</span></label>
+                        <input asp-for="Code" class="form-control text-uppercase"
+                               placeholder="VD: SALE10PCT" maxlength="50" required />
+                        <span asp-validation-for="Code" class="text-danger small"></span>
+                        <div class="form-text">Tối đa 50 ký tự, không phân biệt hoa thường.</div>
+                    </div>
+
+                    <!-- Loại giảm giá -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Loại giảm giá <span class="text-danger">*</span></label>
+                        <select asp-for="DiscountType" class="form-select" id="discountType" onchange="onTypeChange()">
+                            <option value="2">Cố định (Fixed Amount)</option>
+                            <option value="1">Phần trăm (Percent)</option>
+                        </select>
+                    </div>
+
+                    <!-- Giá trị -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" id="valueLabel">Số tiền giảm (VNĐ) <span class="text-danger">*</span></label>
+                        <input asp-for="Value" type="number" class="form-control" min="0" step="1000" required />
+                        <span asp-validation-for="Value" class="text-danger small"></span>
+                    </div>
+
+                    <!-- MaxDiscountAmount (ẩn khi Fixed) -->
+                    <div class="col-md-6" id="maxDiscountGroup" style="display:none;">
+                        <label class="form-label fw-semibold">Giảm tối đa (VNĐ) <span class="text-danger">*</span></label>
+                        <input asp-for="MaxDiscountAmount" type="number" class="form-control" min="0" step="1000" />
+                        <span asp-validation-for="MaxDiscountAmount" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Đơn tối thiểu -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Giá trị đơn tối thiểu (VNĐ)</label>
+                        <input asp-for="MinOrderValue" type="number" class="form-control" min="0" step="1000" />
+                        <div class="form-text">Nhập 0 nếu không yêu cầu giá trị tối thiểu.</div>
+                    </div>
+
+                    <!-- Số lượng -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Số lượt dùng tối đa</label>
+                        <input asp-for="Quantity" type="number" class="form-control" min="0" />
+                        <div class="form-text">Nhập 0 để không giới hạn lượt.</div>
+                    </div>
+
+                    <!-- Ngày bắt đầu -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Ngày bắt đầu <span class="text-danger">*</span></label>
+                        <input asp-for="StartDate" type="date" class="form-control" required />
+                    </div>
+
+                    <!-- Ngày kết thúc -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Ngày kết thúc <span class="text-danger">*</span></label>
+                        <input asp-for="EndDate" type="date" class="form-control" required />
+                    </div>
+
+                    <!-- Mô tả -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Mô tả</label>
+                        <textarea asp-for="Description" class="form-control" rows="2"
+                                  placeholder="VD: Voucher chào mừng thành viên mới"></textarea>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="col-12 d-flex gap-2 mt-2">
+                        <button type="submit" class="btn btn-primary px-4">Tạo Voucher</button>
+                        <a href="/VouchersAdmin" class="btn btn-outline-secondary">Huỷ</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function onTypeChange() {
+            const type = document.getElementById('discountType').value;
+            const label = document.getElementById('valueLabel');
+            const maxGroup = document.getElementById('maxDiscountGroup');
+            const maxInput = document.querySelector('[name="MaxDiscountAmount"]');
+            if (type === '1') { // Percent
+                label.innerHTML = 'Tỉ lệ giảm (%) <span class="text-danger">*</span>';
+                maxGroup.style.display = '';
+                maxInput.required = true;
+            } else {
+                label.innerHTML = 'Số tiền giảm (VNĐ) <span class="text-danger">*</span>';
+                maxGroup.style.display = 'none';
+                maxInput.required = false;
+            }
+        }
+        onTypeChange(); // init on page load
+    </script>
+}
