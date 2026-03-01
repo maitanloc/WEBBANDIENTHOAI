@@ -136,13 +136,24 @@
         function onTypeChange() {
             const type = document.querySelector('[name="DiscountType"]').value;
             const label = document.getElementById('valueLabel');
+            const valueInput = document.querySelector('[name="Value"]');
             const maxGroup = document.getElementById('maxDiscountGroup');
-            if (type === '1') {
+            const maxInput = document.querySelector('[name="MaxDiscountAmount"]');
+
+            if (type === '1') { // Phần trăm (%)
                 label.innerHTML = 'Tỉ lệ giảm (%) <span class="text-red-500">*</span>';
+                valueInput.step = "1";
+                valueInput.min = "1";
+                valueInput.max = "100";
                 maxGroup.style.display = 'block';
-            } else {
+                if (maxInput) maxInput.required = true;
+            } else { // Cố định (đ)
                 label.innerHTML = 'Giá trị giảm (đ) <span class="text-red-500">*</span>';
+                valueInput.step = "1000";
+                valueInput.min = "0";
+                valueInput.removeAttribute('max');
                 maxGroup.style.display = 'none';
+                if (maxInput) maxInput.required = false;
             }
         }
         onTypeChange();

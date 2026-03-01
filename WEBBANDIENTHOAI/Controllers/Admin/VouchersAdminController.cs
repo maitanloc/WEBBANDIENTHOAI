@@ -69,9 +69,15 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
             if (codeExist)
                 ModelState.AddModelError("Code", "Mã voucher này đã tồn tại trong hệ thống.");
 
-            // Percent: MaxDiscountAmount bắt buộc
-            if (model.DiscountType == DiscountType.Percent && (!model.MaxDiscountAmount.HasValue || model.MaxDiscountAmount <= 0))
-                ModelState.AddModelError("MaxDiscountAmount", "Vui lòng nhập số tiền giảm tối đa cho loại Percent.");
+            // Percent: Value phải từ 1-100, MaxDiscountAmount bắt buộc
+            if (model.DiscountType == DiscountType.Percent)
+            {
+                if (model.Value < 1 || model.Value > 100)
+                    ModelState.AddModelError("Value", "Tỉ lệ giảm (%) phải từ 1 đến 100.");
+                
+                if (!model.MaxDiscountAmount.HasValue || model.MaxDiscountAmount <= 0)
+                    ModelState.AddModelError("MaxDiscountAmount", "Vui lòng nhập số tiền giảm tối đa cho loại Percent.");
+            }
 
             if (!ModelState.IsValid)
                 return View("~/Views/Admin/VoucherAdmin/Create.cshtml", model);
@@ -123,8 +129,14 @@ namespace WEBBANDIENTHOAI.Controllers.Admin
             if (codeExist)
                 ModelState.AddModelError("Code", "Mã voucher này đã được sử dụng bởi voucher khác.");
 
-            if (model.DiscountType == DiscountType.Percent && (!model.MaxDiscountAmount.HasValue || model.MaxDiscountAmount <= 0))
-                ModelState.AddModelError("MaxDiscountAmount", "Vui lòng nhập số tiền giảm tối đa.");
+            if (model.DiscountType == DiscountType.Percent)
+            {
+                if (model.Value < 1 || model.Value > 100)
+                    ModelState.AddModelError("Value", "Tỉ lệ giảm (%) phải từ 1 đến 100.");
+
+                if (!model.MaxDiscountAmount.HasValue || model.MaxDiscountAmount <= 0)
+                    ModelState.AddModelError("MaxDiscountAmount", "Vui lòng nhập số tiền giảm tối đa.");
+            }
 
             if (!ModelState.IsValid)
                 return View("~/Views/Admin/VoucherAdmin/Edit.cshtml", model);
