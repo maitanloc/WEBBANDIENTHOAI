@@ -107,6 +107,10 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
             };
 
             ViewBag.LoyaltyPoints = customer.LoyaltyPoints;
+            ViewBag.IsLoggedIn = true;
+            ViewBag.CustomerName = customer.FullName;
+            ViewBag.CustomerEmail = customer.Email;
+            ViewBag.CustomerPhone = customer.Phone;
 
             return View(viewModel);
         }
@@ -162,6 +166,17 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 
             // Lưu tạm thông tin thanh toán vào session
             HttpContext.Session.SetString(CheckoutSessionKey, JsonSerializer.Serialize(model));
+
+            // Truyền thông tin user để _Layoutuser hiển thị đúng
+            var customer = _context.Customers.Find(int.Parse(customerId));
+            if (customer != null)
+            {
+                ViewBag.IsLoggedIn = true;
+                ViewBag.CustomerName = customer.FullName;
+                ViewBag.CustomerEmail = customer.Email;
+                ViewBag.CustomerPhone = customer.Phone;
+                ViewBag.LoyaltyPoints = customer.LoyaltyPoints;
+            }
 
             return View(model);
         }
@@ -231,7 +246,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ProcessOrder()
+        public async Task<IActionResult> ProcessOrder()
         {
             var customerId = HttpContext.Session.GetString("UserId");
 
@@ -252,6 +267,8 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
             try
             {
                 int orderId = 0; // Khai báo orderId ngoài để sử dụng sau
+                bool hvEligible = false; // Cờ: đơn đủ điều kiện tặng voucher
+                int hvCustomerId = int.Parse(customerId); // Lưu để dùng ngoài lambda
 
                 var strategy = _context.Database.CreateExecutionStrategy(); // Tạo execution strategy
 
@@ -402,6 +419,9 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                                 usePointsTask.Wait();
                             }
 
+                            // Đặt cờ trước khi commit – sẽ tặng voucher SAU khi thoát strategy
+                            hvEligible = model.TotalAmount >= 20_000_000m;
+
                             transaction.Commit(); // Commit transaction
 
                             // Xóa session sau khi xử lý thành công
@@ -424,6 +444,14 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 
                 if (result != null)
                 {
+                    // ===== TẶNG VOUCHER 5% SAU KHI TRANSACTION COMMIT (COD) =====
+                    // Thực hiện sau strategy.Execute để tránh deadlock trong transaction
+                    if (hvEligible && orderId > 0)
+                    {
+                        bool hvAwarded = await _promotionSvc.AwardHighValueOrderVoucherAsync(hvCustomerId, orderId, model.TotalAmount);
+                        if (hvAwarded)
+                            TempData["NewVoucherAwarded"] = $"COMEBACK5_{hvCustomerId}_{orderId}";
+                    }
                     return result;
                 }
                 
@@ -531,6 +559,13 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
                             {
                                 await _promotionSvc.UsePointsAsync(order.CustomerId, order.PointsUsed);
                             }
+
+                            // ===== TẶNG VOUCHER 5% NẾU ĐƠN >= 20 TRIỆU =====
+                            // Lấy TotalAmount từ order (trước giảm giá)
+                            decimal originalTotal = order.Total + order.DiscountAmount + (order.PointsUsed * 1000m);
+                            bool hvAwarded = await _promotionSvc.AwardHighValueOrderVoucherAsync(order.CustomerId, order.OrderId, originalTotal);
+                            if (hvAwarded)
+                                TempData["NewVoucherAwarded"] = $"COMEBACK5_{order.CustomerId}_{order.OrderId}";
 
                             await _context.SaveChangesAsync();
                         }

@@ -267,7 +267,7 @@
             }
 
             // --- INTELIGENT VOUCHER SUGGESTIONS & PROMOTION LOGIC ---
-            const originalTotal = @Model.TotalAmount;
+            const originalTotal = @(Model.TotalAmount.ToString(System.Globalization.CultureInfo.InvariantCulture));
             let currentVoucherDiscount = 0;
             let currentPointsDiscount = 0;
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;

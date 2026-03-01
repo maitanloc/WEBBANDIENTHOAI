@@ -534,5 +534,71 @@ namespace WEBBANDIENTHOAI.Services
                 .FirstOrDefaultAsync(c => c.CustomerId == customerId);
             return customer?.Tier;
         }
+
+        // =================================================================
+        //  HIGH-VALUE ORDER VOUCHER – Tặng voucher 5% khi đơn >= 20 triệu
+        // =================================================================
+
+        private const decimal HighValueOrderThreshold = 20_000_000m;
+        private const decimal HighValueVoucherPercent  = 5m;
+        private const decimal HighValueMaxDiscount     = 1_500_000m;
+        private const int     HighValueVoucherDays     = 30;
+
+        public async Task<bool> AwardHighValueOrderVoucherAsync(int customerId, int orderId, decimal orderTotal)
+        {
+            try
+            {
+                if (orderTotal < HighValueOrderThreshold)
+                    return false;
+
+                string voucherCode = $"HV5_{customerId}_{orderId}";
+
+                // Tránh tặng trùng (trường hợp callback gọi nhiều lần)
+                bool alreadyExists = await _ctx.Vouchers.AnyAsync(v => v.Code == voucherCode);
+                if (alreadyExists)
+                {
+                    Console.WriteLine($"[HV Voucher] Voucher {voucherCode} đã tồn tại, bỏ qua.");
+                    return false;
+                }
+
+                var now = DateTime.UtcNow;
+
+                var voucher = new Voucher
+                {
+                    Code              = voucherCode,
+                    Description       = $"Thưởng đơn hàng #{orderId} – Giảm 5% (tối đa 1.500.000đ, đơn ≥20.000.000đ)",
+                    DiscountType      = DiscountType.Percent,
+                    Value             = HighValueVoucherPercent,
+                    MaxDiscountAmount = HighValueMaxDiscount,
+                    MinOrderValue     = HighValueOrderThreshold,
+                    Quantity          = 1,
+                    UsedCount         = 0,
+                    IsActive          = true,
+                    CreatedAt         = now,
+                    StartDate         = now,
+                    EndDate           = now.AddDays(HighValueVoucherDays)
+                };
+
+                _ctx.Vouchers.Add(voucher);
+                await _ctx.SaveChangesAsync(); // Lấy VoucherId
+
+                _ctx.UserVouchers.Add(new UserVoucher
+                {
+                    CustomerId = customerId,
+                    VoucherId  = voucher.VoucherId,
+                    AssignedAt = now,
+                    IsUsed     = false
+                });
+                await _ctx.SaveChangesAsync();
+
+                Console.WriteLine($"[HV Voucher] 🎁 Tặng voucher {voucherCode} (giảm 5%, tối đa 1.5tr) cho Customer #{customerId}, Đơn #{orderId} – {orderTotal:N0}đ");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[HV Voucher] ❌ Lỗi AwardHighValueOrderVoucherAsync: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

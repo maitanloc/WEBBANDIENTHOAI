@@ -65,5 +65,12 @@ namespace WEBBANDIENTHOAI.Services
 
         /// <summary>Lấy thông tin tier hiện tại của customer</summary>
         Task<CustomerTier?> GetCustomerTierAsync(int customerId);
+
+        /// <summary>
+        /// Tặng voucher giảm 5% (tối đa 1.500.000đ, đơn tối thiểu 20 triệu, HSD 30 ngày)
+        /// nếu đơn hàng vừa hoàn tất có tổng >= 20.000.000đ.
+        /// Trả về true nếu voucher được tặng.
+        /// </summary>
+        Task<bool> AwardHighValueOrderVoucherAsync(int customerId, int orderId, decimal orderTotal);
     }
 }
