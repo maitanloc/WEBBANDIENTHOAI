@@ -1,0 +1,165 @@
+@model IEnumerable<WEBBANDIENTHOAI.Models.SpinHistory>
+
+@{
+      Layout = "~/Views/Shared/_Layout.cshtml";
+      ViewData["Title"] = "Lịch Sử Vòng Quay May Mắn";
+      int page = ViewBag.Page;
+      int totalPage = ViewBag.TotalPage;
+      int total = ViewBag.Total;
+      string? search = ViewBag.Search;
+}
+
+@section Styles {
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+}
+
+<div class="category-management">
+      <!-- Header -->
+      <div class="mb-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Lịch Sử Vòng Quay May Mắn</h1>
+                        <p class="text-sm text-gray-500 mt-1">Tổng cộng <strong>@total</strong> lượt quay được ghi nhận.
+                        </p>
+                  </div>
+                  <div class="flex items-center gap-3">
+                        <form method="get" class="flex items-center gap-2">
+                              <div class="relative group">
+                                    <span
+                                    class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors">search</span>
+                                    <input type="text" name="search" value="@search"
+                                           class="w-full md:w-64 pl-10 pr-4 py-2 bg-transparent border-b border-gray-300 focus:outline-none focus:border-orange-500 transition-all text-black"
+                                           placeholder="Tìm theo tên, email khách hàng..." />
+                              </div>
+                              <button type="submit"
+                                      class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded font-semibold text-sm transition-all">
+                                    <span class="material-symbols-outlined text-sm">search</span> Tìm
+                              </button>
+                              @if (!string.IsNullOrEmpty(search))
+                              {
+                                    <a href="@Url.Action("History", "Spin")"
+                                             class="flex items-center gap-1 px-3 py-2 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 transition">
+                                          <span class="material-symbols-outlined text-sm">close</span> Xóa lọc
+                                    </a>
+                              }
+                        </form>
+                  </div>
+            </div>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-white border border-gray-300">
+            <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse border border-gray-300">
+                        <thead>
+                              <tr class="bg-gray-100 border-b border-gray-300">
+                                    <th
+                                          class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">
+                                          #</th>
+                                          <th
+                                                class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">
+                                                Khách Hàng</th>
+                                                <th
+                                                      class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">
+                                                      Email</th>
+                                                      <th
+                                                            class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">
+                                                            Kết Quả</th>
+                                                            <th
+                                                                  class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300 text-center">
+                                                                  Voucher</th>
+                                                                  <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider">Thời
+                                                                        Gian</th>
+                                                                  </tr>
+                                                            </thead>
+                                                            <tbody class="divide-y divide-gray-300">
+                                                                  @if (!Model.Any())
+                                                                  {
+                                                                        <tr>
+                                                                              <td colspan="6" class="px-4 py-12 text-center text-gray-500">
+                                                                                    <span
+                                                                                    class="material-symbols-outlined text-4xl mb-2 text-gray-300 block">casino</span>
+                                                                                    <p>Chưa có lượt quay nào được ghi nhận.</p>
+                                                                              </td>
+                                                                        </tr>
+                                                                  }
+                                                                  @foreach (var item in Model)
+                                                                  {
+                                                                        bool isWin = item.VoucherId.HasValue;
+                                                                        <tr class="border-b border-gray-300 hover:bg-gray-50 transition-colors">
+                                                                              <td class="px-4 py-3 text-gray-400 text-sm border-r border-gray-300">@item.SpinId
+                                                                              </td>
+                                                                              <td class="px-4 py-3 border-r border-gray-300">
+                                                                                    <span class="font-bold text-black">@(item.Customer?.FullName ?? "—")</span>
+                                                                              </td>
+                                                                              <td class="px-4 py-3 text-black text-sm border-r border-gray-300">
+                                                                                    @(item.Customer?.Email ?? "—")
+                                                                              </td>
+                                                                              <td class="px-4 py-3 border-r border-gray-300 text-sm">
+                                                                                    @if (isWin)
+                                                                                    {
+                                                                                          <span
+                                                                                                class="inline-flex items-center gap-1 px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-bold uppercase">
+                                                                                                🎉 Trúng thưởng
+                                                                                          </span>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                          <span
+                                                                                                class="inline-flex items-center gap-1 px-2 py-1 rounded bg-gray-100 text-gray-500 text-xs font-bold uppercase">
+                                                                                                😢 Không trúng
+                                                                                          </span>
+                                                                                    }
+                                                                              </td>
+                                                                              <td class="px-4 py-3 border-r border-gray-300 text-center">
+                                                                                    @if (!string.IsNullOrEmpty(item.Voucher?.Code))
+                                                                                    {
+                                                                                          <span
+                                                                                                class="font-mono text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 px-2 py-1 rounded">
+                                                                                                @item.Voucher.Code
+                                                                                          </span>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                          <span class="text-gray-400 text-xs">—</span>
+                                                                                    }
+                                                                              </td>
+                                                                              <td class="px-4 py-3 text-black text-sm">
+                                                                                    @item.SpinAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                                                              </td>
+                                                                        </tr>
+                                                                  }
+                                                            </tbody>
+                                                      </table>
+                                                </div>
+                                          </div>
+
+                                          <!-- Pagination -->
+                                          @if (totalPage > 1)
+                                          {
+                                                <div class="flex items-center justify-center gap-2 mt-6">
+                                                      @if (page > 1)
+                                                      {
+                                                            <a href="@Url.Action("History", "Spin", new { page = page - 1, search })"
+                                                               class="p-1 px-3 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 transition">‹</a>
+                                                      }
+                                                      @for (int i = 1; i <= totalPage; i++)
+                                                      {
+                                                            <a href="@Url.Action("History", "Spin", new { page = i, search })"
+                                                                     class="p-1 px-3 border rounded text-sm font-semibold transition
+                                                                  @(i == page ? "bg-orange-500 text-white border-orange-500" : "border-gray-300 text-gray-600 hover:bg-orange-50")">
+                                                                  @i
+                                                            </a>
+                                                      }
+                                                      @if (page < totalPage)
+                                                      {
+                                                            <a href="@Url.Action("History", "Spin", new { page = page + 1, search })"
+                                                               class="p-1 px-3 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 transition">›</a>
+                                                      }
+                                                </div>
+                                          }
+                                    </div>
+
+                                    @section Scripts {
+                                          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                                    }

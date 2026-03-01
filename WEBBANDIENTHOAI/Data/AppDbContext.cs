@@ -58,6 +58,7 @@ namespace WEBBANDIENTHOAI.Data
         public DbSet<Voucher> Vouchers { get; set; }
         public DbSet<UserVoucher> UserVouchers { get; set; }
         public DbSet<UserPointHistory> UserPointHistories { get; set; }
+        public DbSet<SpinHistory> SpinHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -104,6 +105,7 @@ namespace WEBBANDIENTHOAI.Data
             modelBuilder.Entity<Voucher>().ToTable("Vouchers");
             modelBuilder.Entity<UserVoucher>().ToTable("UserVouchers");
             modelBuilder.Entity<UserPointHistory>().ToTable("UserPointHistories");
+            modelBuilder.Entity<SpinHistory>().ToTable("SpinHistories");
 
             // CẤU HÌNH QUAN HỆ Product ↔ Category
             modelBuilder.Entity<Product>()
@@ -253,6 +255,25 @@ namespace WEBBANDIENTHOAI.Data
             modelBuilder.Entity<Voucher>()
                 .HasIndex(v => v.Code)
                 .IsUnique();
+
+            // SpinHistory → Customer (N-1)
+            modelBuilder.Entity<SpinHistory>()
+                .HasOne(s => s.Customer)
+                .WithMany()
+                .HasForeignKey(s => s.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // SpinHistory → Voucher (N-1, optional)
+            modelBuilder.Entity<SpinHistory>()
+                .HasOne(s => s.Voucher)
+                .WithMany()
+                .HasForeignKey(s => s.VoucherId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Index: tìm lịch sử quay theo customer và ngày
+            modelBuilder.Entity<SpinHistory>()
+                .HasIndex(s => new { s.CustomerId, s.SpinAt });
 
             // Unique: 1 customer chỉ có 1 record chưa dùng của 1 voucher
             modelBuilder.Entity<UserVoucher>()

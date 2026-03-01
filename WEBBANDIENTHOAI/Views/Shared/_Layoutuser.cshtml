@@ -8,7 +8,7 @@
 
     <!-- SEO Optimization -->
     <meta name="description"
-        content="FOXMOBILE - Cửa hàng điện thoại, laptop, tablet và phụ kiện chính hãng. Giá tốt nhất, bảo hành dài hạn, giao hàng miễn phí.">
+          content="FOXMOBILE - Cửa hàng điện thoại, laptop, tablet và phụ kiện chính hãng. Giá tốt nhất, bảo hành dài hạn, giao hàng miễn phí.">
     <meta name="keywords" content="điện thoại, laptop, tablet, foxmobile, công nghệ, smartphone">
     <meta name="author" content="FOXMOBILE">
 
@@ -28,7 +28,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet" />
+          rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
     <!-- AOS Animation -->
@@ -36,188 +36,189 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <!-- Leaflet CSS for Maps -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
     <script>
         tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#f48c25",
-                        "primary-dark": "#d97a1a",
-                        "secondary": "#1f2937",
-                        "accent": "#10b981",
-                        "background-light": "#f8f7f5",
-                        "background-dark": "#221910",
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 3s ease-in-out infinite',
-                        'bounce-slow': 'bounce 2s infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        }
-                    }
-                },
-            },
+        darkMode: "class",
+        theme: {
+        extend: {
+        colors: {
+        "primary": "#f48c25",
+        "primary-dark": "#d97a1a",
+        "secondary": "#1f2937",
+        "accent": "#10b981",
+        "background-light": "#f8f7f5",
+        "background-dark": "#221910",
+        },
+        fontFamily: {
+        "display": ["Inter", "sans-serif"]
+        },
+        animation: {
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-slow': 'pulse 3s ease-in-out infinite',
+        'bounce-slow': 'bounce 2s infinite',
+        },
+        keyframes: {
+        float: {
+        '0%, 100%': { transform: 'translateY(0px)' },
+        '50%': { transform: 'translateY(-10px)' },
+        }
+        }
+        },
+        },
         }
     </script>
 
     <style>
         .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
         /* Custom Scrollbar (Slide Bar style) */
         ::-webkit-scrollbar {
-            width: 6px;
+        width: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.02);
-            border-radius: 10px;
+        background: rgba(0, 0, 0, 0.02);
+        border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #f48c25;
-            border-radius: 20px;
-            border: 1px solid transparent;
-            background-clip: content-box;
+        background: #f48c25;
+        border-radius: 20px;
+        border: 1px solid transparent;
+        background-clip: content-box;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #d97a1a;
+        background: #d97a1a;
         }
 
         .sidebar-scrollable {
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #f48c25 rgba(0,0,0,0.05);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #f48c25 rgba(0, 0, 0, 0.05);
         }
 
         /* Gradient text */
         .gradient-text {
-            background: linear-gradient(135deg, #f48c25 0%, #f59e0b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        background: linear-gradient(135deg, #f48c25 0%, #f59e0b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         }
 
         /* === POPUP XÁC NHẬN ĐĂNG XUẤT === */
         .logout-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
         }
 
         .logout-popup {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
         .logout-image {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 1.5rem;
-            border-radius: 12px;
-            object-fit: cover;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1.5rem;
+        border-radius: 12px;
+        object-fit: cover;
         }
 
         .logout-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
         }
 
         .logout-message {
-            color: #6b7280;
-            margin-bottom: 2rem;
+        color: #6b7280;
+        margin-bottom: 2rem;
         }
 
         .logout-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
         }
 
         .logout-btn-cancel {
-            background: #6b7280;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.2s;
+        background: #6b7280;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
         }
 
         .logout-btn-cancel:hover {
-            background: #4b5563;
+        background: #4b5563;
         }
 
         .logout-btn-confirm {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.2s;
+        background: #ef4444;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
         }
 
         .logout-btn-confirm:hover {
-            background: #dc2626;
+        background: #dc2626;
         }
 
         /* === CHAT WIDGET STYLES === */
         #chat-container {
-            animation: slideUp 0.3s ease-out;
+        animation: slideUp 0.3s ease-out;
         }
 
         @@keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
+        from {
+        opacity: 0;
+        transform: translateY(20px);
+        }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        to {
+        opacity: 1;
+        transform: translateY(0);
+        }
         }
 
         #chat-messages::-webkit-scrollbar {
-            width: 4px;
+        width: 4px;
         }
 
         #chat-messages::-webkit-scrollbar-track {
-            background: #f1f1f1;
+        background: #f1f1f1;
         }
 
         #chat-messages::-webkit-scrollbar-thumb {
-            background: #f48c25;
-            border-radius: 4px;
+        background: #f48c25;
+        border-radius: 4px;
         }
     </style>
 
@@ -241,7 +242,7 @@
     @if (ViewBag.IsLoggedIn == true && !string.IsNullOrEmpty(ViewBag.CustomerName?.ToString()))
     {
         <div id="welcome-notification"
-            class="fixed top-20 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-50 border border-primary/20 animate-bounce-slow">
+             class="fixed top-20 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-50 border border-primary/20 animate-bounce-slow">
             <div class="flex items-center gap-3">
                 <div
                     class="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center">
@@ -262,7 +263,7 @@
 
     <!-- Loading Screen -->
     <div id="loadingScreen"
-        class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex items-center justify-center transition-opacity duration-500">
+         class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex items-center justify-center transition-opacity duration-500">
         <div class="text-center">
             <div class="w-20 h-20 mx-auto mb-4 relative">
                 <div class="absolute inset-0 bg-primary rounded-full animate-ping"></div>
@@ -315,16 +316,16 @@
                                 <i class="fas fa-search"></i>
                             </div>
                             <input
-                                class="flex-1 rounded-r-xl text-gray-800 dark:text-white bg-transparent border-none h-full px-4 text-sm focus:outline-none focus:ring-0"
-                                placeholder="Tìm kiếm sản phẩm, thương hiệu..." id="globalSearch" name="query"
-                                autocomplete="off" />
+                            class="flex-1 rounded-r-xl text-gray-800 dark:text-white bg-transparent border-none h-full px-4 text-sm focus:outline-none focus:ring-0"
+                            placeholder="Tìm kiếm sản phẩm, thương hiệu..." id="globalSearch" name="query"
+                            autocomplete="off" />
                             <button type="submit" class="px-4 text-gray-500 hover:text-primary transition-colors">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                         <!-- Search Suggestions -->
                         <div class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden z-50 overflow-hidden"
-                            id="searchSuggestions">
+                             id="searchSuggestions">
                             <div class="p-3 border-b border-gray-100 dark:border-gray-700">
                                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Đề xuất tìm kiếm
                                 </p>
@@ -341,12 +342,12 @@
                     <!-- Desktop Navigation -->
                     <nav class="hidden xl:flex items-center gap-6 mr-4">
                         <a href="/HomeUser/Smartphones"
-                            class="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 flex items-center gap-2 group">
+                               class="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 flex items-center gap-2 group">
                             <i class="fas fa-mobile-alt text-base"></i>
                             <span>Điện thoại</span>
                         </a>
                         <a href="/HomeUser/Laptops"
-                            class="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 flex items-center gap-2 group">
+                               class="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors duration-200 flex items-center gap-2 group">
                             <i class="fas fa-laptop text-base"></i>
                             <span>Laptop</span>
                         </a>
@@ -358,9 +359,9 @@
 
                         <!-- Cart with Enhanced Badge -->
                         <a href="/HomeCarts/Index"
-                            class="flex items-center justify-center rounded-xl w-10 h-10 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 relative group">
+                               class="flex items-center justify-center rounded-xl w-10 h-10 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 relative group">
                             <i
-                                class="fas fa-shopping-cart text-gray-600 dark:text-gray-400 group-hover:text-primary"></i>
+                            class="fas fa-shopping-cart text-gray-600 dark:text-gray-400 group-hover:text-primary"></i>
                             @* <span class="absolute -top-1 -right-1 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center shadow-lg cart-count transform group-hover:scale-110 transition-transform">
                                 !
                             </span> *@
@@ -371,15 +372,16 @@
                         <!-- User Profile với Click Dropdown -->
                         <div class="relative" id="user-profile-container">
                             <button id="user-profile-button"
-                                class="flex items-center gap-2 rounded-xl px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200">
+                                    class="flex items-center gap-2 rounded-xl px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200">
                                 @if (ViewBag.IsLoggedIn == true)
                                 {
                                     <div
                                         class="w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                                        @( !string.IsNullOrEmpty(ViewBag.CustomerName?.ToString()) ? ViewBag.CustomerName.ToString().Substring(0, 1).ToUpper() : "U" )
+                                        @(!string.IsNullOrEmpty(ViewBag.CustomerName?.ToString()) ?
+                                    ViewBag.CustomerName.ToString().Substring(0, 1).ToUpper() : "U")
                                     </div>
                                     <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform"
-                                        id="user-profile-chevron"></i>
+                                       id="user-profile-chevron"></i>
                                 }
                                 else
                                 {
@@ -388,20 +390,21 @@
                                         <i class="fas fa-user text-xs"></i>
                                     </div>
                                     <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform"
-                                        id="user-profile-chevron"></i>
+                                       id="user-profile-chevron"></i>
                                 }
                             </button>
 
                             <!-- Enhanced User Dropdown -->
                             <div id="user-profile-dropdown"
-                                class="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden z-50 overflow-hidden">
+                                 class="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 hidden z-50 overflow-hidden">
                                 @if (ViewBag.IsLoggedIn == true)
                                 {
                                     <div class="p-4 border-b border-gray-100 dark:border-gray-700">
                                         <div class="flex items-center gap-3">
                                             <div
                                                 class="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white font-semibold">
-                                                @( !string.IsNullOrEmpty(ViewBag.CustomerName?.ToString()) ? ViewBag.CustomerName.ToString().Substring(0, 1).ToUpper() : "U" )
+                                                @(!string.IsNullOrEmpty(ViewBag.CustomerName?.ToString()) ?
+                                            ViewBag.CustomerName.ToString().Substring(0, 1).ToUpper() : "U")
                                             </div>
                                             <div>
                                                 <p class="font-semibold text-gray-800 dark:text-white">@ViewBag.CustomerName
@@ -420,22 +423,22 @@
                                     </div>
                                     <div class="p-2">
                                         <a href="/Info/ThongTinKH"
-                                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                               class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-user text-gray-500 w-5"></i>
                                             <span>Tài khoản của tôi</span>
                                         </a>
                                         <a asp-controller="Orders" asp-action="HomeOrders"
-                                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                               class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-clipboard-list text-gray-500 w-5"></i>
                                             <span>Đơn hàng</span>
                                         </a>
                                         <a asp-controller="Loyalty" asp-action="Index"
-                                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                               class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-gem text-gray-500 w-5"></i>
                                             <span>Điểm thưởng & Ưu đãi</span>
                                         </a>
                                         <a asp-controller="Loyalty" asp-action="MyVouchers"
-                                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                               class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-tags text-primary w-5"></i>
                                             <span>Kho Voucher</span>
                                         </a>
@@ -462,18 +465,18 @@
                                     </div>
                                     <div class="p-2">
                                         <a href="/Account/Login"
-                                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                               class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-sign-in-alt text-gray-500 w-5"></i>
                                             <span>Đăng nhập</span>
                                         </a>
                                         <a href="/Account/Login"
-                                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                               class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-user-plus text-gray-500 w-5"></i>
                                             <span>Đăng ký</span>
                                         </a>
                                         <div class="border-t border-gray-100 dark:border-gray-700 my-2"></div>
                                         <a href="/help"
-                                            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                               class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                             <i class="fas fa-question-circle text-gray-500 w-5"></i>
                                             <span>Trợ giúp</span>
                                         </a>
@@ -505,7 +508,7 @@
                         <i class="fas fa-shopping-cart text-lg"></i>
                         <span class="text-xs mt-1">Giỏ hàng</span>
                         <span
-                            class="absolute -top-1 -right-2 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">2</span>
+                        class="absolute -top-1 -right-2 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">2</span>
                     </a>
                     <a href="/account" class="flex flex-col items-center text-gray-600 dark:text-gray-400">
                         <i class="fas fa-user text-lg"></i>
@@ -524,9 +527,9 @@
                 <!-- Background Pattern -->
                 <div class="absolute inset-0 opacity-5">
                     <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\" 60\"
-                        height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\"
-                        fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\"
-                        cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+                         height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\"
+                         fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\"
+                         cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
                 </div>
 
                 <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -549,19 +552,19 @@
                             </p>
                             <div class="flex space-x-4">
                                 <a href="https://www.facebook.com/share/1BruCUcK9c/" target="_blank"
-                                    class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
+                                       class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
                                     <i class="fab fa-facebook-f"></i>
                                 </a>
                                 <a href="#"
-                                    class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
+                                       class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
                                     <i class="fab fa-youtube"></i>
                                 </a>
                                 <a href="#"
-                                    class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
+                                       class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
                                     <i class="fab fa-tiktok"></i>
                                 </a>
                                 <a href="#"
-                                    class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
+                                       class="w-10 h-10 bg-gray-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all transform hover:scale-110 hover:rotate-12">
                                     <i class="fab fa-zalo"></i>
                                 </a>
                             </div>
@@ -576,33 +579,33 @@
                             <ul class="space-y-3">
                                 <li>
                                     <a href="/help"
-                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                           class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
                                         <i
-                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                        class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Trung tâm trợ giúp
                                     </a>
                                 </li>
                                 <li>
                                     <a href="/shipping"
-                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                           class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
                                         <i
-                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                        class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Chính sách vận chuyển
                                     </a>
                                 </li>
                                 <li>
                                     <a href="/returns"
-                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                           class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
                                         <i
-                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                        class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Đổi trả & Hoàn tiền
                                     </a>
                                 </li>
                                 <li>
                                     <a href="/warranty"
-                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                           class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
                                         <i
-                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                        class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Chính sách bảo hành
                                     </a>
                                 </li>
@@ -618,33 +621,33 @@
                             <ul class="space-y-3">
                                 <li>
                                     <a href="/privacy"
-                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                           class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
                                         <i
-                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                        class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Chính sách bảo mật
                                     </a>
                                 </li>
                                 <li>
                                     <a href="/terms"
-                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                           class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
                                         <i
-                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                        class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Điều khoản sử dụng
                                     </a>
                                 </li>
                                 <li>
                                     <a href="/payment"
-                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                           class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
                                         <i
-                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                        class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Phương thức thanh toán
                                     </a>
                                 </li>
                                 <li>
                                     <a href="/installment"
-                                        class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
+                                           class="text-gray-300 hover:text-primary transition-colors flex items-center gap-2 group">
                                         <i
-                                            class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                        class="fas fa-chevron-right text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                         Mua trả góp
                                     </a>
                                 </li>
@@ -687,7 +690,7 @@
                                 <p class="text-xs text-gray-400 mb-3">Nhận ưu đãi độc quyền & tin tức mới nhất</p>
                                 <div class="flex gap-2">
                                     <input type="email" placeholder="Email của bạn"
-                                        class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                           class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                                     <button
                                         class="bg-primary hover:bg-primary-dark text-white rounded-lg px-4 transition-colors">
                                         <i class="fas fa-paper-plane"></i>
@@ -721,81 +724,375 @@
 
     <div id="chat-widget" class="fixed bottom-6 right-6 z-50">
         <button id="chat-toggle"
-            class="w-14 h-14 bg-primary hover:bg-primary-dark rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
+                class="w-14 h-14 bg-primary hover:bg-primary-dark rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
             <i class="fas fa-headset text-white text-xl"></i>
             <span class="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full animate-ping"></span>
             <span class="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full"></span>
         </button>
 
         <div id="chat-container"
-            class="hidden absolute bottom-16 right-0 w-80 h-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col">
+             class="hidden absolute bottom-16 right-0 w-80 h-96 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col">
             <div class="bg-gradient-to-r from-primary to-primary-dark p-4 text-white">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-white rounded-full overflow-hidden">
                             <img src="~/images/nhân viên tư vấn.png" alt="Nhân viên tư vấn"
-                                class="w-full h-full object-cover">
+                                 class="w-full h-full object-cover">
+                            </div>
+
+                            <div class="flex flex-col">
+                                <span class="font-semibold text-base">FOX AI</span>
+                                <span class="text-xs opacity-80">Nhân viên tư vấn</span>
+                            </div>
                         </div>
 
-                        <div class="flex flex-col">
-                            <span class="font-semibold text-base">FOX AI</span>
-                            <span class="text-xs opacity-80">Nhân viên tư vấn</span>
-                        </div>
+                        <button id="chat-close" class="text-white hover:text-gray-200 transition-colors">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
-
-                    <button id="chat-close" class="text-white hover:text-gray-200 transition-colors">
-                        <i class="fas fa-times"></i>
-                    </button>
                 </div>
-            </div>
 
 
-            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-900 space-y-4">
-            </div>
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-900 space-y-4">
+                </div>
 
-            <div class="border-t border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-800">
-                <div class="flex items-center gap-2">
-                    <input type="text" id="chat-input" placeholder="Type your message..."
-                        class="flex-1 bg-gray-100 dark:bg-gray-700 border-none rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                    <button id="chat-send"
-                        class="w-10 h-10 bg-primary hover:bg-primary-dark rounded-full flex items-center justify-center transition-colors">
-                        <i class="fas fa-paper-plane text-white text-sm"></i>
-                    </button>
+                <div class="border-t border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-800">
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="chat-input" placeholder="Type your message..."
+                               class="flex-1 bg-gray-100 dark:bg-gray-700 border-none rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                        <button id="chat-send"
+                                class="w-10 h-10 bg-primary hover:bg-primary-dark rounded-full flex items-center justify-center transition-colors">
+                            <i class="fas fa-paper-plane text-white text-sm"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="~/js/lazyload.js" defer></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+        <!-- 🎡 Nút nổi Vòng Quay -->
+        <button onclick="openSpinModal()" id="spin-fab"
+                title="Vòng Quay May Mắn"
+                style="
+                    position: fixed;
+                    bottom: 5.5rem;
+                    right: 1.25rem;
+                    z-index: 9990;
+                    width: 56px;
+                    height: 56px;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, #FFD700, #ff9f00);
+                    box-shadow: 0 4px 20px rgba(255,215,0,0.6);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.7rem;
+                    border: none;
+                    cursor: pointer;
+                    animation: spinFabPulse 2.5s ease-in-out infinite;
+                ">🎡</button>
 
-    <script>
-        // Close welcome notification
-        function closeWelcome() {
+        <!-- ===== POPUP VÒNG QUAY ===== -->
+        <div id="spin-modal"
+             style="display:none; position:fixed; inset:0; z-index:99999;
+                    background:rgba(0,0,0,0.45); backdrop-filter:blur(6px);
+                    align-items:center; justify-content:center;">
+            <div style="
+                    background: #fff;
+                    border: 2px solid #f48c25;
+                    border-radius: 24px;
+                    padding: 1.5rem;
+                    width: min(400px, 95vw);
+                    position: relative;
+                    box-shadow: 0 8px 40px rgba(244,140,37,0.25);
+                    font-family: 'Inter', sans-serif;
+                    color: #1f2937;
+                    text-align: center;">
+
+                <!-- Nút đóng -->
+                <button onclick="closeSpinModal()"
+                        style="position:absolute;top:12px;right:14px;background:rgba(244,140,37,0.1);
+                               border:1px solid rgba(244,140,37,0.3);color:#f48c25;font-size:1.1rem;border-radius:50%;
+                               width:32px;height:32px;cursor:pointer;line-height:32px;font-weight:700;">✕</button>
+
+                <!-- Tiêu đề -->
+                <h3 style="font-size:1.4rem;font-weight:800;
+                           background:linear-gradient(135deg,#f48c25,#d97a1a);
+                           -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+                           margin:0 0 4px;">🎡 Vòng Quay May Mắn</h3>
+                <p id="spin-subtitle" style="font-size:0.8rem;color:#6b7280;margin:0 0 1rem;">
+                    Mỗi ngày 1 lượt – Cơ hội nhận voucher!
+                </p>
+
+                <!-- Wheel cha -->
+                <div id="spin-wheel-wrapper"
+                     style="position:relative;width:min(300px,80vw);height:min(300px,80vw);
+                            margin:0 auto 1rem;filter:drop-shadow(0 4px 16px rgba(244,140,37,0.35));">
+                    <!-- Ring ngoài -->
+                    <div style="position:absolute;inset:-6px;border-radius:50%;
+                                background:conic-gradient(from 0deg,#f48c25,#fbbf24,#f97316,#f48c25,#fbbf24,#f97316,#f48c25);
+                                animation:ringRotate 4s linear infinite;z-index:0;"></div>
+                    <div style="position:absolute;inset:-2px;border-radius:50%;background:#fff;z-index:1;"></div>
+                    <!-- Mũi tên -->
+                    <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+                                z-index:10;width:0;height:0;
+                                border-left:12px solid transparent;border-right:12px solid transparent;
+                                border-top:34px solid #f48c25;
+                                filter:drop-shadow(0 3px 6px rgba(0,0,0,0.3));"></div>
+                    <canvas id="spin-canvas" style="position:relative;z-index:2;border-radius:50%;cursor:pointer;display:block;"></canvas>
+                    <!-- Nút quay trung tâm -->
+                    <button id="spin-center-btn" onclick="doSpin()"
+                            style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+                                   z-index:10;width:58px;height:58px;border-radius:50%;
+                                   background:linear-gradient(135deg,#f48c25,#d97a1a);
+                                   border:3px solid #fff;cursor:pointer;
+                                   font-family:'Inter',sans-serif;font-size:0.65rem;font-weight:800;
+                                   color:#fff;box-shadow:0 4px 18px rgba(244,140,37,0.6);">QUAY<br>NGAY!</button>
+                </div>
+
+                <!-- Kết quả -->
+                <div id="spin-result-area" style="display:none;
+                        background:rgba(244,140,37,0.08);border:1px solid rgba(244,140,37,0.3);
+                        border-radius:14px;padding:0.9rem;margin-bottom:0.5rem;">
+                    <div id="spin-result-emoji" style="font-size:2rem;"></div>
+                    <div id="spin-result-name" style="font-size:1.05rem;font-weight:800;color:#1f2937;margin:4px 0;"></div>
+                    <div id="spin-result-code"
+                         style="display:none;font-size:1rem;font-weight:800;color:#f48c25;
+                                letter-spacing:2px;padding:3px 12px;
+                                background:rgba(244,140,37,0.1);border-radius:20px;
+                                border:1px solid rgba(244,140,37,0.35);display:inline-block;margin-top:4px;"></div>
+                    <p id="spin-result-msg" style="font-size:0.78rem;color:#6b7280;margin:6px 0 0;"></p>
+                </div>
+
+                <!-- Form AntiForgery ẩn -->
+                <form id="spin-form" method="post" action="/Spin/DoSpin" style="display:none">
+                    @Html.AntiForgeryToken()
+                </form>
+            </div>
+        </div>
+
+        <style>
+            @@keyframes spinFabPulse {
+                0%, 100% { box-shadow: 0 4px 20px rgba(244,140,37,0.6), 0 0 0 0 rgba(244,140,37,0.3); }
+                50%       { box-shadow: 0 4px 30px rgba(244,140,37,0.9), 0 0 0 12px rgba(244,140,37,0); }
+            }
+            @@keyframes ringRotate { to { transform: rotate(360deg); } }
+        </style>
+
+        <script>
+        (function() {
+            // ── Dữ liệu ──────────────────────────────────────────────────────
+            const NO_PRIZE_SLOTS = 2;
+            const COLORS = [
+                ["#f48c25","#d97a1a"],["#fff","#f3f4f6"],["#f97316","#ea580c"],
+                ["#fff","#f3f4f6"],["#fbbf24","#f59e0b"],["#fff","#f3f4f6"],
+                ["#f48c25","#d97a1a"],["#fff","#f3f4f6"],["#fb923c","#f97316"],
+                ["#fff","#f3f4f6"]
+            ];
+            let vouchers = [];
+            let segments = [];
+            let rotation = 0;
+            let isSpinning = false;
+            let initialised = false;
+
+            // ── Lấy danh sách voucher ─────────────────────────────────────────
+            async function loadVouchers() {
+                try {
+                    const r = await fetch('/Spin/GetSegments');
+                    vouchers = await r.json();
+                } catch(e) { vouchers = []; }
+                segments = [
+                    ...vouchers.map(v => v.discountType === 1
+                        ? `🎉 ${v.value}%` : `🎉 ${Number(v.value).toLocaleString('vi-VN')}đ`
+                    ),
+                    ...Array(NO_PRIZE_SLOTS).fill("😢 Thử lại!")
+                ];
+            }
+
+            // ── Vẽ bánh xe ───────────────────────────────────────────────────
+            function drawWheel(canvas) {
+                const n = segments.length;
+                if (!n) return;
+                const cx = canvas.width / 2, cy = canvas.height / 2, r = cx - 3;
+                const arc = (2 * Math.PI) / n;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                for (let i = 0; i < n; i++) {
+                    const s = rotation + i * arc, e = s + arc;
+                    const [c1, c2] = COLORS[i % COLORS.length];
+                    const grad = ctx.createRadialGradient(cx, cy, r * 0.2, cx, cy, r);
+                    grad.addColorStop(0, c1); grad.addColorStop(1, c2);
+                    ctx.beginPath(); ctx.moveTo(cx, cy);
+                    ctx.arc(cx, cy, r, s, e); ctx.closePath();
+                    ctx.fillStyle = grad; ctx.fill();
+                    ctx.strokeStyle = 'rgba(244,140,37,0.35)'; ctx.lineWidth = 1.5; ctx.stroke();
+                    ctx.save(); ctx.translate(cx, cy); ctx.rotate(s + arc / 2);
+                    ctx.textAlign = 'right'; ctx.fillStyle = i%2===0 ? '#fff' : '#1f2937';
+                    ctx.font = `bold ${Math.max(9, Math.min(12, 200 / n))}px Inter,sans-serif`;
+                    ctx.shadowColor = i%2===0 ? 'rgba(0,0,0,0.5)' : 'rgba(244,140,37,0.4)';
+                    ctx.shadowBlur = 3;
+                    ctx.fillText(segments[i], r - 10, 4); ctx.restore();
+                }
+                // Tâm
+                const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 30);
+                cg.addColorStop(0, '#fff'); cg.addColorStop(1, '#f48c25');
+                ctx.beginPath(); ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+                ctx.fillStyle = cg; ctx.fill();
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+            }
+
+            // ── Mở popup ─────────────────────────────────────────────────────
+            window.openSpinModal = async function() {
+                const modal = document.getElementById('spin-modal');
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+
+                if (!initialised) {
+                    await loadVouchers();
+                    initialised = true;
+                }
+                const canvas = document.getElementById('spin-canvas');
+                const size = Math.min(300, window.innerWidth * 0.78);
+                canvas.width = canvas.height = size;
+                drawWheel(canvas);
+            };
+
+            // ── Đóng popup ────────────────────────────────────────────────────
+            window.closeSpinModal = function() {
+                document.getElementById('spin-modal').style.display = 'none';
+                document.body.style.overflow = '';
+            };
+
+            // ── Quay ─────────────────────────────────────────────────────────
+            window.doSpin = async function() {
+                if (isSpinning) return;
+                const btn = document.getElementById('spin-center-btn');
+                isSpinning = true; btn.disabled = true;
+
+                const token = document.querySelector('#spin-form input[name="__RequestVerificationToken"]').value;
+                let data;
+                try {
+                    const res = await fetch('/Spin/DoSpin', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `__RequestVerificationToken=${encodeURIComponent(token)}`
+                    });
+                    data = await res.json();
+                } catch(e) {
+                    isSpinning = false; btn.disabled = false;
+                    alert('Lỗi kết nối, thử lại nhé!'); return;
+                }
+
+                if (!data.success) {
+                    isSpinning = false; btn.disabled = false;
+                    showSpinResult('😅', data.message, '', data.message); return;
+                }
+
+                // ⚡ Đồng bộ segments từ server (nguồn sự thật duy nhất)
+                const canvas = document.getElementById('spin-canvas');
+                if (data.segmentLabels && data.segmentLabels.length) {
+                    segments = data.segmentLabels;
+                    drawWheel(canvas); // vẽ lại với đúng nhãn server
+                }
+
+                // Animate đến đúng ô server chọn
+                const n = segments.length;
+                const arc = (2 * Math.PI) / n;
+                const targetAngle = (3 * Math.PI / 2) - (data.segmentIndex + 0.5) * arc;
+                const extra = Math.PI * 2 * (5 + Math.random() * 4);
+                const diff = ((targetAngle - rotation) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+                const finalRot = rotation - (Math.PI * 2 - diff) - extra;
+                const startRot = rotation, startTime = performance.now();
+                const duration = 3500 + Math.random() * 1000;
+
+                function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+                function animate(now) {
+                    const t = Math.min((now - startTime) / duration, 1);
+                    rotation = startRot + (finalRot - startRot) * easeOut(t);
+                    drawWheel(canvas);
+                    if (t < 1) { requestAnimationFrame(animate); }
+                    else {
+                        rotation = finalRot;
+                        isSpinning = false;
+                        btn.style.display = 'none'; // Không còn lượt hôm nay
+                        if (data.isWin) {
+                            launchConfetti();
+                            showSpinResult('🎉', data.label, data.voucherCode, data.message);
+                        } else {
+                            showSpinResult('😢', data.label, '', data.message);
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            };
+
+            function showSpinResult(emoji, name, code, msg) {
+                const area = document.getElementById('spin-result-area');
+                document.getElementById('spin-result-emoji').textContent = emoji;
+                document.getElementById('spin-result-name').textContent = name;
+                const codeEl = document.getElementById('spin-result-code');
+                if (code) { codeEl.textContent = code; codeEl.style.display = 'inline-block'; }
+                else        codeEl.style.display = 'none';
+                document.getElementById('spin-result-msg').innerHTML = msg;
+                area.style.display = 'block';
+            }
+
+            function launchConfetti() {
+                const colors = ['#FFD700','#ff6bff','#00e5ff','#ff6b6b','#1DD1A1'];
+                for (let i = 0; i < 60; i++) {
+                    const el = document.createElement('div');
+                    el.style.cssText = `position:fixed;top:-10px;width:8px;height:8px;
+                        border-radius:${Math.random()>.5?'50%':'2px'};
+                        background:${colors[Math.floor(Math.random()*colors.length)]};
+                        left:${Math.random()*100}vw;z-index:99999;pointer-events:none;
+                        animation:confettiFall ${1.5+Math.random()*2}s linear ${Math.random()*.8}s forwards;`;
+                    document.body.appendChild(el);
+                    el.addEventListener('animationend', () => el.remove());
+                }
+            }
+
+            // Đóng khi click vào overlay
+            document.getElementById('spin-modal').addEventListener('click', function(e) {
+                if (e.target === this) closeSpinModal();
+            });
+        })();
+        </script>
+        <style>
+            @@keyframes confettiFall {
+                to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+            }
+        </style>
+
+        <script src="~/js/lazyload.js" defer></script>
+        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+
+        <script>
+            // Close welcome notification
+            function closeWelcome() {
             const welcomeNotification = document.getElementById('welcome-notification');
             if (welcomeNotification) {
-                welcomeNotification.style.opacity = '0';
-                welcomeNotification.style.transform = 'translateX(100%)';
-                setTimeout(() => {
-                    welcomeNotification.remove();
-                }, 300);
+            welcomeNotification.style.opacity = '0';
+            welcomeNotification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+            welcomeNotification.remove();
+            }, 300);
             }
-        }
+            }
 
-        // Auto close welcome notification after 5 seconds
-        setTimeout(() => {
+            // Auto close welcome notification after 5 seconds
+            setTimeout(() => {
             closeWelcome();
-        }, 5000);
+            }, 5000);
 
-        // Loading Screen & AOS Initialization
-        document.addEventListener('DOMContentLoaded', function () {
+            // Loading Screen & AOS Initialization
+            document.addEventListener('DOMContentLoaded', function () {
             // Initialize AOS
             if (typeof AOS !== 'undefined') {
-                AOS.init({
-                    duration: 800,
-                    once: true,
-                    offset: 100
-                });
+            AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+            });
             }
 
             const loadingScreen = document.getElementById('loadingScreen');
@@ -803,97 +1100,97 @@
 
             let progress = 0;
             const interval = setInterval(() => {
-                progress += Math.random() * 40 + 20;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    if (progressFill) progressFill.style.width = '100%';
-                    setTimeout(() => {
-                        if (loadingScreen) {
-                            loadingScreen.style.opacity = '0';
-                            setTimeout(() => {
-                                loadingScreen.style.display = 'none';
-                            }, 300);
-                        }
-                    }, 100);
-                } else {
-                    if (progressFill) progressFill.style.width = progress + '%';
-                }
-            }, 50);
-        });
-
-        // Header Scroll Effect
-        let lastScrollY = window.scrollY;
-        const header = document.getElementById('mainHeader');
-
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 100) {
-                if (header) header.classList.add('scrolled');
+            progress += Math.random() * 40 + 20;
+            if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            if (progressFill) progressFill.style.width = '100%';
+            setTimeout(() => {
+            if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+            loadingScreen.style.display = 'none';
+            }, 300);
+            }
+            }, 100);
             } else {
-                if (header) header.classList.remove('scrolled');
+            if (progressFill) progressFill.style.width = progress + '%';
+            }
+            }, 50);
+            });
+
+            // Header Scroll Effect
+            let lastScrollY = window.scrollY;
+            const header = document.getElementById('mainHeader');
+
+            window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+            if (header) header.classList.add('scrolled');
+            } else {
+            if (header) header.classList.remove('scrolled');
             }
             lastScrollY = window.scrollY;
-        });
+            });
 
-        // Search Functionality
-        const globalSearch = document.getElementById('globalSearch');
-        const searchSuggestions = document.getElementById('searchSuggestions');
+            // Search Functionality
+            const globalSearch = document.getElementById('globalSearch');
+            const searchSuggestions = document.getElementById('searchSuggestions');
 
-        if (globalSearch && searchSuggestions) {
+            if (globalSearch && searchSuggestions) {
             globalSearch.addEventListener('focus', () => {
-                if (globalSearch.value.length > 0) {
-                    searchSuggestions.classList.remove('hidden');
-                }
+            if (globalSearch.value.length > 0) {
+            searchSuggestions.classList.remove('hidden');
+            }
             });
 
             globalSearch.addEventListener('blur', () => {
-                setTimeout(() => {
-                    searchSuggestions.classList.add('hidden');
-                }, 200);
+            setTimeout(() => {
+            searchSuggestions.classList.add('hidden');
+            }, 200);
             });
 
             globalSearch.addEventListener('input', async (e) => {
-                const query = e.target.value;
+            const query = e.target.value;
 
-                if (query.length < 1) {
-                    searchSuggestions.classList.add('hidden');
-                    return;
-                }
+            if (query.length < 1) {
+            searchSuggestions.classList.add('hidden');
+            return;
+            }
 
-                const response = await fetch(`/HomeUser/Search?query=${encodeURIComponent(query)}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-                const data = await response.json();
-
-                if (data.redirectToUrl) {
-                    window.location.href = data.redirectToUrl;
-                    return;
-                }
-
-                const suggestionsContainer = searchSuggestions.querySelector('.max-h-60');
-                if (suggestionsContainer) {
-                    if (data.suggestions && data.suggestions.length > 0) {
-                        suggestionsContainer.innerHTML = data.suggestions.map(item => `
-                            <a href="/HomeUser/Productdetails/${item.productId}" class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0">
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-search text-gray-400"></i>
-                                    <span class="text-gray-700 dark:text-gray-300">${item.name}</span>
-                                </div>
-                            </a>
-                        `).join('');
-                        searchSuggestions.classList.remove('hidden');
-                    } else {
-                        suggestionsContainer.innerHTML = '<p class="p-4 text-sm text-gray-500">Không tìm thấy sản phẩm nào.</p>';
-                        searchSuggestions.classList.remove('hidden');
-                    }
-                }
+            const response = await fetch(`/HomeUser/Search?query=${encodeURIComponent(query)}`, {
+            headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+            }
             });
-        }
+            const data = await response.json();
 
-        // User Profile Dropdown với Click
-        document.addEventListener('DOMContentLoaded', function () {
+            if (data.redirectToUrl) {
+            window.location.href = data.redirectToUrl;
+            return;
+            }
+
+            const suggestionsContainer = searchSuggestions.querySelector('.max-h-60');
+            if (suggestionsContainer) {
+            if (data.suggestions && data.suggestions.length > 0) {
+            suggestionsContainer.innerHTML = data.suggestions.map(item => `
+            <a href="/HomeUser/Productdetails/${item.productId}" class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+            <div class="flex items-center gap-3">
+            <i class="fas fa-search text-gray-400"></i>
+            <span class="text-gray-700 dark:text-gray-300">${item.name}</span>
+            </div>
+            </a>
+            `).join('');
+            searchSuggestions.classList.remove('hidden');
+            } else {
+            suggestionsContainer.innerHTML = '<p class="p-4 text-sm text-gray-500">Không tìm thấy sản phẩm nào.</p>';
+            searchSuggestions.classList.remove('hidden');
+            }
+            }
+            });
+            }
+
+            // User Profile Dropdown với Click
+            document.addEventListener('DOMContentLoaded', function () {
             const userProfileButton = document.getElementById('user-profile-button');
             const userProfileDropdown = document.getElementById('user-profile-dropdown');
             const userProfileChevron = document.getElementById('user-profile-chevron');
@@ -901,27 +1198,27 @@
 
             // Toggle dropdown khi click
             if (userProfileButton && userProfileDropdown && userProfileChevron) {
-                userProfileButton.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    const isHidden = userProfileDropdown.classList.contains('hidden');
-                    userProfileDropdown.classList.toggle('hidden', !isHidden);
-                    userProfileChevron.classList.toggle('rotate-180', !isHidden);
-                });
+            userProfileButton.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isHidden = userProfileDropdown.classList.contains('hidden');
+            userProfileDropdown.classList.toggle('hidden', !isHidden);
+            userProfileChevron.classList.toggle('rotate-180', !isHidden);
+            });
             }
 
             // Đóng dropdown khi click ra ngoài
             document.addEventListener('click', function () {
-                if (userProfileDropdown && userProfileChevron) {
-                    userProfileDropdown.classList.add('hidden');
-                    userProfileChevron.classList.remove('rotate-180');
-                }
+            if (userProfileDropdown && userProfileChevron) {
+            userProfileDropdown.classList.add('hidden');
+            userProfileChevron.classList.remove('rotate-180');
+            }
             });
 
             // Ngăn đóng dropdown khi click vào dropdown
             if (userProfileDropdown) {
-                userProfileDropdown.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                });
+            userProfileDropdown.addEventListener('click', function (e) {
+            e.stopPropagation();
+            });
             }
 
             // XỬ LÝ POPUP ĐĂNG XUẤT
@@ -930,67 +1227,67 @@
             const logoutConfirm = document.getElementById('logout-confirm');
 
             function showLogoutPopup() {
-                if (logoutPopup) logoutPopup.style.display = 'flex';
+            if (logoutPopup) logoutPopup.style.display = 'flex';
             }
 
             function hideLogoutPopup() {
-                if (logoutPopup) logoutPopup.style.display = 'none';
+            if (logoutPopup) logoutPopup.style.display = 'none';
             }
 
             // Gán sự kiện cho các nút đăng xuất
             logoutTriggers.forEach(trigger => {
-                trigger.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    // Đóng dropdown trước khi mở popup
-                    if (userProfileDropdown) userProfileDropdown.classList.add('hidden');
-                    if (userProfileChevron) userProfileChevron.classList.remove('rotate-180');
-                    showLogoutPopup();
-                });
+            trigger.addEventListener('click', function (e) {
+            e.preventDefault();
+            // Đóng dropdown trước khi mở popup
+            if (userProfileDropdown) userProfileDropdown.classList.add('hidden');
+            if (userProfileChevron) userProfileChevron.classList.remove('rotate-180');
+            showLogoutPopup();
+            });
             });
 
             // Xử lý nút hủy
             if (logoutCancel) {
-                logoutCancel.addEventListener('click', function () {
-                    hideLogoutPopup();
-                });
+            logoutCancel.addEventListener('click', function () {
+            hideLogoutPopup();
+            });
             }
 
             // Xử lý nút xác nhận đăng xuất
             if (logoutConfirm) {
-                logoutConfirm.addEventListener('click', function () {
-                    hideLogoutPopup();
-                    // Optional: show a loader here
-                    window.location.href = '/Account/Logout';
-                });
+            logoutConfirm.addEventListener('click', function () {
+            hideLogoutPopup();
+            // Optional: show a loader here
+            window.location.href = '/Account/Logout';
+            });
             }
 
             // Đóng popup khi click bên ngoài
             if (logoutPopup) {
-                logoutPopup.addEventListener('click', function (e) {
-                    if (e.target === logoutPopup) {
-                        hideLogoutPopup();
-                    }
-                });
+            logoutPopup.addEventListener('click', function (e) {
+            if (e.target === logoutPopup) {
+            hideLogoutPopup();
             }
-        });
+            });
+            }
+            });
 
-        // Dark Mode Toggle
-        function toggleDarkMode() {
+            // Dark Mode Toggle
+            function toggleDarkMode() {
             const html = document.documentElement;
             html.classList.toggle('dark');
             localStorage.setItem('darkMode', html.classList.contains('dark'));
-        }
+            }
 
-        // Check for saved dark mode preference
-        if (localStorage.getItem('darkMode') === 'true') {
+            // Check for saved dark mode preference
+            if (localStorage.getItem('darkMode') === 'true') {
             document.documentElement.classList.add('dark');
-        }
+            }
 
 
-        // =======================================================
-        // 🤖 CHAT WIDGET FUNCTIONALITY (ĐÃ SỬA CHO CẤU TRÚC HTML MỚI)
-        // =======================================================
-        document.addEventListener('DOMContentLoaded', function () {
+            // =======================================================
+            // 🤖 CHAT WIDGET FUNCTIONALITY (ĐÃ SỬA CHO CẤU TRÚC HTML MỚI)
+            // =======================================================
+            document.addEventListener('DOMContentLoaded', function () {
             // Lấy các phần tử DOM
             const chatToggle = document.getElementById('chat-toggle');
             const chatContainer = document.getElementById('chat-container'); // Khối chat chính
@@ -1009,194 +1306,195 @@
 
             // Hàm tạo tin nhắn trên giao diện
             function createMessageElement(text, sender, isLoading = false) {
-                const messageWrapper = document.createElement('div');
-                messageWrapper.className = `flex gap-2 mb-4 ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = `flex gap-2 mb-4 ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
 
-                const innerContent = document.createElement('div');
-                innerContent.className = 'flex-1 max-w-[85%]';
+            const innerContent = document.createElement('div');
+            innerContent.className = 'flex-1 max-w-[85%]';
 
-                // Nếu là tin nhắn AI, thêm Avatar và căn chỉnh
-                if (sender === 'ai') {
-                    messageWrapper.classList.add('items-start', 'justify-start');
+            // Nếu là tin nhắn AI, thêm Avatar và căn chỉnh
+            if (sender === 'ai') {
+            messageWrapper.classList.add('items-start', 'justify-start');
 
-                    // Thêm Avatar
-                    const avatarDiv = document.createElement('div');
-                    avatarDiv.className = 'w-8 h-8 bg-primary rounded-full overflow-hidden flex-shrink-0';
-                    avatarDiv.innerHTML = `<img src="${aiAvatarUrl}" alt="Fox AI" class="w-full h-full object-cover">`;
-                    messageWrapper.appendChild(avatarDiv);
+            // Thêm Avatar
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'w-8 h-8 bg-primary rounded-full overflow-hidden flex-shrink-0';
+            avatarDiv.innerHTML = `<img src="${aiAvatarUrl}" alt="Fox AI" class="w-full h-full object-cover">`;
+            messageWrapper.appendChild(avatarDiv);
 
-                    innerContent.className = 'flex-1';
-                } else {
-                    messageWrapper.classList.add('justify-end');
-                    innerContent.className = 'flex-none';
-                }
+            innerContent.className = 'flex-1';
+            } else {
+            messageWrapper.classList.add('justify-end');
+            innerContent.className = 'flex-none';
+            }
 
 
-                // Nội dung tin nhắn chính
-                const messageBubble = document.createElement('div');
-                messageBubble.className = `rounded-lg p-3 shadow-sm ${sender === 'user' ? userBg : aiBg}`;
+            // Nội dung tin nhắn chính
+            const messageBubble = document.createElement('div');
+            messageBubble.className = `rounded-lg p-3 shadow-sm ${sender === 'user' ? userBg : aiBg}`;
 
-                if (isLoading) {
-                    messageBubble.id = 'loading-message';
-                    messageBubble.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Fox AI đang gõ...';
-                } else {
-                    // Xử lý xuống dòng và hiển thị nội dung
-                    messageBubble.innerHTML = text.replace(/\n/g, '<br>');
-                }
+            if (isLoading) {
+            messageBubble.id = 'loading-message';
+            messageBubble.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Fox AI đang gõ...';
+            } else {
+            // Xử lý xuống dòng và hiển thị nội dung
+            messageBubble.innerHTML = text.replace(/\n/g, '<br>');
+            }
 
-                innerContent.appendChild(messageBubble);
+            innerContent.appendChild(messageBubble);
 
-                // Thêm bubble vào wrapper
-                messageWrapper.appendChild(innerContent);
+            // Thêm bubble vào wrapper
+            messageWrapper.appendChild(innerContent);
 
-                chatMessagesContainer.appendChild(messageWrapper);
-                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight; // Cuộn xuống dưới
-                return messageWrapper;
+            chatMessagesContainer.appendChild(messageWrapper);
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight; // Cuộn xuống dưới
+            return messageWrapper;
             }
 
             // Hàm tải lịch sử chat
             async function loadHistory() {
-                try {
-                    // Gọi action GetChatHistory trong ChatController
-                    const response = await fetch('/Chat/GetChatHistory');
-                    const history = await response.json();
+            try {
+            // Gọi action GetChatHistory trong ChatController
+            const response = await fetch('/Chat/GetChatHistory');
+            const history = await response.json();
 
-                    chatMessagesContainer.innerHTML = ''; // Xóa nội dung cũ
+            chatMessagesContainer.innerHTML = ''; // Xóa nội dung cũ
 
-                    if (history.length === 0) {
-                        createMessageElement("Chào bạn! Tôi là Fox AI, chuyên gia tư vấn công nghệ của FOXMOBILE. Tôi có thể giúp bạn tìm kiếm Điện thoại hoặc Laptop phù hợp!", 'ai');
-                    } else {
-                        history.forEach(msg => {
-                            createMessageElement(msg.userPrompt, 'user');
-                            createMessageElement(msg.aiResponse, 'ai');
-                        });
-                    }
-                } catch (error) {
-                    console.error('Lỗi khi tải lịch sử chat:', error);
-                }
+            if (history.length === 0) {
+            createMessageElement("Chào bạn! Tôi là Fox AI, chuyên gia tư vấn công nghệ của FOXMOBILE. Tôi có thể giúp bạn tìm kiếm Điện thoại hoặc Laptop phù hợp!", 'ai');
+            } else {
+            history.forEach(msg => {
+            createMessageElement(msg.userPrompt, 'user');
+            createMessageElement(msg.aiResponse, 'ai');
+            });
+            }
+            } catch (error) {
+            console.error('Lỗi khi tải lịch sử chat:', error);
+            }
             }
 
 
             // Hàm gửi tin nhắn
             async function sendMessage() {
-                const userPrompt = chatInput.value.trim();
-                if (userPrompt === '') return;
+            const userPrompt = chatInput.value.trim();
+            if (userPrompt === '') return;
 
-                // 1. Hiển thị tin nhắn người dùng
-                createMessageElement(userPrompt, 'user');
-                chatInput.value = '';
-                chatInput.disabled = true;
-                chatSend.disabled = true;
+            // 1. Hiển thị tin nhắn người dùng
+            createMessageElement(userPrompt, 'user');
+            chatInput.value = '';
+            chatInput.disabled = true;
+            chatSend.disabled = true;
 
-                // 2. Hiện tin nhắn Loading
-                const loadingMsg = createMessageElement('', 'ai', true);
+            // 2. Hiện tin nhắn Loading
+            const loadingMsg = createMessageElement('', 'ai', true);
 
-                try {
-                    // 3. Gửi tin nhắn đến Controller
-                    const response = await fetch('/Chat/Ask', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ UserPrompt: userPrompt })
-                    });
+            try {
+            // 3. Gửi tin nhắn đến Controller
+            const response = await fetch('/Chat/Ask', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ UserPrompt: userPrompt })
+            });
 
-                    const data = await response.json();
+            const data = await response.json();
 
-                    // 4. Xóa loading và hiển thị câu trả lời
-                    const existingLoading = document.getElementById('loading-message');
-                    if (existingLoading) existingLoading.remove();
+            // 4. Xóa loading và hiển thị câu trả lời
+            const existingLoading = document.getElementById('loading-message');
+            if (existingLoading) existingLoading.remove();
 
-                    if (data.success) {
-                        createMessageElement(data.aiResponse, 'ai');
-                    } else {
-                        createMessageElement("Xin lỗi, Fox AI gặp lỗi: " + (data.message || "Không nhận được phản hồi từ server."), 'ai');
-                    }
+            if (data.success) {
+            createMessageElement(data.aiResponse, 'ai');
+            } else {
+            createMessageElement("Xin lỗi, Fox AI gặp lỗi: " + (data.message || "Không nhận được phản hồi từ server."), 'ai');
+            }
 
-                } catch (error) {
-                    const existingLoading = document.getElementById('loading-message');
-                    if (existingLoading) existingLoading.remove();
-                    createMessageElement("Lỗi kết nối. Vui lòng kiểm tra Server và API Key.", 'ai');
-                    console.error('Lỗi gửi tin nhắn:', error);
-                } finally {
-                    chatInput.disabled = false;
-                    chatSend.disabled = false;
-                    chatInput.focus();
-                }
+            } catch (error) {
+            const existingLoading = document.getElementById('loading-message');
+            if (existingLoading) existingLoading.remove();
+            createMessageElement("Lỗi kết nối. Vui lòng kiểm tra Server và API Key.", 'ai');
+            console.error('Lỗi gửi tin nhắn:', error);
+            } finally {
+            chatInput.disabled = false;
+            chatSend.disabled = false;
+            chatInput.focus();
+            }
             }
 
             // Hàm xóa lịch sử
             async function clearHistory() {
-                if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử chat không?")) {
-                    await fetch('/Chat/ClearHistory', { method: 'POST' });
-                    loadHistory();
-                }
+            if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử chat không?")) {
+            await fetch('/Chat/ClearHistory', { method: 'POST' });
+            loadHistory();
+            }
             }
 
             // --- KÍCH HOẠT CÁC CHỨC NĂNG CHATBOT ---
 
             // Toggle chat visibility
             if (chatToggle && chatContainer) {
-                chatToggle.addEventListener('click', function () {
-                    chatContainer.classList.toggle('hidden');
-                    if (!chatContainer.classList.contains('hidden')) {
-                        loadHistory(); // Tải lịch sử khi mở
-                        chatInput.focus();
-                    }
-                });
+            chatToggle.addEventListener('click', function () {
+            chatContainer.classList.toggle('hidden');
+            if (!chatContainer.classList.contains('hidden')) {
+            loadHistory(); // Tải lịch sử khi mở
+            chatInput.focus();
+            }
+            });
             }
 
             // Close chat
             if (chatClose && chatContainer) {
-                chatClose.addEventListener('click', function () {
-                    chatContainer.classList.add('hidden');
-                });
+            chatClose.addEventListener('click', function () {
+            chatContainer.classList.add('hidden');
+            });
             }
 
             // Send message on button click
             if (chatSend) {
-                chatSend.addEventListener('click', sendMessage);
+            chatSend.addEventListener('click', sendMessage);
             }
 
             // Send message on Enter key
             if (chatInput) {
-                chatInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        sendMessage();
-                        e.preventDefault();
-                    }
-                });
+            chatInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+            sendMessage();
+            e.preventDefault();
+            }
+            });
             }
 
             // Xử lý nút xóa lịch sử (Nếu bạn thêm ID chat-clear vào HTML)
             if (chatClear) {
-                chatClear.addEventListener('click', clearHistory);
+            chatClear.addEventListener('click', clearHistory);
             }
-        });
-    </script>
+            });
+        </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-    <script>
-        function showCustomAlert(message, type = 'error') {
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+        <script>
+            function showCustomAlert(message, type = 'error') {
             if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: type,
-                    title: 'Thông báo',
-                    text: message,
-                    confirmButtonColor: '#f48c25'
-                });
+            Swal.fire({
+            icon: type,
+            title: 'Thông báo',
+            text: message,
+            confirmButtonColor: '#f48c25'
+            });
             } else {
-                alert(message);
+            alert(message);
             }
-        }
-    </script>
-    
-    <!-- Leaflet JS for Maps -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <!-- Map Address Handler -->
-    <script src="~/js/map-address.js"></script>
+            }
+        </script>
 
-    @RenderSection("Scripts", required: false)
-</body>
+        <!-- Leaflet JS for Maps -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+                integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <!-- Map Address Handler -->
+        <script src="~/js/map-address.js"></script>
+
+        @RenderSection("Scripts", required: false)
+    </body>
 
 </html>
