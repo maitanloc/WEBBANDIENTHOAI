@@ -2,6 +2,30 @@
 @{
       ViewData["Title"] = "Báo Cáo Doanh Thu";
       Layout = "~/Views/Shared/_Layout.cshtml";
+      var isMonthly = Model.ChartMode == "monthly";
+}
+
+@section Styles {
+      <style>
+                  .mode-btn {
+                        transition: all 0.2s;
+                  }
+
+                  .mode-btn.active {
+                        background: #2563eb;
+                        color: #fff;
+                        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+                  }
+
+                  .mode-btn:not(.active) {
+                        background: #f3f4f6;
+                        color: #374151;
+                  }
+
+                  .mode-btn:not(.active):hover {
+                        background: #e5e7eb;
+                  }
+      </style>
 }
 
 <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -9,87 +33,201 @@
             <h1 class="text-2xl font-bold text-gray-900">Báo Cáo Doanh Thu</h1>
             <p class="text-sm text-gray-500 mt-1">Chi tiết doanh thu từ @Model.StartDate.ToString("dd/MM/yyyy") đến
                   @Model.EndDate.ToString("dd/MM/yyyy")</p>
-      </div>
-
-      <!-- Filter Form -->
-      <form method="get"
-            class="flex flex-wrap items-center gap-2 bg-white p-2 rounded-xl shadow-sm border border-gray-100">
-            <div class="flex items-center gap-2">
-                  <span class="text-sm text-gray-500 pl-2">Từ:</span>
-                  <input type="date" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")"
-                        class="border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
             </div>
-            <div class="flex items-center gap-2">
-                  <span class="text-sm text-gray-500">Đến:</span>
-                  <input type="date" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")"
-                        class="border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+
+            <!-- Filter Form -->
+            <form method="get"
+                  class="flex flex-wrap items-center gap-2 bg-white p-2 rounded-xl shadow-sm border border-gray-100">
+                  <input type="hidden" name="mode" value="@Model.ChartMode" />
+                  <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-500 pl-2">Từ:</span>
+                        <input type="date" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")"
+                               class="border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+                  </div>
+                  <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-500">Đến:</span>
+                        <input type="date" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")"
+                               class="border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+                  </div>
+                  <button type="submit"
+                          class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                        Lọc dữ liệu
+                  </button>
+                  <a href="/Admin/Reports/Revenue" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">Đặt
+                        lại</a>
+                  </form>
             </div>
-            <button type="submit"
-                  class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                  Lọc dữ liệu
-            </button>
-            <a href="/Admin/Reports/Revenue" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">Đặt
-                  lại</a>
-      </form>
-</div>
 
-<!-- Summary Stats -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <p class="text-sm font-semibold text-gray-500">Tổng doanh thu</p>
-            <h3 class="text-2xl font-bold text-blue-600">@Model.TotalRevenue.ToString("N0")đ</h3>
-      </div>
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <p class="text-sm font-semibold text-gray-500">Số đơn hàng</p>
-            <h3 class="text-2xl font-bold text-gray-900">@Model.TotalOrders</h3>
-      </div>
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <p class="text-sm font-semibold text-gray-500">Giá trị trung bình/đơn</p>
-            <h3 class="text-2xl font-bold text-gray-900">@Model.AverageOrderValue.ToString("N0")đ</h3>
-      </div>
-</div>
+            <!-- Summary Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-sm font-semibold text-gray-500">Tổng doanh thu</p>
+                        <h3 class="text-2xl font-bold text-blue-600">@Model.TotalRevenue.ToString("N0")đ</h3>
+                  </div>
+                  <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-sm font-semibold text-gray-500">Số đơn hàng</p>
+                        <h3 class="text-2xl font-bold text-gray-900">@Model.TotalOrders</h3>
+                  </div>
+                  <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-sm font-semibold text-gray-500">Giá trị trung bình/đơn</p>
+                        <h3 class="text-2xl font-bold text-gray-900">@Model.AverageOrderValue.ToString("N0")đ</h3>
+                  </div>
+            </div>
 
-<!-- Detailed Table -->
-<div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-            <h3 class="font-bold text-gray-900">Chi tiết theo ngày</h3>
-            <!-- Print/Export buttons could go here -->
-      </div>
-      <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-                  <thead class="text-xs text-gray-500 uppercase bg-gray-50">
-                        <tr>
-                              <th class="px-6 py-3">Ngày</th>
-                              <th class="px-6 py-3 text-center">Số đơn hàng</th>
-                              <th class="px-6 py-3 text-right">Doanh thu</th>
-                              <th class="px-6 py-3 text-right">Trung bình</th>
-                        </tr>
-                  </thead>
-                  <tbody class="divide-y divide-gray-100">
-                        @if (Model.DailyStats.Any())
-                        {
-                              foreach (var item in Model.DailyStats)
-                              {
-                                    <tr class="hover:bg-gray-50">
-                                          <td class="px-6 py-4 font-medium text-gray-900">@item.Date.ToString("dd/MM/yyyy")</td>
-                                          <td class="px-6 py-4 text-center">@item.OrderCount</td>
-                                          <td class="px-6 py-4 text-right font-bold text-emerald-600">@item.Revenue.ToString("N0")đ
-                                          </td>
-                                          <td class="px-6 py-4 text-right text-gray-600">
-                                                @((item.OrderCount > 0 ? item.Revenue / item.OrderCount : 0).ToString("N0"))đ
-                                          </td>
+            <!-- Chart Section -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <div>
+                              <h3 class="font-bold text-gray-900 text-lg">Biểu đồ biến động doanh thu</h3>
+                              <p class="text-sm text-gray-500 mt-0.5">Dữ liệu từ đơn hàng đã hoàn thành</p>
+                        </div>
+                        <!-- Mode Toggle -->
+                        <div class="flex gap-1 bg-gray-50 p-1.5 rounded-xl border border-gray-100">
+                              <a href="?startDate=@Model.StartDate.ToString("yyyy-MM-dd")&endDate=@Model.EndDate.ToString("yyyy-MM-dd")&mode=daily"
+                                       class="mode-btn text-sm font-medium px-4 py-2 rounded-lg @(isMonthly ? "" : "active")">
+                                    Theo ngày
+                              </a>
+                              <a href="?startDate=@Model.StartDate.ToString("yyyy-MM-dd")&endDate=@Model.EndDate.ToString("yyyy-MM-dd")&mode=monthly"
+                                       class="mode-btn text-sm font-medium px-4 py-2 rounded-lg @(isMonthly ? "active" : "")">
+                                    Theo tháng
+                              </a>
+                        </div>
+                  </div>
+                  <div style="height:340px; position:relative;">
+                        <canvas id="revenueDetailChart"></canvas>
+                  </div>
+            </div>
+
+            <!-- Detailed Table -->
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+                  <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-900">Chi tiết theo ngày</h3>
+                        <!-- Print/Export buttons could go here -->
+                  </div>
+                  <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                              <thead class="text-xs text-gray-500 uppercase bg-gray-50">
+                                    <tr>
+                                          <th class="px-6 py-3">Ngày</th>
+                                          <th class="px-6 py-3 text-center">Số đơn hàng</th>
+                                          <th class="px-6 py-3 text-right">Doanh thu</th>
+                                          <th class="px-6 py-3 text-right">Trung bình</th>
                                     </tr>
-                              }
+                              </thead>
+                              <tbody class="divide-y divide-gray-100">
+                                    @if (Model.DailyStats.Any())
+                                    {
+                                          foreach (var item in Model.DailyStats)
+                                          {
+                                                <tr class="hover:bg-gray-50">
+                                                      <td class="px-6 py-4 font-medium text-gray-900">@item.Date.ToString("dd/MM/yyyy")</td>
+                                                      <td class="px-6 py-4 text-center">@item.OrderCount</td>
+                                                      <td class="px-6 py-4 text-right font-bold text-emerald-600">@item.Revenue.ToString("N0")đ
+                                                      </td>
+                                                      <td class="px-6 py-4 text-right text-gray-600">
+                                                            @((item.OrderCount > 0 ? item.Revenue / item.OrderCount : 0).ToString("N0"))đ
+                                                      </td>
+                                                </tr>
+                                          }
+                                    }
+                                    else
+                                    {
+                                          <tr>
+                                                <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                                                      Chưa có dữ liệu cho khoảng thời gian này.
+                                                </td>
+                                          </tr>
+                                    }
+                              </tbody>
+                        </table>
+                  </div>
+            </div>
+
+            @section Scripts {
+                  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                  <script>
+                        const chartLabels = @Html.Raw(Json.Serialize(Model.ChartLabels));
+                        const chartValues = @Html.Raw(Json.Serialize(Model.ChartValues));
+                        const chartOrders = @Html.Raw(Json.Serialize(Model.ChartOrderCounts));
+                        const isMonthly = @Html.Raw(Model.ChartMode == "monthly" ? "true" : "false");
+
+                        const ctx = document.getElementById('revenueDetailChart');
+                        if (ctx) {
+                        const context = ctx.getContext('2d');
+                        const gradient = context.createLinearGradient(0, 0, 0, 340);
+                        gradient.addColorStop(0, 'rgba(37,99,235,0.2)');
+                        gradient.addColorStop(1, 'rgba(37,99,235,0)');
+
+                        new Chart(ctx, {
+                        type: isMonthly ? 'bar' : 'line',
+                        data: {
+                        labels: chartLabels,
+                        datasets: [{
+                        label: 'Doanh thu (đ)',
+                        data: chartValues,
+                        borderColor: '#2563eb',
+                        backgroundColor: isMonthly ? 'rgba(37,99,235,0.85)' : gradient,
+                        hoverBackgroundColor: '#1d4ed8',
+                        fill: !isMonthly,
+                        tension: 0.4,
+                        borderWidth: isMonthly ? 0 : 3,
+                        borderRadius: isMonthly ? 6 : 0,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#2563eb',
+                        pointBorderWidth: 2,
+                        pointRadius: isMonthly ? 0 : 4,
+                        pointHoverRadius: 6
+                        }]
+                        },
+                        options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                        backgroundColor: '#1e293b',
+                        titleFont: { size: 14, family: "'Inter', sans-serif" },
+                        bodyFont: { size: 13, family: "'Inter', sans-serif" },
+                        padding: 12,
+                        cornerRadius: 8,
+                        displayColors: false,
+                        callbacks: {
+                        label: ctx => 'Doanh thu: ' + ctx.parsed.y.toLocaleString('vi-VN') + 'đ',
+                        afterLabel: ctx => 'Số đơn hàng: ' + chartOrders[ctx.dataIndex]
                         }
-                        else
-                        {
-                              <tr>
-                                    <td colspan="4" class="px-6 py-8 text-center text-gray-500">
-                                          Chưa có dữ liệu cho khoảng thời gian này.
-                                    </td>
-                              </tr>
                         }
-                  </tbody>
-            </table>
-      </div>
-</div>
+                        },
+                        scales: {
+                        y: {
+                        beginAtZero: true,
+                        grid: { color: '#f1f5f9', drawBorder: false },
+                        border: { display: false },
+                        ticks: {
+                        callback: v => {
+                        if (v >= 1000000000) return (v / 1000000000).toFixed(1) + 'B';
+                        if (v >= 1000000) return (v / 1000000).toFixed(1) + 'M';
+                        if (v >= 1000) return (v / 1000).toFixed(0) + 'K';
+                        return v;
+                        },
+                        color: '#64748b', font: { size: 12, family: "'Inter', sans-serif" },
+                        padding: 10
+                        }
+                        },
+                        x: {
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: {
+                        color: '#64748b',
+                        font: { size: 12, family: "'Inter', sans-serif" },
+                        padding: 10,
+                        maxRotation: 45,
+                        minRotation: 0
+                        }
+                        }
+                        }
+                        }
+                        });
+                        }
+                  </script>
+            }
