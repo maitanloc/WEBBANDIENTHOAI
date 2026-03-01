@@ -69,12 +69,16 @@
                                          class="w-16 h-16 object-cover rounded-lg border">
                                     <div>
                                         <p class="font-semibold text-gray-800 dark:text-white">@item.ProductName</p>
+                                        @if (!string.IsNullOrEmpty(item.SelectedOptionsDisplay))
+                                        {
+                                            <p class="text-xs text-orange-600 mt-0.5">@item.SelectedOptionsDisplay</p>
+                                        }
                                         <p class="text-sm text-gray-600 dark:text-gray-400">Số lượng: @item.Quantity</p>
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <p class="font-semibold text-gray-800 dark:text-white">@((item.Price * item.Quantity).ToString("N0"))₫</p>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">@item.Price.ToString("N0")₫ x @item.Quantity</p>
+                                    <p class="font-semibold text-gray-800 dark:text-white">@(((item.Price + item.OptionsPrice) * item.Quantity).ToString("N0"))₫</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">@((item.Price + item.OptionsPrice).ToString("N0"))₫ x @item.Quantity</p>
                                 </div>
                             </div>
                         }

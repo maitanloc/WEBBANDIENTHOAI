@@ -19,7 +19,9 @@
                     <input type="hidden" name="SelectedItems[@i].ProductId" value="@Model.SelectedItems[i].ProductId" />
                     <input type="hidden" name="SelectedItems[@i].Quantity" value="@Model.SelectedItems[i].Quantity" />
                     <input type="hidden" name="SelectedItems[@i].Price" value="@Model.SelectedItems[i].Price" />
+                    <input type="hidden" name="SelectedItems[@i].OptionsPrice" value="@Model.SelectedItems[i].OptionsPrice" />
                     <input type="hidden" name="SelectedItems[@i].ProductName" value="@Model.SelectedItems[i].ProductName" />
+                    <input type="hidden" name="SelectedItems[@i].SelectedOptionsDisplay" value="@Model.SelectedItems[i].SelectedOptionsDisplay" />
                 }
                 <input type="hidden" name="TotalAmount" value="@Model.TotalAmount" />
                 <input type="hidden" name="PaymentMethod" id="payment-method-hidden" value="COD" />
@@ -130,10 +132,14 @@
 
                                             <div class="flex-1">
                                                 <p class="font-semibold">@item.ProductName</p>
+                                                @if (!string.IsNullOrEmpty(item.SelectedOptionsDisplay))
+                                                {
+                                                    <p class="text-xs text-orange-600 mt-0.5">@item.SelectedOptionsDisplay</p>
+                                                }
                                                 <p class="text-sm text-[#9c7349]">Số lượng: @item.Quantity</p>
                                             </div>
 
-                                            <p class="font-semibold text-base">@((item.Price * item.Quantity).ToString("N0"))₫</p>
+                                            <p class="font-semibold text-base">@(((item.Price + item.OptionsPrice) * item.Quantity).ToString("N0"))₫</p>
                                         </div>
                                     }
                                 </div>

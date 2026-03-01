@@ -65,14 +65,33 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
 
             var selectedItems = cart.Details
                 .Where(cd => productIds.Contains(cd.ProductId))
-                .Select(cd => new WEBBANDIENTHOAI.ViewModels.CartItemViewModel
+                .Select(cd =>
                 {
-                    CartDetailId = cd.CartDetailId,
-                    ProductId = cd.ProductId,
-                    ProductName = cd.Product.Name ?? "Sản phẩm không tồn tại",
-                    ProductImage = cd.Product.ImageId.HasValue ? $"/Image/ProductImage/{cd.Product.ImageId.Value}" : "/Images/default.jpg",
-                    Price = cd.UnitPrice,
-                    Quantity = cd.Quantity
+                    // Tạo chuỗi hiển thị tùy chọn cấu hình
+                    var selectedOptionsDisplay = "";
+                    if (!string.IsNullOrEmpty(cd.SelectedOptions))
+                    {
+                        try
+                        {
+                            var optionsDict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(cd.SelectedOptions);
+                            if (optionsDict != null)
+                                selectedOptionsDisplay = string.Join(" | ", optionsDict.Select(kv => $"{kv.Key}: {kv.Value}"));
+                        }
+                        catch { /* ignore parse errors */ }
+                    }
+
+                    return new WEBBANDIENTHOAI.ViewModels.CartItemViewModel
+                    {
+                        CartDetailId = cd.CartDetailId,
+                        ProductId = cd.ProductId,
+                        ProductName = cd.Product.Name ?? "Sản phẩm không tồn tại",
+                        ProductImage = cd.Product.ImageId.HasValue ? $"/Image/ProductImage/{cd.Product.ImageId.Value}" : "/Images/default.jpg",
+                        Price = cd.UnitPrice,
+                        OptionsPrice = cd.OptionsPrice,  // Giữ đúng giá theo cấu hình
+                        Quantity = cd.Quantity,
+                        SelectedOptions = cd.SelectedOptions,
+                        SelectedOptionsDisplay = selectedOptionsDisplay
+                    };
                 })
                 .ToList();
 
@@ -80,7 +99,7 @@ namespace WEBBANDIENTHOAI.Controllers.NguoiDung
             {
                 Customer = customer,
                 SelectedItems = selectedItems,
-                TotalAmount = selectedItems.Sum(item => item.Price * item.Quantity),
+                TotalAmount = selectedItems.Sum(item => (item.Price + item.OptionsPrice) * item.Quantity),
                 Phone = customer.Phone ?? "",
                 FullName = customer.FullName,
                 Address = customer.Address ?? "",

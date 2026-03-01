@@ -12,7 +12,7 @@ using WEBBANDIENTHOAI.Data;
 namespace WEBBANDIENTHOAI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260301024415_InitialCreate")]
+    [Migration("20260301045450_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -1646,6 +1646,37 @@ namespace WEBBANDIENTHOAI.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.SpinHistory", b =>
+                {
+                    b.Property<int>("SpinId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SpinId"));
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SpinAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SpinResult")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("VoucherId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SpinId");
+
+                    b.HasIndex("VoucherId");
+
+                    b.HasIndex("CustomerId", "SpinAt");
+
+                    b.ToTable("SpinHistories", (string)null);
+                });
+
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.User", b =>
                 {
                     b.Property<int>("UserId")
@@ -2262,6 +2293,24 @@ namespace WEBBANDIENTHOAI.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("WEBBANDIENTHOAI.Models.SpinHistory", b =>
+                {
+                    b.HasOne("WEBBANDIENTHOAI.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WEBBANDIENTHOAI.Models.Voucher", "Voucher")
+                        .WithMany()
+                        .HasForeignKey("VoucherId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Voucher");
                 });
 
             modelBuilder.Entity("WEBBANDIENTHOAI.Models.User", b =>

@@ -62,8 +62,7 @@
                                 data-inventory-quantity="@item.InventoryQuantity">
 
                                 <input type="checkbox"
-                                    class="item-checkbox h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50"
-                                    checked />
+                                    class="item-checkbox h-5 w-5 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50" />
 
                                 <img src="@item.ProductImage"
                                     class="w-24 h-24 object-contain rounded-xl bg-gray-100 p-1 shadow-sm"
@@ -136,8 +135,7 @@
                             </p>
                         </div>
 
-                        <form asp-controller="ThanhToan" asp-action="Index" method="post" id="checkout-form">
-                            @Html.AntiForgeryToken()
+                        <form asp-controller="ThanhToan" asp-action="Index" method="get" id="checkout-form">
                             <input type="hidden" name="selectedProductIds" id="selected-product-ids" />
                             <button type="submit"
                                 class="flex w-full h-12 items-center justify-center bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105 gap-2">
@@ -288,16 +286,15 @@
             return selectedProductIds;
         }
 
-        // Khi trang load lên
+        // Khi trang load lên - KHÔNG tự check tất cả, để người dùng tự chọn
         window.addEventListener("DOMContentLoaded", function () {
+            updateTotal(); // Cập nhật tổng tiền khi tải trang (sẽ là 0 vì chưa có gì được check)
+            // Đồng bộ trạng thái select-all
             const itemCheckboxes = document.querySelectorAll(".item-checkbox");
-
-            if (itemCheckboxes.length > 0) {
-                itemCheckboxes.forEach(cb => cb.checked = true);
-            }
-            updateTotal(); // Cập nhật tổng tiền khi tải trang
-            if (selectAllCheckbox) {
-                selectAllCheckbox.checked = true;
+            if (selectAllCheckbox && itemCheckboxes.length > 0) {
+                const allChecked = Array.from(itemCheckboxes).every(x => x.checked);
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = false;
             }
         });
 
