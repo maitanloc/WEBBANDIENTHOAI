@@ -12,8 +12,8 @@ using WEBBANDIENTHOAI.Data;
 namespace WEBBANDIENTHOAI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260228060339_AddPromotionLoyaltySystem")]
-    partial class AddPromotionLoyaltySystem
+    [Migration("20260301024415_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -199,12 +199,22 @@ namespace WEBBANDIENTHOAI.Migrations
                         new
                         {
                             CrossSellRuleId = 1,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DiscountedPrice = 45990000m,
-                            DisplayMessage = "Hoàn thiện bộ đôi Apple của bạn!",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountedPrice = 40990000m,
+                            DisplayMessage = "Hoàn thiện hệ sinh thái Apple 2026 của bạn!",
                             IsActive = true,
                             SuggestedProductId = 2,
                             TriggerProductId = 1
+                        },
+                        new
+                        {
+                            CrossSellRuleId = 2,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountedPrice = 61990000m,
+                            DisplayMessage = "Bộ đôi làm việc đa nhiệm siêu mạnh mẽ",
+                            IsActive = true,
+                            SuggestedProductId = 4,
+                            TriggerProductId = 3
                         });
                 });
 
@@ -263,6 +273,9 @@ namespace WEBBANDIENTHOAI.Migrations
                     b.Property<int>("TierId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("TotalSpent")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("CustomerId");
 
                     b.HasIndex("Email")
@@ -285,7 +298,8 @@ namespace WEBBANDIENTHOAI.Migrations
                             LoyaltyPoints = 0,
                             PasswordHash = new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 },
                             Phone = "0987654321",
-                            TierId = 1
+                            TierId = 1,
+                            TotalSpent = 0m
                         });
                 });
 
@@ -304,8 +318,8 @@ namespace WEBBANDIENTHOAI.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("MinPoints")
-                        .HasColumnType("int");
+                    b.Property<decimal>("MinSpending")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TierName")
                         .IsRequired()
@@ -322,31 +336,31 @@ namespace WEBBANDIENTHOAI.Migrations
                             TierId = 1,
                             BonusMultiplier = 1.0m,
                             Description = "Thành viên thường – nhận 1 điểm / 10.000đ",
-                            MinPoints = 0,
+                            MinSpending = 0m,
                             TierName = "Member"
                         },
                         new
                         {
                             TierId = 2,
                             BonusMultiplier = 1.2m,
-                            Description = "Thành viên Bạc – nhân hệ số điểm x1.2",
-                            MinPoints = 1000,
+                            Description = "Thành viên Bạc – Chi tiêu > 10Tr, hệ số điểm x1.2",
+                            MinSpending = 10000000m,
                             TierName = "Silver"
                         },
                         new
                         {
                             TierId = 3,
                             BonusMultiplier = 1.5m,
-                            Description = "Thành viên Vàng – nhân hệ số điểm x1.5",
-                            MinPoints = 5000,
+                            Description = "Thành viên Vàng – Chi tiêu > 50Tr, hệ số điểm x1.5",
+                            MinSpending = 50000000m,
                             TierName = "Gold"
                         },
                         new
                         {
                             TierId = 4,
                             BonusMultiplier = 2.0m,
-                            Description = "Thành viên Kim Cương – nhân hệ số điểm x2.0",
-                            MinPoints = 10000,
+                            Description = "Thành viên Kim Cương – Chi tiêu > 100Tr, hệ số điểm x2.0",
+                            MinSpending = 100000000m,
                             TierName = "Diamond"
                         });
                 });
@@ -605,24 +619,46 @@ namespace WEBBANDIENTHOAI.Migrations
                         new
                         {
                             InventoryId = 1,
-                            CurrentQuantity = 50,
-                            LastUpdated = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CurrentQuantity = 100,
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Location = "Kho A1",
                             MaximumQuantity = 1000,
-                            MinimumQuantity = 10,
+                            MinimumQuantity = 15,
                             ProductId = 1,
-                            StockCode = "SC-IP15P256"
+                            StockCode = "SC-IP16PM256"
                         },
                         new
                         {
                             InventoryId = 2,
-                            CurrentQuantity = 30,
-                            LastUpdated = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CurrentQuantity = 45,
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Location = "Kho B2",
                             MaximumQuantity = 1000,
-                            MinimumQuantity = 5,
+                            MinimumQuantity = 10,
                             ProductId = 2,
-                            StockCode = "SC-MBP14M3"
+                            StockCode = "SC-MBP14M4"
+                        },
+                        new
+                        {
+                            InventoryId = 3,
+                            CurrentQuantity = 80,
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Location = "Kho A2",
+                            MaximumQuantity = 1000,
+                            MinimumQuantity = 20,
+                            ProductId = 3,
+                            StockCode = "SC-S24U256"
+                        },
+                        new
+                        {
+                            InventoryId = 4,
+                            CurrentQuantity = 25,
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Location = "Kho C1",
+                            MaximumQuantity = 1000,
+                            MinimumQuantity = 5,
+                            ProductId = 4,
+                            StockCode = "SC-DXPS16"
                         });
                 });
 
@@ -744,17 +780,32 @@ namespace WEBBANDIENTHOAI.Migrations
                         new
                         {
                             ConfigurationId = 1,
-                            CPU = "Apple M3 Pro 11-core",
-                            Color = "Space Gray",
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            GraphicsCard = "14-core GPU",
-                            OperatingSystem = "macOS Sonoma",
+                            CPU = "Apple M4 10-core",
+                            Color = "Space Black",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            GraphicsCard = "10-core GPU",
+                            OperatingSystem = "macOS Sequoia",
                             ProductId = 2,
-                            RAM = "18 GB",
+                            RAM = "16 GB",
                             ScreenSize = "14.2 inch",
                             ScreenTechnology = "Liquid Retina XDR display",
                             Storage = "512 GB SSD",
                             Weight = "1.55 kg"
+                        },
+                        new
+                        {
+                            ConfigurationId = 2,
+                            CPU = "Intel Core Ultra 9 185H",
+                            Color = "Platinum",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            GraphicsCard = "NVIDIA GeForce RTX 4070 8GB GDDR6",
+                            OperatingSystem = "Windows 11 Pro",
+                            ProductId = 4,
+                            RAM = "32 GB LPDDR5x",
+                            ScreenSize = "16.3 inch",
+                            ScreenTechnology = "OLED Touch 4K+ (3840x2400)",
+                            Storage = "1 TB PCIe 4.0 NVMe",
+                            Weight = "2.13 kg"
                         });
                 });
 
@@ -1085,16 +1136,30 @@ namespace WEBBANDIENTHOAI.Migrations
                         new
                         {
                             ConfigurationId = 1,
-                            Battery = "Li-Ion, sạc nhanh",
-                            CPU = "Apple A17 Pro",
-                            Camera = "Chính 48 MP & Phụ 12 MP, 12 MP",
-                            Color = "Titan tự nhiên",
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Battery = "Li-Ion, sạc nhanh 45W",
+                            CPU = "Apple A18 Pro",
+                            Camera = "Chính 48 MP & Phụ 48 MP, 12 MP",
+                            Color = "Titan Sa Mạc",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             InternalStorage = "256 GB",
-                            OperatingSystem = "iOS 17",
+                            OperatingSystem = "iOS 18",
                             ProductId = 1,
                             RAM = "8 GB",
-                            Screen = "6.1-inch Super Retina XDR"
+                            Screen = "6.9-inch Super Retina XDR"
+                        },
+                        new
+                        {
+                            ConfigurationId = 2,
+                            Battery = "5000 mAh, sạc nhanh 45W",
+                            CPU = "Snapdragon 8 Gen 3 for Galaxy",
+                            Camera = "200 MP & Phụ 50 MP, 12 MP, 10 MP",
+                            Color = "Xám Titan",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            InternalStorage = "256 GB",
+                            OperatingSystem = "Android 14, One UI 6.1",
+                            ProductId = 3,
+                            RAM = "12 GB",
+                            Screen = "6.8-inch Dynamic AMOLED 2X"
                         });
                 });
 
@@ -1180,30 +1245,60 @@ namespace WEBBANDIENTHOAI.Migrations
                             ProductId = 1,
                             Brand = "Apple",
                             CategoryId = 1,
-                            Color = "Titan tự nhiên",
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "iPhone 15 Pro 256GB",
-                            OldPrice = 30990000m,
-                            Price = 28990000m,
-                            SKU = "IP15P256",
-                            ShortDescription = "Chip A17 Pro, Màn hình Super Retina XDR, Camera Pro 48MP.",
+                            Color = "Titan Sa Mạc",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "iPhone 16 Pro Max 256GB",
+                            OldPrice = 36990000m,
+                            Price = 34990000m,
+                            SKU = "IP16PM256",
+                            ShortDescription = "Chip A18 Pro, Apple Intelligence, Màn hình 6.9 inch Super Retina XDR.",
                             StatusId = (byte)1,
-                            StockCode = "SC-IP15P256"
+                            StockCode = "SC-IP16PM256"
                         },
                         new
                         {
                             ProductId = 2,
                             Brand = "Apple",
                             CategoryId = 2,
-                            Color = "Space Gray",
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "MacBook Pro 14 inch M3",
-                            OldPrice = 52990000m,
-                            Price = 49990000m,
-                            SKU = "MBP14M3",
-                            ShortDescription = "Chip M3 Pro, 18GB RAM, 512GB SSD, Màn hình Liquid Retina XDR.",
+                            Color = "Space Black",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "MacBook Pro 14 inch M4",
+                            OldPrice = 45990000m,
+                            Price = 42990000m,
+                            SKU = "MBP14M4",
+                            ShortDescription = "Chip M4 tiên tiến, 16GB RAM, 512GB SSD, Màn hình Liquid Retina XDR.",
                             StatusId = (byte)1,
-                            StockCode = "SC-MBP14M3"
+                            StockCode = "SC-MBP14M4"
+                        },
+                        new
+                        {
+                            ProductId = 3,
+                            Brand = "Samsung",
+                            CategoryId = 1,
+                            Color = "Xám Titan",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Samsung Galaxy S24 Ultra 256GB",
+                            OldPrice = 35990000m,
+                            Price = 33990000m,
+                            SKU = "S24U256",
+                            ShortDescription = "Galaxy AI, Khung viền Titan, Camera 200MP zoom quang 5x.",
+                            StatusId = (byte)1,
+                            StockCode = "SC-S24U256"
+                        },
+                        new
+                        {
+                            ProductId = 4,
+                            Brand = "Dell",
+                            CategoryId = 2,
+                            Color = "Platinum",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Dell XPS 16 (2026)",
+                            OldPrice = 69990000m,
+                            Price = 65990000m,
+                            SKU = "DXPS162026",
+                            ShortDescription = "Intel Core Ultra 9, 32GB RAM, 1TB SSD, RTX 4070, Màn hình 4K+ OLED Touch.",
+                            StatusId = (byte)1,
+                            StockCode = "SC-DXPS16"
                         });
                 });
 
@@ -1243,7 +1338,7 @@ namespace WEBBANDIENTHOAI.Migrations
                         new
                         {
                             ImageId = 1,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ImagePath = new byte[0],
                             IsPrimary = true,
                             ProductId = 1
@@ -1251,7 +1346,7 @@ namespace WEBBANDIENTHOAI.Migrations
                         new
                         {
                             ImageId = 2,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ImagePath = new byte[0],
                             IsPrimary = false,
                             ProductId = 1
@@ -1259,10 +1354,26 @@ namespace WEBBANDIENTHOAI.Migrations
                         new
                         {
                             ImageId = 3,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             ImagePath = new byte[0],
                             IsPrimary = true,
                             ProductId = 2
+                        },
+                        new
+                        {
+                            ImageId = 4,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ImagePath = new byte[0],
+                            IsPrimary = true,
+                            ProductId = 3
+                        },
+                        new
+                        {
+                            ImageId = 5,
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ImagePath = new byte[0],
+                            IsPrimary = true,
+                            ProductId = 4
                         });
                 });
 
@@ -1310,7 +1421,7 @@ namespace WEBBANDIENTHOAI.Migrations
                             DisplayOrder = 1,
                             GroupName = "Màu sắc",
                             IsActive = true,
-                            OptionName = "Titan Tự Nhiên",
+                            OptionName = "Titan Sa Mạc",
                             ProductId = 1
                         },
                         new
@@ -1320,7 +1431,7 @@ namespace WEBBANDIENTHOAI.Migrations
                             DisplayOrder = 2,
                             GroupName = "Màu sắc",
                             IsActive = true,
-                            OptionName = "Titan Xanh",
+                            OptionName = "Titan Tự Nhiên",
                             ProductId = 1
                         },
                         new
@@ -1356,7 +1467,7 @@ namespace WEBBANDIENTHOAI.Migrations
                         new
                         {
                             ProductOptionId = 6,
-                            AdditionalPrice = 3000000m,
+                            AdditionalPrice = 5000000m,
                             DisplayOrder = 2,
                             GroupName = "Bộ nhớ trong",
                             IsActive = true,
@@ -1366,7 +1477,7 @@ namespace WEBBANDIENTHOAI.Migrations
                         new
                         {
                             ProductOptionId = 7,
-                            AdditionalPrice = 6000000m,
+                            AdditionalPrice = 11000000m,
                             DisplayOrder = 3,
                             GroupName = "Bộ nhớ trong",
                             IsActive = true,
@@ -1380,7 +1491,7 @@ namespace WEBBANDIENTHOAI.Migrations
                             DisplayOrder = 1,
                             GroupName = "RAM",
                             IsActive = true,
-                            OptionName = "18GB",
+                            OptionName = "16GB",
                             ProductId = 2
                         },
                         new
@@ -1390,7 +1501,7 @@ namespace WEBBANDIENTHOAI.Migrations
                             DisplayOrder = 2,
                             GroupName = "RAM",
                             IsActive = true,
-                            OptionName = "36GB",
+                            OptionName = "24GB",
                             ProductId = 2
                         },
                         new
@@ -1415,13 +1526,43 @@ namespace WEBBANDIENTHOAI.Migrations
                         },
                         new
                         {
-                            ProductOptionId = 12,
-                            AdditionalPrice = 10000000m,
-                            DisplayOrder = 3,
-                            GroupName = "SSD",
+                            ProductOptionId = 16,
+                            AdditionalPrice = 0m,
+                            DisplayOrder = 1,
+                            GroupName = "Bộ nhớ trong",
                             IsActive = true,
-                            OptionName = "2TB",
-                            ProductId = 2
+                            OptionName = "256GB",
+                            ProductId = 3
+                        },
+                        new
+                        {
+                            ProductOptionId = 17,
+                            AdditionalPrice = 3500000m,
+                            DisplayOrder = 2,
+                            GroupName = "Bộ nhớ trong",
+                            IsActive = true,
+                            OptionName = "512GB",
+                            ProductId = 3
+                        },
+                        new
+                        {
+                            ProductOptionId = 18,
+                            AdditionalPrice = 0m,
+                            DisplayOrder = 1,
+                            GroupName = "Màn hình",
+                            IsActive = true,
+                            OptionName = "OLED Touch 4K+",
+                            ProductId = 4
+                        },
+                        new
+                        {
+                            ProductOptionId = 19,
+                            AdditionalPrice = -4000000m,
+                            DisplayOrder = 2,
+                            GroupName = "Màn hình",
+                            IsActive = true,
+                            OptionName = "FHD+ Non-Touch",
+                            ProductId = 4
                         });
                 });
 

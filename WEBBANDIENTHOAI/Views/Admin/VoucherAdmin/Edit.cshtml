@@ -4,85 +4,126 @@
     ViewData["Title"] = "Chỉnh sửa Voucher";
 }
 
-<div class="container py-4" style="max-width:700px;">
-    <div class="d-flex align-items-center gap-2 mb-4">
-        <a href="/VouchersAdmin" class="btn btn-sm btn-outline-secondary">Quay lại</a>
-        <h2 class="fw-bold mb-0">Chỉnh sửa Voucher</h2>
-        <span class="badge bg-dark fs-6 ms-1">@Model.Code</span>
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+}
+
+<div class="max-w-3xl mx-auto py-8 px-4">
+    <!-- Breadcrumb/Header -->
+    <div class="flex items-center gap-3 mb-8">
+        <a href="/Admin/VouchersAdmin" class="flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-orange-500 hover:border-orange-500 transition-all shadow-sm no-underline">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div>
+            <div class="flex items-center gap-2">
+                <h1 class="text-2xl font-bold text-gray-900">Chỉnh sửa Voucher</h1>
+                <span class="px-2 py-1 bg-gray-900 text-white rounded text-xs font-bold uppercase tracking-wider">@Model.Code</span>
+            </div>
+            <p class="text-sm text-gray-500 mt-1 text-black">Cập nhật thông tin cho mã giảm giá của bạn.</p>
+        </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <form method="post" action="/VouchersAdmin/Edit/@Model.VoucherId">
+    <!-- Form Card -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
+        <div class="p-8">
+            <form method="post" action="/Admin/VouchersAdmin/Edit/@Model.VoucherId" class="space-y-6">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="VoucherId" />
                 <input type="hidden" asp-for="UsedCount" />
                 <input type="hidden" asp-for="CreatedAt" />
+                
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="p-4 bg-red-50 border border-red-100 rounded-xl mb-6">
+                        <div class="flex gap-3">
+                            <span class="material-symbols-outlined text-red-500">error</span>
+                            <div class="text-sm text-red-700 font-medium">Vui lòng kiểm tra lại các thông tin bên dưới.</div>
+                        </div>
+                    </div>
+                }
 
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Mã Voucher <span class="text-danger">*</span></label>
-                        <input asp-for="Code" class="form-control text-uppercase" maxlength="50" required />
-                        <span asp-validation-for="Code" class="text-danger small"></span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Mã voucher -->
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-bold text-gray-700">Mã Voucher <span class="text-red-500">*</span></label>
+                        <input asp-for="Code" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-black font-bold tracking-wider placeholder-gray-300 uppercase" maxlength="50" required />
+                        <span asp-validation-for="Code" class="text-xs text-red-500"></span>
                     </div>
 
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Loại giảm giá</label>
-                        <select asp-for="DiscountType" class="form-select" onchange="onTypeChange()">
-                            <option value="2">Cố định (Fixed Amount)</option>
-                            <option value="1">Phần trăm (Percent)</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold" id="valueLabel">Giá trị <span class="text-danger">*</span></label>
-                        <input asp-for="Value" type="number" class="form-control" min="0" step="1000" required />
-                        <span asp-validation-for="Value" class="text-danger small"></span>
-                    </div>
-
-                    <div class="col-md-6" id="maxDiscountGroup">
-                        <label class="form-label fw-semibold">Giảm tối đa (VNĐ)</label>
-                        <input asp-for="MaxDiscountAmount" type="number" class="form-control" min="0" step="1000" />
-                        <span asp-validation-for="MaxDiscountAmount" class="text-danger small"></span>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Đơn tối thiểu (VNĐ)</label>
-                        <input asp-for="MinOrderValue" type="number" class="form-control" min="0" step="1000" />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Số lượt tối đa</label>
-                        <input asp-for="Quantity" type="number" class="form-control" min="0" />
-                        <div class="form-text">Đã dùng: <strong>@Model.UsedCount</strong> lượt. Nhập 0 = không giới hạn.</div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Ngày bắt đầu</label>
-                        <input asp-for="StartDate" type="date" class="form-control" />
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Ngày kết thúc</label>
-                        <input asp-for="EndDate" type="date" class="form-control" />
-                    </div>
-
-                    <div class="col-12">
-                        <label class="form-label fw-semibold">Mô tả</label>
-                        <textarea asp-for="Description" class="form-control" rows="2"></textarea>
-                    </div>
-
-                    <div class="col-12">
-                        <div class="form-check form-switch">
-                            <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
-                            <label class="form-check-label fw-semibold" asp-for="IsActive">Đang kích hoạt</label>
+                    <!-- Loại giảm giá -->
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-bold text-gray-700">Loại giảm giá</label>
+                        <div class="relative">
+                            <select asp-for="DiscountType" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-black appearance-none" onchange="onTypeChange()">
+                                <option value="2">Cố định (đ)</option>
+                                <option value="1">Phần trăm (%)</option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">expand_more</span>
                         </div>
                     </div>
 
-                    <div class="col-12 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary px-4">Lưu thay đổi</button>
-                        <a href="/VouchersAdmin" class="btn btn-outline-secondary">Huỷ</a>
+                    <!-- Giá trị -->
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-bold text-gray-700" id="valueLabel">Giá trị <span class="text-red-500">*</span></label>
+                        <input asp-for="Value" type="number" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-black font-bold" min="0" step="1000" required />
+                        <span asp-validation-for="Value" class="text-xs text-red-500"></span>
                     </div>
+
+                    <!-- MaxDiscountAmount -->
+                    <div class="space-y-1.5" id="maxDiscountGroup">
+                        <label class="block text-sm font-bold text-gray-700">Giảm tối đa (đ)</label>
+                        <input asp-for="MaxDiscountAmount" type="number" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-black font-bold" min="0" step="1000" />
+                        <span asp-validation-for="MaxDiscountAmount" class="text-xs text-red-500"></span>
+                    </div>
+
+                    <!-- Đơn tối thiểu -->
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-bold text-gray-700">Đơn hàng tối thiểu (đ)</label>
+                        <input asp-for="MinOrderValue" type="number" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-black font-bold" min="0" step="1000" />
+                    </div>
+
+                    <!-- Số lượng -->
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-bold text-gray-700">Tổng lượt dùng</label>
+                        <input asp-for="Quantity" type="number" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-black font-bold" min="0" />
+                        <p class="text-[10px] text-gray-400">Đã dùng: <strong class="text-emerald-600">@Model.UsedCount</strong> lượt. Nhập 0 = không giới hạn.</p>
+                    </div>
+
+                    <!-- Ngày bắt đầu -->
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-bold text-gray-700">Ngày bắt đầu</label>
+                        <input asp-for="StartDate" type="date" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-black" />
+                    </div>
+
+                    <!-- Ngày kết thúc -->
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-bold text-gray-700">Ngày kết thúc</label>
+                        <input asp-for="EndDate" type="date" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-black" />
+                    </div>
+
+                    <!-- Mô tả -->
+                    <div class="col-span-1 md:col-span-2 space-y-1.5">
+                        <label class="block text-sm font-bold text-gray-700">Mô tả chương trình</label>
+                        <textarea asp-for="Description" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-black" rows="3"></textarea>
+                    </div>
+
+                    <div class="col-span-1 md:col-span-2">
+                        <label class="relative inline-flex items-center cursor-pointer group">
+                            <input asp-for="IsActive" type="checkbox" class="sr-only peer" />
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                            <span class="ml-3 text-sm font-bold text-gray-700 group-hover:text-emerald-600 transition-colors">Đang kích hoạt</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="pt-6 flex flex-col sm:flex-row gap-3">
+                    <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">save</span>
+                        Lưu thay đổi
+                    </button>
+                    <a href="/Admin/VouchersAdmin" class="sm:w-32 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-3 rounded-xl transition-all text-center no-underline">
+                        Hủy bỏ
+                    </a>
                 </div>
             </form>
         </div>
@@ -97,10 +138,10 @@
             const label = document.getElementById('valueLabel');
             const maxGroup = document.getElementById('maxDiscountGroup');
             if (type === '1') {
-                label.innerHTML = 'Tỉ lệ giảm (%) <span class="text-danger">*</span>';
-                maxGroup.style.display = '';
+                label.innerHTML = 'Tỉ lệ giảm (%) <span class="text-red-500">*</span>';
+                maxGroup.style.display = 'block';
             } else {
-                label.innerHTML = 'Số tiền giảm (VNĐ) <span class="text-danger">*</span>';
+                label.innerHTML = 'Giá trị giảm (đ) <span class="text-red-500">*</span>';
                 maxGroup.style.display = 'none';
             }
         }

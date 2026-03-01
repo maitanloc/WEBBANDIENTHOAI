@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WEBBANDIENTHOAI.Migrations
 {
     /// <inheritdoc />
-    public partial class AddPromotionLoyaltySystem : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,7 +51,7 @@ namespace WEBBANDIENTHOAI.Migrations
                     TierId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TierName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    MinPoints = table.Column<int>(type: "int", nullable: false),
+                    MinSpending = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     BonusMultiplier = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true)
                 },
@@ -199,6 +199,7 @@ namespace WEBBANDIENTHOAI.Migrations
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     LoyaltyPoints = table.Column<int>(type: "int", nullable: false),
                     TierId = table.Column<int>(type: "int", nullable: false),
+                    TotalSpent = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Latitude = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
                     Longitude = table.Column<decimal>(type: "decimal(18,8)", nullable: true)
                 },
@@ -718,13 +719,13 @@ namespace WEBBANDIENTHOAI.Migrations
 
             migrationBuilder.InsertData(
                 table: "CustomerTiers",
-                columns: new[] { "TierId", "BonusMultiplier", "Description", "MinPoints", "TierName" },
+                columns: new[] { "TierId", "BonusMultiplier", "Description", "MinSpending", "TierName" },
                 values: new object[,]
                 {
-                    { 1, 1.0m, "Thành viên thường – nhận 1 điểm / 10.000đ", 0, "Member" },
-                    { 2, 1.2m, "Thành viên Bạc – nhân hệ số điểm x1.2", 1000, "Silver" },
-                    { 3, 1.5m, "Thành viên Vàng – nhân hệ số điểm x1.5", 5000, "Gold" },
-                    { 4, 2.0m, "Thành viên Kim Cương – nhân hệ số điểm x2.0", 10000, "Diamond" }
+                    { 1, 1.0m, "Thành viên thường – nhận 1 điểm / 10.000đ", 0m, "Member" },
+                    { 2, 1.2m, "Thành viên Bạc – Chi tiêu > 10Tr, hệ số điểm x1.2", 10000000m, "Silver" },
+                    { 3, 1.5m, "Thành viên Vàng – Chi tiêu > 50Tr, hệ số điểm x1.5", 50000000m, "Gold" },
+                    { 4, 2.0m, "Thành viên Kim Cương – Chi tiêu > 100Tr, hệ số điểm x2.0", 100000000m, "Diamond" }
                 });
 
             migrationBuilder.InsertData(
@@ -773,16 +774,18 @@ namespace WEBBANDIENTHOAI.Migrations
 
             migrationBuilder.InsertData(
                 table: "Customers",
-                columns: new[] { "CustomerId", "Address", "CitizenID", "CreatedAt", "Email", "FullName", "IsActive", "Latitude", "Longitude", "LoyaltyPoints", "PasswordHash", "Phone", "TierId" },
-                values: new object[] { 1, "123 Đường ABC, Quận 1, TP. HCM", "0123456789", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "customer@example.com", "Nguyễn Văn A", true, null, null, 0, new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 }, "0987654321", 1 });
+                columns: new[] { "CustomerId", "Address", "CitizenID", "CreatedAt", "Email", "FullName", "IsActive", "Latitude", "Longitude", "LoyaltyPoints", "PasswordHash", "Phone", "TierId", "TotalSpent" },
+                values: new object[] { 1, "123 Đường ABC, Quận 1, TP. HCM", "0123456789", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "customer@example.com", "Nguyễn Văn A", true, null, null, 0, new byte[] { 176, 65, 192, 174, 179, 91, 176, 250, 74, 166, 104, 202, 90, 146, 11, 89, 1, 150, 253, 175, 154, 0, 235, 133, 44, 155, 127, 77, 18, 60, 198, 214 }, "0987654321", 1, 0m });
 
             migrationBuilder.InsertData(
                 table: "Products",
                 columns: new[] { "ProductId", "Brand", "CategoryId", "Color", "CreatedAt", "ImageId", "Name", "OldPrice", "Price", "SKU", "ShortDescription", "Size", "StatusId", "StockCode" },
                 values: new object[,]
                 {
-                    { 1, "Apple", 1, "Titan tự nhiên", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "iPhone 15 Pro 256GB", 30990000m, 28990000m, "IP15P256", "Chip A17 Pro, Màn hình Super Retina XDR, Camera Pro 48MP.", null, (byte)1, "SC-IP15P256" },
-                    { 2, "Apple", 2, "Space Gray", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "MacBook Pro 14 inch M3", 52990000m, 49990000m, "MBP14M3", "Chip M3 Pro, 18GB RAM, 512GB SSD, Màn hình Liquid Retina XDR.", null, (byte)1, "SC-MBP14M3" }
+                    { 1, "Apple", 1, "Titan Sa Mạc", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "iPhone 16 Pro Max 256GB", 36990000m, 34990000m, "IP16PM256", "Chip A18 Pro, Apple Intelligence, Màn hình 6.9 inch Super Retina XDR.", null, (byte)1, "SC-IP16PM256" },
+                    { 2, "Apple", 2, "Space Black", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "MacBook Pro 14 inch M4", 45990000m, 42990000m, "MBP14M4", "Chip M4 tiên tiến, 16GB RAM, 512GB SSD, Màn hình Liquid Retina XDR.", null, (byte)1, "SC-MBP14M4" },
+                    { 3, "Samsung", 1, "Xám Titan", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Samsung Galaxy S24 Ultra 256GB", 35990000m, 33990000m, "S24U256", "Galaxy AI, Khung viền Titan, Camera 200MP zoom quang 5x.", null, (byte)1, "SC-S24U256" },
+                    { 4, "Dell", 2, "Platinum", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Dell XPS 16 (2026)", 69990000m, 65990000m, "DXPS162026", "Intel Core Ultra 9, 32GB RAM, 1TB SSD, RTX 4070, Màn hình 4K+ OLED Touch.", null, (byte)1, "SC-DXPS16" }
                 });
 
             migrationBuilder.InsertData(
@@ -797,35 +800,51 @@ namespace WEBBANDIENTHOAI.Migrations
             migrationBuilder.InsertData(
                 table: "CrossSellRules",
                 columns: new[] { "CrossSellRuleId", "CreatedAt", "DiscountedPrice", "DisplayMessage", "IsActive", "SuggestedProductId", "TriggerProductId" },
-                values: new object[] { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 45990000m, "Hoàn thiện bộ đôi Apple của bạn!", true, 2, 1 });
+                values: new object[,]
+                {
+                    { 1, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 40990000m, "Hoàn thiện hệ sinh thái Apple 2026 của bạn!", true, 2, 1 },
+                    { 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 61990000m, "Bộ đôi làm việc đa nhiệm siêu mạnh mẽ", true, 4, 3 }
+                });
 
             migrationBuilder.InsertData(
                 table: "Inventory",
                 columns: new[] { "InventoryId", "CurrentQuantity", "LastUpdated", "Location", "MaximumQuantity", "MinimumQuantity", "ProductId", "StockCode" },
                 values: new object[,]
                 {
-                    { 1, 50, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Kho A1", 1000, 10, 1, "SC-IP15P256" },
-                    { 2, 30, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Kho B2", 1000, 5, 2, "SC-MBP14M3" }
+                    { 1, 100, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Kho A1", 1000, 15, 1, "SC-IP16PM256" },
+                    { 2, 45, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Kho B2", 1000, 10, 2, "SC-MBP14M4" },
+                    { 3, 80, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Kho A2", 1000, 20, 3, "SC-S24U256" },
+                    { 4, 25, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Kho C1", 1000, 5, 4, "SC-DXPS16" }
                 });
 
             migrationBuilder.InsertData(
                 table: "LaptopConfigurations",
                 columns: new[] { "ConfigurationId", "Battery", "CPU", "Color", "CreatedAt", "GraphicsCard", "OperatingSystem", "Ports", "ProductId", "RAM", "Resolution", "ScreenSize", "ScreenTechnology", "Storage", "Weight" },
-                values: new object[] { 1, null, "Apple M3 Pro 11-core", "Space Gray", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "14-core GPU", "macOS Sonoma", null, 2, "18 GB", null, "14.2 inch", "Liquid Retina XDR display", "512 GB SSD", "1.55 kg" });
+                values: new object[,]
+                {
+                    { 1, null, "Apple M4 10-core", "Space Black", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "10-core GPU", "macOS Sequoia", null, 2, "16 GB", null, "14.2 inch", "Liquid Retina XDR display", "512 GB SSD", "1.55 kg" },
+                    { 2, null, "Intel Core Ultra 9 185H", "Platinum", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "NVIDIA GeForce RTX 4070 8GB GDDR6", "Windows 11 Pro", null, 4, "32 GB LPDDR5x", null, "16.3 inch", "OLED Touch 4K+ (3840x2400)", "1 TB PCIe 4.0 NVMe", "2.13 kg" }
+                });
 
             migrationBuilder.InsertData(
                 table: "PhoneConfigurations",
                 columns: new[] { "ConfigurationId", "Battery", "CPU", "Camera", "Color", "Cores", "CreatedAt", "InternalStorage", "OperatingSystem", "Ports", "ProductId", "RAM", "Resolution", "Screen", "ScreenTechnology", "Threads" },
-                values: new object[] { 1, "Li-Ion, sạc nhanh", "Apple A17 Pro", "Chính 48 MP & Phụ 12 MP, 12 MP", "Titan tự nhiên", null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "256 GB", "iOS 17", null, 1, "8 GB", null, "6.1-inch Super Retina XDR", null, null });
+                values: new object[,]
+                {
+                    { 1, "Li-Ion, sạc nhanh 45W", "Apple A18 Pro", "Chính 48 MP & Phụ 48 MP, 12 MP", "Titan Sa Mạc", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "256 GB", "iOS 18", null, 1, "8 GB", null, "6.9-inch Super Retina XDR", null, null },
+                    { 2, "5000 mAh, sạc nhanh 45W", "Snapdragon 8 Gen 3 for Galaxy", "200 MP & Phụ 50 MP, 12 MP, 10 MP", "Xám Titan", null, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "256 GB", "Android 14, One UI 6.1", null, 3, "12 GB", null, "6.8-inch Dynamic AMOLED 2X", null, null }
+                });
 
             migrationBuilder.InsertData(
                 table: "ProductImages",
                 columns: new[] { "ImageId", "CreatedAt", "ImagePath", "IsPrimary", "ProductId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new byte[0], true, 1 },
-                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new byte[0], false, 1 },
-                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new byte[0], true, 2 }
+                    { 1, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new byte[0], true, 1 },
+                    { 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new byte[0], false, 1 },
+                    { 3, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new byte[0], true, 2 },
+                    { 4, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new byte[0], true, 3 },
+                    { 5, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new byte[0], true, 4 }
                 });
 
             migrationBuilder.InsertData(
@@ -833,18 +852,21 @@ namespace WEBBANDIENTHOAI.Migrations
                 columns: new[] { "ProductOptionId", "AdditionalPrice", "DisplayOrder", "GroupName", "IsActive", "OptionName", "ProductId" },
                 values: new object[,]
                 {
-                    { 1, 0m, 1, "Màu sắc", true, "Titan Tự Nhiên", 1 },
-                    { 2, 0m, 2, "Màu sắc", true, "Titan Xanh", 1 },
+                    { 1, 0m, 1, "Màu sắc", true, "Titan Sa Mạc", 1 },
+                    { 2, 0m, 2, "Màu sắc", true, "Titan Tự Nhiên", 1 },
                     { 3, 0m, 3, "Màu sắc", true, "Titan Đen", 1 },
                     { 4, 0m, 4, "Màu sắc", true, "Titan Trắng", 1 },
                     { 5, 0m, 1, "Bộ nhớ trong", true, "256GB", 1 },
-                    { 6, 3000000m, 2, "Bộ nhớ trong", true, "512GB", 1 },
-                    { 7, 6000000m, 3, "Bộ nhớ trong", true, "1TB", 1 },
-                    { 8, 0m, 1, "RAM", true, "18GB", 2 },
-                    { 9, 5000000m, 2, "RAM", true, "36GB", 2 },
+                    { 6, 5000000m, 2, "Bộ nhớ trong", true, "512GB", 1 },
+                    { 7, 11000000m, 3, "Bộ nhớ trong", true, "1TB", 1 },
+                    { 8, 0m, 1, "RAM", true, "16GB", 2 },
+                    { 9, 5000000m, 2, "RAM", true, "24GB", 2 },
                     { 10, 0m, 1, "SSD", true, "512GB", 2 },
                     { 11, 5000000m, 2, "SSD", true, "1TB", 2 },
-                    { 12, 10000000m, 3, "SSD", true, "2TB", 2 }
+                    { 16, 0m, 1, "Bộ nhớ trong", true, "256GB", 3 },
+                    { 17, 3500000m, 2, "Bộ nhớ trong", true, "512GB", 3 },
+                    { 18, 0m, 1, "Màn hình", true, "OLED Touch 4K+", 4 },
+                    { 19, -4000000m, 2, "Màn hình", true, "FHD+ Non-Touch", 4 }
                 });
 
             migrationBuilder.InsertData(

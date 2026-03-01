@@ -4,176 +4,243 @@
     ViewData["Title"] = "Quản lý Voucher";
 }
 
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold mb-0">Quản lý Voucher</h2>
-            <p class="text-muted small mb-0">Danh sách tất cả các mã giảm giá trong hệ thống</p>
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+}
+
+<div class="voucher-management">
+    <!-- Header Section -->
+    <div class="mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Quản lý Voucher</h1>
+                <p class="text-sm text-gray-500 mt-1">Danh sách tất cả các mã giảm giá trong hệ thống</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="relative group">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors">search</span>
+                    <input type="text" id="searchInput" 
+                           class="w-full md:w-64 pl-10 pr-4 py-2 bg-transparent border-b border-gray-300 focus:outline-none focus:border-emerald-500 transition-all text-black"
+                           placeholder="Tìm kiếm voucher..." />
+                </div>
+                
+                <a href="/Admin/VouchersAdmin/Create"
+                   class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded font-semibold text-sm transition-all no-underline">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                    Thêm mới
+                </a>
+            </div>
         </div>
-        <a href="/VouchersAdmin/Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-1"></i> Tạo Voucher mới
-        </a>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["ErrorMessage"]
+        <div class="alert alert-success alert-dismissible fade show mb-4 border-0 shadow-sm rounded-xl" role="alert">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-emerald-500">check_circle</span>
+                <span class="text-sm font-medium">@TempData["SuccessMessage"]</span>
+            </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Mã</th>
-                            <th>Mô tả</th>
-                            <th>Loại</th>
-                            <th>Giá trị</th>
-                            <th>Đơn tối thiểu</th>
-                            <th>Hiệu lực</th>
-                            <th>Lượt dùng</th>
-                            <th>Trạng thái</th>
-                            <th class="text-center">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var v in Model)
-                        {
-                            var isExpired = v.EndDate < DateTime.UtcNow;
-                            <tr class="@(isExpired ? "table-secondary" : "")">
-                                <td><span class="badge bg-dark fs-6">@v.Code</span></td>
-                                <td>
-                                    <div class="fw-semibold">@(v.Description ?? "---")</div>
-                                </td>
-                                <td>
-                                    @if (v.DiscountType == WEBBANDIENTHOAI.Models.DiscountType.Percent)
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4 border-0 shadow-sm rounded-xl" role="alert">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-500">error</span>
+                <span class="text-sm font-medium">@TempData["ErrorMessage"]</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Main Content -->
+    <div class="bg-white border border-gray-300">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse border border-gray-300" id="vouchersTable">
+                <thead>
+                    <tr class="bg-gray-100 border-b border-gray-300">
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Mã</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300">Mô tả</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300 text-center">Loại</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300 text-right">Giá trị</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300 text-right">Đơn tối thiểu</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300 text-center">Hiệu lực</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300 text-center">Lượt dùng</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider border-r border-gray-300 text-center">Trạng thái</th>
+                        <th class="px-4 py-3 text-xs font-bold text-black uppercase tracking-wider text-right">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-300">
+                    @foreach (var v in Model)
+                    {
+                        var isExpired = v.EndDate < DateTime.UtcNow;
+                        <tr class="voucher-row border-b border-gray-300 hover:bg-gray-50 transition-colors @(isExpired ? "opacity-60 bg-gray-50" : "")">
+                            <td class="px-4 py-3 border-r border-gray-300">
+                                <span class="px-2 py-1 bg-gray-900 text-white rounded text-xs font-bold uppercase">@v.Code</span>
+                            </td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-sm text-black">
+                                @(v.Description ?? "---")
+                            </td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-center">
+                                @if (v.DiscountType == WEBBANDIENTHOAI.Models.DiscountType.Percent)
+                                {
+                                    <span class="inline-block whitespace-nowrap px-2 py-1 bg-amber-100 text-amber-700 border border-amber-300 rounded text-[10px] font-bold uppercase">Phần trăm</span>
+                                }
+                                else
+                                {
+                                    <span class="inline-block whitespace-nowrap px-2 py-1 bg-blue-100 text-blue-700 border border-blue-300 rounded text-[10px] font-bold uppercase">Cố định</span>
+                                }
+                            </td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-right font-bold text-emerald-600">
+                                @if (v.DiscountType == WEBBANDIENTHOAI.Models.DiscountType.Percent)
+                                {
+                                    @($"{v.Value:N0}%")
+                                    if (v.MaxDiscountAmount.HasValue)
                                     {
-                                        <span class="badge bg-warning text-dark">Phần trăm</span>
+                                        <div class="text-[10px] text-gray-400 font-normal mt-0.5">Max @($"{v.MaxDiscountAmount:N0}đ")</div>
                                     }
-                                    else
-                                    {
-                                        <span class="badge bg-info text-dark">Cố định</span>
-                                    }
-                                </td>
-                                <td class="fw-bold text-success">
-                                    @if (v.DiscountType == WEBBANDIENTHOAI.Models.DiscountType.Percent)
-                                    {
-                                        @($"{v.Value:N0}%")
-                                        if (v.MaxDiscountAmount.HasValue)
-                                        {
-                                            <div class="text-muted small">max @($"{v.MaxDiscountAmount:N0}đ")</div>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        @($"{v.Value:N0}đ")
-                                    }
-                                </td>
-                                <td>@($"{v.MinOrderValue:N0}đ")</td>
-                                <td>
-                                    <div class="small">
-                                        <div>@v.StartDate.ToLocalTime().ToString("dd/MM/yyyy")</div>
-                                        <div class="text-muted">đến @v.EndDate.ToLocalTime().ToString("dd/MM/yyyy")</div>
-                                    </div>
-                                    @if (isExpired)
-                                    {
-                                        <span class="badge bg-secondary">Hết hạn</span>
-                                    }
-                                </td>
-                                <td>
+                                }
+                                else
+                                {
+                                    @($"{v.Value:N0}đ")
+                                }
+                            </td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-right text-sm text-black">
+                                @($"{v.MinOrderValue:N0}đ")
+                            </td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-center">
+                                <div class="text-[11px] leading-tight text-black">
+                                    <div class="font-medium">@v.StartDate.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                                    <div class="text-gray-400">đến @v.EndDate.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                                </div>
+                                @if (isExpired)
+                                {
+                                    <span class="mt-1 inline-block px-1.5 py-0.5 bg-gray-100 text-gray-500 border border-gray-300 rounded text-[9px] font-bold uppercase text-black">Hết hạn</span>
+                                }
+                            </td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-center">
+                                <div class="text-xs font-medium text-black">
                                     @if (v.Quantity == 0)
                                     {
-                                        <span>@v.UsedCount / <span class="text-muted">Vô hạn</span></span>
+                                        <span>@v.UsedCount / <span class="text-gray-400">∞</span></span>
                                     }
                                     else
                                     {
-                                        <div class="small">@v.UsedCount / @v.Quantity</div>
-                                        <div class="progress" style="height:5px; width:80px;">
-                                            <div class="progress-bar" style="width:@(v.Quantity>0 ? (v.UsedCount*100/v.Quantity) : 0)%"></div>
+                                        <span>@v.UsedCount / @v.Quantity</span>
+                                        <div class="w-16 h-1 mt-1.5 bg-gray-100 rounded-full mx-auto overflow-hidden">
+                                            <div class="h-full bg-emerald-500 rounded-full" style="width:@(v.Quantity>0 ? Math.Min(100, v.UsedCount*100/v.Quantity) : 0)%"></div>
                                         </div>
                                     }
-                                </td>
-                                <td>
-                                    <span id="status-badge-@v.VoucherId"
-                                          class="badge @(v.IsActive ? "bg-success" : "bg-secondary")">
-                                        @(v.IsActive ? "Hoạt động" : "Dừng")
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="d-flex gap-1 justify-content-center flex-wrap">
-                                        <a href="/VouchersAdmin/Edit/@v.VoucherId" class="btn btn-sm btn-outline-primary">
-                                            Sửa
-                                        </a>
-                                        <button class="btn btn-sm btn-outline-warning"
-                                                onclick="toggleVoucher(@v.VoucherId)">
-                                            @(v.IsActive ? "Tắt" : "Bật")
-                                        </button>
-                                        @if (v.UsedCount == 0)
-                                        {
-                                            <form method="post" action="/VouchersAdmin/Delete/@v.VoucherId"
-                                                  onsubmit="return confirm('Xác nhận xoá voucher [@v.Code]?')">
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Xoá</button>
-                                            </form>
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                        @if (!Model.Any())
-                        {
-                            <tr>
-                                <td colspan="9" class="text-center py-5 text-muted">
-                                    Chưa có voucher nào. Tạo voucher đầu tiên ngay!
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 border-r border-gray-300 text-center">
+                                <span id="status-badge-@v.VoucherId"
+                                      class="inline-block whitespace-nowrap px-2 py-1 rounded text-[10px] font-bold uppercase border transition-colors @(v.IsActive ? "bg-emerald-100 text-emerald-700 border-emerald-300" : "bg-gray-100 text-gray-500 border-gray-300 text-black")">
+                                    @(v.IsActive ? "Hoạt động" : "Dừng")
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="/Admin/VouchersAdmin/Edit/@v.VoucherId" 
+                                       class="p-1 px-2 text-amber-700 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded text-[10px] font-bold uppercase transition-colors no-underline">
+                                        Sửa
+                                    </a>
+                                    <button class="p-1 px-2 text-blue-700 bg-blue-100 hover:bg-blue-200 border border-blue-300 rounded text-[10px] font-bold uppercase transition-colors"
+                                            onclick="toggleVoucher(@v.VoucherId)">
+                                        @(v.IsActive ? "Tắt" : "Bật")
+                                    </button>
+                                    @if (v.UsedCount == 0)
+                                    {
+                                        <form method="post" action="/Admin/VouchersAdmin/Delete/@v.VoucherId"
+                                              onsubmit="return confirm('Xác nhận xoá voucher [@v.Code]?')">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="p-1 px-2 text-red-700 bg-red-100 hover:bg-red-200 border border-red-300 rounded text-[10px] font-bold uppercase transition-colors">
+                                                Xoá
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="9" class="px-4 py-12 text-center text-gray-500">
+                                <span class="material-symbols-outlined text-4xl mb-2 text-gray-300">confirmation_number</span>
+                                <p>Chưa có voucher nào được tạo. Tạo voucher đầu tiên ngay!</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         async function toggleVoucher(id) {
             const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
-            const res = await fetch(`/VouchersAdmin/Toggle/${id}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `__RequestVerificationToken=${encodeURIComponent(token)}`
-            });
-            const data = await res.json();
-            if (data.success) {
-                const badge = document.getElementById('status-badge-' + id);
-                badge.textContent = data.isActive ? 'Hoạt động' : 'Dừng';
-                badge.className = 'badge ' + (data.isActive ? 'bg-success' : 'bg-secondary');
-                showToast(data.message, 'success');
-            } else {
-                showToast(data.message, 'danger');
+            try {
+                const res = await fetch(`/Admin/VouchersAdmin/Toggle/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `__RequestVerificationToken=${encodeURIComponent(token)}`
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const badge = document.getElementById('status-badge-' + id);
+                    badge.textContent = data.isActive ? 'Hoạt động' : 'Dừng';
+                    if (data.isActive) {
+                        badge.className = 'inline-block whitespace-nowrap px-2 py-1 rounded text-[10px] font-bold uppercase border transition-colors bg-emerald-100 text-emerald-700 border-emerald-300';
+                    } else {
+                        badge.className = 'inline-block whitespace-nowrap px-2 py-1 rounded text-[10px] font-bold uppercase border transition-colors bg-gray-100 text-gray-500 border-gray-300 text-black';
+                    }
+                    showToast(data.message, 'success');
+                } else {
+                    showToast(data.message, 'danger');
+                }
+            } catch (err) {
+                showToast('Có lỗi xảy ra khi cập nhật trạng thái.', 'danger');
             }
         }
 
         function showToast(msg, type) {
             const div = document.createElement('div');
-            div.className = `alert alert-${type} position-fixed bottom-0 end-0 m-3 shadow`;
+            div.className = `alert alert-${type} border-0 shadow-lg rounded-xl position-fixed bottom-0 end-0 m-3`;
             div.style.zIndex = 9999;
             div.style.minWidth = '260px';
-            div.innerHTML = msg;
+            div.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined">${type === 'success' ? 'check_circle' : 'error'}</span>
+                    <span class="text-sm font-medium">${msg}</span>
+                </div>
+            `;
             document.body.appendChild(div);
-            setTimeout(() => div.remove(), 3000);
+            setTimeout(() => {
+                div.style.transition = 'opacity 0.5s ease';
+                div.style.opacity = '0';
+                setTimeout(() => div.remove(), 500);
+            }, 3000);
         }
+
+        // Tìm kiếm voucher
+        $('#searchInput').on('keyup', function() {
+            var value = $(this).val().toLowerCase();
+            $('.voucher-row').filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+        // Tự động ẩn thông báo sau 5 giây
+        setTimeout(function() {
+            $('.alert:not(.position-fixed)').fadeOut('slow');
+        }, 5000);
     </script>
 }
