@@ -1,0 +1,176 @@
+@model WEBBANDIENTHOAI.Models.ProductOption
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Thêm mới Cấu hình";
+}
+
+<div class="max-w-3xl mx-auto p-4 md:p-6 lg:p-8">
+    <div class="mb-6 flex items-center gap-3">
+        <a href="@Url.Action("Index")" class="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-2xl font-bold text-gray-900">Thêm mới Cấu hình</h1>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <form asp-action="Create" method="post" class="p-6 md:p-8 space-y-6">
+            @Html.AntiForgeryToken()
+            
+            <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm mb-4"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label asp-for="ProductId" class="block text-sm font-semibold text-gray-700 mb-2">Sản phẩm <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <select asp-for="ProductId" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all appearance-none" asp-items="ViewBag.ProductId">
+                            <option value="">-- Chọn sản phẩm --</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">expand_more</span>
+                    </div>
+                    <span asp-validation-for="ProductId" class="text-xs text-red-500 mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="GroupName" class="block text-sm font-semibold text-gray-700 mb-2">Nhóm tùy chọn <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <select asp-for="GroupName" id="GroupNameSelect" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all appearance-none" required>
+                            <option value="">-- Chọn nhóm tùy chọn --</option>
+                            <option value="Màu sắc">Màu sắc</option>
+                            <option value="RAM">RAM</option>
+                            <option value="Bộ nhớ trong">Bộ nhớ trong</option>
+                            <option value="Tùy chọn khác">Tùy chọn khác</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">expand_more</span>
+                    </div>
+                    <span asp-validation-for="GroupName" class="text-xs text-red-500 mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="OptionName" class="block text-sm font-semibold text-gray-700 mb-2">Tên tùy chọn <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input asp-for="OptionName" id="OptionNameInput" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium" placeholder="VD: Titan Xanh, 8, 256..." />
+                        <span id="OptionNameSuffix" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium hidden">GB</span>
+                    </div>
+                    <span asp-validation-for="OptionName" id="OptionNameError" class="text-xs text-red-500 mt-1 block"></span>
+                    <p id="OptionNameHint" class="text-xs text-gray-500 mt-1">VD: Titan Xanh, 8GB, 256GB...</p>
+                </div>
+
+                <div>
+                    <label asp-for="AdditionalPrice" class="block text-sm font-semibold text-gray-700 mb-2">Giá phụ thêm (VNĐ)</label>
+                    <div class="relative">
+                        <input asp-for="AdditionalPrice" type="number" step="1000" class="w-full pl-4 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-mono" placeholder="0" />
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">đ</span>
+                    </div>
+                    <span asp-validation-for="AdditionalPrice" class="text-xs text-red-500 mt-1 block"></span>
+                    <p class="text-xs text-gray-500 mt-1">Cộng thêm hoặc trừ bớt so với giá gốc (có thể nhập số âm).</p>
+                </div>
+
+                <div>
+                    <label asp-for="DisplayOrder" class="block text-sm font-semibold text-gray-700 mb-2">Thứ tự hiển thị</label>
+                    <input asp-for="DisplayOrder" type="number" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all" placeholder="1" />
+                    <span asp-validation-for="DisplayOrder" class="text-xs text-red-500 mt-1 block"></span>
+                </div>
+
+                <div class="md:col-span-2 flex justify-between items-center py-4 border-t border-b border-gray-100">
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-900">Trạng thái</h4>
+                        <p class="text-xs text-gray-500">Cho phép hiển thị tùy chọn này cho người dùng</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" asp-for="IsActive" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        <span class="ml-3 text-sm font-semibold text-gray-700 peer-checked:text-emerald-600">Hiệu lực</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="pt-4 flex justify-end gap-3">
+                <a href="@Url.Action("Index")" class="px-6 py-3 text-sm font-bold tracking-wide text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+                    Hủy bỏ
+                </a>
+                <button type="submit" class="px-6 py-3 text-sm font-bold tracking-wide text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-lg shadow-emerald-200 transition-all">
+                    Lưu Cấu hình
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const groupSelect = document.getElementById('GroupNameSelect');
+            const optionInput = document.getElementById('OptionNameInput');
+            const optionSuffix = document.getElementById('OptionNameSuffix');
+            const optionHint = document.getElementById('OptionNameHint');
+            const optionError = document.getElementById('OptionNameError');
+            const form = optionInput.closest('form');
+
+            function handleGroupChange() {
+                const group = groupSelect.value;
+                optionInput.value = ''; // Reset khi đổi nhóm
+                optionError.textContent = '';
+                
+                if (group === 'RAM' || group === 'Bộ nhớ trong') {
+                    // Chế độ nhập số
+                    optionInput.type = 'number';
+                    optionInput.placeholder = 'Ví dụ: 8, 16, 128, 256...';
+                    optionSuffix.classList.remove('hidden');
+                    optionHint.textContent = 'Chỉ nhập số. Hệ thống sẽ tự động thêm chữ "GB" khi lưu.';
+                    optionInput.classList.add('pr-12'); // Dành chỗ cho chữ GB
+                } else {
+                    // Chế độ nhập chữ + số cho Màu sắc hoặc Khác
+                    optionInput.type = 'text';
+                    optionInput.placeholder = 'Ví dụ: Titan Xanh, Đen, Bạc...';
+                    optionSuffix.classList.add('hidden');
+                    optionHint.textContent = 'Có thể nhập chữ và số.';
+                    optionInput.classList.remove('pr-12');
+                }
+            }
+
+            groupSelect.addEventListener('change', handleGroupChange);
+
+            // Bắt sự kiện submit form để tự động gắn thêm chữ GB nếu là cấu hình lưu trữ
+            form.addEventListener('submit', function(e) {
+                const group = groupSelect.value;
+                const optVal = optionInput.value.trim();
+
+                if (!optVal) {
+                    optionError.textContent = 'Vui lòng nhập tên tùy chọn';
+                    e.preventDefault();
+                    return;
+                }
+
+                if (group === 'RAM' || group === 'Bộ nhớ trong') {
+                    // Kiểm tra xem người dùng có cố tình nhập sai không (VD: chữ cái)
+                    if (isNaN(optVal)) {
+                        optionError.textContent = 'RAM và Bộ nhớ trong chỉ được nhập số nguyên!';
+                        e.preventDefault();
+                        return;
+                    }
+
+                    // Tự động append GB
+                    if (!optVal.toUpperCase().endsWith('GB') && !optVal.toUpperCase().endsWith('TB')) {
+                       optionInput.type = 'text'; // Chuyển lại type text để có thể submit string
+                       optionInput.value = optVal + 'GB';
+                    }
+                }
+            });
+
+            // Gọi lần đầu để setup UI ban đầu nếu cần (trường hợp load lại form do lỗi)
+            if(groupSelect.value) {
+                // Tạm thời nếu view model trả về value cũ thì cần xử lý để cắt cái 'GB' đi
+                const oldVal = optionInput.value;
+                handleGroupChange();
+                
+                if ((groupSelect.value === 'RAM' || groupSelect.value === 'Bộ nhớ trong') && oldVal.toUpperCase().endsWith('GB')) {
+                    optionInput.value = oldVal.substring(0, oldVal.length - 2).trim();
+                } else {
+                    optionInput.value = oldVal;
+                }
+            }
+        });
+    </script>
+}
